@@ -55,7 +55,7 @@ bool Mesh::intersection(const Ray& ray, IntersectionData &inter) const
     {
         inter.dist   = phitDist;
         inter.normal = triangles[phitTriangle].normal;
-        inter.object = &triangles[phitTriangle];
+        inter.object = this;
         return true;
     }
     else

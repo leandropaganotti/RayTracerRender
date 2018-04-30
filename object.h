@@ -19,12 +19,13 @@ struct IntersectionData
 class Object
 {   
 public:
-    Object(const Vector3f& color={}): c_diffuse{color}
+    Object()
     {
+        c_diffuse = {1.0f};
+        c_specular = {1.0f};
         k_ambient = 0.05f;
         k_diffuse = 1.0f;
         k_specular = 0.5f;
-        c_specular = {1.0f};
         shininess = 30.0f;
     }
 

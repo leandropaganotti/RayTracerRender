@@ -18,7 +18,7 @@ public:
 
 #endif // SPHERE_H
 
-// analytic solution
+//       analytic solution
 //       Vec3f L = orig - center;
 //       float a = dotProduct(dir, dir);
 //       float b = 2 * dotProduct(dir, L);
@@ -28,5 +28,4 @@ public:
 //       if (t0 < 0) t0 = t1;
 //       if (t0 < 0) return false;
 //       tnear = t0;
-
 //       return true;

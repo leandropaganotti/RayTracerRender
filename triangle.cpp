@@ -1,8 +1,8 @@
 #include "triangle.h"
 #include <vertex.h>
 
-Triangle::Triangle(size_t v0, size_t v1, size_t v2, const Vector3f &n, const Vector3f &color):
-    Object(color), v{v0, v1, v2}, normal(n)
+Triangle::Triangle(size_t v0, size_t v1, size_t v2, const Vector3f &n):
+    v{v0, v1, v2}, normal(n)
 {
     size_t vbs = vertexBuffer.size();
     if(v0 >= vbs || v1 >= vbs || v2 >= vbs)
@@ -10,35 +10,6 @@ Triangle::Triangle(size_t v0, size_t v1, size_t v2, const Vector3f &n, const Vec
 
     area = ((vertexBuffer[v1]-vertexBuffer[v0]) % (vertexBuffer[v2]-vertexBuffer[v0])).length() / 2.0f;
 }
-
-inline
-bool Triangle::intersection(const Ray &ray, IntersectionData &inter) const
-{
-    if (Plane::intersection(vertexBuffer[v[0]], normal, ray, inter.dist))
-    {
-        inter.phit = ray.origin + inter.dist * ray.direction;
-
-        if (isInside2(inter.phit))
-        {
-            inter.normal = normal;
-            inter.object = this;
-            return true;
-        }
-    }
-    return false;
-}
-
-inline
-bool Triangle::intersection(const Ray &ray, float &dist) const
-{
-    if (Plane::intersection(vertexBuffer[v[0]], normal, ray, dist))
-    {
-        Vector3f phit = ray.origin + dist * ray.direction;
-        return isInside2(phit);
-    }
-    return false;
-}
-
 
 bool Triangle::intersection(const Ray &ray, Vector3f &phit, float & dist) const
 {

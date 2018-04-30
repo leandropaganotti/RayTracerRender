@@ -1,9 +1,9 @@
 #include "plane.h"
 
 Plane::Plane(const Vector3f &P, const Vector3f &n, const Vector3f& color):
-    Object(color), P(P), normal(n)
+    P(P), normal(n)
 {
-
+    c_diffuse = color;
 }
 
 inline

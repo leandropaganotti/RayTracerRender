@@ -2,9 +2,9 @@
 
 
 Sphere::Sphere(const Vector3f &center, const float &radius, const Vector3f &color) :
-    Object(color),
     center(center), radius(radius), radius2(radius * radius)
 {
+    c_diffuse = color;
 }
 
 bool Sphere::intersection(const Ray &ray, IntersectionData &inter) const
@@ -43,8 +43,7 @@ bool Sphere::intersection(const Ray &ray, float &dist) const
     float t0 = tca - thc;
     float t1 = tca + thc;
 
-    if (t0 < 0) t0 = t1;
+    dist = t0 < 0 ? t1 : t0;
 
-    dist = (t0 * ray.direction).length();
     return true;
 }

@@ -2,6 +2,7 @@
 
 Cube::Cube(const Vector3f &color)
 {
+    c_diffuse = color;
 
     add({0,0,0}); //0
     add({1,0,0}); //1
@@ -13,27 +14,27 @@ Cube::Cube(const Vector3f &color)
     add({1,1,-1});//7
 
     //bottom
-    add(Triangle(0, 1, 3, {0,-1,0}, color));
-    add(Triangle(0, 2, 3, {0,-1,0}, color));
+    add(Triangle(0, 1, 3, {0,-1,0}));
+    add(Triangle(0, 2, 3, {0,-1,0}));
 
     //top
-    add(Triangle(4, 5, 7, {0,1,0}, color));
-    add(Triangle(4, 6, 7, {0,1,0}, color));
+    add(Triangle(4, 5, 7, {0,1,0}));
+    add(Triangle(4, 6, 7, {0,1,0}));
 
     //front
-    add(Triangle(0, 4, 5, {0,0,1}, color));
-    add(Triangle(0, 1, 5, {0,0,1}, color));
+    add(Triangle(0, 4, 5, {0,0,1}));
+    add(Triangle(0, 1, 5, {0,0,1}));
 
     //back
-    add(Triangle(2, 3, 7, {0,0,-1}, color));
-    add(Triangle(2, 6, 7, {0,0,-1}, color));
+    add(Triangle(2, 3, 7, {0,0,-1}));
+    add(Triangle(2, 6, 7, {0,0,-1}));
 
     //right
-    add(Triangle(1, 3, 7, {1,0,0}, color));
-    add(Triangle(1, 5, 7, {1,0,0}, color));
+    add(Triangle(1, 3, 7, {1,0,0}));
+    add(Triangle(1, 5, 7, {1,0,0}));
 
     //left
-    add(Triangle(0, 2, 6, {-1,0,0}, color));
-    add(Triangle(0, 4, 6, {-1,0,0}, color));
+    add(Triangle(0, 2, 6, {-1,0,0}));
+    add(Triangle(0, 4, 6, {-1,0,0}));
 }
 
