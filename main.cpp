@@ -5,16 +5,17 @@
 #include "sphere.h"
 #include "utils.h"
 
+#include <thread>
+
 using namespace std;
 
 int main()
 {
-    Scene scene;
 
+    Scene scene;
     scene.backgroundColor = {0.0f};
 
-    scene.objects.push_back(new Plane());
-    scene.objects.push_back(new Plane({0,0,-20}, {0,0,1}));
+    scene.objects.push_back(new Plane({0,-0.5,0}, {0,1,0}));
 
     scene.objects.push_back(new Sphere({2.5,0.5, -0.5}, 0.5, {1,0,0}));
     scene.objects.push_back(new Sphere({2.5,0.5, -2.5}, 0.5, {0,1,0}));
@@ -41,27 +42,37 @@ int main()
 
     cout << vertexBuffer << endl <<  *cube << endl;
 
-    double t1, t2;
+    double t1, t2, avg=0;
     char buf[256];
     int n=36, i=0;
 
-    float a=0;
+    float a=360.0/n;
 
-    for (i=0; i < n; ++i)
+    Camera camera;
+    Vector3f origin = {0, 0, 10};
+
+    cout <<  Ry(deg2rad( a )) ;
+
+    for (i=0; i <= n; ++i)
     {
-        Camera camera;
-        cout << i << " " <<  a << " ";
+        // new camera position
+        camera.cameraToWorld =  Ry(deg2rad( i*a )) ;
+        camera.origin = camera.cameraToWorld * origin;
+
         t1 =ms_time();
-        camera.cameraToWorld = T({1.5, 1.5, -3}) * Ry(deg2rad( a )) * T({-1.5, -1.5, 3}) * T({1.5, 1.5, 6}) ;
-        //camera.cameraToWorld = T({1.5, 1.5, 5}) ;
-        camera.render1(scene );
+        camera.render(scene, 1, 4);
+
         t2 =ms_time();
+
+        cout << i << " " <<  i*a << " " << camera.origin;
+        avg += t2-t1;
+        cout << " time in ms: " << t2-t1 << endl;
+
         sprintf(buf, "%04d.ppm", i);
         camera.frame().save_ppm_bin(buf);
-        a = a + (360.0/n);
-        cout << "time in ms: " << t2-t1 << endl;
     }
-
+    avg /=n;
+    cout << "avg time in ms: " << avg << endl;
     return 0;
 }
 

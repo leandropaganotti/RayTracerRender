@@ -8,8 +8,7 @@
 class Mesh: public Object
 {
 
-    std::vector<size_t> vertices;
-    std::vector<Triangle> triangles;
+
 
 public:
     Mesh();
@@ -26,6 +25,9 @@ public:
     bool  intersection(const Ray& ray, float& dist) const;
 
     friend std::ostream& operator << (std::ostream& os, const Mesh& m);
+
+    std::vector<size_t> vertices;
+    std::vector<Triangle> triangles;
 };
 
 #endif // MESH_H

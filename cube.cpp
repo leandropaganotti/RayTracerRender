@@ -36,5 +36,10 @@ Cube::Cube(const Vector3f &color)
     //left
     add(Triangle(0, 2, 6, {-1,0,0}));
     add(Triangle(0, 4, 6, {-1,0,0}));
+
+    for (size_t i=0; i < vertices.size(); ++i)
+    {
+        vertexBuffer[vertices[i]] += Vector3f(-0.5, -0.5, 0.5);
+    }
 }
 

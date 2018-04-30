@@ -10,7 +10,6 @@
 
 class Camera
 {
-    Vector3f origin;
     float fov;
 
     Image m_frame;
@@ -24,14 +23,17 @@ class Camera
     Vector3f rayDirection(size_t i, size_t j);
 
 public:
+    Vector3f origin;
 
     Camera();
 
     ~Camera();
 
     void resolution(size_t w, size_t h);
-    Image& render4(const Scene &scene);
-    Image& render1(const Scene &scene);
+
+    void render(const Scene &scene, uint8_t nrays=1, uint8_t nthreads=1);
+    void render1(const Scene &scene, size_t start, size_t end);
+    void render4(const Scene &scene, size_t start, size_t end);
 
     friend std::ostream& operator << (std::ostream& os, const Camera& cam);
 
@@ -41,6 +43,7 @@ public:
     {
         return m_frame;
     }
+
 
 };
 
