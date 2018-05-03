@@ -28,6 +28,8 @@ public:
     size_t width;
     size_t height;
     Vector3f **buffer;
+
+    void move(Image &image);
 };
 
 #endif // IMAGE_H

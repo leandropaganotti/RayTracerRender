@@ -17,7 +17,7 @@ Vector3f RayCaster::cast(const Ray &ray, const Scene &scene)
     {
         float attenuation, gamma=1.0/2.2, bias = 0.0001;
 
-        Vector3f phitColor(0), diffuseColor(0), specularColor(0);
+        Vector3f phitColor(0);
 
         //ambient color
         phitColor = inter.object->c_diffuse * inter.object->k_ambient;
@@ -26,6 +26,8 @@ Vector3f RayCaster::cast(const Ray &ray, const Scene &scene)
         {
             Vector3f toLight = scene.lights[i].origin - inter.phit;
             float distToLight = toLight.length();
+
+            Vector3f diffuseColor(0), specularColor(0);
 
             toLight.normalize();
 
@@ -48,7 +50,7 @@ Vector3f RayCaster::cast(const Ray &ray, const Scene &scene)
 
                 //attenuation
                 attenuation = 1.0f / ( 1.0f + scene.lights[i].attenuation * distToLight * distToLight);
-                phitColor += attenuation * ( diffuseColor + specularColor );
+                phitColor += attenuation * (diffuseColor + specularColor);
             }
         }
 

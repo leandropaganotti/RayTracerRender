@@ -69,6 +69,19 @@ void Image::save_ppm_bin(const char *filename) const
     (void) fclose(fp);
 }
 
+void Image::move(Image &image)
+{
+    destroy();
+    width  = image.width;
+    height = image.height;
+    buffer = image.buffer;
+
+    image.buffer = nullptr;
+    image.width = 0;
+    image.height = 0;
+
+}
+
 std::ostream& operator <<(std::ostream &os, Image &img)
 {
     for( size_t i=0 ; i < img.height ; ++i )

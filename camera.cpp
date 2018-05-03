@@ -5,13 +5,10 @@
 
 void thread_worker(Camera *camera, const Scene *scene, size_t start, size_t end, size_t nrays)
 {
-    if (nrays == 4)
-        camera->render4(*scene, start, end);
-    else
-        camera->render1(*scene, start, end);
+    camera->render1(*scene, start, end);
 }
 
-Camera::Camera(): origin(0), fov(40), width(150), height(150)
+Camera::Camera(): origin(0), fov(40), width(640), height(480)
 {
     m_frame.resize(width, height);
     aspectRatio = (float)width / (float)height;
@@ -28,37 +25,6 @@ void Camera::resolution(size_t w, size_t h)
     aspectRatio = (float)width / (float)height;
 }
 
-void Camera::render4(const Scene &scene, size_t start, size_t end)
-{
-//    Ray ray;
-//    width *= 2;
-//    height*= 2;
-//    size_t m=0, n=0;
-//    ray.origin = origin;
-//    for (size_t i = start; i < end; i=i+2)
-//    {
-//        n=0;
-//        for (size_t j = 0; j < width; j=j+2)
-//        {
-//            ray.direction = cameraToWorld * rayDirection(i, j);
-//            m_frame.at(m, n)  = rayCaster.cast(ray, scene);
-
-//            ray.direction = cameraToWorld * rayDirection(i, j+1);
-//            m_frame.at(m, n) += rayCaster.cast(ray, scene);
-
-//            ray.direction = cameraToWorld * rayDirection(i+1, j);
-//            m_frame.at(m, n) += rayCaster.cast(ray, scene);
-
-//            ray.direction = cameraToWorld * rayDirection(i+1, j+1);
-//            m_frame.at(m, n) += rayCaster.cast(ray, scene);
-
-//            m_frame.at(m, n) = m_frame.at(m, n) / 4.0f;
-//            ++n;
-//        }
-//        ++m;
-//    }
-}
-
 void Camera::render1(const Scene &scene, size_t start, size_t end)
 {
     Ray ray;
@@ -68,7 +34,6 @@ void Camera::render1(const Scene &scene, size_t start, size_t end)
         for (size_t j = 0; j < width; ++j)
         {
             ray.direction = cameraToWorld * rayDirection(i, j);
-
             m_frame.at(i, j) = rayCaster.cast(ray, scene);
         }
     }
@@ -78,6 +43,11 @@ void Camera::render(const Scene &scene, uint8_t nrays, uint8_t nthreads)
 {
     if (nthreads ==0 || nthreads > 4)
         throw std::invalid_argument("# of threads must be 1, 2, 3 or 4");
+
+    if (nrays > 1)
+    {
+        resolution(width * nrays, height * nrays);
+    }
 
     std::vector<std::thread> threads;
 
@@ -90,7 +60,33 @@ void Camera::render(const Scene &scene, uint8_t nrays, uint8_t nthreads)
 
     threads.push_back( std::thread( thread_worker, this, &scene, i*nrows, height, nrays ) );
 
-    for (auto& th : threads) th.join();
+    for (auto& t : threads) t.join();
+
+    if( nrays > 1)
+    {
+        Image frame;
+        frame.resize(width / nrays, height / nrays);
+
+        for (size_t i = 0; i < frame.height; ++i)
+        {
+            for (size_t j = 0; j < frame.width; ++j)
+            {
+                frame.at(i, j) = 0;
+                for (size_t k = i*nrays; k < i*nrays + nrays; ++k)
+                {
+                    for (size_t l = j*nrays; l < j*nrays + nrays; ++l)
+                    {
+                        frame.at(i, j) += m_frame.at(k, l);
+                    }
+                }
+                frame.at(i, j) /= nrays*nrays;
+            }
+        }
+        m_frame.move(frame);
+        width = m_frame.width;
+        height = m_frame.height;
+        aspectRatio = (float)width / (float)height;
+    }
 }
 
 std::ostream &operator <<(std::ostream &os, const Camera &cam)
