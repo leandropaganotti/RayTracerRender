@@ -14,7 +14,7 @@ public:
 
     void cast(const Ray& ray, const ObjectVector& objects, IntersectionData& inter);
 
-    bool cast(const Ray& ray, const ObjectVector& objects, const float distToLight);
+    bool cast(const Ray& ray, const ObjectVector& objects, float distToLight);
 
 };
 

@@ -15,7 +15,7 @@ int main()
     Scene scene;
     scene.backgroundColor = {0.0f};
 
-    scene.objects.push_back(new Plane({0,-0.5,0}, {0,1,0}));
+    scene.objects.push_back(new Plane({0,0,0}, {0,1,0}));
 
     scene.objects.push_back(new Sphere({2.5,0.5, -0.5}, 0.5, {1,0,0}));
     scene.objects.push_back(new Sphere({2.5,0.5, -2.5}, 0.5, {0,1,0}));
@@ -24,20 +24,18 @@ int main()
     Cube *cube = new Cube({1,1,0});
     scene.objects.push_back(cube);
 
-    Light light1;
-    light1.color       = {1.0f};
-    light1.origin      = Vector3f(2, 2 , 2);
-    light1.strength    = 1.0f;
-    light1.attenuation = 0.05f;
 
-    Light light2;
-    light2.color       = {1.0f};
-    light2.origin      = Vector3f(2, 2 , -2);
-    light2.strength    = 1.0f;
-    light2.attenuation = 1.5f;
+//    Light light2;
+//    light2.color       = {1.0f};
+//    light2.origin      = Vector3f(2, 2 , -2);
+//    light2.strength    = 1.0f;
+//    light2.attenuation = 1.5f;
 
 
-    scene.lights.push_back(light1);
+    scene.lights.push_back(new PointLight(Vector3f(0,1,1)));
+
+    //scene.lights.push_back(new DistantLight(-Vector3f(1,1,-1).normalize(), {1}, 0.03));
+
     //scene.lights.push_back(light2);
 
     cout << vertexBuffer << endl <<  *cube << endl;
@@ -49,9 +47,7 @@ int main()
     float a=360.0/n;
 
     Camera camera;
-    Vector3f origin = {0, 0, 10};
-
-    cout <<  Ry(deg2rad( a )) ;
+    Vector3f origin = {0, 2, 10};
 
     for (i=0; i <= n; ++i)
     {
@@ -73,6 +69,7 @@ int main()
     }
     avg /=n;
     cout << "avg time in ms: " << avg << endl;
+
     return 0;
 }
 

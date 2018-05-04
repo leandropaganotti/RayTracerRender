@@ -15,7 +15,7 @@ Vector3f RayCaster::cast(const Ray &ray, const Scene &scene)
 
     if (inter.object)
     {
-        float attenuation, gamma=1.0/2.2, bias = 0.0001;
+        float bias = 0.0001;
 
         Vector3f phitColor(0);
 
@@ -24,12 +24,9 @@ Vector3f RayCaster::cast(const Ray &ray, const Scene &scene)
 
         for(size_t i = 0; i < scene.lights.size(); ++i)
         {
-            Vector3f toLight = scene.lights[i].origin - inter.phit;
-            float distToLight = toLight.length();
+            Vector3f toLight = -scene.lights[i]->direction(inter.phit);
 
-            Vector3f diffuseColor(0), specularColor(0);
-
-            toLight.normalize();
+            float distToLight = scene.lights[i]->distance(inter.phit);
 
             bool inShadow = cast(Ray(inter.phit + bias * inter.normal, toLight), scene.objects, distToLight);
 
@@ -37,27 +34,26 @@ Vector3f RayCaster::cast(const Ray &ray, const Scene &scene)
             {
                 //diffuse NdotL
                 float NdotL = std::max(0.0f, inter.normal ^ toLight);
-                diffuseColor = scene.lights[i].strength * scene.lights[i].color * inter.object->c_diffuse * inter.object->k_diffuse * NdotL;
+                phitColor += scene.lights[i]->intensity(inter.phit) * inter.object->c_diffuse * inter.object->k_diffuse * NdotL;
 
                 //specular
                 if( NdotL > 0.0f )
                 {
                     //specular color
                     Vector3f toOrigin = (ray.origin - inter.phit).normalize();
-                    Vector3f reflection = (2.0f * ((inter.normal ^ toLight) * inter.normal) - toLight).normalize();
-                    specularColor = scene.lights[i].strength * scene.lights[i].color * inter.object->c_specular * inter.object->k_specular * pow(std::max(0.0f, toOrigin ^ reflection), inter.object->shininess);
+                    Vector3f reflection = (2.0f * ((inter.normal ^ toLight) * inter.normal) - toLight);
+                    phitColor += scene.lights[i]->intensity(inter.phit) *
+                            inter.object->c_specular * inter.object->k_specular *
+                            pow(std::max(0.0f, toOrigin ^ reflection), inter.object->shininess);
                 }
-
-                //attenuation
-                attenuation = 1.0f / ( 1.0f + scene.lights[i].attenuation * distToLight * distToLight);
-                phitColor += attenuation * (diffuseColor + specularColor);
             }
         }
 
         //gamma
-        phitColor.r = pow(phitColor.r, gamma);
-        phitColor.g = pow(phitColor.g, gamma);
-        phitColor.b = pow(phitColor.b, gamma);
+        float gamma=1.0/2.2;
+        phitColor[0] = pow(phitColor[0], gamma);
+        phitColor[1] = pow(phitColor[1], gamma);
+        phitColor[2] = pow(phitColor[2], gamma);
 
         return phitColor;
     }
@@ -86,7 +82,7 @@ void RayCaster::cast(const Ray &ray, const ObjectVector &objects, IntersectionDa
 
 }
 
-bool RayCaster::cast(const Ray &ray, const ObjectVector &objects, const float distToLight)
+bool RayCaster::cast(const Ray &ray, const ObjectVector &objects, float distToLight)
 {
     float dist;
     for (size_t k = 0; k < objects.size(); ++k)
