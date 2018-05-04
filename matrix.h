@@ -43,8 +43,10 @@ struct Matrix4x4
 
     friend std::ostream& operator << (std::ostream &os, Matrix4x4 m)
     {
-        for (size_t i=0; i < 4; ++i)
+        size_t i;
+        for ( i=0; i < 3; ++i)
             os << "[" << m.mat[i][0] << " " << m.mat[i][1]<< " " << m.mat[i][2] << " " << m.mat[i][3] << "] " << std::endl;
+        os << "[" << m.mat[i][0] << " " << m.mat[i][1]<< " " << m.mat[i][2] << " " << m.mat[i][3] << "] ";
         return os;
     }
 

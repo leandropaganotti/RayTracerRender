@@ -20,31 +20,25 @@ Vector3f RayCaster::cast(const Ray &ray, const Scene &scene)
         Vector3f phitColor(0);
 
         //ambient color
-        phitColor = inter.object->c_diffuse * inter.object->k_ambient;
+        phitColor = inter.object->ambient();
 
-        for(size_t i = 0; i < scene.lights.size(); ++i)
+        for (Light *light : scene.lights)
         {
-            Vector3f toLight = -scene.lights[i]->direction(inter.phit);
+            Vector3f toLight = light->direction(inter.phit);
 
-            float distToLight = scene.lights[i]->distance(inter.phit);
-
-            bool inShadow = cast(Ray(inter.phit + bias * inter.normal, toLight), scene.objects, distToLight);
-
-            if (!inShadow)
+            if (!castShadowRay(Ray(inter.phit + bias * inter.normal, toLight), scene.objects, light->distance(inter.phit)))
             {
                 //diffuse NdotL
                 float NdotL = std::max(0.0f, inter.normal ^ toLight);
-                phitColor += scene.lights[i]->intensity(inter.phit) * inter.object->c_diffuse * inter.object->k_diffuse * NdotL;
+                phitColor += light->intensity(inter.phit) * inter.object->diffColor() * NdotL;
 
                 //specular
                 if( NdotL > 0.0f )
                 {
                     //specular color
-                    Vector3f toOrigin = (ray.origin - inter.phit).normalize();
+                    Vector3f toCamera = (ray.origin - inter.phit).normalize();
                     Vector3f reflection = (2.0f * ((inter.normal ^ toLight) * inter.normal) - toLight);
-                    phitColor += scene.lights[i]->intensity(inter.phit) *
-                            inter.object->c_specular * inter.object->k_specular *
-                            pow(std::max(0.0f, toOrigin ^ reflection), inter.object->shininess);
+                    phitColor += light->intensity(inter.phit) * inter.object->specColor() * pow(std::max(0.0f, toCamera ^ reflection), inter.object->shininess);
                 }
             }
         }
@@ -82,7 +76,7 @@ void RayCaster::cast(const Ray &ray, const ObjectVector &objects, IntersectionDa
 
 }
 
-bool RayCaster::cast(const Ray &ray, const ObjectVector &objects, float distToLight)
+bool RayCaster::castShadowRay(const Ray &ray, const ObjectVector &objects, float distToLight)
 {
     float dist;
     for (size_t k = 0; k < objects.size(); ++k)

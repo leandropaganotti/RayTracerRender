@@ -12,10 +12,7 @@ SOURCES += main.cpp \
     cube.cpp \
     camera.cpp \
     scene.cpp \
-    light.cpp \
     image.cpp \
-    utils.cpp \
-    ray.cpp \
     raycaster.cpp \
     sphere.cpp
 

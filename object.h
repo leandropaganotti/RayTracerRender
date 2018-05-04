@@ -44,6 +44,19 @@ public:
     float k_ambient;
 
     float shininess;
+
+    Vector3f diffColor() const
+    {
+        return k_diffuse * c_diffuse;
+    }
+    Vector3f specColor() const
+    {
+        return k_specular * c_specular;
+    }
+    Vector3f ambient() const
+    {
+        return k_ambient * c_diffuse;
+    }
 };
 
 #endif // OBJECT_H

@@ -32,7 +32,7 @@ int main()
 //    light2.attenuation = 1.5f;
 
 
-    scene.lights.push_back(new PointLight(Vector3f(0,1,1)));
+    scene.lights.push_back(new PointLight(Vector3f(0.5,2,-0.5)));
 
     //scene.lights.push_back(new DistantLight(-Vector3f(1,1,-1).normalize(), {1}, 0.03));
 
@@ -47,25 +47,27 @@ int main()
     float a=360.0/n;
 
     Camera camera;
-    Vector3f origin = {0, 2, 10};
+    Vector3f from(0, 5, 10);
+    Vector3f to(0,0,0);
 
     for (i=0; i <= n; ++i)
     {
         // new camera position
-        camera.cameraToWorld =  Ry(deg2rad( i*a )) ;
-        camera.origin = camera.cameraToWorld * origin;
+
+
+        camera.lookAt(Ry(deg2rad( i*a )) * from, to);
 
         t1 =ms_time();
         camera.render(scene, 1, 4);
 
         t2 =ms_time();
 
-        cout << i << " " <<  i*a << " " << camera.origin;
+        cout << i << " " <<  i*a << " " << camera.getPosition();
         avg += t2-t1;
-        cout << " time in ms: " << t2-t1 << endl;
+        cout << " time in ms: " << t2-t1 << endl << endl;
 
         sprintf(buf, "%04d.ppm", i);
-        camera.frame().save_ppm_bin(buf);
+        camera.getFrameBuffer().save_ppm_bin(buf);
     }
     avg /=n;
     cout << "avg time in ms: " << avg << endl;

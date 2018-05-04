@@ -26,6 +26,11 @@ struct Vector3
     Vector3(T x): x(x), y(x), z(x){}
     Vector3(T x, T y, T z): x(x), y(y), z(z){}
 
+    bool operator==(const Vector3f& rhs) const
+    {
+        return x==rhs.x && y==rhs.y && z==rhs.z;
+    }
+
     T dot(const Vector3& v) const
     {
         return x*v.x + y*v.y + z*v.z;
@@ -38,7 +43,7 @@ struct Vector3
     {
         return sqrtf(x*x + y*y + z*z);
     }
-    Vector3& normalize()
+    const Vector3& normalize()
     {
         float m = length(); x/=m; y/=m; z/=m; return *this;
     }

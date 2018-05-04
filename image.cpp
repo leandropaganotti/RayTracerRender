@@ -2,9 +2,9 @@
 #include <iostream>
 #include <fstream>
 
-Image::Image(): width(0), height(0), buffer(nullptr)
+Image::Image(size_t width, size_t height): _width(width), _height(height), _aspectRatio((float)width/height), buffer(nullptr)
 {
-
+    resize(width, height);
 }
 
 Image::~Image()
@@ -12,39 +12,15 @@ Image::~Image()
     destroy();
 }
 
-void Image::resize(uint16_t w, uint16_t h)
-{
-    destroy();
-    buffer = new_buffer(w, h);
-    width = w;
-    height = h;
-}
-
-void Image::destroy()
-{
-    if(buffer)
-    {
-        del_buffer(buffer, height);
-        buffer = nullptr;
-        width = height = 0;
-    }
-}
-
-inline
-Vector3f &Image::at(size_t i, size_t j)
-{
-    return buffer[i][j];
-}
-
 void Image::save_ppm(const char *filename) const
 {
     std::ofstream outfile (filename, std::ofstream::out);
 
     outfile << "P3\n";
-    outfile << width << " " << height << " " << "255\n";
-    for (uint16_t i=0; i < height; ++i)
+    outfile << _width << " " << _height << " " << "255\n";
+    for (uint16_t i=0; i < _height; ++i)
     {
-        for (uint16_t j=0; j < width; ++j)
+        for (uint16_t j=0; j < _width; ++j)
             outfile << (int)round(255 * buffer[i][j][0]) << " " << (int)round( 255 * buffer[i][j][1]) << " " << (int)round(255 * buffer[i][j][2]) << " ";
         outfile << "\n";
     }
@@ -54,10 +30,10 @@ void Image::save_ppm(const char *filename) const
 void Image::save_ppm_bin(const char *filename) const
 {
     FILE *fp = fopen(filename, "wb"); /* b - binary mode */
-    (void) fprintf(fp, "P6\n%lu %lu\n255\n", width, height);
-    for (size_t i = 0; i < height; ++i)
+    (void) fprintf(fp, "P6\n%lu %lu\n255\n", _width, _height);
+    for (size_t i = 0; i < _height; ++i)
     {
-        for (size_t j = 0; j < width; ++j)
+        for (size_t j = 0; j < _width; ++j)
         {
             static unsigned char color[3];
             color[0] = std::min((int)round(buffer[i][j][0] * 255), 255);  /* red */
@@ -72,40 +48,46 @@ void Image::save_ppm_bin(const char *filename) const
 void Image::move(Image &image)
 {
     destroy();
-    width  = image.width;
-    height = image.height;
+    _aspectRatio = image._aspectRatio;
+    _width  = image._width;
+    _height = image._height;
     buffer = image.buffer;
 
     image.buffer = nullptr;
-    image.width = 0;
-    image.height = 0;
+    image._width = 0;
+    image._height = 0;
 
 }
 
 std::ostream& operator <<(std::ostream &os, Image &img)
 {
-    for( size_t i=0 ; i < img.height ; ++i )
+    for( size_t i=0 ; i < img._height ; ++i )
     {
-        for( size_t j=0 ; j < img.width ; ++j )
+        for( size_t j=0 ; j < img._width ; ++j )
             os << img.at(i, j);
         os << std::endl;
     }
     return os;
 }
 
-Vector3f **Image::new_buffer(size_t w, size_t h)
+void Image::resize(size_t width, size_t height)
 {
-    Vector3f** img = new Vector3f *[w];
-    for(size_t i = 0; i < h; ++i)
-        img[i] = new Vector3f[w]{};
-
-    return img;
+    destroy();
+    if (width > 0 && height > 0)
+    {
+        buffer = new_array_2d<Vector3f>(width, height);
+        this->_width = width;
+        this->_height = height;
+        _aspectRatio = (float)width / (float)height;
+    }
 }
 
-void Image::del_buffer(Vector3f **img, size_t h)
+void Image::destroy()
 {
-    for(size_t i = 0; i <h; i++)
-        delete [] img[i];
-    delete [] img;
-    img=nullptr;
+    if(buffer)
+    {
+        del_array_2d<Vector3f>(buffer, _height);
+        buffer = nullptr;
+        _aspectRatio = _width = _height = 0;
+    }
 }

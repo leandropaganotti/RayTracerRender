@@ -36,7 +36,7 @@ public:
     }
     Vector3f direction(const Vector3f &point) const
     {
-        return (point - pos).normalize();
+        return (pos - point).normalize();
     }
     Vector3f intensity(const Vector3f &point) const
     {
@@ -61,7 +61,7 @@ public:
     DistantLight(const Vector3f &dir={0.0f, -1.0f, 0.0f}, const Vector3f &color={1.0f}, float strength=1.0f):
         dir(dir), color(color), strength(strength)
     {
-
+        this->dir.normalize();
     }
     Vector3f position() const
     {
