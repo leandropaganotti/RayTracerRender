@@ -10,7 +10,7 @@ typedef std::vector<Object*> ObjectVector;
 
 struct IntersectionData
 {
-    float dist;
+    float tNear;
     Vector3f normal;
     Vector3f phit;
     const Object * object;
@@ -30,7 +30,7 @@ public:
     }
 
     virtual bool intersection(const Ray& ray, IntersectionData &inter) const = 0;
-    virtual bool intersection(const Ray& ray, float &dist) const = 0;
+    virtual bool intersection(const Ray& ray, float &tNear) const = 0;
 
     virtual ~Object(){}
 

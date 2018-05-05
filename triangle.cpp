@@ -11,14 +11,60 @@ Triangle::Triangle(size_t v0, size_t v1, size_t v2, const Vector3f &n):
     area = ((vertexBuffer[v1]-vertexBuffer[v0]) % (vertexBuffer[v2]-vertexBuffer[v0])).length() / 2.0f;
 }
 
-bool Triangle::intersection(const Ray &ray, Vector3f &phit, float & dist) const
+bool Triangle::intersection(const Ray &ray, Vector3f &phit, float & tNear) const
 {
-    if (Plane::intersection(vertexBuffer[v[0]], normal, ray, dist))
+    if (Plane::intersection(vertexBuffer[v[0]], normal, ray, tNear))
     {
-        phit = ray.origin + dist * ray.direction;
+        phit = ray.origin + tNear * ray.direction;
         return isInside2(phit);
     }
     return false;
+}
+
+bool Triangle::intersection(const Ray &ray, float &tNear) const
+{
+    Vector3f &p0 = vertexBuffer[v[0]];
+    Vector3f &p1 = vertexBuffer[v[1]];
+    Vector3f &p2 = vertexBuffer[v[2]];
+
+    float A = p0.x - p1.x;
+    float B = p0.y - p1.y;
+    float C = p0.z - p1.z;
+
+    float D = p0.x - p2.x;
+    float E = p0.y - p2.y;
+    float F = p0.z - p2.z;
+
+    float G = ray.direction.x;
+    float H = ray.direction.y;
+    float I = ray.direction.z;
+
+    float J = p0.x - ray.origin.x;
+    float K = p0.y - ray.origin.y;
+    float L = p0.z - ray.origin.z;
+
+
+    float EIHF = E*I-H*F;
+    float GFDI = G*F-D*I;
+    float DHEG = D*H-E*G;
+
+    float denon = A*EIHF + B*GFDI + C*DHEG;
+
+    float beta = (J*EIHF + K*GFDI + L*DHEG) / denon;
+
+    if (beta <= 0.0f || beta >= 1.0f) return false;
+
+    float AKJB = A*K-J*B;
+    float JCAL = J*C-A*L;
+    float BLKC = B*L-K*C;
+
+    float gamma = (I*AKJB + H*JCAL + G*BLKC ) / denon;
+
+    if (gamma <= 0.0f || beta + gamma >= 1.0f) return false;
+
+    tNear = -(F*AKJB + E*JCAL + D*BLKC  ) / denon;
+
+    return tNear > 0.0f ? true : false;
 }
 
 std::ostream &operator <<(std::ostream &os, const Triangle &t)

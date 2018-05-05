@@ -9,9 +9,9 @@ Plane::Plane(const Vector3f &P, const Vector3f &n, const Vector3f& color):
 inline
 bool Plane::intersection(const Ray &ray, IntersectionData& inter) const
 {
-    if( intersection(P, normal, ray, inter.dist) )
+    if( intersection(P, normal, ray, inter.tNear) )
     {
-        inter.phit   = ray.origin + inter.dist * ray.direction;
+        inter.phit   = ray.origin + inter.tNear * ray.direction;
         inter.normal = normal;
         inter.object = this;
         return true;
@@ -20,19 +20,19 @@ bool Plane::intersection(const Ray &ray, IntersectionData& inter) const
 }
 
 inline
-bool Plane::intersection(const Ray &ray, float& dist) const
+bool Plane::intersection(const Ray &ray, float& tNear) const
 {
-    return intersection(P, normal, ray, dist);
+    return intersection(P, normal, ray, tNear);
 }
 
 // static functions down here
-bool Plane::intersection(const Vector3f &P, const Vector3f &n, const Ray &ray, float& dist)
+bool Plane::intersection(const Vector3f &P, const Vector3f &n, const Ray &ray, float& tNear)
 {
     float t = ((P-ray.origin) ^ n) / (ray.direction ^ n);
 
     if ( t > 0.0f )
     {
-        dist = t;
+        tNear = t;
         return true;
     }
     return false;

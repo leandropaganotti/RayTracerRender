@@ -20,18 +20,15 @@ bool Sphere::intersection(const Ray &ray, IntersectionData &inter) const
     t1 = tca + thc;
 
     if (t0 < 0) t0 = t1;
-
-    Vector3f t0_ray = t0 * ray.direction;
-
-    inter.phit = ray.origin + t0_ray;
-    inter.dist = t0_ray.length();
+       inter.phit = ray.origin + t0 * ray.direction;
+    inter.tNear = t0;
     inter.normal = (inter.phit - center).normalize();
     inter.object = this;
 
     return true;
 }
 
-bool Sphere::intersection(const Ray &ray, float &dist) const
+bool Sphere::intersection(const Ray &ray, float &tNear) const
 {
     Vector3f l = center - ray.origin;
     float tca = l.dot(ray.direction);
@@ -43,7 +40,7 @@ bool Sphere::intersection(const Ray &ray, float &dist) const
     float t0 = tca - thc;
     float t1 = tca + thc;
 
-    dist = t0 < 0 ? t1 : t0;
+    tNear = t0 < 0 ? t1 : t0;
 
     return true;
 }

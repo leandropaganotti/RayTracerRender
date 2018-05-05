@@ -66,9 +66,9 @@ void RayCaster::cast(const Ray &ray, const ObjectVector &objects, IntersectionDa
     {
         if (objects[i]->intersection(ray, inter2))
         {
-            if ( inter2.dist < closestDist)
+            if ( inter2.tNear < closestDist)
             {
-                closestDist = inter2.dist;
+                closestDist = inter2.tNear;
                 inter = inter2; // copy
             }
         }
@@ -76,14 +76,14 @@ void RayCaster::cast(const Ray &ray, const ObjectVector &objects, IntersectionDa
 
 }
 
-bool RayCaster::castShadowRay(const Ray &ray, const ObjectVector &objects, float distToLight)
+bool RayCaster::castShadowRay(const Ray &ray, const ObjectVector &objects, float tMax)
 {
-    float dist;
+    float tNear;
     for (size_t k = 0; k < objects.size(); ++k)
     {
-        if (objects[k]->intersection(ray, dist))
+        if (objects[k]->intersection(ray, tNear))
         {
-            if ( dist < distToLight )
+            if ( tNear > 0 && tNear < tMax )
             {
                 return true;
             }

@@ -6,84 +6,59 @@ Mesh::Mesh()
 
 }
 
-size_t Mesh::add(Vertex &&v)
+size_t Mesh::addVertex(const Vertex &v)
 {
+    std::cout << "not move "<< std::endl;
     vertexBuffer.push_back(v);
     vertices.push_back(vertexBuffer.size() - 1);
     return vertexBuffer.size() - 1;
 }
 
-size_t Mesh::add(const Vertex &v)
-{
-    vertexBuffer.push_back(v);
-    vertices.push_back(vertexBuffer.size() - 1);
-    return vertexBuffer.size() - 1;
-}
-
-size_t Mesh::add(Triangle &&tri)
+size_t Mesh::addTriangle(const Triangle &tri)
 {
     triangles.push_back(tri);
     return triangles.size() - 1;
 }
 
-size_t Mesh::add(const Triangle &tri)
-{
-    triangles.push_back(tri);
-    return triangles.size() - 1;
-}
 
-inline
 bool Mesh::intersection(const Ray& ray, IntersectionData &inter) const
-{
-    float phitDist = FLT_MAX, dist;
-    Vector3f phit;
-    size_t phitTriangle;
-
+{   
+    float tNear;
+    inter.tNear = FLT_MAX;
+    size_t tri;
     for (size_t i=0 ; i < triangles.size(); ++i)
     {
-        if (triangles[i].intersection(ray, phit, dist))
+        if (triangles[i].intersection(ray, tNear))
         {
-            if (dist < phitDist)
+            if (tNear < inter.tNear)
             {
-                inter.phit = phit;
-                phitDist = dist;
-                phitTriangle = i;
+                inter.tNear = tNear;
+                tri = i;
             }
         }
     }
-    if (phitDist < FLT_MAX)
+    if (inter.tNear < FLT_MAX)
     {
-        inter.dist   = phitDist;
-        inter.normal = triangles[phitTriangle].normal;
+        inter.normal = triangles[tri].normal;
         inter.object = this;
+        inter.phit   = ray.origin + inter.tNear * ray.direction;
         return true;
     }
-    else
-        return false;
+    return false;
 }
 
-bool Mesh::intersection(const Ray& ray, float &dist) const
+bool Mesh::intersection(const Ray& ray, float &tNear) const
 {
-    float phitDist = FLT_MAX, d;
-    Vector3f phit;
-
+    float t;
+    tNear = FLT_MAX;
     for (size_t i=0 ; i < triangles.size(); ++i)
     {
-        if (triangles[i].intersection(ray, phit, d))
+        if (triangles[i].intersection(ray, t))
         {
-            if (d < phitDist)
-            {
-                phitDist = d;
-            }
+            if (t < tNear) tNear = t;
         }
     }
-    if (phitDist < FLT_MAX)
-    {
-        dist = phitDist;
-        return true;
-    }
-    else
-        return false;
+    return tNear < FLT_MAX ? true : false;
 }
 
 std::ostream &operator <<(std::ostream &os, const Mesh &m)

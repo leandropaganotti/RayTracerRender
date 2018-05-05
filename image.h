@@ -35,8 +35,6 @@ public:
 };
 
 
-
-
 inline
 Vector3f &Image::at(size_t i, size_t j)
 {

@@ -32,7 +32,7 @@ int main()
 //    light2.attenuation = 1.5f;
 
 
-    scene.lights.push_back(new PointLight(Vector3f(0.5,2,-0.5)));
+    scene.lights.push_back(new PointLight(Vector3f(2,2,2)));
 
     //scene.lights.push_back(new DistantLight(-Vector3f(1,1,-1).normalize(), {1}, 0.03));
 

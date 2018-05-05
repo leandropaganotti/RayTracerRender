@@ -7,22 +7,15 @@
 
 class Mesh: public Object
 {
-
-
-
 public:
     Mesh();
 
-    size_t add(Vertex&& v);
+    size_t addVertex(const Vertex& v);
 
-    size_t add(const Vertex& v);
-
-    size_t add(Triangle&& tri);
-
-    size_t add(const Triangle& tri);
+    size_t addTriangle(const Triangle& tri);
 
     bool  intersection(const Ray& ray, IntersectionData& inter) const;
-    bool  intersection(const Ray& ray, float& dist) const;
+    bool  intersection(const Ray& ray, float& tNear) const;
 
     friend std::ostream& operator << (std::ostream& os, const Mesh& m);
 

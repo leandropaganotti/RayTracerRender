@@ -13,7 +13,7 @@ public:
 
     bool  intersection(const Ray &ray, IntersectionData &inter) const;
 
-    bool  intersection(const Ray& ray, float& dist) const;
+    bool  intersection(const Ray& ray, float& tNear) const;
 };
 
 #endif // SPHERE_H
