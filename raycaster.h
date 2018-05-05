@@ -12,7 +12,7 @@ public:
 
     Vector3f cast(const Ray& ray, const Scene& scene);
 
-    void cast(const Ray& ray, const ObjectVector& objects, IntersectionData& inter);
+    void cast(const Ray& ray, const ObjectVector& objects, IntersectionData& isec);
 
     bool castShadowRay(const Ray& ray, const ObjectVector& objects, float tMax);
 

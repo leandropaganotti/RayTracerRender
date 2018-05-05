@@ -3,16 +3,18 @@
 #include "vector.h"
 #include <vector>
 #include <float.h>
+#include <memory>
 
 class Light
 {
 public:     
-    virtual Vector3f  position() const = 0;
-    virtual float     distance(const Vector3f &point) const = 0;
-    virtual Vector3f direction(const Vector3f &point) const = 0;
-    virtual Vector3f intensity(const Vector3f &point) const = 0;
+    virtual Vector3f position  () const = 0;
+    virtual float    distance  (const Vector3f &point) const = 0;
+    virtual Vector3f direction (const Vector3f &point) const = 0;
+    virtual Vector3f intensity (const Vector3f &point) const = 0;
 };
 
+typedef std::vector<std::unique_ptr<Light>> LightVector;
 
 class PointLight: public Light
 {
@@ -67,20 +69,18 @@ public:
     {
         return FLT_MAX;
     }
-    float distance(const Vector3f &point) const
+    float distance(const Vector3f &) const
     {
         return FLT_MAX;
     }
-    Vector3f direction(const Vector3f &point) const
+    Vector3f direction(const Vector3f &) const
     {
         return dir;
     }
-    Vector3f intensity(const Vector3f &point) const
+    Vector3f intensity(const Vector3f &) const
     {
         return strength * color;
     }
 };
-
-typedef std::vector<Light*> LightVector;
 
 #endif // LIGHT_H

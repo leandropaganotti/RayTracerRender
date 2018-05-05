@@ -6,7 +6,7 @@
 class Ray
 {
 public:
-    Ray(){}
+    Ray() = default;
     Ray(const Vector3f& origin, const Vector3f& direction): origin(origin), direction(direction){}
 
     friend std::ostream& operator<< (std::ostream& os, const Ray& r)

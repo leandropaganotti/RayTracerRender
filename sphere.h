@@ -11,9 +11,9 @@ public:
 
     Sphere( const Vector3f &center={0.0f}, const float &radius=1.0f, const Vector3f &color={1.0f});
 
-    bool  intersection(const Ray &ray, IntersectionData &inter) const;
+    bool  intersection(const Ray &ray, IntersectionData &isec) const;
 
-    bool  intersection(const Ray& ray, float& tNear) const;
+    bool  intersection(const Ray& ray, float& tnear) const;
 };
 
 #endif // SPHERE_H

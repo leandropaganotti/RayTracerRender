@@ -8,12 +8,23 @@
 class Scene
 {
 public:
-    Scene();
-    ~Scene();
+    Scene() = default;
+    ~Scene() = default;
 
     ObjectVector objects;
-    Vector3f backgroundColor;
     LightVector lights;
+
+    Vector3f bgColor;
+
+    void addObject(Object * obj)
+    {
+        objects.emplace_back(obj);
+    }
+
+    void addLight(Light * light)
+    {
+        lights.emplace_back(light);
+    }
 
 };
 

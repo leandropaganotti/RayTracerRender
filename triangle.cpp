@@ -11,17 +11,17 @@ Triangle::Triangle(size_t v0, size_t v1, size_t v2, const Vector3f &n):
     area = ((vertexBuffer[v1]-vertexBuffer[v0]) % (vertexBuffer[v2]-vertexBuffer[v0])).length() / 2.0f;
 }
 
-bool Triangle::intersection(const Ray &ray, Vector3f &phit, float & tNear) const
+bool Triangle::intersection(const Ray &ray, Vector3f &phit, float & tnear) const
 {
-    if (Plane::intersection(vertexBuffer[v[0]], normal, ray, tNear))
+    if (Plane::intersection(vertexBuffer[v[0]], normal, ray, tnear))
     {
-        phit = ray.origin + tNear * ray.direction;
+        phit = ray.origin + tnear * ray.direction;
         return isInside2(phit);
     }
     return false;
 }
 
-bool Triangle::intersection(const Ray &ray, float &tNear) const
+bool Triangle::intersection(const Ray &ray, float &tnear) const
 {
     Vector3f &p0 = vertexBuffer[v[0]];
     Vector3f &p1 = vertexBuffer[v[1]];
@@ -62,9 +62,9 @@ bool Triangle::intersection(const Ray &ray, float &tNear) const
 
     if (gamma <= 0.0f || beta + gamma >= 1.0f) return false;
 
-    tNear = -(F*AKJB + E*JCAL + D*BLKC  ) / denon;
+    tnear = -(F*AKJB + E*JCAL + D*BLKC  ) / denon;
 
-    return tNear > 0.0f ? true : false;
+    return tnear > 0.0f ? true : false;
 }
 
 std::ostream &operator <<(std::ostream &os, const Triangle &t)

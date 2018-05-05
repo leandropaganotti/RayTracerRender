@@ -13,16 +13,18 @@ int main()
 {
 
     Scene scene;
-    scene.backgroundColor = {0.0f};
+    scene.bgColor = {0.0f};
 
-    scene.objects.push_back(new Plane({0,0,0}, {0,1,0}));
+    scene.addObject(new Plane({0,0,0}, {0,1,0}));
+    scene.addObject(new Sphere({2.5,0.5, -0.5}, 0.5, {1,0,0}));
+    scene.addObject(new Sphere({2.5,0.5, -2.5}, 0.5, {0,1,0}));
+    scene.addObject(new Sphere({0.5,0.5, -2.5}, 0.5, {0,0,1}));
 
-    scene.objects.push_back(new Sphere({2.5,0.5, -0.5}, 0.5, {1,0,0}));
-    scene.objects.push_back(new Sphere({2.5,0.5, -2.5}, 0.5, {0,1,0}));
-    scene.objects.push_back(new Sphere({0.5,0.5, -2.5}, 0.5, {0,0,1}));
+    scene.addObject(new Sphere({0, 0.5, 2}, 0.5, {1,0,1}));
+    scene.addObject(new Sphere({-3.5,0.5, 2}, 0.5, {1,1,0}));
+    scene.addObject(new Sphere({3,0.5, 3}, 0.5, {0,1,1}));
 
-    Cube *cube = new Cube({1,1,0});
-    scene.objects.push_back(cube);
+    scene.addObject(new Cube({1,1,0}));
 
 
 //    Light light2;
@@ -32,13 +34,13 @@ int main()
 //    light2.attenuation = 1.5f;
 
 
-    scene.lights.push_back(new PointLight(Vector3f(2,2,2)));
+    scene.addLight(new PointLight(Vector3f(2,2,2)));
 
     //scene.lights.push_back(new DistantLight(-Vector3f(1,1,-1).normalize(), {1}, 0.03));
 
     //scene.lights.push_back(light2);
 
-    cout << vertexBuffer << endl <<  *cube << endl;
+    //cout << vertexBuffer << endl <<  *cube << endl;
 
     double t1, t2, avg=0;
     char buf[256];

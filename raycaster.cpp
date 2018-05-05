@@ -9,36 +9,36 @@ RayCaster::RayCaster()
 
 Vector3f RayCaster::cast(const Ray &ray, const Scene &scene)
 {
-    IntersectionData inter;
+    IntersectionData isec;
 
-    cast(ray, scene.objects, inter);
+    cast(ray, scene.objects, isec);
 
-    if (inter.object)
+    if (isec.object)
     {
         float bias = 0.0001;
 
         Vector3f phitColor(0);
 
         //ambient color
-        phitColor = inter.object->ambient();
+        phitColor = isec.object->ambient();
 
-        for (Light *light : scene.lights)
+        for(auto& light: scene.lights)
         {
-            Vector3f toLight = light->direction(inter.phit);
+            Vector3f toLight = light->direction(isec.phit);
 
-            if (!castShadowRay(Ray(inter.phit + bias * inter.normal, toLight), scene.objects, light->distance(inter.phit)))
+            if (!castShadowRay(Ray(isec.phit + bias * isec.normal, toLight), scene.objects, light->distance(isec.phit)))
             {
                 //diffuse NdotL
-                float NdotL = std::max(0.0f, inter.normal ^ toLight);
-                phitColor += light->intensity(inter.phit) * inter.object->diffColor() * NdotL;
+                float NdotL = std::max(0.0f, isec.normal ^ toLight);
+                phitColor += light->intensity(isec.phit) * isec.object->diffColor() * NdotL;
 
                 //specular
                 if( NdotL > 0.0f )
                 {
                     //specular color
-                    Vector3f toCamera = (ray.origin - inter.phit).normalize();
-                    Vector3f reflection = (2.0f * ((inter.normal ^ toLight) * inter.normal) - toLight);
-                    phitColor += light->intensity(inter.phit) * inter.object->specColor() * pow(std::max(0.0f, toCamera ^ reflection), inter.object->shininess);
+                    Vector3f toCamera = (ray.origin - isec.phit).normalize();
+                    Vector3f reflection = (2.0f * ((isec.normal ^ toLight) * isec.normal) - toLight);
+                    phitColor += light->intensity(isec.phit) * isec.object->specColor() * pow(std::max(0.0f, toCamera ^ reflection), isec.object->shininess);
                 }
             }
         }
@@ -51,42 +51,38 @@ Vector3f RayCaster::cast(const Ray &ray, const Scene &scene)
 
         return phitColor;
     }
-    return scene.backgroundColor;
+    return scene.bgColor;
 }
 
-void RayCaster::cast(const Ray &ray, const ObjectVector &objects, IntersectionData &inter)
+void RayCaster::cast(const Ray &ray, const ObjectVector &objects, IntersectionData &isec)
 {
-    IntersectionData inter2;
+    IntersectionData isec_tmp;
 
-    float closestDist = FLT_MAX;
+    float tnear = FLT_MAX;
 
-    inter.object = nullptr;
+    isec.object = nullptr;
 
-    for(size_t i=0; i < objects.size() ; ++i)
+    for(auto &object : objects)
     {
-        if (objects[i]->intersection(ray, inter2))
+        if (object->intersection(ray, isec_tmp))
         {
-            if ( inter2.tNear < closestDist)
+            if ( isec_tmp.tnear < tnear)
             {
-                closestDist = inter2.tNear;
-                inter = inter2; // copy
+                tnear = isec_tmp.tnear;
+                isec = isec_tmp; // copy
             }
         }
     }
-
 }
 
 bool RayCaster::castShadowRay(const Ray &ray, const ObjectVector &objects, float tMax)
 {
-    float tNear;
-    for (size_t k = 0; k < objects.size(); ++k)
+    float tnear;
+    for(auto &object : objects)
     {
-        if (objects[k]->intersection(ray, tNear))
+        if (object->intersection(ray, tnear))
         {
-            if ( tNear > 0 && tNear < tMax )
-            {
-                return true;
-            }
+            if ( tnear > 0 && tnear < tMax ) return true;
         }
     }
     return false;

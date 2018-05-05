@@ -6,33 +6,31 @@ Plane::Plane(const Vector3f &P, const Vector3f &n, const Vector3f& color):
     c_diffuse = color;
 }
 
-inline
-bool Plane::intersection(const Ray &ray, IntersectionData& inter) const
+bool Plane::intersection(const Ray &ray, IntersectionData& isec) const
 {
-    if( intersection(P, normal, ray, inter.tNear) )
+    if( intersection(P, normal, ray, isec.tnear) )
     {
-        inter.phit   = ray.origin + inter.tNear * ray.direction;
-        inter.normal = normal;
-        inter.object = this;
+        isec.phit   = ray.origin + isec.tnear * ray.direction;
+        isec.normal = normal;
+        isec.object = this;
         return true;
     }
     return false;
 }
 
-inline
-bool Plane::intersection(const Ray &ray, float& tNear) const
+bool Plane::intersection(const Ray &ray, float& tnear) const
 {
-    return intersection(P, normal, ray, tNear);
+    return intersection(P, normal, ray, tnear);
 }
 
 // static functions down here
-bool Plane::intersection(const Vector3f &P, const Vector3f &n, const Ray &ray, float& tNear)
+bool Plane::intersection(const Vector3f &P, const Vector3f &n, const Ray &ray, float& tnear)
 {
     float t = ((P-ray.origin) ^ n) / (ray.direction ^ n);
 
     if ( t > 0.0f )
     {
-        tNear = t;
+        tnear = t;
         return true;
     }
     return false;

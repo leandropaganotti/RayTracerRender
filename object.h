@@ -1,16 +1,17 @@
 #ifndef OBJECT_H
 #define OBJECT_H
+#include <memory>
 #include <vector>
 #include "vector.h"
 #include "ray.h"
 
 class Object;
 
-typedef std::vector<Object*> ObjectVector;
+typedef std::vector<std::unique_ptr<Object>> ObjectVector;
 
 struct IntersectionData
 {
-    float tNear;
+    float tnear;
     Vector3f normal;
     Vector3f phit;
     const Object * object;
@@ -29,20 +30,18 @@ public:
         shininess = 30.0f;
     }
 
-    virtual bool intersection(const Ray& ray, IntersectionData &inter) const = 0;
-    virtual bool intersection(const Ray& ray, float &tNear) const = 0;
+    virtual bool intersection(const Ray& ray, IntersectionData &isec) const = 0;
+    virtual bool intersection(const Ray& ray, float &tnear) const = 0;
 
-    virtual ~Object(){}
+    virtual ~Object() = default;
 
     //Object attributes down here
 
     Vector3f c_diffuse;
     Vector3f c_specular;
-
     float k_diffuse;
     float k_specular;
     float k_ambient;
-
     float shininess;
 
     Vector3f diffColor() const

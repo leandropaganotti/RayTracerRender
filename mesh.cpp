@@ -1,14 +1,8 @@
 #include "mesh.h"
 #include <float.h>
 
-Mesh::Mesh()
-{
-
-}
-
 size_t Mesh::addVertex(const Vertex &v)
 {
-    std::cout << "not move "<< std::endl;
     vertexBuffer.push_back(v);
     vertices.push_back(vertexBuffer.size() - 1);
     return vertexBuffer.size() - 1;
@@ -21,44 +15,44 @@ size_t Mesh::addTriangle(const Triangle &tri)
 }
 
 
-bool Mesh::intersection(const Ray& ray, IntersectionData &inter) const
+bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
 {   
-    float tNear;
-    inter.tNear = FLT_MAX;
+    float tnear;
+    isec.tnear = FLT_MAX;
     size_t tri;
     for (size_t i=0 ; i < triangles.size(); ++i)
     {
-        if (triangles[i].intersection(ray, tNear))
+        if (triangles[i].intersection(ray, tnear))
         {
-            if (tNear < inter.tNear)
+            if (tnear < isec.tnear)
             {
-                inter.tNear = tNear;
+                isec.tnear = tnear;
                 tri = i;
             }
         }
     }
-    if (inter.tNear < FLT_MAX)
+    if (isec.tnear < FLT_MAX)
     {
-        inter.normal = triangles[tri].normal;
-        inter.object = this;
-        inter.phit   = ray.origin + inter.tNear * ray.direction;
+        isec.normal = triangles[tri].normal;
+        isec.object = this;
+        isec.phit   = ray.origin + isec.tnear * ray.direction;
         return true;
     }
     return false;
 }
 
-bool Mesh::intersection(const Ray& ray, float &tNear) const
+bool Mesh::intersection(const Ray& ray, float &tnear) const
 {
     float t;
-    tNear = FLT_MAX;
+    tnear = FLT_MAX;
     for (size_t i=0 ; i < triangles.size(); ++i)
     {
         if (triangles[i].intersection(ray, t))
         {
-            if (t < tNear) tNear = t;
+            if (t < tnear) tnear = t;
         }
     }
-    return tNear < FLT_MAX ? true : false;
+    return tnear < FLT_MAX ? true : false;
 }
 
 std::ostream &operator <<(std::ostream &os, const Mesh &m)

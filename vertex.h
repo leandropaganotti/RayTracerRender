@@ -5,7 +5,7 @@
 #include "vector.h"
 
 class Vertex: public Vector3f
-{  
+{
 
 public:
 
