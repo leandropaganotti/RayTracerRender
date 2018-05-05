@@ -6,8 +6,6 @@ LIBS += -lpthread
 
 SOURCES += main.cpp \
     plane.cpp \
-    vertex.cpp \
-    triangle.cpp \
     mesh.cpp \
     cube.cpp \
     camera.cpp \
@@ -20,10 +18,8 @@ HEADERS += \
     plane.h \
     object.h \
     vector.h \
-    vertex.h \
     mesh.h \
     cube.h \
-    triangle.h \
     camera.h \
     utils.h \
     scene.h \

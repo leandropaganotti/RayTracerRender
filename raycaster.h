@@ -8,7 +8,7 @@
 class RayCaster
 {
 public:
-    RayCaster();
+    RayCaster() = default;
 
     Vector3f cast(const Ray& ray, const Scene& scene);
 

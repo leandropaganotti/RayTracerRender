@@ -1,12 +1,6 @@
 #include "raycaster.h"
 #include "float.h"
 
-
-RayCaster::RayCaster()
-{
-
-}
-
 Vector3f RayCaster::cast(const Ray &ray, const Scene &scene)
 {
     IntersectionData isec;

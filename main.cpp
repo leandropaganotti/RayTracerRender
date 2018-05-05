@@ -24,7 +24,8 @@ int main()
     scene.addObject(new Sphere({-3.5,0.5, 2}, 0.5, {1,1,0}));
     scene.addObject(new Sphere({3,0.5, 3}, 0.5, {0,1,1}));
 
-    scene.addObject(new Cube({1,1,0}));
+    Cube *cube = new Cube({1,1,0});
+    scene.addObject(cube);
 
 
 //    Light light2;
@@ -40,7 +41,7 @@ int main()
 
     //scene.lights.push_back(light2);
 
-    //cout << vertexBuffer << endl <<  *cube << endl;
+    cout << *cube << endl;
 
     double t1, t2, avg=0;
     char buf[256];
@@ -57,7 +58,7 @@ int main()
         // new camera position
 
 
-        camera.lookAt(Ry(deg2rad( i*a )) * from, to);
+        camera.lookAt(Ry(deg2rad( a )) * from, to);
 
         t1 =ms_time();
         camera.render(scene, 1, 4);
