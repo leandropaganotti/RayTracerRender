@@ -22,9 +22,8 @@ struct Matrix4x4
         mat[3][0] = a30, mat[3][1] = a31, mat[3][2] = a32, mat[3][3] = a33;
     }
 
-    const T* operator [] (uint8_t i) const { return mat[i]; }
-
     T* operator [] (uint8_t i) { return mat[i]; }
+    const T* operator [] (uint8_t i) const { return mat[i]; }
 
     friend Matrix4x4 operator * (const Matrix4x4& A, const Matrix4x4& B)
     {
@@ -50,19 +49,8 @@ struct Matrix4x4
         return os;
     }
 
-//    Matrix4x4 transpose()
-//    {
-//        Matrix4x4 m = {
-//                        mat[0][0], mat[1][0], mat[2][0], mat[3][0],
-//                        mat[0][1], mat[1][1], mat[2][1], mat[3][1],
-//                        mat[0][2], mat[1][2], mat[2][2], mat[3][2],
-//                        mat[0][3], mat[1][3], mat[2][3], mat[3][3]
-//                      };
-
-//        return m;
-//    }
-
 private:
+    // R = A * B
     static void multiply_4x4_4x4(T R[][4], const T A[][4], const T B[][4])
     {
         for (size_t i=0; i < 4; ++i)
@@ -74,12 +62,12 @@ private:
                     R[i][j] += A[i][3] * B[3][j];
                 }
     }
-
-    static void multiply_4x4_Vector(T RV[], const T M[][4], const T V[])
+    // R = M * V
+    static void multiply_4x4_Vector(T R[], const T M[][4], const T V[])
     {
-        RV[0] = M[0][0] * V[0] + M[0][1] * V[1] + M[0][2] * V[2] + M[0][3];
-        RV[1] = M[1][0] * V[0] + M[1][1] * V[1] + M[1][2] * V[2] + M[1][3];
-        RV[2] = M[2][0] * V[0] + M[2][1] * V[1] + M[2][2] * V[2] + M[2][3];
+        R[0] = M[0][0] * V[0] + M[0][1] * V[1] + M[0][2] * V[2] + M[0][3];
+        R[1] = M[1][0] * V[0] + M[1][1] * V[1] + M[1][2] * V[2] + M[1][3];
+        R[2] = M[2][0] * V[0] + M[2][1] * V[1] + M[2][2] * V[2] + M[2][3];
 //        T w   = M[3][0] * V[0] + M[3][1] * V[1] + M[3][2] * V[2] + M[3][3];
 //        if ( w != 1 && w != 0) {
 //            RV[0] /= w, RV[1] /= w, RV[2] /= w;
