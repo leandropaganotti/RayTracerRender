@@ -41,9 +41,7 @@ bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
     }
     if (isec.tnear < FLT_MAX)
     {
-        //isec.normal = faces[idx].normal;
         isec.object = this;
-        //isec.phit   = ray.origin + isec.tnear * ray.direction;
         return true;
     }
     return false;
@@ -63,6 +61,31 @@ bool Mesh::intersection(const Ray& ray, float &tnear) const
     return tnear < FLT_MAX ? true : false;
 }
 
+const Vector3f Mesh::normal(const Vector3f &, size_t idx) const
+{
+    return faces[idx].normal;
+}
+
+std::ostream &operator <<(std::ostream &os, const Mesh &m)
+{
+    os << "Mesh:" << std::endl;
+    os << "|Vertices: " << std::endl;
+    for(size_t i= 0 ; i < m.vertices.size(); ++i)
+        std::cout << "||" << i << ":" << m.vertices[i] << " ---> " << m.vertexBuffer[m.vertices[i]] << std::endl;
+
+    os << "|Faces: " << std::endl;
+    for(size_t i= 0 ; i < m.faces.size(); ++i)
+        std::cout << "||" << i << ":" << m.faces[i] << std::endl;
+
+    return os ;
+}
+
+std::ostream& operator <<(std::ostream &os, const Face &f)
+{
+    return os << f.v0 << " " << f.v1 << " " << f.v2 << " ---> " << Mesh::vertexBuffer[f.v0] << Mesh::vertexBuffer[f.v1] << Mesh::vertexBuffer[f.v2] << "  " << f.normal ;
+}
+
+inline
 bool Triangle::intersection(const Vector3f &p0, const Vector3f &p1, const Vector3f &p2, const Ray &ray, float &tnear)
 {
     float A = p0.x - p1.x;
@@ -105,21 +128,12 @@ bool Triangle::intersection(const Vector3f &p0, const Vector3f &p1, const Vector
     return tnear > 0.0f ? true : false;
 }
 
-std::ostream &operator <<(std::ostream &os, const Mesh &m)
+inline
+bool Face::intersection(const Ray &ray, float &tnear) const
 {
-    os << "Mesh:" << std::endl;
-    os << "|Vertices: " << std::endl;
-    for(size_t i= 0 ; i < m.vertices.size(); ++i)
-        std::cout << "||" << i << ":" << m.vertices[i] << " ---> " << m.vertexBuffer[m.vertices[i]] << std::endl;
+    const Vector3f *p0 = &Mesh::vertexBuffer[ v0 ];
+    const Vector3f *p1 = &Mesh::vertexBuffer[ v1 ];
+    const Vector3f *p2 = &Mesh::vertexBuffer[ v2 ];
 
-    os << "|Faces: " << std::endl;
-    for(size_t i= 0 ; i < m.faces.size(); ++i)
-        std::cout << "||" << i << ":" << m.faces[i] << std::endl;
-
-    return os ;
-}
-
-std::ostream& operator <<(std::ostream &os, const Face &f)
-{
-    return os << f.v0 << " " << f.v1 << " " << f.v2 << " ---> " << Mesh::vertexBuffer[f.v0] << Mesh::vertexBuffer[f.v1] << Mesh::vertexBuffer[f.v2] << "  " << f.normal ;
+    return Triangle::intersection(*p0, *p1, *p2, ray, tnear);
 }

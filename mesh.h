@@ -47,23 +47,12 @@ public:
 
     bool  intersection(const Ray& ray, IntersectionData& isec) const;
     bool  intersection(const Ray& ray, float& tnear) const;
-    const Vector3f normal(const Vector3f &, size_t idx) const
-    {
-        return faces[idx].normal;
-    }
+    const Vector3f normal(const Vector3f &, size_t idx) const;
 
     friend std::ostream& operator << (std::ostream& os, const Mesh &m);
     friend std::ostream& operator << (std::ostream &os, const Face &f);
 };
 
-inline
-bool Face::intersection(const Ray &ray, float &tnear) const
-{
-    const Vector3f *p0 = &Mesh::vertexBuffer[ v0 ];
-    const Vector3f *p1 = &Mesh::vertexBuffer[ v1 ];
-    const Vector3f *p2 = &Mesh::vertexBuffer[ v2 ];
 
-    return Triangle::intersection(*p0, *p1, *p2, ray, tnear);
-}
 
 #endif // MESH_H

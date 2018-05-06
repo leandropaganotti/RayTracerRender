@@ -11,11 +11,8 @@ Vector3f RayCaster::cast(const Ray &ray, const Scene &scene)
     {
         float bias = 0.0001;
 
-        Vector3f phitColor(0);
-
         //ambient color
-        phitColor = isec.object->ambient();
-
+        Vector3f phitColor = isec.object->ambient();
         Vector3f phit = ray.origin + isec.tnear * ray.direction;
         Vector3f normal = isec.object->normal(phit, isec.idx);
 
@@ -54,18 +51,15 @@ Vector3f RayCaster::cast(const Ray &ray, const Scene &scene)
 void RayCaster::cast(const Ray &ray, const ObjectVector &objects, IntersectionData &isec)
 {
     IntersectionData isec_tmp;
-
-    float tnear = FLT_MAX;
-
     isec.object = nullptr;
+    isec.tnear  = FLT_MAX;
 
     for(auto &object : objects)
     {
         if (object->intersection(ray, isec_tmp))
         {
-            if ( isec_tmp.tnear < tnear)
+            if ( isec_tmp.tnear < isec.tnear )
             {
-                tnear = isec_tmp.tnear;
                 isec = isec_tmp; // copy
             }
         }
@@ -79,7 +73,7 @@ bool RayCaster::castShadowRay(const Ray &ray, const ObjectVector &objects, float
     {
         if (object->intersection(ray, tnear))
         {
-            if ( tnear > 0 && tnear < tMax ) return true;
+            if ( tnear < tMax ) return true;
         }
     }
     return false;
