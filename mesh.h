@@ -47,7 +47,7 @@ public:
 
     bool  intersection(const Ray& ray, IntersectionData& isec) const;
     bool  intersection(const Ray& ray, float& tnear) const;
-    const Vector3f get(const Vector3f &, size_t idx) const
+    const Vector3f normal(const Vector3f &, size_t idx) const
     {
         return faces[idx].normal;
     }

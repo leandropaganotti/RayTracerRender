@@ -17,7 +17,7 @@ Vector3f RayCaster::cast(const Ray &ray, const Scene &scene)
         phitColor = isec.object->ambient();
 
         Vector3f phit = ray.origin + isec.tnear * ray.direction;
-        Vector3f normal = isec.object->get(phit, isec.idx);
+        Vector3f normal = isec.object->normal(phit, isec.idx);
 
         for(auto& light: scene.lights)
         {

@@ -1,14 +1,14 @@
 #include "plane.h"
 
 Plane::Plane(const Vector3f &P, const Vector3f &n, const Vector3f& color):
-    P(P), normal(n)
+    P(P), N(n)
 {
     c_diffuse = color;
 }
 
 bool Plane::intersection(const Ray &ray, IntersectionData& isec) const
 {
-    if( intersection(P, normal, ray, isec.tnear) )
+    if( intersection(P, N, ray, isec.tnear) )
     {
         //isec.phit   = ray.origin + isec.tnear * ray.direction;
         //isec.normal = normal;
@@ -20,6 +20,6 @@ bool Plane::intersection(const Ray &ray, IntersectionData& isec) const
 
 bool Plane::intersection(const Ray &ray, float& tnear) const
 {
-    return intersection(P, normal, ray, tnear);
+    return intersection(P, N, ray, tnear);
 }
 
