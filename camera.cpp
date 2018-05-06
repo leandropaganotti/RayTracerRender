@@ -45,7 +45,7 @@ void Camera::render(const Scene &scene, uint8_t nrays, uint8_t nthreads)
     if( nrays > 1)
     {
         Image frame;
-        frameBuffer.resize( frameBuffer.width() / nrays, frameBuffer.height() / nrays);
+        frame.resize( frameBuffer.width() / nrays, frameBuffer.height() / nrays);
 
         for (size_t i = 0; i < frame.height(); ++i)
         {
