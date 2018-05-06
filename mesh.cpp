@@ -28,7 +28,6 @@ bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
 {   
     float tnear;
     isec.tnear = FLT_MAX;
-    size_t idx;
     for (size_t i=0 ; i < faces.size(); ++i)
     {
         if (faces[i].intersection(ray, tnear))
@@ -36,7 +35,7 @@ bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
             if (tnear < isec.tnear)
             {
                 isec.tnear = tnear;
-                idx = i;
+                isec.idx = i;
             }
         }
     }
@@ -45,7 +44,6 @@ bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
         //isec.normal = faces[idx].normal;
         isec.object = this;
         //isec.phit   = ray.origin + isec.tnear * ray.direction;
-        isec.idx = idx;
         return true;
     }
     return false;
