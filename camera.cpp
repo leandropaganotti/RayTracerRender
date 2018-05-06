@@ -3,6 +3,12 @@
 #include "utils.h"
 #include <thread>
 
+Camera::Camera(): pos(0), fov(40)
+{
+    frameBuffer.resize(640, 480);
+    fov = deg2rad(fov);
+}
+
 void Camera::render_1x1x1(const Scene *scene, size_t start, size_t end)
 {
     if (scene == nullptr) return;
@@ -98,7 +104,7 @@ void Camera::lookAt(const Vector3f &from, const Vector3f &to, const Vector3f &up
 
 std::ostream &operator <<(std::ostream &os, const Camera &cam)
 {
-    os << "Camera parameters:" << cam.getPosition() << "\n";
+    os << "Camera parameters:" << cam.position() << "\n";
 
     return os;
 }

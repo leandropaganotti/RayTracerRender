@@ -23,17 +23,3 @@ bool Plane::intersection(const Ray &ray, float& tnear) const
     return intersection(P, normal, ray, tnear);
 }
 
-// static functions down here
-bool Plane::intersection(const Vector3f &P, const Vector3f &n, const Ray &ray, float& tnear)
-{
-    float t = ((P-ray.origin) ^ n) / (ray.direction ^ n);
-
-    if ( t > 0.0f )
-    {
-        tnear = t;
-        return true;
-    }
-    return false;
-}
-
-

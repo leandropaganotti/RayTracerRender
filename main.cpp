@@ -65,12 +65,12 @@ int main()
 
         t2 =ms_time();
 
-        cout << i << " " <<  i*a << " " << camera.getPosition();
+        cout << i << " " <<  i*a << " " << camera.position();
         avg += t2-t1;
         cout << " time in ms: " << t2-t1 << endl << endl;
 
         sprintf(buf, "%04d.ppm", i);
-        camera.getFrameBuffer().save_ppm_bin(buf);
+        camera.frame().save_ppm_bin(buf);
     }
     avg /=n;
     cout << "avg time in ms: " << avg << endl;

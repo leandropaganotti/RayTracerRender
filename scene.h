@@ -8,9 +8,6 @@
 class Scene
 {
 public:
-    Scene() = default;
-    ~Scene() = default;
-
     ObjectVector objects;
     LightVector lights;
 

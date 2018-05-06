@@ -13,7 +13,17 @@ public:
     bool intersection(const Ray& ray, IntersectionData& isec) const;
     bool intersection(const Ray& ray, float &tnear) const;
 
-    static bool intersection(const Vector3f& P, const Vector3f& n, const Ray& ray, float& tnear);
+    static bool intersection(const Vector3f& P, const Vector3f& n, const Ray& ray, float& tnear)
+    {
+        float t = ((P-ray.origin) ^ n) / (ray.direction ^ n);
+
+        if ( t > 0.0f )
+        {
+            tnear = t;
+            return true;
+        }
+        return false;
+    }
 };
 
 #endif // PLANE_H

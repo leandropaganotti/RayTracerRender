@@ -33,6 +33,7 @@ public:
 
 class Mesh: public Object
 {
+protected:
     friend class Face;
 
     static std::vector<Vertex>   vertexBuffer;
