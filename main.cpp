@@ -53,27 +53,27 @@ int main()
         sprintf(buf, "%04d.ppm", i);
         render.frame().save_ppm_bin(buf);
 
-        cout << "Elapsed time in nanoseconds : "
-            << chrono::duration_cast<chrono::nanoseconds>(end - start).count()
-            << " ns" << endl;
+//        cout << "Elapsed time in nanoseconds : "
+//            << chrono::duration_cast<chrono::nanoseconds>(end - start).count()
+//            << " ns" << endl;
 
-        cout << "Elapsed time in microseconds : "
-            << chrono::duration_cast<chrono::microseconds>(end - start).count()
-            << " µs" << endl;
+//        cout << "Elapsed time in microseconds : "
+//            << chrono::duration_cast<chrono::microseconds>(end - start).count()
+//            << " µs" << endl;
 
         cout << "Elapsed time in milliseconds : "
             << chrono::duration_cast<chrono::milliseconds>(end - start).count()
             << " ms" << endl;
 
-        cout << "Elapsed time in seconds : "
-            << chrono::duration_cast<chrono::seconds>(end - start).count()
-            << " sec" << endl;
+//        cout << "Elapsed time in seconds : "
+//            << chrono::duration_cast<chrono::seconds>(end - start).count()
+//            << " sec" << endl;
 
         avg += chrono::duration_cast<chrono::milliseconds>(end - start).count();
     }
 
     avg = avg / (n+1);
-    cout << endl << "Elapsed avarage time in milliseconds : " << avg << endl;
+    cout << endl << "Elapsed average time in milliseconds : " << avg << endl;
 
     return 0;
 }
