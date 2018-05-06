@@ -12,8 +12,7 @@ typedef std::vector<std::unique_ptr<Object>> ObjectVector;
 struct IntersectionData
 {
     float tnear;
-    Vector3f normal;
-    Vector3f phit;
+    size_t idx;
     const Object * object;
 };
 
@@ -32,6 +31,7 @@ public:
 
     virtual bool intersection(const Ray& ray, IntersectionData &isec) const = 0;
     virtual bool intersection(const Ray& ray, float &tnear) const = 0;
+    virtual const Vector3f get(const Vector3f &phit, size_t idx) const = 0;
 
     virtual ~Object() = default;
 

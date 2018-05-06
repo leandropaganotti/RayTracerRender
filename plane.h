@@ -12,6 +12,10 @@ public:
 
     bool intersection(const Ray& ray, IntersectionData& isec) const;
     bool intersection(const Ray& ray, float &tnear) const;
+    const Vector3f get(const Vector3f &, size_t) const
+    {
+        return normal;
+    }
 
     static bool intersection(const Vector3f& P, const Vector3f& n, const Ray& ray, float& tnear)
     {

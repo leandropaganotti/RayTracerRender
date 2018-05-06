@@ -32,8 +32,8 @@ bool Sphere::intersection(const Ray &ray, IntersectionData &isec) const
     float t1 = tca + thc;
 
     isec.tnear = t0 < 0 ? t1 : t0;
-    isec.phit = ray.origin + isec.tnear * ray.direction;
-    isec.normal = (isec.phit - center).normalize();
+    //isec.phit = ray.origin + isec.tnear * ray.direction;
+    //isec.normal = (isec.phit - center).normalize();
     isec.object = this;
 
     return true;

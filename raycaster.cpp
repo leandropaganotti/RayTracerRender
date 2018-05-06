@@ -16,29 +16,32 @@ Vector3f RayCaster::cast(const Ray &ray, const Scene &scene)
         //ambient color
         phitColor = isec.object->ambient();
 
+        Vector3f phit = ray.origin + isec.tnear * ray.direction;
+        Vector3f normal = isec.object->get(phit, isec.idx);
+
         for(auto& light: scene.lights)
         {
-            Vector3f toLight = light->direction(isec.phit);
+            Vector3f toLight = light->direction(phit);
 
-            if (!castShadowRay(Ray(isec.phit + bias * isec.normal, toLight), scene.objects, light->distance(isec.phit)))
+            if (!castShadowRay(Ray(phit + bias * normal, toLight), scene.objects, light->distance(phit)))
             {
                 //diffuse NdotL
-                float NdotL = std::max(0.0f, isec.normal ^ toLight);
-                phitColor += light->intensity(isec.phit) * isec.object->diffColor() * NdotL;
+                float NdotL = std::max(0.0f, normal ^ toLight);
+                phitColor += light->intensity(phit) * isec.object->diffColor() * NdotL;
 
                 //specular
                 if( NdotL > 0.0f )
                 {
                     //specular color
-                    Vector3f toCamera = (ray.origin - isec.phit).normalize();
-                    Vector3f reflection = (2.0f * ((isec.normal ^ toLight) * isec.normal) - toLight);
-                    phitColor += light->intensity(isec.phit) * isec.object->specColor() * pow(std::max(0.0f, toCamera ^ reflection), isec.object->shininess);
+                    Vector3f toCamera = (ray.origin - phit).normalize();
+                    Vector3f reflection = (2.0f * ((normal ^ toLight) * normal) - toLight);
+                    phitColor += light->intensity(phit) * isec.object->specColor() * pow(std::max(0.0f, toCamera ^ reflection), isec.object->shininess);
                 }
             }
         }
 
         //gamma
-        float gamma=1.0/2.2;
+        const float gamma=1.0/2.2;
         phitColor[0] = pow(phitColor[0], gamma);
         phitColor[1] = pow(phitColor[1], gamma);
         phitColor[2] = pow(phitColor[2], gamma);

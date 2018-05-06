@@ -42,9 +42,10 @@ bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
     }
     if (isec.tnear < FLT_MAX)
     {
-        isec.normal = faces[idx].normal;
+        //isec.normal = faces[idx].normal;
         isec.object = this;
-        isec.phit   = ray.origin + isec.tnear * ray.direction;
+        //isec.phit   = ray.origin + isec.tnear * ray.direction;
+        isec.idx = idx;
         return true;
     }
     return false;

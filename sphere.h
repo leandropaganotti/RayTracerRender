@@ -12,6 +12,10 @@ public:
 
     bool  intersection(const Ray &ray, IntersectionData &isec) const;
     bool  intersection(const Ray& ray, float& tnear) const;
+    const Vector3f get(const Vector3f &phit, size_t) const
+    {
+        return (phit-center).normalize();
+    }
 };
 
 #endif  // SPHERE_H

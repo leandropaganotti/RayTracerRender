@@ -10,8 +10,8 @@ bool Plane::intersection(const Ray &ray, IntersectionData& isec) const
 {
     if( intersection(P, normal, ray, isec.tnear) )
     {
-        isec.phit   = ray.origin + isec.tnear * ray.direction;
-        isec.normal = normal;
+        //isec.phit   = ray.origin + isec.tnear * ray.direction;
+        //isec.normal = normal;
         isec.object = this;
         return true;
     }
