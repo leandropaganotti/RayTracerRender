@@ -11,7 +11,6 @@ using namespace std;
 
 int main()
 {
-
     Scene scene;
     scene.bgColor = {0.0f};
 
@@ -43,7 +42,7 @@ int main()
 
     cout << *cube << endl;
 
-    double t1, t2, avg=0;
+    double avg=0;
     char buf[256];
     int n=36, i=0;
 
@@ -55,25 +54,38 @@ int main()
 
     for (i=0; i <= n; ++i)
     {
-        // new camera position
-
-
         camera.lookAt(Ry(deg2rad( a )) * from, to);
 
-        t1 =ms_time();
+        auto start = chrono::steady_clock::now();
         camera.render(scene, 1, 4);
+        auto end = chrono::steady_clock::now();
 
-        t2 =ms_time();
-
-        cout << i << " " <<  i*a << " " << camera.position();
-        avg += t2-t1;
-        cout << " time in ms: " << t2-t1 << endl << endl;
+        cout << endl << i << " " <<  i*a << " " << camera.position() << endl;
 
         sprintf(buf, "%04d.ppm", i);
         camera.frame().save_ppm_bin(buf);
+
+        cout << "Elapsed time in nanoseconds : "
+            << chrono::duration_cast<chrono::nanoseconds>(end - start).count()
+            << " ns" << endl;
+
+        cout << "Elapsed time in microseconds : "
+            << chrono::duration_cast<chrono::microseconds>(end - start).count()
+            << " µs" << endl;
+
+        cout << "Elapsed time in milliseconds : "
+            << chrono::duration_cast<chrono::milliseconds>(end - start).count()
+            << " ms" << endl;
+
+        cout << "Elapsed time in seconds : "
+            << chrono::duration_cast<chrono::seconds>(end - start).count()
+            << " sec" << endl;
+
+        avg += chrono::duration_cast<chrono::milliseconds>(end - start).count();
     }
-    avg /=n;
-    cout << "avg time in ms: " << avg << endl;
+
+    avg = avg / (n+1);
+    cout << endl << "Elapsed avarage time in milliseconds : " << avg << endl;
 
     return 0;
 }
