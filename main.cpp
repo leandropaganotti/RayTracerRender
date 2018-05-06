@@ -1,10 +1,9 @@
 #include <iostream>
-#include "camera.h"
+#include "render.h"
 #include "scene.h"
 #include "cube.h"
 #include "sphere.h"
 #include "utils.h"
-
 #include <thread>
 
 using namespace std;
@@ -25,22 +24,10 @@ int main()
 
     Cube *cube = new Cube({1,1,0});
     scene.addObject(cube);
-
-
-//    Light light2;
-//    light2.color       = {1.0f};
-//    light2.origin      = Vector3f(2, 2 , -2);
-//    light2.strength    = 1.0f;
-//    light2.attenuation = 1.5f;
-
+    cout << *cube << endl;
 
     scene.addLight(new PointLight(Vector3f(2,2,2)));
 
-    //scene.lights.push_back(new DistantLight(-Vector3f(1,1,-1).normalize(), {1}, 0.03));
-
-    //scene.lights.push_back(light2);
-
-    cout << *cube << endl;
 
     double avg=0;
     char buf[256];
@@ -48,22 +35,23 @@ int main()
 
     float a=360.0/n;
 
-    Camera camera;
     Vector3f from(0, 5, 10);
     Vector3f to(0,0,0);
 
+    Render render;
+
     for (i=0; i <= n; ++i)
     {
-        camera.lookAt(Ry(deg2rad( a )) * from, to);
+        render.camera().lookAt(Ry(deg2rad( a )) * from, to);
+
+        cout << endl << i << " " <<  i*a << " " << render.camera().position() << endl;
 
         auto start = chrono::steady_clock::now();
-        camera.render(scene, 1, 4);
+        render.render(scene, 640, 480);
         auto end = chrono::steady_clock::now();
 
-        cout << endl << i << " " <<  i*a << " " << camera.position() << endl;
-
         sprintf(buf, "%04d.ppm", i);
-        camera.frame().save_ppm_bin(buf);
+        render.frame().save_ppm_bin(buf);
 
         cout << "Elapsed time in nanoseconds : "
             << chrono::duration_cast<chrono::nanoseconds>(end - start).count()
@@ -89,4 +77,3 @@ int main()
 
     return 0;
 }
-

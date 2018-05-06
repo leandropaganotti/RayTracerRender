@@ -8,7 +8,7 @@ class Image
 {   
     size_t _width;
     size_t _height;
-    float _aspectRatio;
+
     Vector3f **buffer;
 
 public:
@@ -29,7 +29,6 @@ public:
     void    width(const size_t value);
     size_t  height() const;
     void    height(const size_t value);
-    float   aspectRatio() const;
 
     friend std::ostream& operator << (std::ostream& os, Image& img);
 };
@@ -60,12 +59,5 @@ void Image::height(const size_t value)
 {
     _height = value;
 }
-inline
-float Image::aspectRatio() const
-{
-    return _aspectRatio;
-}
-
-
 
 #endif // IMAGE_H

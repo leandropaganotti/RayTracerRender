@@ -11,8 +11,8 @@ SOURCES += main.cpp \
     camera.cpp \
     scene.cpp \
     image.cpp \
-    raycaster.cpp \
-    sphere.cpp
+    sphere.cpp \
+    render.cpp
 
 HEADERS += \
     plane.h \
@@ -27,6 +27,6 @@ HEADERS += \
     light.h \
     image.h \
     ray.h \
-    raycaster.h \
-    sphere.h
+    sphere.h \
+    render.h
 

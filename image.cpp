@@ -2,9 +2,10 @@
 #include <iostream>
 #include <fstream>
 
-Image::Image(size_t width, size_t height): _width(width), _height(height), _aspectRatio((float)width/height), buffer(nullptr)
+Image::Image(size_t width, size_t height): _width(width), _height(height), buffer(nullptr)
 {
-    resize(width, height);
+    if ( width != 0 && height != 0)
+        resize(width, height);
 }
 
 Image::~Image()
@@ -48,7 +49,6 @@ void Image::save_ppm_bin(const char *filename) const
 void Image::move(Image &image)
 {
     destroy();
-    _aspectRatio = image._aspectRatio;
     _width  = image._width;
     _height = image._height;
     buffer = image.buffer;
@@ -78,7 +78,6 @@ void Image::resize(size_t width, size_t height)
         buffer = new_array_2d<Vector3f>(width, height);
         this->_width = width;
         this->_height = height;
-        _aspectRatio = (float)width / (float)height;
     }
 }
 
@@ -88,6 +87,5 @@ void Image::destroy()
     {
         del_array_2d<Vector3f>(buffer, _height);
         buffer = nullptr;
-        _aspectRatio = _width = _height = 0;
     }
 }
