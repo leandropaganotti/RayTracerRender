@@ -28,7 +28,7 @@ int main()
 	sphere->reflectivity = 1.0f;
 	scene.addObject(sphere);
 
-    Cube *cube = new Cube(Vector3f(0.0, 0.0, 0.0), Vector3f(1.0), Vector3f(0, 0, 0), Vector3f(1,1,0));
+    Cube *cube = new Cube( Vector3f(1.5, 0.5, -2.5), Vector3f(1, 1.5, 1), Vector3f(0, 30, 0), Vector3f(1,1,0));
     cube->reflectivity = 0.0;
 	//cube->shininess = 15;
     //cube->c_specular = Vector3f(1, 0, 0);
@@ -65,7 +65,7 @@ int main()
     	cout << endl << i << " " <<  a << " " << render.getCamera().getPosition() << endl;
         auto start = chrono::steady_clock::now();
         camera.lookAt(Ry(deg2rad( i*a )) * from, to);
-        render.render(scene, 640, 480, 4 );
+        render.render(scene, 640, 480, 1 );
         auto end = chrono::steady_clock::now();
 
         sprintf(buf, "%04d.ppm", i);

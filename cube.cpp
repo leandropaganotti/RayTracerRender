@@ -4,15 +4,6 @@
 Cube::Cube(const Vector3f &center, const Vector3f &size, const Vector3f &rotation, const Vector3f& color):
 	Mesh(color)
 {
-//    size_t v0 = addVertex({0,0,0}); //0
-//    size_t v1 = addVertex({1,0,0}); //1
-//    size_t v2 = addVertex({0,0,-1});//2
-//    size_t v3 = addVertex({1,0,-1});//3
-//    size_t v4 = addVertex({0,1,0}); //4
-//    size_t v5 = addVertex({1,1,0}); //5
-//    size_t v6 = addVertex({0,1,-1});//6
-//    size_t v7 = addVertex({1,1,-1});//7
-
     size_t v0 = addVertex({-0.5,-0.5, 0.5}); //0
 	size_t v1 = addVertex({ 0.5,-0.5, 0.5}); //1
 	size_t v2 = addVertex({-0.5,-0.5,-0.5}); //2
@@ -49,8 +40,7 @@ Cube::Cube(const Vector3f &center, const Vector3f &size, const Vector3f &rotatio
 
     for (auto &idx : vertices)
     {
-    	//std::cout << rotation << std::endl << Rx(deg2rad(rotation.x)) * Ry(deg2rad(rotation.y)) * Rz(deg2rad(rotation.z)) << std::endl << std::endl;
-        vertexBuffer[idx] = T(center) * S(size) * Rz(deg2rad(rotation.z)) * Ry(deg2rad(rotation.y)) * Rx(deg2rad(rotation.x)) * vertexBuffer[idx];
+        vertexBuffer[idx] = T(center) * Rz(deg2rad(rotation.z)) * Ry(deg2rad(rotation.y)) * Rx(deg2rad(rotation.x)) * S(size) * vertexBuffer[idx];
     }
 }
 
