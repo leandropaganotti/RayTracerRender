@@ -40,9 +40,9 @@ void Render::render_1x1x1(const Scene *scene, size_t start, size_t end, size_t n
         for (size_t j = 0; j < image.width(); ++j)
         {
             image.at(i, j) = 0;
-            for (size_t y=0; y < nrays; ++y)
+            for (size_t y=1; y <= nrays; ++y)
             {
-                for (size_t x=0; x < nrays; ++x)
+                for (size_t x=1; x <= nrays; ++x)
                 {
                     ray.direction = camera.getRayDirection(i+dy*y, j+dx*x);
                     image.at(i, j) += trace(ray, *scene, 0);

@@ -59,6 +59,7 @@ Vector3f Camera::getRayDirection(float i, float j) const
     float Px = (2.0f * ((j) / options.width) - 1.0f) * tan(options.fov / 2.0f ) * options.aspectRatio;
     float Py = (1.0f - 2.0f * ((i) / options.height)) * tan(options.fov / 2.0f);
     Vector3f dir = (cameraToWorld * Vector3f(Px, Py, -1.0f)) - options.from;
+    printf("%f %f\n", Px, Py);
     return dir.normalize();
 }
 
