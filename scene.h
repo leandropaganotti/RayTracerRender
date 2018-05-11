@@ -4,14 +4,17 @@
 #include <vector>
 #include "object.h"
 #include "light.h"
+#include "camera.h"
 
 class Scene
 {
 public:
+	Scene() = default;
+
     ObjectVector objects;
     LightVector lights;
-
     Vector3f bgColor;
+    CameraOptions cameraOptions;
 
     void addObject(Object * obj)
     {
@@ -22,7 +25,6 @@ public:
     {
         lights.emplace_back(light);
     }
-
 };
 
 #endif // SCENE_H

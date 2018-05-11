@@ -6,8 +6,6 @@ void Camera::lookAt(const Vector3f &from, const Vector3f &to, const Vector3f &up
     Vector3f xaxis = (up % zaxis).normalize();
     Vector3f yaxis = zaxis % xaxis;
 
-    //std::cout << zaxis << xaxis << yaxis << std::endl;
-
     cameraToWorld[0][0] = xaxis.x;
     cameraToWorld[1][0] = xaxis.y;
     cameraToWorld[2][0] = xaxis.z;
@@ -24,26 +22,44 @@ void Camera::lookAt(const Vector3f &from, const Vector3f &to, const Vector3f &up
     cameraToWorld[1][3] = from.y;
     cameraToWorld[2][3] = from.z;
 
-    //std::cout << cameraToWorld << std::endl;
-
-    pos = cameraToWorld * Vector3f(0.0f);
+    options.from = from;
+    options.to	 = to;
 }
 
-const Vector3f &Camera::position() const
+const Vector3f& Camera::getPosition() const
 {
-    return pos;
+    return options.from;
 }
 
-void Camera::resolution(size_t width, size_t height)
+const CameraOptions& Camera::getOptions() const
 {
-    this->width = width;
-    this->height = height;
-    aspectRatio = float(width) / height;
+	return options;
+}
+
+void Camera::setResolution(size_t width, size_t height)
+{
+	options.width = width;
+    options.height = height;
+    options.aspectRatio = float(width) / height;
+}
+
+void Camera::setFov(float fov)
+{
+	options.fov = fov;
+}
+
+void Camera::setOptions(const CameraOptions& options)
+{
+	this->options = options;
 }
 
 std::ostream &operator <<(std::ostream &os, const Camera &cam)
 {
-    return os << "Camera: " << cam.position();
+    return os << "Camera: " << cam.options;
 }
 
+std::ostream &operator <<(std::ostream &os, const CameraOptions &opt)
+{
+    return os << "Camera: " << opt.from << opt.to << " " << rad2deg(opt.fov) << " " << opt.width << " " << opt.height;
+}
 

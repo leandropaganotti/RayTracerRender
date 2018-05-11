@@ -1,42 +1,64 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include "utils.h"
 #include "vector.h"
-#include "scene.h"
-#include "image.h"
 #include "matrix.h"
 
-#define FOV 40
+#define FOV 	40
+#define WIDTH 	640
+#define HEIGHT 	480
+
+class CameraOptions
+{
+	friend class Camera;
+
+	Vector3f from;
+	Vector3f to;
+	float fov;
+	size_t width;
+	size_t height;
+
+	float aspectRatio;
+
+public:
+	CameraOptions(const Vector3f& from={0}, const Vector3f& to={0,0,-1}, float fov=FOV, size_t width=WIDTH, size_t height=HEIGHT):
+		from(from), to(to), fov(deg2rad(fov)), width(width), height(height), aspectRatio(float(width)/height)
+	{}
+	CameraOptions(const Vector3f& from, const Vector3f& to, size_t width, size_t height):
+		from(from), to(to), fov(deg2rad(FOV)), width(width), height(height), aspectRatio(float(width)/height)
+	{}
+
+	friend std::ostream &operator <<(std::ostream &os, const CameraOptions &opt);
+};
 
 class Camera
 {
-    Vector3f pos;
-    Matrix4x4f cameraToWorld;
-    float fov;
-    size_t width;
-    size_t height;
-    float aspectRatio;
+    CameraOptions 	options;
+    Matrix4x4f 		cameraToWorld;
 public:
 
-    Camera(): pos(0), fov(deg2rad(FOV)){}
-
-    Vector3f rayDirection(size_t i, size_t j);
+    Camera() = default;
 
     void lookAt(const Vector3f &from, const Vector3f &to, const Vector3f& up={0.0f,1.0f,0.0f});
 
-    const Vector3f& position() const;
+    void setResolution(size_t width, size_t height);
+    void setFov(float fov);
+    void setOptions(const CameraOptions& options);
 
-    void resolution(size_t width, size_t height);
+    Vector3f getRayDirection(size_t i, size_t j) const;
+    const Vector3f& getPosition() const;
+    const CameraOptions& getOptions() const;
 
     friend std::ostream& operator << (std::ostream& os, const Camera& cam);
 };
 
 inline
-Vector3f Camera::rayDirection(size_t i, size_t j)
+Vector3f Camera::getRayDirection(size_t i, size_t j) const
 {
-    float Px = (2.0f * ((j + 0.5f) / width) - 1.0f) * tan(fov / 2.0f ) * aspectRatio;
-    float Py = (1.0f - 2.0f * ((i + 0.5f) / height)) * tan(fov / 2.0f);
-    Vector3f dir = (cameraToWorld * Vector3f(Px, Py, -1.0f)) - pos;
+    float Px = (2.0f * ((j + 0.5f) / options.width) - 1.0f) * tan(options.fov / 2.0f ) * options.aspectRatio;
+    float Py = (1.0f - 2.0f * ((i + 0.5f) / options.height)) * tan(options.fov / 2.0f);
+    Vector3f dir = (cameraToWorld * Vector3f(Px, Py, -1.0f)) - options.from;
     return dir.normalize();
 }
 

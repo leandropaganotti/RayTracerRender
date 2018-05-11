@@ -3,6 +3,12 @@
 
 std::vector<Vertex>   Mesh::vertexBuffer;
 
+Mesh::Mesh(const Vector3f &color):
+	Object(color)
+{
+
+}
+
 Face::Face(size_t v0, size_t v1, size_t v2, const Vector3f &normal): v0(v0), v1(v1), v2(v2), normal(normal)
 {
     size_t vbs = Mesh::vertexBuffer.size();

@@ -6,6 +6,7 @@
 class Vertex: public Vector3f
 {
 public:
+	Vertex() = default;
     Vertex(float x): Vector3f(x){}
     Vertex(float x, float y, float z): Vector3f(x, y, z){}
     Vertex(const Vector3f &v): Vector3f(v){}
@@ -21,6 +22,7 @@ public:
 class Face
 {
 public:
+	Face() = delete;
     Face(size_t v0, size_t v1, size_t v2, const Vector3f& normal);
 
     bool intersection(const Ray &ray, float &tnear) const;
@@ -42,6 +44,8 @@ protected:
     std::vector<Face>   faces;
 
 public:
+    Mesh(const Vector3f &color={1.0f});
+
     size_t addVertex(const Vertex& v);
     size_t addFace(const Face& t);
 

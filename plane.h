@@ -5,7 +5,7 @@
 
 class Plane: public Object
 {
-    Vector3f P;         // a point P on the plane
+    Vector3f P;    // a point P on the plane
     Vector3f N;    // normal to the plane
 public:    
     Plane(const Vector3f& P={0.0f}, const Vector3f& N={0.0f, 1.0f, 0.0f}, const Vector3f& color={1.0f});

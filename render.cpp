@@ -9,19 +9,19 @@ void Render::render(const Scene &scene, size_t width, size_t height, uint8_t nra
     if (nrays < 1)
         throw std::invalid_argument("# of rays must be > 0");
 
-    _frame.resize( width * nrays, height * nrays);
+    camera.setResolution(width * nrays, height * nrays);
 
-    _camera.resolution(_frame.width(), _frame.height());
+    image.resize(width * nrays, height * nrays);
 
     std::vector<std::thread> threads;
 
-    size_t nrows = _frame.height() / nthreads, i;
+    size_t nrows = image.height() / nthreads, i;
 
     for( i=0 ; i < nthreads - 1u; ++i)
     {
         threads.push_back( std::thread( &Render::render_1x1x1, this, &scene, i*nrows, (i+1) * nrows ) );
     }
-    threads.push_back( std::thread( &Render::render_1x1x1, this, &scene, i*nrows, _frame.height() ) );
+    threads.push_back( std::thread( &Render::render_1x1x1, this, &scene, i*nrows, image.height() ) );
 
     for (auto& thread : threads) thread.join();
 
@@ -38,73 +38,77 @@ void Render::render(const Scene &scene, size_t width, size_t height, uint8_t nra
                 {
                     for (size_t l = j*nrays; l < j*nrays + nrays; ++l)
                     {
-                        frame.at(i, j) += _frame.at(k, l);
+                        frame.at(i, j) += image.at(k, l);
                     }
                 }
                 frame.at(i, j) /= nrays*nrays;
             }
         }
-        _frame.move(frame);
+        image.move(frame);
     }
 }
 
 void Render::render_1x1x1(const Scene *scene, size_t start, size_t end)
 {
     if (scene == nullptr) return;
-    Ray ray(_camera.position(), 0.0f);
+    Ray ray(camera.getPosition(), 0.0f);
     for (size_t i = start; i < end; ++i)
     {
-        for (size_t j = 0; j < _frame.width(); ++j)
+        for (size_t j = 0; j < image.width(); ++j)
         {
-            ray.direction = _camera.rayDirection(i, j);
-            _frame.at(i, j) = trace(ray, *scene);
+            ray.direction = camera.getRayDirection(i, j);
+            image.at(i, j) = trace(ray, *scene, 0);
         }
     }
 }
 
-Vector3f Render::trace(const Ray &ray, const Scene &scene)
+Vector3f Render::trace(const Ray &ray, const Scene &scene, const uint8_t depth)
 {
+    if(depth == MAX_DEPTH) return scene.bgColor;
+
     IntersectionData isec;
 
     castRay(ray, scene.objects, isec);
 
-    if (isec.object)
+    if (isec.object == nullptr) return scene.bgColor;
+
+    Vector3f phit = ray.origin + isec.tnear * ray.direction;
+    Vector3f normal = isec.object->normal(phit, isec.idx);
+
+    //ambient
+    Vector3f phitColor = isec.object->k_ambient;
+
+    // diffuse and specular
+    for(auto& light: scene.lights)
     {
-        //ambient color
-        Vector3f phitColor = isec.object->ambient();
-        Vector3f phit = ray.origin + isec.tnear * ray.direction;
-        Vector3f normal = isec.object->normal(phit, isec.idx);
+        Vector3f toLight = light->direction(phit);
 
-        for(auto& light: scene.lights)
+        float incidence = normal ^ toLight;
+        if( incidence > 0.0f )
         {
-            Vector3f toLight = light->direction(phit);
+        	if (!castShadowRay(Ray(phit + bias * normal, toLight), scene.objects, light->distance(phit)))
+			{
+				Vector3f lightIntensity = light->intensity(phit);
 
-            if (!castShadowRay(Ray(phit + bias * normal, toLight), scene.objects, light->distance(phit)))
-            {
-                //diffuse NdotL
-                float NdotL = std::max(0.0f, normal ^ toLight);
-                phitColor += light->intensity(phit) * isec.object->diffColor() * NdotL;
+				//diffuse
+				phitColor += lightIntensity * isec.object->k_diffuse * incidence;
 
-                //specular
-                if( NdotL > 0.0f )
-                {
-                    //specular color
-                    Vector3f toCamera = (ray.origin - phit).normalize();
-                    Vector3f reflection = (2.0f * ((normal ^ toLight) * normal) - toLight);
-                    phitColor += light->intensity(phit) * isec.object->specColor() * pow(std::max(0.0f, toCamera ^ reflection), isec.object->shininess);
-                }
-            }
+				//specular
+				Vector3f toCamera = (ray.origin - phit).normalize();
+				Vector3f reflected = reflect(-toLight, normal);
+				phitColor += lightIntensity * isec.object->k_specular * pow(std::max(0.0f, toCamera ^ reflected), isec.object->shininess);
+			}
         }
-
-        //gamma
-        const float gamma=1.0/2.2;
-        phitColor[0] = pow(phitColor[0], gamma);
-        phitColor[1] = pow(phitColor[1], gamma);
-        phitColor[2] = pow(phitColor[2], gamma);
-
-        return phitColor;
     }
-    return scene.bgColor;
+
+    //reflection
+    if( isec.object->reflectivity )
+    {
+        Ray reflected( phit + bias * normal, reflect(ray.direction, normal) );
+        phitColor += trace(reflected, scene, depth + 1) * isec.object->reflectivity ;
+    }
+
+    return phitColor;
 }
 
 inline

@@ -36,10 +36,11 @@ void Image::save_ppm_bin(const char *filename) const
     {
         for (size_t j = 0; j < _width; ++j)
         {
-            static unsigned char color[3];
-            color[0] = std::min((int)round(buffer[i][j][0] * 255), 255);  /* red */
-            color[1] = std::min((int)round(buffer[i][j][1] * 255), 255);  /* green */
-            color[2] = std::min((int)round(buffer[i][j][2] * 255), 255);  /* blue */
+            const float gamma=1.0/2.2;
+            unsigned char color[3];
+            color[0] = pow(clamp(buffer[i][j].r), gamma) * 255;  /* red */
+            color[1] = pow(clamp(buffer[i][j].g), gamma) * 255;  /* green */
+            color[2] = pow(clamp(buffer[i][j].b), gamma) * 255;  /* blue */
             (void) fwrite(color, 1, 3, fp);
         }
     }

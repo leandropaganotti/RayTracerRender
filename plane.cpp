@@ -1,9 +1,9 @@
 #include "plane.h"
 
 Plane::Plane(const Vector3f &P, const Vector3f &n, const Vector3f& color):
-    P(P), N(n)
+    Object(color), P(P), N(n)
 {
-    c_diffuse = color;
+
 }
 
 bool Plane::intersection(const Ray &ray, IntersectionData& isec) const

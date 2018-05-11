@@ -12,6 +12,7 @@ public:
     virtual float    distance  (const Vector3f &point) const = 0;
     virtual Vector3f direction (const Vector3f &point) const = 0;
     virtual Vector3f intensity (const Vector3f &point) const = 0;
+    virtual ~Light() = default;
 };
 
 typedef std::vector<std::unique_ptr<Light>> LightVector;
@@ -23,7 +24,7 @@ class PointLight: public Light
     float strength;
     float k;
 public:
-    PointLight(const Vector3f &pos={0.0f}, const Vector3f &color={1.0f}, float strength=1.0f, float k=0.05f):
+    PointLight(const Vector3f &pos={0.0f}, const Vector3f &color={1.0f}, float strength=1.0f, float k=0.01f):
         pos(pos), color(color), strength(strength), k(k)
     {
 

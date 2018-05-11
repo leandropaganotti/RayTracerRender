@@ -9,6 +9,19 @@
 
 typedef struct timeval timestamp;
 
+
+inline
+Vector3f reflect(const Vector3f &I, const Vector3f &N)
+{
+    return (I - 2 * I.dot(N) * N).normalize();
+}
+
+inline
+float clamp(float x)
+{
+    return x < 0.0f ? 0.0f : x > 1.0 ? 1.0f : x;
+}
+
 inline
 double ms_time()
 {

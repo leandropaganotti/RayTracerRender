@@ -19,14 +19,14 @@ struct IntersectionData
 class Object
 {   
 public:
-    Object()
+    Object(const Vector3f &color)
     {
-        c_diffuse = {1.0f};
-        c_specular = {1.0f};
-        k_ambient = 0.05f;
-        k_diffuse = 1.0f;
-        k_specular = 0.5f;
-        shininess = 30.0f;
+        k_diffuse = color;
+        k_specular = 1.0f;
+        k_ambient = k_diffuse * 0.1f;
+
+        shininess = 150.0f;
+        reflectivity = 0.3f;
     }
 
     virtual bool intersection(const Ray& ray, IntersectionData &isec) const = 0;
@@ -37,25 +37,11 @@ public:
 
     //Object attributes down here
 
-    Vector3f c_diffuse;
-    Vector3f c_specular;
-    float k_diffuse;
-    float k_specular;
-    float k_ambient;
+    Vector3f k_diffuse;
+    Vector3f k_specular;
+    Vector3f k_ambient;
     float shininess;
-
-    Vector3f diffColor() const
-    {
-        return k_diffuse * c_diffuse;
-    }
-    Vector3f specColor() const
-    {
-        return k_specular * c_specular;
-    }
-    Vector3f ambient() const
-    {
-        return k_ambient * c_diffuse;
-    }
+    float reflectivity;
 };
 
 #endif // OBJECT_H

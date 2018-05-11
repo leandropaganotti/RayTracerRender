@@ -23,14 +23,9 @@ struct Vector3
     T& operator[](size_t i) { return vec[i]; }
     const T& operator[](size_t i) const { return vec[i]; }
 
-    Vector3(){}
+    Vector3() = default;
     Vector3(T x): x(x), y(x), z(x){}
     Vector3(T x, T y, T z): x(x), y(y), z(z){}
-
-    bool operator==(const Vector3f& rhs) const
-    {
-        return x==rhs.x && y==rhs.y && z==rhs.z;
-    }
 
     T dot(const Vector3& v) const
     {
@@ -48,10 +43,22 @@ struct Vector3
     {
         float m = length(); x/=m; y/=m; z/=m; return *this;
     }
+    bool operator==(const Vector3f& rhs) const
+    {
+        return x==rhs.x && y==rhs.y && z==rhs.z;
+    }
     Vector3 operator-() const
     {
         return {-x, -y, -z};
     }
+    Vector3 operator-(const Vector3& rhs) const
+	{
+		return {x - rhs.x, y - rhs.y, z - rhs.z};
+	}
+    void operator-=(const Vector3& rhs)
+	{
+		x -= rhs.x; y -= rhs.y; z -= rhs.z;
+	}
     Vector3 operator+(const Vector3& rhs) const
     {
         return {x+rhs.x, y+rhs.y, z+rhs.z};
@@ -59,14 +66,6 @@ struct Vector3
     void operator+=(const Vector3& rhs)
     {
         x+=rhs.x; y+=rhs.y; z+=rhs.z;
-    }
-    Vector3 operator-(const Vector3& rhs) const
-    {
-        return {x - rhs.x, y - rhs.y, z - rhs.z};
-    }
-    void operator-=(const Vector3& rhs)
-    {
-        x -= rhs.x; y -= rhs.y; z -= rhs.z;
     }
     Vector3 operator*(float scalar) const
     {

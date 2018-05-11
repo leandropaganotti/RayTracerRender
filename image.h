@@ -15,10 +15,16 @@ public:
     Image(size_t width=0, size_t height=0);
     ~Image();
 
+    Image(const Image &image) = delete;
+    Image(const Image &&image) = delete;
+
+    Image & operator=(const Image &image) = delete;
+    Image & operator=(const Image &&image) = delete;
+
     void resize(size_t width, size_t height);
     void destroy();
 
-    Vector3f& at(size_t i, size_t j);
+    Vector3f & at(size_t i, size_t j);
 
     void save_ppm(const char* filename) const;
     void save_ppm_bin(const char * filename) const;

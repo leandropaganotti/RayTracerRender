@@ -14,9 +14,9 @@
 
 
 Sphere::Sphere(const Vector3f &center, const float &radius, const Vector3f &color) :
-    center(center), radius(radius), radius2(radius * radius)
+    Object(color), center(center), radius(radius), radius2(radius * radius)
 {
-    c_diffuse = color;
+
 }
 
 bool Sphere::intersection(const Ray &ray, IntersectionData &isec) const
