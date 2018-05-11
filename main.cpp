@@ -28,11 +28,11 @@ int main()
 	sphere->reflectivity = 1.0f;
 	scene.addObject(sphere);
 
-	Cube *cube = new Cube(Vector3f(0.0, 0.0, 0.0), Vector3f(1.0), Vector3f(0, 0, 0));
-    cube->reflectivity = 0.3;
+    Cube *cube = new Cube(Vector3f(0.0, 0.0, 0.0), Vector3f(1.0), Vector3f(0, 0, 0), Vector3f(1,1,0));
+    cube->reflectivity = 0.0;
 	//cube->shininess = 15;
     //cube->c_specular = Vector3f(1, 0, 0);
-    //scene.addObject(cube);
+    scene.addObject(cube);
 	//cout << *cube << endl;
 
     scene.addObject(new Sphere({3.5,0.5, -0.5}, 0.5, {1,0,0}));

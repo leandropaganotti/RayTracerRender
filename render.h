@@ -16,7 +16,7 @@ class Render
 
     const float bias = 0.0001;
 
-    void render_1x1x1(const Scene *scene, size_t start, size_t end);
+    void render_1x1x1(const Scene *scene, size_t start, size_t end, size_t nrays);
 
     Vector3f trace(const Ray &ray, const Scene &scene, const uint8_t depth);
 

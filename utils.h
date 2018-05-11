@@ -95,7 +95,7 @@ T **new_array_2d(size_t width, size_t height)
 {
     T** array2d_ptr = new T *[height];
     for(size_t i = 0; i < height; ++i)
-        array2d_ptr[i] = new T[width]{};
+        array2d_ptr[i] = new T[width]{0};
     return array2d_ptr;
 }
 

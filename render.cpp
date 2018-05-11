@@ -9,9 +9,9 @@ void Render::render(const Scene &scene, size_t width, size_t height, uint8_t nra
     if (nrays < 1)
         throw std::invalid_argument("# of rays must be > 0");
 
-    camera.setResolution(width * nrays, height * nrays);
+    camera.setResolution(width, height);
 
-    image.resize(width * nrays, height * nrays);
+    image.resize(width, height);
 
     std::vector<std::thread> threads;
 
@@ -19,45 +19,36 @@ void Render::render(const Scene &scene, size_t width, size_t height, uint8_t nra
 
     for( i=0 ; i < nthreads - 1u; ++i)
     {
-        threads.push_back( std::thread( &Render::render_1x1x1, this, &scene, i*nrows, (i+1) * nrows ) );
+        threads.push_back( std::thread( &Render::render_1x1x1, this, &scene, i*nrows, (i+1) * nrows, nrays ) );
     }
-    threads.push_back( std::thread( &Render::render_1x1x1, this, &scene, i*nrows, image.height() ) );
+    threads.push_back( std::thread( &Render::render_1x1x1, this, &scene, i*nrows, image.height(), nrays ) );
 
     for (auto& thread : threads) thread.join();
-
-    if( nrays > 1)
-    {
-        Image frame( width, height );
-
-        for (size_t i = 0; i < frame.height(); ++i)
-        {
-            for (size_t j = 0; j < frame.width(); ++j)
-            {
-                frame.at(i, j) = 0;
-                for (size_t k = i*nrays; k < i*nrays + nrays; ++k)
-                {
-                    for (size_t l = j*nrays; l < j*nrays + nrays; ++l)
-                    {
-                        frame.at(i, j) += image.at(k, l);
-                    }
-                }
-                frame.at(i, j) /= nrays*nrays;
-            }
-        }
-        image.move(frame);
-    }
 }
 
-void Render::render_1x1x1(const Scene *scene, size_t start, size_t end)
+void Render::render_1x1x1(const Scene *scene, size_t start, size_t end, size_t nrays)
 {
     if (scene == nullptr) return;
     Ray ray(camera.getPosition(), 0.0f);
+
+    // nrays defines a greid nrays x nrays
+    float dx = 1.0f / ( 1.0f + nrays);
+    float dy = 1.0f / ( 1.0f + nrays);
+
     for (size_t i = start; i < end; ++i)
     {
         for (size_t j = 0; j < image.width(); ++j)
         {
-            ray.direction = camera.getRayDirection(i, j);
-            image.at(i, j) = trace(ray, *scene, 0);
+            image.at(i, j) = 0;
+            for (size_t y=0; y < nrays; ++y)
+            {
+                for (size_t x=0; x < nrays; ++x)
+                {
+                    ray.direction = camera.getRayDirection(i+dy*y, j+dx*x);
+                    image.at(i, j) += trace(ray, *scene, 0);
+                }
+            }
+            image.at(i, j) /= nrays*nrays;
         }
     }
 }
@@ -71,6 +62,8 @@ Vector3f Render::trace(const Ray &ray, const Scene &scene, const uint8_t depth)
     castRay(ray, scene.objects, isec);
 
     if (isec.object == nullptr) return scene.bgColor;
+
+    //Phong shading down here
 
     Vector3f phit = ray.origin + isec.tnear * ray.direction;
     Vector3f normal = isec.object->normal(phit, isec.idx);

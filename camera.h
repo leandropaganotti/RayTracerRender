@@ -46,7 +46,7 @@ public:
     void setFov(float fov);
     void setOptions(const CameraOptions& options);
 
-    Vector3f getRayDirection(size_t i, size_t j) const;
+    Vector3f getRayDirection(float i, float j) const;
     const Vector3f& getPosition() const;
     const CameraOptions& getOptions() const;
 
@@ -54,10 +54,10 @@ public:
 };
 
 inline
-Vector3f Camera::getRayDirection(size_t i, size_t j) const
+Vector3f Camera::getRayDirection(float i, float j) const
 {
-    float Px = (2.0f * ((j + 0.5f) / options.width) - 1.0f) * tan(options.fov / 2.0f ) * options.aspectRatio;
-    float Py = (1.0f - 2.0f * ((i + 0.5f) / options.height)) * tan(options.fov / 2.0f);
+    float Px = (2.0f * ((j) / options.width) - 1.0f) * tan(options.fov / 2.0f ) * options.aspectRatio;
+    float Py = (1.0f - 2.0f * ((i) / options.height)) * tan(options.fov / 2.0f);
     Vector3f dir = (cameraToWorld * Vector3f(Px, Py, -1.0f)) - options.from;
     return dir.normalize();
 }
