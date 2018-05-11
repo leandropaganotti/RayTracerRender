@@ -1,32 +1,26 @@
 #include "render.h"
 #include <thread>
 
-void Render::render(const Scene &scene, size_t width, size_t height, uint8_t nrays, uint8_t nthreads)
+
+Render::Render()
 {
-    if (nthreads ==0 || nthreads > 4)
-        throw std::invalid_argument("# of threads must be 1, 2, 3 or 4");
-
-    if (nrays < 1)
-        throw std::invalid_argument("# of rays must be > 0");
-
-    camera.setResolution(width, height);
-
-    image.resize(width, height);
-
-    std::vector<std::thread> threads;
-
-    size_t nrows = image.height() / nthreads, i;
-
-    for( i=0 ; i < nthreads - 1u; ++i)
-    {
-        threads.push_back( std::thread( &Render::render_1x1x1, this, &scene, i*nrows, (i+1) * nrows, nrays ) );
-    }
-    threads.push_back( std::thread( &Render::render_1x1x1, this, &scene, i*nrows, image.height(), nrays ) );
-
-    for (auto& thread : threads) thread.join();
+    image.resize(camera.getWidth(), camera.getHeight());
 }
 
-void Render::render_1x1x1(const Scene *scene, size_t start, size_t end, size_t nrays)
+void Render::render(size_t width, size_t height, const Scene &scene, uint8_t nrays, uint8_t nthreads)
+{
+   image.resize(width, height);
+   camera.setResolution(width, height);
+   render(scene, nrays, nthreads);
+}
+
+void Render::render(const CameraOptions &opts, const Scene &scene, uint8_t nrays, uint8_t nthreads)
+{
+    camera.setOptions(opts);
+    render(scene, nrays, nthreads);
+}
+
+void Render::renderSingleThread(const Scene *scene, size_t start, size_t end, size_t nrays)
 {
     if (scene == nullptr) return;
     Ray ray(camera.getPosition(), 0.0f);
@@ -135,4 +129,26 @@ bool Render::castShadowRay(const Ray &ray, const ObjectVector &objects, float tM
         }
     }
     return false;
+}
+
+void Render::render(const Scene &scene, uint8_t nrays, uint8_t nthreads)
+{
+
+    if (nthreads == 0 || nthreads >= image.height())
+        throw std::invalid_argument("# of threads must be > 0 and < image.height ");
+
+    if (nrays == 0)
+        throw std::invalid_argument("# of rays must be greater than 0");
+
+    std::vector<std::thread> threads;
+
+    size_t nrows = image.height() / nthreads, i;
+
+    for( i=0 ; i < nthreads - 1u; ++i)
+    {
+        threads.push_back( std::thread( &Render::renderSingleThread, this, &scene, i*nrows, (i+1) * nrows, nrays ) );
+    }
+    threads.push_back( std::thread( &Render::renderSingleThread, this, &scene, i*nrows, image.height(), nrays ) );
+
+    for (auto& thread : threads) thread.join();
 }

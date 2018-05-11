@@ -33,7 +33,17 @@ const Vector3f& Camera::getPosition() const
 
 const CameraOptions& Camera::getOptions() const
 {
-	return options;
+    return options;
+}
+
+size_t Camera::getWidth() const
+{
+    return options.width;
+}
+
+size_t Camera::getHeight() const
+{
+    return options.height;
 }
 
 void Camera::setResolution(size_t width, size_t height)

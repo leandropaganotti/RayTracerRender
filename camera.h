@@ -25,9 +25,6 @@ public:
 	CameraOptions(const Vector3f& from={0}, const Vector3f& to={0,0,-1}, float fov=FOV, size_t width=WIDTH, size_t height=HEIGHT):
 		from(from), to(to), fov(deg2rad(fov)), width(width), height(height), aspectRatio(float(width)/height)
 	{}
-	CameraOptions(const Vector3f& from, const Vector3f& to, size_t width, size_t height):
-		from(from), to(to), fov(deg2rad(FOV)), width(width), height(height), aspectRatio(float(width)/height)
-	{}
 
 	friend std::ostream &operator <<(std::ostream &os, const CameraOptions &opt);
 };
@@ -49,6 +46,8 @@ public:
     Vector3f getRayDirection(float i, float j) const;
     const Vector3f& getPosition() const;
     const CameraOptions& getOptions() const;
+    size_t getWidth() const;
+    size_t getHeight() const;
 
     friend std::ostream& operator << (std::ostream& os, const Camera& cam);
 };

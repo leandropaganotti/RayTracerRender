@@ -16,7 +16,7 @@ class Render
 
     const float bias = 0.0001;
 
-    void render_1x1x1(const Scene *scene, size_t start, size_t end, size_t nrays);
+    void renderSingleThread(const Scene *scene, size_t start, size_t end, size_t nrays);
 
     Vector3f trace(const Ray &ray, const Scene &scene, const uint8_t depth);
 
@@ -25,7 +25,7 @@ class Render
 
 public:
 
-    Render() = default;
+    Render();
 
     Camera& getCamera() { return camera; }
     Image& getImage()   { return image;  }
@@ -38,12 +38,12 @@ public:
     /*
      * render the scene with current the CameraOptions, but set resolution width x height
      * */
-    void render(const Scene &scene, size_t width, size_t height, uint8_t nrays=NRAYS, uint8_t nthreads=NTHREADS);
+    void render(size_t width, size_t height, const Scene &scene, uint8_t nrays=NRAYS, uint8_t nthreads=NTHREADS);
 
     /*
      * render the scene with specified CameraOptions opts
      * */
-    void render(const Scene &scene, const CameraOptions &opts, uint8_t nrays=NRAYS, uint8_t nthreads=NTHREADS);
+    void render(const CameraOptions &opts, const Scene &scene, uint8_t nrays=NRAYS, uint8_t nthreads=NTHREADS);
 
 };
 

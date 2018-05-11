@@ -65,7 +65,7 @@ int main()
     	cout << endl << i << " " <<  a << " " << render.getCamera().getPosition() << endl;
         auto start = chrono::steady_clock::now();
         camera.lookAt(Ry(deg2rad( i*a )) * from, to);
-        render.render(scene, 640, 480, 1 );
+        render.render(1920, 1080, scene, 6, 4);
         auto end = chrono::steady_clock::now();
 
         sprintf(buf, "%04d.ppm", i);
