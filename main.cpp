@@ -47,7 +47,7 @@ int main()
 
     double avg=0;
     char buf[256];
-    int n=0, i=0;
+    int n=36, i=0;
     float a=360.0/n;
 
     /**
@@ -65,7 +65,7 @@ int main()
     	cout << endl << i << " " <<  a << " " << render.getCamera().getPosition() << endl;
         auto start = chrono::steady_clock::now();
         camera.lookAt(Ry(deg2rad( i*a )) * from, to);
-        render.render(scene, 2, 2, 1, 1 );
+        render.render(scene, 640, 480, 4 );
         auto end = chrono::steady_clock::now();
 
         sprintf(buf, "%04d.ppm", i);
