@@ -9,11 +9,14 @@
 class Scene
 {
 public:
-	Scene() = default;
+    Scene(): ambientIndex(1.0f) {}
 
     ObjectVector objects;
     LightVector lights;
     Vector3f bgColor;
+
+    float ambientIndex;
+
     CameraOptions cameraOptions;
 
     void addObject(Object * obj)

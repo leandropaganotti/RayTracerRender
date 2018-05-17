@@ -13,7 +13,48 @@ typedef struct timeval timestamp;
 inline
 Vector3f reflect(const Vector3f &I, const Vector3f &N)
 {
-    return (I - 2 * I.dot(N) * N).normalize();
+    //I-2(N.I)N => N.I = cosi
+    return (I - 2.0f * I.dot(N) * N).normalize();
+}
+
+inline
+Vector3f refract(const Vector3f &I, const Vector3f &N, float n1, float n2)
+{
+    //n  = n1 / n2
+    float n = n1 / n2;
+
+    //cosi = N.I
+    float cosi = N.dot(I);
+
+    // sin2t = n^2(1-cosi^2)
+    float sin2t = n * n * (1.0f - cosi * cosi);
+
+    if (sin2t > 1.0f) return Vector3f(0);
+
+    return n * I + (n * cosi - sqrt(1.0f - sin2t)) * N;
+}
+
+inline
+void fresnel(const Vector3f &I, const Vector3f &N, const float &ior, float &kr)
+{
+    float cosi = N.dot(I);
+    float etai = 1, etat = ior;
+    if (cosi > 0) { std::swap(etai, etat); }
+    // Compute sini using Snell's law
+    float sint = etai / etat * sqrtf(std::max(0.f, 1 - cosi * cosi));
+    // Total internal reflection
+    if (sint >= 1) {
+        kr = 1;
+    }
+    else {
+        float cost = sqrtf(std::max(0.f, 1 - sint * sint));
+        cosi = fabsf(cosi);
+        float Rs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost));
+        float Rp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost));
+        kr = (Rs * Rs + Rp * Rp) / 2;
+    }
+    // As a consequence of the conservation of energy, transmittance is given by:
+    // kt = 1 - kr;
 }
 
 inline

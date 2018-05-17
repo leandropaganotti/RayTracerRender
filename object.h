@@ -27,8 +27,10 @@ public:
 
         shininess = 150.0f;
         reflectivity = 0.3f;
-    }
+        refractiveIndex = 1.0f;
 
+        type = Type::OPAQUE;
+    }   
     virtual bool intersection(const Ray& ray, IntersectionData &isec) const = 0;
     virtual bool intersection(const Ray& ray, float &tnear) const = 0;
     virtual const Vector3f normal(const Vector3f &phit, size_t idx) const = 0;
@@ -36,12 +38,16 @@ public:
     virtual ~Object() = default;
 
     //Object attributes down here
+    enum class Type { OPAQUE, REFRACTIVE };
 
     Vector3f k_diffuse;
     Vector3f k_specular;
     Vector3f k_ambient;
     float shininess;
     float reflectivity;
+    float refractiveIndex;
+    Type type;
+
 };
 
 #endif // OBJECT_H
