@@ -3,6 +3,8 @@ CONFIG += console c++11
 CONFIG -= app_bundle
 CONFIG -= qt
 LIBS += -lpthread
+LIBS += -L/usr/local/lib -lxml2
+INCLUDEPATH = /usr/include/libxml2/
 
 SOURCES += main.cpp \
     plane.cpp \
@@ -12,7 +14,9 @@ SOURCES += main.cpp \
     scene.cpp \
     image.cpp \
     sphere.cpp \
-    render.cpp
+    render.cpp \
+    xmlparser.cpp \
+    light.cpp
 
 HEADERS += \
     plane.h \
@@ -28,5 +32,6 @@ HEADERS += \
     image.h \
     ray.h \
     sphere.h \
-    render.h
+    render.h \
+    xmlparser.h
 

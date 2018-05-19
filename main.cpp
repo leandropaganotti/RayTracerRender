@@ -48,24 +48,30 @@ int main()
     double avg=0;
     char buf[256];
     int n=36, i=0;
-    float a=360.0/n;
+    float a= n?360.0/n:0;
 
     /**
      * Starts here
      * */
 
+    Scene scene1;
+
+    scene1.load("/home/leandro/projects/Render/scenes/balls.xml");
+
     Render render;
 
     Camera &camera = render.getCamera();
 
-    const Vector3f from(0.5, 2, 10), to(0.5, 0, 0);
+    camera.setOptions(scene1.cameraOptions);
+
+    const Vector3f from( scene1.cameraOptions.getFrom() ), to( scene1.cameraOptions.getTo() );
 
     for (i=0; i <= n; ++i)
     {
-    	cout << endl << i << " " <<  a << " " << render.getCamera().getPosition() << endl;
+        cout << endl << i << " " <<  i*a << " " << render.getCamera().getPosition() << endl;
         auto start = chrono::steady_clock::now();
         camera.lookAt(Ry(deg2rad( i*a )) * from, to);
-        render.render(1920, 1080, scene, 6, 4);
+        render.render(scene1, 1, 4);
         auto end = chrono::steady_clock::now();
 
         sprintf(buf, "%04d.ppm", i);

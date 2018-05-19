@@ -15,18 +15,27 @@ class CameraOptions
 
 	Vector3f from;
 	Vector3f to;
-	float fov;
-	size_t width;
-	size_t height;
-
-	float aspectRatio;
+    float    fov;
+    size_t   width;
+    size_t   height;
+    float    aspectRatio;
 
 public:
-	CameraOptions(const Vector3f& from={0}, const Vector3f& to={0,0,-1}, float fov=FOV, size_t width=WIDTH, size_t height=HEIGHT):
-		from(from), to(to), fov(deg2rad(fov)), width(width), height(height), aspectRatio(float(width)/height)
-	{}
+    CameraOptions(const Vector3f& from={0}, const Vector3f& to={0,0,-1}, float fov=FOV, size_t width=WIDTH, size_t height=HEIGHT);
 
-	friend std::ostream &operator <<(std::ostream &os, const CameraOptions &opt);
+    Vector3f getFrom() const;
+    void     setFrom(const Vector3f &value);
+    Vector3f getTo() const;
+    void     setTo(const Vector3f &value);
+    float    getFov() const;
+    void     setFov(float value);
+    size_t   getWidth() const;
+    void     setWidth(const size_t &value);
+    size_t   getHeight() const;
+    void     setHeight(const size_t &value);
+    float    getAspectRatio() const;
+
+    friend std::ostream &operator <<(std::ostream &os, const CameraOptions &opt);
 };
 
 class Camera
@@ -37,17 +46,18 @@ public:
 
     Camera() = default;
 
-    void lookAt(const Vector3f &from, const Vector3f &to, const Vector3f& up={0.0f,1.0f,0.0f});
-
-    void setResolution(size_t width, size_t height);
-    void setFov(float fov);
-    void setOptions(const CameraOptions& options);
+    void lookAt(const Vector3f &from, const Vector3f &to, const Vector3f& up={0.0f,1.0f,0.0f}); 
 
     Vector3f getRayDirection(float i, float j) const;
-    const Vector3f& getPosition() const;
+
     const CameraOptions& getOptions() const;
+    void setOptions(const CameraOptions& options);
+
+    const Vector3f& getPosition() const;   
     size_t getWidth() const;
     size_t getHeight() const;
+    void setResolution(size_t width, size_t height);
+    void setFov(float fov);
 
     friend std::ostream& operator << (std::ostream& os, const Camera& cam);
 };

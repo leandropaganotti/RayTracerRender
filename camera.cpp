@@ -33,7 +33,7 @@ const Vector3f& Camera::getPosition() const
 
 const CameraOptions& Camera::getOptions() const
 {
-    return options;
+    return options;    
 }
 
 size_t Camera::getWidth() const
@@ -55,12 +55,13 @@ void Camera::setResolution(size_t width, size_t height)
 
 void Camera::setFov(float fov)
 {
-	options.fov = fov;
+    options.fov = deg2rad(fov);
 }
 
 void Camera::setOptions(const CameraOptions& options)
 {
 	this->options = options;
+    lookAt(options.from, options.to);
 }
 
 std::ostream &operator <<(std::ostream &os, const Camera &cam)
@@ -68,8 +69,68 @@ std::ostream &operator <<(std::ostream &os, const Camera &cam)
     return os << "Camera: " << cam.options;
 }
 
-std::ostream &operator <<(std::ostream &os, const CameraOptions &opt)
+CameraOptions::CameraOptions(const Vector3f &from, const Vector3f &to, float fov, size_t width, size_t height):
+    from(from), to(to), fov(deg2rad(fov)), width(width), height(height), aspectRatio(float(width)/height)
+{}
+
+Vector3f CameraOptions::getTo() const
 {
-    return os << "Camera: " << opt.from << opt.to << " " << rad2deg(opt.fov) << " " << opt.width << " " << opt.height;
+    return to;
 }
 
+void CameraOptions::setTo(const Vector3f &value)
+{
+    to = value;
+}
+
+float CameraOptions::getFov() const
+{
+    return fov;
+}
+
+void CameraOptions::setFov(float value)
+{
+    fov = deg2rad(value);
+}
+
+size_t CameraOptions::getWidth() const
+{
+    return width;
+}
+
+void CameraOptions::setWidth(const size_t &value)
+{
+    width = value;
+    aspectRatio = float(width) / height;
+}
+
+size_t CameraOptions::getHeight() const
+{
+    return height;
+}
+
+void CameraOptions::setHeight(const size_t &value)
+{
+    height = value;
+    aspectRatio = float(width) / height;
+}
+
+float CameraOptions::getAspectRatio() const
+{
+    return aspectRatio;
+}
+
+Vector3f CameraOptions::getFrom() const
+{
+    return from;
+}
+
+void CameraOptions::setFrom(const Vector3f &value)
+{
+    from = value;
+}
+
+std::ostream &operator <<(std::ostream &os, const CameraOptions &opt)
+{
+    return os << "CameraOptions: " << opt.from << opt.to << " " << rad2deg(opt.fov) << " " << opt.width << " " << opt.height << " " << opt.aspectRatio;
+}

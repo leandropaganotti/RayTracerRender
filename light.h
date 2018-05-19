@@ -26,9 +26,7 @@ class PointLight: public Light
 public:
     PointLight(const Vector3f &pos={0.0f}, const Vector3f &color={1.0f}, float strength=1.0f, float k=0.01f):
         pos(pos), color(color), strength(strength), k(k)
-    {
-
-    }
+    {}
     Vector3f position() const
     {
         return pos;
@@ -45,15 +43,22 @@ public:
     {
         return strength * color * attenuation(point);
     }
-
     float attenuation(const Vector3f &point) const
     {
         //attenuation = 1.0f / ( 1.0f + scene.lights[i].attenuation * distToLight * distToLight);
         float d = distance(point);
         return 1.0f / ( 1.0f + k * d * d);
     }
-};
 
+    Vector3f getPos() const;
+    void     setPos(const Vector3f &value);
+    Vector3f getColor() const;
+    void     setColor(const Vector3f &value);
+    float    getStrength() const;
+    void     setStrength(float value);
+    float    getK() const;
+    void     setK(float value);
+};
 
 class DistantLight: public Light
 {

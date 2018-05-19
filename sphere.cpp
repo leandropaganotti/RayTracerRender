@@ -1,22 +1,35 @@
 #include "sphere.h"
 
-//       analytic solution
-//       Vec3f L = orig - center;
-//       float a = dotProduct(dir, dir);
-//       float b = 2 * dotProduct(dir, L);
-//       float c = dotProduct(L, L) - radius2;
-//       float t0, t1;
-//       if (!solveQuadratic(a, b, c, t0, t1)) return false;
-//       if (t0 < 0) t0 = t1;
-//       if (t0 < 0) return false;
-//       tnear = t0;
-//       return true;
-
-
 Sphere::Sphere(const Vector3f &center, const float &radius, const Vector3f &color) :
     Object(color), center(center), radius(radius), radius2(radius * radius)
 {
 
+}
+
+Vector3f Sphere::getCenter() const
+{
+    return center;
+}
+
+void Sphere::setCenter(const Vector3f &value)
+{
+    center = value;
+}
+
+float Sphere::getRadius() const
+{
+    return radius;
+}
+
+void Sphere::setRadius(float value)
+{
+    radius = value;
+    radius2 = radius * radius;
+}
+
+void Sphere::setColor(const Vector3f &value)
+{
+    k_diffuse = value;
 }
 
 bool Sphere::intersection(const Ray &ray, IntersectionData &isec) const
@@ -58,3 +71,15 @@ const Vector3f Sphere::normal(const Vector3f &phit, size_t) const
 {
     return (phit-center).normalize();
 }
+
+//       analytic solution
+//       Vec3f L = orig - center;
+//       float a = dotProduct(dir, dir);
+//       float b = 2 * dotProduct(dir, L);
+//       float c = dotProduct(L, L) - radius2;
+//       float t0, t1;
+//       if (!solveQuadratic(a, b, c, t0, t1)) return false;
+//       if (t0 < 0) t0 = t1;
+//       if (t0 < 0) return false;
+//       tnear = t0;
+//       return true;

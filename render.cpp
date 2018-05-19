@@ -63,7 +63,7 @@ Vector3f Render::trace(const Ray &ray, const Scene &scene, const uint8_t depth)
     Vector3f normal = isec.object->normal(phit, isec.idx);
 
     //ambient
-    Vector3f phitColor = isec.object->k_ambient;
+    Vector3f phitColor = isec.object->k_diffuse * scene.kAmbient;
 
     //float cosi; if ( (cosi=normal.dot(ray.direction) ) >= 0.0f) normal = -normal;
 
@@ -91,7 +91,7 @@ Vector3f Render::trace(const Ray &ray, const Scene &scene, const uint8_t depth)
     }
 
     //reflection
-    if(isec.object->type == Object::Type::OPAQUE && isec.object->reflectivity)
+    if(isec.object->type == Object::Type::REFLECTIVE && isec.object->reflectivity)
     {
         Ray R;
         R.origin = phit + bias * normal;

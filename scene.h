@@ -1,6 +1,7 @@
 #ifndef SCENE_H
 #define SCENE_H
 
+#include <string>
 #include <vector>
 #include "object.h"
 #include "light.h"
@@ -9,25 +10,22 @@
 class Scene
 {
 public:
-    Scene(): ambientIndex(1.0f) {}
+    Scene();
 
-    ObjectVector objects;
-    LightVector lights;
-    Vector3f bgColor;
+    void addObject(Object * obj);
+    void addLight(Light * light);
 
-    float ambientIndex;
+    void load(const char* filename);
 
-    CameraOptions cameraOptions;
+    Vector3f        bgColor;
+    float           ambientIndex;
+    float           kAmbient;
 
-    void addObject(Object * obj)
-    {
-        objects.emplace_back(obj);
-    }
+    CameraOptions   cameraOptions;
+    ObjectVector    objects;
+    LightVector     lights;
 
-    void addLight(Light * light)
-    {
-        lights.emplace_back(light);
-    }
+    friend std::ostream &operator <<(std::ostream &os, const Scene &scene);
 };
 
 #endif // SCENE_H
