@@ -7,6 +7,22 @@ Render::Render()
     image.resize(camera.getWidth(), camera.getHeight());
 }
 
+void Render::setCameraOptions(const CameraOptions &options)
+{
+    camera.setOptions(options);
+    image.resize(camera.getWidth(), camera.getHeight());
+}
+
+Camera &Render::getCamera()
+{
+    return camera;
+}
+
+Image &Render::getImage()
+{
+    return image;
+}
+
 void Render::render(size_t width, size_t height, const Scene &scene, uint8_t nrays, uint8_t nthreads)
 {
    image.resize(width, height);
@@ -16,7 +32,7 @@ void Render::render(size_t width, size_t height, const Scene &scene, uint8_t nra
 
 void Render::render(const CameraOptions &opts, const Scene &scene, uint8_t nrays, uint8_t nthreads)
 {
-    camera.setOptions(opts);
+    setCameraOptions(opts);
     render(scene, nrays, nthreads);
 }
 
@@ -25,7 +41,7 @@ void Render::renderSingleThread(const Scene *scene, size_t start, size_t end, si
     if (scene == nullptr) return;
     Ray ray(camera.getPosition(), 0.0f);
 
-    // nrays defines a greid nrays x nrays
+    // nrays defines a grid nrays x nrays
     float dx = 1.0f / ( 1.0f + nrays);
     float dy = 1.0f / ( 1.0f + nrays);
 

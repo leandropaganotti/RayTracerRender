@@ -154,7 +154,7 @@ void XMLParser::parseCameraOptions(xmlNode *xmlCameraOptionsNode, CameraOptions 
             else if (equals(node->name, "lookingAt"))
                 options->setTo( toVector(node->children) );
             else if (equals(node->name, "fov"))
-                options->setFov( toFloat(node->children) );
+                options->setFov( deg2rad(toFloat(node->children) ));
             else if (equals(node->name, "width"))
                 options->setWidth( toInt(node->children) );
             else if (equals(node->name, "height"))

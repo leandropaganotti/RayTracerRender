@@ -62,13 +62,13 @@ int main()
 
     Camera &camera = render.getCamera();
 
-    camera.setOptions(scene1.cameraOptions);
+    render.setCameraOptions(scene1.cameraOptions);
 
     const Vector3f from( scene1.cameraOptions.getFrom() ), to( scene1.cameraOptions.getTo() );
 
     for (i=0; i <= n; ++i)
     {
-        cout << endl << i << " " <<  i*a << " " << render.getCamera().getPosition() << endl;
+        cout << endl << i << " " <<  i*a << " " << endl;
         auto start = chrono::steady_clock::now();
         camera.lookAt(Ry(deg2rad( i*a )) * from, to);
         render.render(scene1, 1, 4);

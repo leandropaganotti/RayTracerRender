@@ -27,8 +27,10 @@ public:
 
     Render();
 
-    Camera& getCamera() { return camera; }
-    Image& getImage()   { return image;  }
+    void setCameraOptions(const CameraOptions &options);
+
+    Camera& getCamera();
+    Image& getImage();
 
     /*
 	 * render the scene with current the CameraOptions

@@ -25,7 +25,7 @@ public:
         k_specular = 1.0f;
 
         shininess = 150.0f;
-        reflectivity = 0.0f;
+        reflectivity = 1.0f;
         refractiveIndex = 1.0f;
 
         type = Type::REFLECTIVE;

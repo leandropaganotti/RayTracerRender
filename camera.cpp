@@ -55,7 +55,7 @@ void Camera::setResolution(size_t width, size_t height)
 
 void Camera::setFov(float fov)
 {
-    options.fov = deg2rad(fov);
+    options.fov = fov;
 }
 
 void Camera::setOptions(const CameraOptions& options)
@@ -70,7 +70,7 @@ std::ostream &operator <<(std::ostream &os, const Camera &cam)
 }
 
 CameraOptions::CameraOptions(const Vector3f &from, const Vector3f &to, float fov, size_t width, size_t height):
-    from(from), to(to), fov(deg2rad(fov)), width(width), height(height), aspectRatio(float(width)/height)
+    from(from), to(to), fov(fov), width(width), height(height), aspectRatio(float(width)/height)
 {}
 
 Vector3f CameraOptions::getTo() const
@@ -90,7 +90,7 @@ float CameraOptions::getFov() const
 
 void CameraOptions::setFov(float value)
 {
-    fov = deg2rad(value);
+    fov = value;
 }
 
 size_t CameraOptions::getWidth() const

@@ -5,7 +5,7 @@
 #include "vector.h"
 #include "matrix.h"
 
-#define FOV 	40
+#define FOV 	0.698131700797732 // 40 degree
 #define WIDTH 	640
 #define HEIGHT 	480
 
