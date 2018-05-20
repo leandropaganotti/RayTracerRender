@@ -16,19 +16,37 @@ struct IntersectionData
     const Object * object;
 };
 
-class Object
-{   
-public:
-    Object(const Vector3f &color)
+struct Material
+{
+    enum class Type { REFLECTIVE, REFRACTIVE };
+
+    Vector3f kDiffuse;
+    Vector3f kSpecular;
+    float shininess;
+    float reflectivity;
+    float refractiveIndex;
+    Type type;
+
+    Material(const Vector3f &color={1.0})
     {
-        k_diffuse = color;
-        k_specular = 1.0f;
+        kDiffuse = color;
+        kSpecular = 0.0f;
 
         shininess = 150.0f;
-        reflectivity = 1.0f;
+        reflectivity = 0.0f;
         refractiveIndex = 1.0f;
 
         type = Type::REFLECTIVE;
+    }
+};
+
+class Object
+{   
+public:
+    Object(const Vector3f &color={1.0}):
+        material(color)
+    {
+
     }   
     virtual bool intersection(const Ray& ray, IntersectionData &isec) const = 0;
     virtual bool intersection(const Ray& ray, float &tnear) const = 0;
@@ -36,16 +54,7 @@ public:
 
     virtual ~Object() = default;
 
-    //Object attributes down here
-    enum class Type { REFLECTIVE, REFRACTIVE };
-
-    Vector3f k_diffuse;
-    Vector3f k_specular;
-    float shininess;
-    float reflectivity;
-    float refractiveIndex;
-    Type type;
-
+    Material material;
 };
 
 #endif // OBJECT_H

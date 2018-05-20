@@ -17,7 +17,6 @@ public:
 
     void load(const char* filename);
 
-    Vector3f        bgColor;
     float           ambientIndex;
     float           kAmbient;
 

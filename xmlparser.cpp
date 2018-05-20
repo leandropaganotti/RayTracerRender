@@ -19,9 +19,9 @@ bool XMLParser::equals(const xmlChar *lhs, const char *rhs)
 void XMLParser::error(const xmlNode *node)
 {
     if (node && node->parent)
-        cerr << "Error parsing node " << node->name << " in " << node->parent->name << endl;
+        cerr << "Error parsing node " << node->name << " inside node " << node->parent->name << endl;
     else
-        cerr << "Error parsin node in xml file" << endl;
+        cerr << "Error parsing xml file" << endl;
 }
 
 Vector3f XMLParser::toVector(const xmlNode *node)
@@ -93,15 +93,17 @@ void XMLParser::parseFile(const char *filename, Scene * const scene)
     {
         cerr << "error: could not parse file " << filename << endl;
     }
+    else
+    {
+        xmlSceneNode = xmlDocGetRootElement(doc);
 
-    xmlSceneNode = xmlDocGetRootElement(doc);
+        // start parsing the xml tree here
+        parseScene(xmlSceneNode, scene);
 
-    // start parsing the xml tree here
-    parseScene(xmlSceneNode, scene);
+        xmlFreeDoc(doc);
 
-    xmlFreeDoc(doc);
-
-    xmlCleanupParser();
+        xmlCleanupParser();
+    }
 }
 
 void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene * const scene)
@@ -121,8 +123,6 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene * const scene)
             }
             else if(equals(node->name, "ambientIndex"))
                scene->ambientIndex = toFloat(node->children);
-            else if(equals(node->name, "bgColor"))
-               scene->bgColor = toVector(node->children);
             else if(equals(node->name, "PointLight"))
             {
                 PointLight *light = new PointLight();
@@ -131,6 +131,12 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene * const scene)
             }
             else if(equals(node->name, "kAmbient"))
                 scene->kAmbient = toFloat(node->children);
+            else if(equals(node->name, "plane"))
+            {
+                Plane *plane = new Plane();
+                parsePlane(node, plane);
+                scene->addObject(plane);
+            }
             else
                 error(node);
         }
@@ -169,34 +175,49 @@ void XMLParser::parseSphere(xmlNode *xmlSphereNode, Sphere * const sphere)
         {
             if (equals(node->name, "center"))
                 sphere->setCenter( toVector(node->children) );
-            else if (equals(node->name, "color"))
-                sphere->setColor( toVector(node->children) );
             else if (equals(node->name, "radius"))
                 sphere->setRadius( toFloat(node->children) );
             else if (equals(node->name, "material"))
-                parseMaterial(node);
+                parseMaterial(node, &sphere->material);
             else
                 error(node);
         }
     }
 }
 
-void XMLParser::parseMaterial(xmlNode *xmlMaterialNode)
+void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, Material * const material)
 {
     xmlNode *node = NULL;
     for (node = xmlMaterialNode->children; node; node = node->next)
     {
         if (node->type == XML_ELEMENT_NODE)
         {
-            if (equals(node->name, "k_diffuse"))
-                cout << node->name << " " << node->children->content << endl;
+            if (equals(node->name, "kDiffuse"))
+                material->kDiffuse = toVector(node->children);
+            else if (equals(node->name, "kSpecular"))
+                material->kSpecular = toVector(node->children);
+            else if (equals(node->name, "shininess"))
+                material->shininess = toFloat(node->children);
+            else if (equals(node->name, "reflectivity"))
+                material->reflectivity = toFloat(node->children);
+            else if (equals(node->name, "refractiveIndex"))
+                material->refractiveIndex = toFloat(node->children);
+            else if (equals(node->name, "type"))
+            {
+                if (equals(node->children->content, "REFRACTIVE"))
+                    material->type = Material::Type::REFRACTIVE;
+                else if (equals(node->children->content, "REFLECTIVE"))
+                    material->type = Material::Type::REFLECTIVE;
+                else
+                    error(node);
+            }
             else
                 error(node);
         }
     }
 }
 
-void XMLParser::parsePointLight(xmlNode *xmlPointLightNode, PointLight *light)
+void XMLParser::parsePointLight(xmlNode *xmlPointLightNode, PointLight * const light)
 {
     xmlNode *node = NULL;
     for (node = xmlPointLightNode->children; node; node = node->next)
@@ -211,6 +232,25 @@ void XMLParser::parsePointLight(xmlNode *xmlPointLightNode, PointLight *light)
                 light->setStrength( toFloat(node->children) );
             else if (equals(node->name, "k"))
                 light->setK( toFloat(node->children) );
+            else
+                error(node);
+        }
+    }
+}
+
+void XMLParser::parsePlane(xmlNode *xmlPlaneNode, Plane * const plane)
+{
+    xmlNode *node = NULL;
+    for (node = xmlPlaneNode->children; node; node = node->next)
+    {
+        if (node->type == XML_ELEMENT_NODE)
+        {
+            if (equals(node->name, "point"))
+                plane->P = toVector(node->children);
+            else if (equals(node->name, "normal"))
+                plane->N = toVector(node->children);
+            else if (equals(node->name, "material"))
+                parseMaterial(node, &plane->material);
             else
                 error(node);
         }

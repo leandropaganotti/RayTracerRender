@@ -5,6 +5,8 @@
 #include <libxml/tree.h>
 #include "scene.h"
 #include "sphere.h"
+#include "plane.h"
+#include "cube.h"
 
 class XMLParser
 {
@@ -24,9 +26,11 @@ public:
 
     void parseSphere(xmlNode * xmlSphereNode, Sphere * const sphere);
 
-    void parseMaterial(xmlNode * xmlMaterialNode);
+    void parseMaterial(xmlNode * xmlMaterialNode, Material * const material);
 
-    void parsePointLight(xmlNode * xmlPointLightNode, PointLight *light);
+    void parsePointLight(xmlNode * xmlPointLightNode, PointLight * const light);
+
+    void parsePlane(xmlNode * xmlPlaneNode, Plane * const plane);
 
 };
 

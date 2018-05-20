@@ -59,21 +59,22 @@ void Render::renderSingleThread(const Scene *scene, size_t startRow, size_t endR
 
 Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t depth)
 {
-    if(depth == MAX_DEPTH) return scene.bgColor;
+    if(depth == MAX_DEPTH) return Vector3f(0);
 
     IntersectionData isec;
 
     castRay(ray, scene.objects, isec);
 
-    if (isec.object == nullptr) return scene.bgColor;
+    if (isec.object == nullptr) return Vector3f(0);
 
     //Phong shading down here
 
     Vector3f phit = ray.origin + isec.tnear * ray.direction;
     Vector3f normal = isec.object->normal(phit, isec.idx);
+    const Material *material = &isec.object->material;
 
     //ambient
-    Vector3f phitColor = isec.object->k_diffuse * scene.kAmbient;
+    Vector3f phitColor = material->kDiffuse * scene.kAmbient;
 
     // diffuse and specular
     for(auto& light: scene.lights)
@@ -88,25 +89,25 @@ Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t dept
 				Vector3f lightIntensity = light->intensity(phit);
 
 				//diffuse
-				phitColor += lightIntensity * isec.object->k_diffuse * incidence;
+                phitColor += lightIntensity * material->kDiffuse * incidence;
 
 				//specular
 				Vector3f toCamera = (ray.origin - phit).normalize();
                 Vector3f reflected = reflect(-toLight, normal);
-				phitColor += lightIntensity * isec.object->k_specular * pow(std::max(0.0f, toCamera ^ reflected), isec.object->shininess);
+                phitColor += lightIntensity * material->kSpecular * pow(std::max(0.0f, toCamera ^ reflected), material->shininess);
 			}
         }
     }
 
     //reflection
-    if(isec.object->type == Object::Type::REFLECTIVE && isec.object->reflectivity)
+    if(material->type == Material::Type::REFLECTIVE && material->reflectivity)
     {
         Ray R;
         R.origin = phit + bias * normal;
         R.direction = reflect(ray.direction, normal).normalize();
-        phitColor += rayTrace(R, scene, depth + 1) * isec.object->reflectivity ;
+        phitColor += rayTrace(R, scene, depth + 1) * material->reflectivity ;
     }
-    else if(isec.object->type == Object::Type::REFRACTIVE)
+    else if(material->type == Material::Type::REFRACTIVE)
     {
 
         float n, n1, n2, kr, kt;
@@ -115,12 +116,12 @@ Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t dept
         {
             cosi = -cosi;
             n1 = scene.ambientIndex;
-            n2 = isec.object->refractiveIndex;
+            n2 = material->refractiveIndex;
         }
         else              // inside
         {
             normal = -normal;
-            n1 = isec.object->refractiveIndex;
+            n1 = material->refractiveIndex;
             n2 = scene.ambientIndex;
         }
 
@@ -184,7 +185,7 @@ bool Render::castShadowRay(const Ray &ray, const ObjectVector &objects, float tM
     {
         if (object->intersection(ray, tnear))
         {
-            if ( tnear < tMax && object->type != Object::Type::REFRACTIVE ) return true;
+            if ( tnear < tMax && object->material.type != Material::Type::REFRACTIVE ) return true;
             //if ( tnear < tMax ) return true;
         }
     }

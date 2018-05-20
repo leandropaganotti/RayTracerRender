@@ -19,7 +19,6 @@ public:
     float    getRadius() const;
     void     setRadius(float value);
 
-    void     setColor(const Vector3f &value);
 };
 
 #endif  // SPHERE_H

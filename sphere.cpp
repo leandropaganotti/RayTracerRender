@@ -27,11 +27,6 @@ void Sphere::setRadius(float value)
     radius2 = radius * radius;
 }
 
-void Sphere::setColor(const Vector3f &value)
-{
-    k_diffuse = value;
-}
-
 bool Sphere::intersection(const Ray &ray, IntersectionData &isec) const
 {
     Vector3f l = center - ray.origin;
