@@ -64,7 +64,7 @@ int main()
 
     render.setCameraOptions(scene1.cameraOptions);
 
-    const Vector3f from( scene1.cameraOptions.getFrom() ), to( scene1.cameraOptions.getTo() );
+    const Vector3f from( scene1.cameraOptions.getFrom() ), to( scene1.cameraOptions.getTo());
 
     for (i=0; i <= n; ++i)
     {

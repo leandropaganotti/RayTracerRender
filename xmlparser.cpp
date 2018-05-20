@@ -87,25 +87,20 @@ void XMLParser::parseFile(const char *filename, Scene * const scene)
     */
     LIBXML_TEST_VERSION
 
-    /*parse the file and get the DOM */
     doc = xmlReadFile(filename, NULL, XML_PARSE_NOBLANKS);
 
-    if (doc == NULL) {
-        printf("error: could not parse file %s\n", filename);
+    if (doc == NULL)
+    {
+        cerr << "error: could not parse file " << filename << endl;
     }
 
-    /*Get the root element node */
     xmlSceneNode = xmlDocGetRootElement(doc);
 
+    // start parsing the xml tree here
     parseScene(xmlSceneNode, scene);
 
-    /*free the document */
     xmlFreeDoc(doc);
 
-    /*
-    *Free the global variables that may
-    *have been allocated by the parser.
-    */
     xmlCleanupParser();
 }
 

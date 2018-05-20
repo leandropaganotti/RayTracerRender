@@ -9,23 +9,20 @@
 #define NTHREADS 4
 #define MAX_DEPTH 5
 
-class Render
+class Render: public Camera
 {
-    Camera camera;
-    Image  image;
-
     const float bias = 0.0001;
 
-    void renderSingleThread(const Scene *scene, size_t start, size_t end, size_t nrays);
+    void renderSingleThread(const Scene *scene, size_t startRow, size_t endRow, size_t nrays);
 
-    Vector3f trace(const Ray &ray, const Scene &scene, const uint8_t depth);
+    Vector3f rayTrace(const Ray &ray, const Scene &scene, const uint8_t depth);
 
     void castRay(const Ray &ray, const ObjectVector &objects, IntersectionData &isec);
     bool castShadowRay(const Ray &ray, const ObjectVector &objects, float tMax);
 
 public:
 
-    Render();
+    Render() = default;
 
     void setCameraOptions(const CameraOptions &options);
 

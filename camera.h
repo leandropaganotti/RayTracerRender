@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "vector.h"
 #include "matrix.h"
+#include "image.h"
 
 #define FOV 	0.698131700797732 // 40 degree
 #define WIDTH 	640
@@ -11,10 +12,11 @@
 
 class CameraOptions
 {
-	friend class Camera;
+    friend class Camera;
+    friend class Render;
 
-	Vector3f from;
-	Vector3f to;
+    Vector3f from;
+    Vector3f to;
     float    fov;
     size_t   width;
     size_t   height;
@@ -40,15 +42,19 @@ public:
 
 class Camera
 {
+
+protected:
     CameraOptions 	options;
     Matrix4x4f 		cameraToWorld;
-public:
-
-    Camera() = default;
-
-    void lookAt(const Vector3f &from, const Vector3f &to, const Vector3f& up={0.0f,1.0f,0.0f}); 
+    Image           image;
 
     Vector3f getRayDirection(float i, float j) const;
+
+public:
+
+    Camera();
+
+    void lookAt(const Vector3f &from, const Vector3f &to, const Vector3f& up={0.0f,1.0f,0.0f}); 
 
     const CameraOptions& getOptions() const;
     void setOptions(const CameraOptions& options);
@@ -56,6 +62,7 @@ public:
     const Vector3f& getPosition() const;   
     size_t getWidth() const;
     size_t getHeight() const;
+
     void setResolution(size_t width, size_t height);
     void setFov(float fov);
 

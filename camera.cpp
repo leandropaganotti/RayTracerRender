@@ -1,5 +1,11 @@
 #include "camera.h"
 
+Camera::Camera()
+{
+    lookAt(options.from, options.to);
+    image.resize(options.width, options.height);
+}
+
 void Camera::lookAt(const Vector3f &from, const Vector3f &to, const Vector3f &up)
 {
     Vector3f zaxis = (from - to).normalize();
@@ -51,6 +57,7 @@ void Camera::setResolution(size_t width, size_t height)
 	options.width = width;
     options.height = height;
     options.aspectRatio = float(width) / height;
+    image.resize(options.width, options.height);
 }
 
 void Camera::setFov(float fov)
@@ -62,6 +69,7 @@ void Camera::setOptions(const CameraOptions& options)
 {
 	this->options = options;
     lookAt(options.from, options.to);
+    image.resize(options.width, options.height);
 }
 
 std::ostream &operator <<(std::ostream &os, const Camera &cam)

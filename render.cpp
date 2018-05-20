@@ -1,21 +1,14 @@
 #include "render.h"
 #include <thread>
 
-
-Render::Render()
-{
-    image.resize(camera.getWidth(), camera.getHeight());
-}
-
 void Render::setCameraOptions(const CameraOptions &options)
 {
-    camera.setOptions(options);
-    image.resize(camera.getWidth(), camera.getHeight());
+    setOptions(options);
 }
 
 Camera &Render::getCamera()
 {
-    return camera;
+    return *this;
 }
 
 Image &Render::getImage()
@@ -25,8 +18,7 @@ Image &Render::getImage()
 
 void Render::render(size_t width, size_t height, const Scene &scene, uint8_t nrays, uint8_t nthreads)
 {
-   image.resize(width, height);
-   camera.setResolution(width, height);
+   setResolution(width, height);
    render(scene, nrays, nthreads);
 }
 
@@ -36,26 +28,28 @@ void Render::render(const CameraOptions &opts, const Scene &scene, uint8_t nrays
     render(scene, nrays, nthreads);
 }
 
-void Render::renderSingleThread(const Scene *scene, size_t start, size_t end, size_t nrays)
+void Render::renderSingleThread(const Scene *scene, size_t startRow, size_t endRow, size_t nrays)
 {
     if (scene == nullptr) return;
-    Ray ray(camera.getPosition(), 0.0f);
+
+    Ray ray;
+    ray.origin = options.from;
 
     // nrays defines a grid nrays x nrays
     float dx = 1.0f / ( 1.0f + nrays);
     float dy = 1.0f / ( 1.0f + nrays);
 
-    for (size_t i = start; i < end; ++i)
+    for (size_t i = startRow; i < endRow; ++i)
     {
-        for (size_t j = 0; j < image.width(); ++j)
+        for (size_t j = 0; j < options.width; ++j)
         {
             image.at(i, j) = 0;
             for (size_t y=1; y <= nrays; ++y)
             {
                 for (size_t x=1; x <= nrays; ++x)
                 {
-                    ray.direction = camera.getRayDirection(i+dy*y, j+dx*x);
-                    image.at(i, j) += trace(ray, *scene, 0);
+                    ray.direction = getRayDirection(i+dy*y, j+dx*x);
+                    image.at(i, j) += rayTrace(ray, *scene, 0);
                 }
             }
             image.at(i, j) /= nrays*nrays;
@@ -63,7 +57,7 @@ void Render::renderSingleThread(const Scene *scene, size_t start, size_t end, si
     }
 }
 
-Vector3f Render::trace(const Ray &ray, const Scene &scene, const uint8_t depth)
+Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t depth)
 {
     if(depth == MAX_DEPTH) return scene.bgColor;
 
@@ -80,8 +74,6 @@ Vector3f Render::trace(const Ray &ray, const Scene &scene, const uint8_t depth)
 
     //ambient
     Vector3f phitColor = isec.object->k_diffuse * scene.kAmbient;
-
-    //float cosi; if ( (cosi=normal.dot(ray.direction) ) >= 0.0f) normal = -normal;
 
     // diffuse and specular
     for(auto& light: scene.lights)
@@ -112,7 +104,7 @@ Vector3f Render::trace(const Ray &ray, const Scene &scene, const uint8_t depth)
         Ray R;
         R.origin = phit + bias * normal;
         R.direction = reflect(ray.direction, normal).normalize();
-        phitColor += trace(R, scene, depth + 1) * isec.object->reflectivity ;
+        phitColor += rayTrace(R, scene, depth + 1) * isec.object->reflectivity ;
     }
     else if(isec.object->type == Object::Type::REFRACTIVE)
     {
@@ -152,14 +144,14 @@ Vector3f Render::trace(const Ray &ray, const Scene &scene, const uint8_t depth)
             T.origin = phit - bias * normal;
             T.direction = n * ray.direction + (n * cosi - cost) * normal;
             T.direction.normalize();
-            phitColor += trace(T, scene, depth + 1) * kt;
+            phitColor += rayTrace(T, scene, depth + 1) * kt;
         }
 
         // reflection
         Ray R;
         R.origin = phit + bias * normal;
         R.direction = reflect(ray.direction, normal).normalize();
-        phitColor += trace(R, scene, depth + 1) * kr ;
+        phitColor += rayTrace(R, scene, depth + 1) * kr ;
 
     }
     return phitColor;
@@ -200,9 +192,8 @@ bool Render::castShadowRay(const Ray &ray, const ObjectVector &objects, float tM
 }
 
 void Render::render(const Scene &scene, uint8_t nrays, uint8_t nthreads)
-{
-
-    if (nthreads == 0 || nthreads >= image.height())
+{       
+    if (nthreads == 0 || nthreads >= options.getHeight())
         throw std::invalid_argument("# of threads must be > 0 and < image.height ");
 
     if (nrays == 0)
@@ -210,13 +201,13 @@ void Render::render(const Scene &scene, uint8_t nrays, uint8_t nthreads)
 
     std::vector<std::thread> threads;
 
-    size_t nrows = image.height() / nthreads, i;
+    size_t nrows = options.getHeight() / nthreads, i;
 
     for( i=0 ; i < nthreads - 1u; ++i)
     {
         threads.push_back( std::thread( &Render::renderSingleThread, this, &scene, i*nrows, (i+1) * nrows, nrays ) );
     }
-    threads.push_back( std::thread( &Render::renderSingleThread, this, &scene, i*nrows, image.height(), nrays ) );
+    threads.push_back( std::thread( &Render::renderSingleThread, this, &scene, i*nrows, options.getHeight(), nrays ) );
 
     for (auto& thread : threads) thread.join();
 }
