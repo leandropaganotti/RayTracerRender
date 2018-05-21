@@ -1,36 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scene>
+<scene id="ballsOnTheMirror">
     <ambientIndex>1.0</ambientIndex>
     <kAmbient>0.1</kAmbient>
     <CameraOptions>
-        <position>0,6,15</position>
-        <lookingAt>0,0,0</lookingAt>
-        <fov>35</fov>
+        <position>0,5,16</position>
+        <lookingAt>0,1,0</lookingAt>
+        <fov>27</fov>
         <width>1920</width>
         <height>1080</height>
     </CameraOptions>
     <PointLight>
-        <position>2,3,2</position>
+        <position>1,4,2</position>
         <color>1</color>
-        <strength>1</strength>
+        <strength>1.5</strength>
         <k>0.01</k>
     </PointLight>
     <plane id="floor">
         <point>0</point>
         <normal>0,1,0</normal>
         <material>
+            <type>REFLECTIVE</type>
             <kDiffuse>0.118, 0.565, 1.000</kDiffuse>
-            <reflectivity>1.0</reflectivity>
-            <kSpecular>0.0</kSpecular>
+            <reflectivity>0.3</reflectivity>
+            <kSpecular>1.0</kSpecular>
         </material>
     </plane>
     <plane id="back wall">
-        <point>0, 0, -20</point>
+        <point>0, 0, -13</point>
         <normal>0,0,1</normal>
         <material>
             <kDiffuse>0</kDiffuse>
-            <reflectivity>0.7</reflectivity>
-            <kSpecular>0.0</kSpecular>
+            <reflectivity>1.0</reflectivity>
+            <kSpecular>0.9</kSpecular>
+            <shininess>1000</shininess>
         </material>
     </plane>
     <Sphere id="big ball">
@@ -39,16 +41,15 @@
         <material>
             <type>REFLECTIVE</type>
             <reflectivity>1.0</reflectivity>
-            <kDiffuse>0.545, 0.271, 0.075</kDiffuse>
-            <kSpecular>1.0</kSpecular>
+            <kDiffuse>0</kDiffuse>
+            <kSpecular>1</kSpecular>
         </material>
     </Sphere>
     <Sphere id="big ball glass">
         <center>0, 1, 0</center>
         <radius>1.0</radius>
         <material>
-            <type>REFRACTIVE</type>
-            <reflectivity>1.0</reflectivity>
+            <type>REFRACTIVE</type>            
             <kDiffuse>0</kDiffuse>
             <kSpecular>1.0</kSpecular>
             <refractiveIndex>1.5</refractiveIndex>
@@ -61,7 +62,7 @@
             <type>REFLECTIVE</type>
             <kDiffuse>1, 0, 0</kDiffuse>
             <kSpecular>1.0</kSpecular>
-            <reflectivity>1.0</reflectivity>
+            <reflectivity>0.5</reflectivity>
         </material>
     </Sphere>
     <Sphere id="green">
@@ -71,7 +72,7 @@
             <type>REFLECTIVE</type>
             <kDiffuse>0, 1, 0</kDiffuse>
             <kSpecular>1.0</kSpecular>
-            <reflectivity>1.0</reflectivity>
+            <reflectivity>0.7</reflectivity>
         </material>
     </Sphere>
     <Sphere id="yellow">
@@ -81,7 +82,7 @@
             <type>REFLECTIVE</type>
             <kDiffuse>1, 1, 0</kDiffuse>
             <kSpecular>1.0</kSpecular>
-            <reflectivity>1.0</reflectivity>
+            <reflectivity>0.5</reflectivity>
         </material>
     </Sphere>
     <Sphere id="magenta">
@@ -91,7 +92,7 @@
             <type>REFLECTIVE</type>
             <kDiffuse>1, 0, 1</kDiffuse>
             <kSpecular>1.0</kSpecular>
-            <reflectivity>1.0</reflectivity>
+            <reflectivity>0.5</reflectivity>
         </material>
     </Sphere>
     <Sphere id="blue">
@@ -101,7 +102,7 @@
             <type>REFLECTIVE</type>
             <kDiffuse>0, 0, 1</kDiffuse>
             <kSpecular>1.0</kSpecular>
-            <reflectivity>1.0</reflectivity>
+            <reflectivity>0.5</reflectivity>
         </material>
     </Sphere>
     <Sphere id="red">
@@ -111,7 +112,7 @@
             <type>REFLECTIVE</type>
             <kDiffuse>1, 0, 0</kDiffuse>
             <kSpecular>1.0</kSpecular>
-            <reflectivity>1.0</reflectivity>
+            <reflectivity>0.5</reflectivity>
         </material>
     </Sphere>
     <Sphere id="cyan">
@@ -121,7 +122,7 @@
             <type>REFLECTIVE</type>
             <kDiffuse>0, 1, 1</kDiffuse>
             <kSpecular>1.0</kSpecular>
-            <reflectivity>1.0</reflectivity>
+            <reflectivity>0.3</reflectivity>
         </material>
     </Sphere>
 <!--    <cube id="yeallow box">
