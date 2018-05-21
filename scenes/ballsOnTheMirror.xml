@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scene>
+    <ambientIndex>1.0</ambientIndex>
+    <kAmbient>0.1</kAmbient>
+    <CameraOptions>
+        <position>0,6,15</position>
+        <lookingAt>0,0,0</lookingAt>
+        <fov>35</fov>
+        <width>1920</width>
+        <height>1080</height>
+    </CameraOptions>
+    <PointLight>
+        <position>2,3,2</position>
+        <color>1</color>
+        <strength>1</strength>
+        <k>0.01</k>
+    </PointLight>
+    <plane id="floor">
+        <point>0</point>
+        <normal>0,1,0</normal>
+        <material>
+            <kDiffuse>0.118, 0.565, 1.000</kDiffuse>
+            <reflectivity>1.0</reflectivity>
+            <kSpecular>0.0</kSpecular>
+        </material>
+    </plane>
+    <plane id="back wall">
+        <point>0, 0, -20</point>
+        <normal>0,0,1</normal>
+        <material>
+            <kDiffuse>0</kDiffuse>
+            <reflectivity>0.7</reflectivity>
+            <kSpecular>0.0</kSpecular>
+        </material>
+    </plane>
+    <Sphere id="big ball">
+        <center>-2.5,1.0, -4.0</center>
+        <radius>1.0</radius>
+        <material>
+            <type>REFLECTIVE</type>
+            <reflectivity>1.0</reflectivity>
+            <kDiffuse>0.545, 0.271, 0.075</kDiffuse>
+            <kSpecular>1.0</kSpecular>
+        </material>
+    </Sphere>
+    <Sphere id="big ball glass">
+        <center>0, 1, 0</center>
+        <radius>1.0</radius>
+        <material>
+            <type>REFRACTIVE</type>
+            <reflectivity>1.0</reflectivity>
+            <kDiffuse>0</kDiffuse>
+            <kSpecular>1.0</kSpecular>
+            <refractiveIndex>1.5</refractiveIndex>
+        </material>
+    </Sphere>
+    <Sphere id="red">
+        <center>3.5,0.5,-0.5</center>
+        <radius>0.5</radius>
+        <material>
+            <type>REFLECTIVE</type>
+            <kDiffuse>1, 0, 0</kDiffuse>
+            <kSpecular>1.0</kSpecular>
+            <reflectivity>1.0</reflectivity>
+        </material>
+    </Sphere>
+    <Sphere id="green">
+        <center>2.5,0.5, -3.5</center>
+        <radius>0.5</radius>
+        <material>
+            <type>REFLECTIVE</type>
+            <kDiffuse>0, 1, 0</kDiffuse>
+            <kSpecular>1.0</kSpecular>
+            <reflectivity>1.0</reflectivity>
+        </material>
+    </Sphere>
+    <Sphere id="yellow">
+        <center>1.5,0.5, -5.5</center>
+        <radius>0.5</radius>
+        <material>
+            <type>REFLECTIVE</type>
+            <kDiffuse>1, 1, 0</kDiffuse>
+            <kSpecular>1.0</kSpecular>
+            <reflectivity>1.0</reflectivity>
+        </material>
+    </Sphere>
+    <Sphere id="magenta">
+        <center>0, 0.5, 4</center>
+        <radius>0.5</radius>
+        <material>
+            <type>REFLECTIVE</type>
+            <kDiffuse>1, 0, 1</kDiffuse>
+            <kSpecular>1.0</kSpecular>
+            <reflectivity>1.0</reflectivity>
+        </material>
+    </Sphere>
+    <Sphere id="blue">
+        <center>-2.5,0.5, -1</center>
+        <radius>0.5</radius>
+        <material>
+            <type>REFLECTIVE</type>
+            <kDiffuse>0, 0, 1</kDiffuse>
+            <kSpecular>1.0</kSpecular>
+            <reflectivity>1.0</reflectivity>
+        </material>
+    </Sphere>
+    <Sphere id="red">
+        <center>3.5,0.5, -0.5</center>
+        <radius>0.5</radius>
+        <material>
+            <type>REFLECTIVE</type>
+            <kDiffuse>1, 0, 0</kDiffuse>
+            <kSpecular>1.0</kSpecular>
+            <reflectivity>1.0</reflectivity>
+        </material>
+    </Sphere>
+    <Sphere id="cyan">
+        <center>3,0.5, 3</center>
+        <radius>0.5</radius>
+        <material>
+            <type>REFLECTIVE</type>
+            <kDiffuse>0, 1, 1</kDiffuse>
+            <kSpecular>1.0</kSpecular>
+            <reflectivity>1.0</reflectivity>
+        </material>
+    </Sphere>
+<!--    <cube id="yeallow box">
+        <center>1.5, 0.5, -2.5</center>
+        <size>1</size>
+        <rotation>0</rotation>
+        <material>
+            <kDiffuse>1, 1, 0</kDiffuse>
+        </material>
+    </cube>-->
+</scene>
