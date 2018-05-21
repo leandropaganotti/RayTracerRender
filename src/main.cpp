@@ -1,22 +1,29 @@
 #include <iostream>
-#include "render.h"
-#include "scene.h"
-#include "cube.h"
-#include "sphere.h"
-#include "utils.h"
 #include <thread>
+#include <unistd.h>
+#include <string>
+
+#include "render.h"
 
 using namespace std;
 
-int main()
+const char *xmlscene = 0;   // xml file with scene description
+unsigned    nthreads = 4;   // number of threads to run
+unsigned    nrays    = 1;   // nrays * nrays rays will be cast for each pixel
+
+void parseArguments(int argc, char **argv);
+
+int main(int argc, char **argv)
 {
+    parseArguments(argc, argv);
+
     Scene scene;
 
-    scene.load("/home/leandro/projects/Render/scenes/ballsOnTheMirror.xml");
+    scene.load(xmlscene);
 
     double avg=0;
     char buf[256];
-    int n=36, i=0;
+    int n=0, i=0;
     float a= n?360.0/n:0;    
 
     Render render;
@@ -32,7 +39,7 @@ int main()
         cout << endl << i << " " <<  i*a << " " << endl;
         auto start = chrono::steady_clock::now();
         camera.lookAt(Ry(deg2rad( i*a )) * from, to);
-        render.render(scene, 6, 4);
+        render.render(scene, nrays, nthreads);
         auto end = chrono::steady_clock::now();
 
         sprintf(buf, "%04d.ppm", i);
@@ -49,7 +56,36 @@ int main()
     }
 
     avg = avg / (n+1);
-    cout << endl << "Elapsed average time in milliseconds : " << avg << endl;
+    cout << endl << "Elapsed time in milliseconds (average): " << avg << endl;
 
     return 0;
+}
+
+void parseArguments(int argc, char **argv)
+{
+    int opt;
+    while ((opt = getopt(argc, argv, "r:t:")) != -1) {
+        switch (opt) {
+        case 'r':
+            nrays = atoi(optarg);
+            break;
+        case 't':
+            nthreads = atoi(optarg);
+            break;
+        default: /* '?' */
+            fprintf(stderr, "Usage: %s [-t nthreads] [-r nrays] xmlfile\n", argv[0]);
+            exit(EXIT_FAILURE);
+        }
+    }
+
+   if (optind >= argc) {
+        fprintf(stderr, "Usage: %s [-t nthreads] [-r nrays] xmlfile\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+   xmlscene = argv[optind];
+
+   printf("Arguments:\n");
+   printf(" xmlfile: %s\n", xmlscene);
+   printf(" nrays: %d\n", nrays);
+   printf(" nthreads: %d\n", nthreads);
 }
