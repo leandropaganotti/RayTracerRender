@@ -24,6 +24,7 @@ public:
     ObjectVector    objects;
     LightVector     lights;
 
+    std::string     id;
     friend std::ostream &operator <<(std::ostream &os, const Scene &scene);
 };
 

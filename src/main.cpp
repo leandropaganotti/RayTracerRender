@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 
     scene.load(xmlscene);
 
-    double avg=0;
+    double averageTime=0.0, elapsedTime=0.0;
     char buf[256];
     int n=0, i=0;
     float a= n?360.0/n:0;    
@@ -37,26 +37,23 @@ int main(int argc, char **argv)
     for (i=0; i <= n; ++i)
     {
         cout << endl << i << " " <<  i*a << " " << endl;
-        auto start = chrono::steady_clock::now();
         camera.lookAt(Ry(deg2rad( i*a )) * from, to);
+
+        auto start = chrono::steady_clock::now();       
         render.render(scene, nrays, nthreads);
         auto end = chrono::steady_clock::now();
 
-        sprintf(buf, "%04d.ppm", i);
+        elapsedTime = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+        cout << "Elapsed time in milliseconds : " << elapsedTime << " ms" << endl;
+
+        sprintf(buf, "%s.%04d.ppm", scene.id.c_str(), i);
         render.getImage().save_ppm_bin(buf);
 
-        cout << "Elapsed time in milliseconds : "
-//        		<< chrono::duration_cast<chrono::nanoseconds>(end - start).count()  << " ns" << endl
-//				<< chrono::duration_cast<chrono::microseconds>(end - start).count() << " µs" << endl
-				<< chrono::duration_cast<chrono::milliseconds>(end - start).count() << " ms" << endl
-//              << chrono::duration_cast<chrono::seconds>(end - start).count() << " sec"
-				<< endl;
-
-        avg += chrono::duration_cast<chrono::milliseconds>(end - start).count();
+        averageTime += chrono::duration_cast<chrono::milliseconds>(end - start).count();
     }
 
-    avg = avg / (n+1);
-    cout << endl << "Elapsed time in milliseconds (average): " << avg << endl;
+    averageTime = averageTime / (n+1);
+    cout << endl << "Elapsed time in milliseconds (average): " << averageTime << "ms" << endl;
 
     return 0;
 }

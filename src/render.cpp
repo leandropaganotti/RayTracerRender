@@ -73,8 +73,10 @@ Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t dept
     Vector3f normal = isec.object->normal(phit, isec.idx);
     const Material *material = &isec.object->material;
 
+    Vector3f  phitColor(0), diffuse(0), specular(0);
+
     //ambient
-    Vector3f phitColor = material->kDiffuse * scene.kAmbient;
+    phitColor += material->kDiffuse * scene.kAmbient;
 
     // diffuse and specular
     for(auto& light: scene.lights)
@@ -86,16 +88,18 @@ Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t dept
         {
             if (!castShadowRay(Ray(phit + bias * normal, toLight), scene.objects, light->distance(phit)))
 			{
-				Vector3f lightIntensity = light->intensity(phit);
+                Vector3f lightIntensity = light->intensity(phit);
 
 				//diffuse
-                phitColor += lightIntensity * material->kDiffuse * incidence;
+                diffuse = material->kDiffuse * incidence;
 
 				//specular
 				Vector3f toCamera = (ray.origin - phit).normalize();
                 Vector3f reflected = reflect(-toLight, normal);
-                phitColor += lightIntensity * material->kSpecular * pow(std::max(0.0f, toCamera ^ reflected), material->shininess);
-			}
+                specular = material->kSpecular * pow(std::max(0.0f, toCamera ^ reflected), material->shininess);
+
+                phitColor +=  lightIntensity * (diffuse + specular);
+			}            
         }
     }
 
@@ -105,7 +109,8 @@ Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t dept
         Ray R;
         R.origin = phit + bias * normal;
         R.direction = reflect(ray.direction, normal).normalize();
-        phitColor += rayTrace(R, scene, depth + 1) * material->reflectivity ;
+        //phitColor *= (1.0f - material->reflectivity);
+        phitColor += rayTrace(R, scene, depth + 1) * material->reflectivity * material->kSpecular;
     }
     else if(material->type == Material::Type::REFRACTIVE)
     {

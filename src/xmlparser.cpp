@@ -108,6 +108,11 @@ void XMLParser::parseFile(const char *filename, Scene * const scene)
 
 void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene * const scene)
 {
+    if(xmlSceneNode == NULL || scene == NULL) return;
+
+    if(xmlSceneNode->properties && equals(xmlSceneNode->properties->name, "id"))
+        scene->id.assign((const char*)xmlSceneNode->properties->children->content);
+
     xmlNode *node = NULL;
     for (node = xmlSceneNode->children; node; node = node->next)
     {
