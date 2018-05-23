@@ -109,21 +109,20 @@ Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t dept
         Ray R;
         R.origin = phit + bias * normal;
         R.direction = reflect(ray.direction, normal).normalize();
-        //phitColor *= (1.0f - material->reflectivity);
-        phitColor += rayTrace(R, scene, depth + 1) * material->reflectivity * material->kSpecular;
+        phitColor += rayTrace(R, scene, depth + 1) * material->reflectivity;
     }
     else if(material->type == Material::Type::REFRACTIVE)
     {
 
         float n, n1, n2, kr, kt;
         float cosi = normal.dot(ray.direction);
-        if ( cosi < 0.0f) // outside
+        if ( cosi < 0.0f) // outside surface
         {
             cosi = -cosi;
             n1 = scene.ambientIndex;
             n2 = material->refractiveIndex;
         }
-        else              // inside
+        else              // inside surface
         {
             normal = -normal;
             n1 = material->refractiveIndex;

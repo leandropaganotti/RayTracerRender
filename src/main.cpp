@@ -7,9 +7,10 @@
 
 using namespace std;
 
-const char *xmlscene = 0;   // xml file with scene description
+const char *xmlscene = NULL;// xml file with scene description
 unsigned    nthreads = 4;   // number of threads to run
 unsigned    nrays    = 1;   // nrays * nrays rays will be cast for each pixel
+unsigned    panoramic= 0;   // generates 36 images from difterent angles around y-axis
 
 void parseArguments(int argc, char **argv);
 
@@ -23,8 +24,7 @@ int main(int argc, char **argv)
 
     double averageTime=0.0, elapsedTime=0.0;
     char buf[256];
-    int n=0, i=0;
-    float a= n?360.0/n:0;    
+    float angle = panoramic ? 360.0 / panoramic : 0.0;
 
     Render render;
 
@@ -34,10 +34,10 @@ int main(int argc, char **argv)
 
     const Vector3f from( scene.cameraOptions.getFrom() ), to( scene.cameraOptions.getTo());
 
-    for (i=0; i <= n; ++i)
+    for (unsigned i=0; i <= panoramic; ++i)
     {
-        cout << endl << i << " " <<  i*a << " " << endl;
-        camera.lookAt(Ry(deg2rad( i*a )) * from, to);
+        cout << endl << i << " " <<  i*angle << " " << endl;
+        camera.lookAt(Ry(deg2rad( i*angle )) * from, to); // rotate around y-axis
 
         auto start = chrono::steady_clock::now();       
         render.render(scene, nrays, nthreads);
@@ -52,16 +52,21 @@ int main(int argc, char **argv)
         averageTime += chrono::duration_cast<chrono::milliseconds>(end - start).count();
     }
 
-    averageTime = averageTime / (n+1);
+    averageTime = averageTime / (panoramic + 1);
     cout << endl << "Elapsed time in milliseconds (average): " << averageTime << "ms" << endl;
 
     return 0;
 }
 
+void usage (char **argv)
+{
+    fprintf(stderr, "Usage: %s [-t nThreads] [-r nRays] [-p] xmlfile\n\n", argv[0]);
+}
+
 void parseArguments(int argc, char **argv)
 {
     int opt;
-    while ((opt = getopt(argc, argv, "r:t:")) != -1) {
+    while ((opt = getopt(argc, argv, "r:t:p")) != -1) {
         switch (opt) {
         case 'r':
             nrays = atoi(optarg);
@@ -69,14 +74,17 @@ void parseArguments(int argc, char **argv)
         case 't':
             nthreads = atoi(optarg);
             break;
+        case 'p':
+            panoramic = 36;
+            break;
         default: /* '?' */
-            fprintf(stderr, "Usage: %s [-t nthreads] [-r nrays] xmlfile\n", argv[0]);
+            usage(argv);
             exit(EXIT_FAILURE);
         }
     }
 
    if (optind >= argc) {
-        fprintf(stderr, "Usage: %s [-t nthreads] [-r nrays] xmlfile\n", argv[0]);
+        usage(argv);
         exit(EXIT_FAILURE);
     }
    xmlscene = argv[optind];
