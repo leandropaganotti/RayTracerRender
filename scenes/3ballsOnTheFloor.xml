@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scene id="3ballsOnTheFloor">
+    <ambientIndex>1.0</ambientIndex>
+    <kAmbient>0.1</kAmbient>
+    <CameraOptions>
+        <position>0,2,10</position>
+        <lookingAt>0,1,0</lookingAt>
+        <fov>35</fov>
+        <width>1920</width>
+        <height>1080</height>
+    </CameraOptions>
+    <PointLight>
+        <position>0,3,4</position>
+        <color>1, 1, 1</color>
+        <strength>1</strength>
+        <k>0.01</k>
+    </PointLight>
+    <Sphere id="1">
+        <center>-2.5,1,0</center>
+        <radius>1</radius>
+        <material>
+            <type>REFLECTIVE</type>
+            <kDiffuse>1, 0.0, 0.0</kDiffuse>
+            <kSpecular>1</kSpecular>
+            <shininess>150</shininess>
+            <reflectivity>1.0</reflectivity>
+            <refractiveIndex>1.0</refractiveIndex>
+        </material>
+    </Sphere>
+    <Sphere id="2">
+        <center>0,1.5,-2.5</center>
+        <radius>1.5</radius>
+        <material>
+            <type>REFLECTIVE</type>
+            <kDiffuse>0.0, 1, 0.0</kDiffuse>
+            <kSpecular>1</kSpecular>
+            <shininess>150</shininess>
+            <reflectivity>0.5</reflectivity>
+            <refractiveIndex>1.5</refractiveIndex>
+        </material>
+    </Sphere>
+    <Sphere id="3">
+        <center>2.5,1,0</center>
+        <radius>1</radius>
+        <material>
+            <type>REFLECTIVE</type>
+            <kDiffuse>0, 0, 1</kDiffuse>
+            <kSpecular>1</kSpecular>
+            <shininess>150</shininess>
+            <reflectivity>1.0</reflectivity>
+        </material>
+    </Sphere>
+    <Sphere id="floor">
+        <center>0,-1e5,0</center>
+        <radius>1e5</radius>
+        <material>
+            <type>REFLECTIVE</type>
+            <kDiffuse>1</kDiffuse>
+            <kSpecular>1.0</kSpecular>
+            <shininess>150</shininess>
+            <reflectivity>0.3</reflectivity>
+        </material>
+    </Sphere>
+</scene>
+
+
+
