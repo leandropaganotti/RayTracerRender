@@ -134,6 +134,8 @@ Matrix4x4f Rz(float angle)
 template<typename T>
 T **new_array_2d(size_t width, size_t height)
 {
+    if (!width || !height)
+        return NULL;
     T** array2d_ptr = new T *[height];
     for(size_t i = 0; i < height; ++i)
         array2d_ptr[i] = new T[width];
@@ -146,6 +148,7 @@ void del_array_2d(T **array2dptr, size_t height)
     for(size_t i = 0; i <height; i++)
         delete [] array2dptr[i];
     delete [] array2dptr;
+    array2dptr = NULL;
 }
 
 #endif // UTILS

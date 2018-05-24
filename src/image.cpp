@@ -73,12 +73,16 @@ std::ostream& operator <<(std::ostream &os, Image &img)
 
 void Image::resize(size_t width, size_t height)
 {
-    destroy();
     if (width > 0 && height > 0)
     {
+    	destroy();
         buffer = new_array_2d<Vector3f>(width, height);
         this->_width = width;
         this->_height = height;
+    }
+    else
+    {
+    	std::cerr << "error: image resize failed: new image size not valid" << std::endl;
     }
 }
 
@@ -88,5 +92,6 @@ void Image::destroy()
     {
         del_array_2d<Vector3f>(buffer, _height);
         buffer = nullptr;
+        _width = _height = 0;
     }
 }
