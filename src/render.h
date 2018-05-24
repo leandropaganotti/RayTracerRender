@@ -27,9 +27,9 @@ public:
     void setCameraOptions(const CameraOptions &options);
 
     Camera& getCamera();
-    Image& getImage();
+    const Image& getImage() const;
 
-    /*
+	/*
 	 * render the scene with current the CameraOptions
 	 * */
 	void render(const Scene &scene, uint8_t nrays=NRAYS, uint8_t nthreads=NTHREADS);

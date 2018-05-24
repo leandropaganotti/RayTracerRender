@@ -9,7 +9,7 @@ struct Matrix4x4
 {
     T mat[4][4]={{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
 
-    Matrix4x4(){}
+    Matrix4x4() = default;
 
     Matrix4x4(  T a00, T a01, T a02, T a03,
                 T a10, T a11, T a12, T a13,

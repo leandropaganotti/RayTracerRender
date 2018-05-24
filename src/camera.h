@@ -46,7 +46,7 @@ class Camera
 protected:
     CameraOptions 	options;
     Matrix4x4f 		cameraToWorld;
-    Image           image;
+    Image			image;
 
     Vector3f getRayDirection(float i, float j) const;
 

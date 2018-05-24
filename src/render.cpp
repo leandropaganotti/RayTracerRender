@@ -11,7 +11,7 @@ Camera &Render::getCamera()
     return *this;
 }
 
-Image &Render::getImage()
+const Image &Render::getImage() const
 {
     return image;
 }
