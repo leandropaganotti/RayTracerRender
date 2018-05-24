@@ -17,7 +17,7 @@ void Scene::addLight(Light *light)
 
 void Scene::load(const char *filename)
 {
-    XMLParser().parseFile(filename, this);
+    XMLParser().parseFile(filename, *this);
 }
 
 std::ostream &operator <<(std::ostream &os, const Scene &scene)

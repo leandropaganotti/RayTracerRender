@@ -18,19 +18,19 @@ class XMLParser
 public:
     XMLParser() = default;
 
-    void parseFile(const char *filename, Scene * const scene);
+    void parseFile(const char *filename, Scene & scene);
 
-    void parseScene(xmlNode * xmlSceneNode, Scene * const scene);
+    void parseScene(xmlNode * xmlSceneNode, Scene & scene);
 
-    void parseCameraOptions(xmlNode * xmlCameraOptionsNode, CameraOptions * const options);
+    void parseCameraOptions(xmlNode * xmlCameraOptionsNode, CameraOptions & options);
 
-    void parseSphere(xmlNode * xmlSphereNode, Sphere * const sphere);
+    void parseSphere(xmlNode * xmlSphereNode, Sphere & sphere);
 
-    void parseMaterial(xmlNode * xmlMaterialNode, Material * const material);
+    void parseMaterial(xmlNode * xmlMaterialNode, Material & material);
 
-    void parsePointLight(xmlNode * xmlPointLightNode, PointLight * const light);
+    void parsePointLight(xmlNode * xmlPointLightNode, PointLight & light);
 
-    void parsePlane(xmlNode * xmlPlaneNode, Plane * const plane);
+    void parsePlane(xmlNode * xmlPlaneNode, Plane & plane);
 
 };
 
