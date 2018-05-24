@@ -20,9 +20,9 @@ struct Vector3
         struct {T r, g, b;};
     };
 
-	Vector3() = default;
-	Vector3(T x): x(x), y(x), z(x){}
-	Vector3(T x, T y, T z): x(x), y(y), z(z){}
+    Vector3() = default;
+    Vector3(T x): x(x), y(x), z(x){}
+    Vector3(T x, T y, T z): x(x), y(y), z(z){}
     
     T& operator[](size_t i) { return vec[i]; }
     const T& operator[](size_t i) const { return vec[i]; }
