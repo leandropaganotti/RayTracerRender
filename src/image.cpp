@@ -4,7 +4,7 @@
 
 Image::Image(size_t width, size_t height): _width(width), _height(height), buffer(nullptr)
 {
-    if ( width != 0 && height != 0)
+    if ( width > 0 && height > 0)
         resize(width, height);
 }
 
