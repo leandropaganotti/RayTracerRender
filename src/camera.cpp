@@ -54,10 +54,10 @@ size_t Camera::getHeight() const
 
 void Camera::setResolution(size_t width, size_t height)
 {
-	options.width = width;
-	options.height = height;
-	options.aspectRatio = float(width) / height;
-	image.resize(options.width, options.height);
+    options.width = width;
+    options.height = height;
+    options.aspectRatio = float(width) / height;
+    image.resize(options.width, options.height);
 }
 
 void Camera::setFov(float fov)
@@ -67,9 +67,9 @@ void Camera::setFov(float fov)
 
 void Camera::setOptions(const CameraOptions& options)
 {
-	this->options = options;
-	lookAt(options.from, options.to);
-	image.resize(options.width, options.height);
+    this->options = options;
+    lookAt(options.from, options.to);
+    image.resize(options.width, options.height);
 }
 
 std::ostream &operator <<(std::ostream &os, const Camera &cam)

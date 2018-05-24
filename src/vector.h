@@ -51,14 +51,14 @@ struct Vector3
     {
         return {-x, -y, -z};
     }
-	Vector3 operator-(const Vector3& rhs) const
-	{
-		return {x - rhs.x, y - rhs.y, z - rhs.z};
-	}
-	void operator-=(const Vector3& rhs)
-	{
-		x -= rhs.x; y -= rhs.y; z -= rhs.z;
-	}
+    Vector3 operator-(const Vector3& rhs) const
+    {
+	    return {x - rhs.x, y - rhs.y, z - rhs.z};
+    }
+    void operator-=(const Vector3& rhs)
+    {
+	    x -= rhs.x; y -= rhs.y; z -= rhs.z;
+    }
     Vector3 operator+(const Vector3& rhs) const
     {
         return {x+rhs.x, y+rhs.y, z+rhs.z};

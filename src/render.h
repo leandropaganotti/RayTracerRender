@@ -29,10 +29,10 @@ public:
     Camera& getCamera();
     const Image& getImage() const;
 
-	/*
-	 * render the scene with current the CameraOptions
-	 * */
-	void render(const Scene &scene, uint8_t nrays=NRAYS, uint8_t nthreads=NTHREADS);
+    /*
+    * render the scene with current the CameraOptions
+    * */
+    void render(const Scene &scene, uint8_t nrays=NRAYS, uint8_t nthreads=NTHREADS);
 
     /*
      * render the scene with current the CameraOptions, but set resolution width x height
