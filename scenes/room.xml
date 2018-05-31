@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scene id="room">
+    <ambientIndex>1.0</ambientIndex>
+    <kAmbient>0.1</kAmbient>
+    <CameraOptions>
+        <position>0, 1.7, 7</position>
+        <lookingAt>0, 1.7, 0</lookingAt>
+        <fov>35</fov>
+        <width>800</width>
+        <height>600</height>
+    </CameraOptions>
+    <PointLight>
+        <position>0,2.9,0</position>
+        <color>1</color>
+        <k>0.01</k>
+    </PointLight>
+    <Sphere id="mirrorBall">
+        <center>-1, 0.8, -1.5</center>
+        <radius>0.8</radius>
+        <material>
+            <type>REFLECTIVE</type>
+            <kDiffuse>0</kDiffuse>
+            <kSpecular>0</kSpecular>
+            <reflectivity>0.9</reflectivity>
+        </material>
+    </Sphere>
+    <Sphere id="glassBall">
+        <center>1, 0.8, 0</center>
+        <radius>0.8</radius>
+        <material>
+            <type>REFRACTIVE</type>
+            <kDiffuse>0</kDiffuse>
+            <kSpecular>1.0</kSpecular>
+            <shininess>150</shininess>
+            <refractiveIndex>1.5</refractiveIndex>
+        </material>
+    </Sphere>
+    <Sphere id="left">
+        <center>-100002,0,0</center>
+        <radius>100000</radius>
+        <material>
+            <type>REFLECTIVE</type>
+            <kDiffuse>.75,.25,.25</kDiffuse>
+            <kSpecular>0</kSpecular>
+        </material>
+    </Sphere>
+    <Sphere id="right">
+        <center>100002,0,0</center>
+        <radius>100000</radius>
+        <material>
+            <type>REFLECTIVE</type>
+            <kDiffuse>.25,.25,.75</kDiffuse>
+            <kSpecular>0</kSpecular>
+        </material>
+    </Sphere>
+    <Sphere id="top">
+        <center>0,100003,0</center>
+        <radius>100000</radius>
+        <material>
+            <type>REFLECTIVE</type>
+            <kDiffuse>.75</kDiffuse>
+            <kSpecular>0</kSpecular>
+        </material>
+    </Sphere>
+    <Sphere id="floor">
+        <center>0,-100000,0</center>
+        <radius>100000</radius>
+        <material>
+            <type>REFLECTIVE</type>
+            <kDiffuse>.75</kDiffuse>
+            <kSpecular>0</kSpecular>
+        </material>
+    </Sphere>
+    <Sphere id="back">
+        <center>0,0,-100003</center>
+        <radius>100000</radius>
+        <material>
+            <type>REFLECTIVE</type>
+            <kDiffuse>.75</kDiffuse>
+            <kSpecular>0</kSpecular>
+        </material>
+    </Sphere>
+    <Sphere id="front">
+        <center>0,0,100007</center>
+        <radius>100000</radius>
+        <material>
+            <type>REFLECTIVE</type>
+            <kDiffuse>0</kDiffuse>
+            <kSpecular>0</kSpecular>
+        </material>
+    </Sphere>
+</scene>
+
+
+
