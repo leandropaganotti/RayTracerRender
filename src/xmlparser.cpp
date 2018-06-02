@@ -19,7 +19,7 @@ bool XMLParser::equals(const xmlChar *lhs, const char *rhs)
 void XMLParser::error(const xmlNode *node)
 {
     if (node && node->parent)
-        cerr << "Error parsing node " << node->name << " inside node " << node->parent->name << endl;
+        cerr << "Error parsing \"" << node->name << "\" inside \"" << node->parent->name << "\"" << endl;
     else
         cerr << "Error parsing xml file" << endl;
 }
@@ -228,10 +228,14 @@ void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, Material & material)
                 material.refractiveIndex = toFloat(node->children);
             else if (equals(node->name, "type"))
             {
-                if (equals(node->children->content, "REFRACTIVE"))
-                    material.type = Material::Type::REFRACTIVE;
-                else if (equals(node->children->content, "REFLECTIVE"))
-                    material.type = Material::Type::REFLECTIVE;
+                if (equals(node->children->content, "DIFFUSE"))
+                    material.type = Material::Type::DIFFUSE;
+                else if (equals(node->children->content, "SPECULAR"))
+                    material.type = Material::Type::SPECULAR;
+                else if (equals(node->children->content, "MIRROR"))
+                    material.type = Material::Type::MIRROR;
+                else if (equals(node->children->content, "TRANSPARENT"))
+                    material.type = Material::Type::TRANSPARENT;
                 else
                     error(node);
             }

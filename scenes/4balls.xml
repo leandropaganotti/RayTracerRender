@@ -13,54 +13,50 @@
         <position>0,0,5</position>
         <color>1, 1, 1</color>
         <strength>1</strength>
-        <k>0.01</k>
+        <k>0.0</k>
     </PointLight>
     <Sphere id="left">
         <center>-2,0,0</center>
         <radius>1</radius>
         <material>
-            <type>REFLECTIVE</type>
+            <type>SPECULAR</type>
             <kDiffuse>1, 0, 0</kDiffuse>
             <kSpecular>1.0</kSpecular>
             <shininess>150</shininess>
-            <reflectivity>1.0</reflectivity>
-            <refractiveIndex>1.0</refractiveIndex>
+            <reflectivity>0.5</reflectivity>
         </material>
     </Sphere>
     <Sphere id="top">
         <center>0,2,0</center>
         <radius>1</radius>
         <material>
-            <type>REFLECTIVE</type>
+            <type>SPECULAR</type>
             <kDiffuse>0, 1, 0</kDiffuse>
             <kSpecular>1.0</kSpecular>
             <shininess>150</shininess>
-            <reflectivity>1.0</reflectivity>
-            <refractiveIndex>1.0</refractiveIndex>
+            <reflectivity>0.5</reflectivity>
         </material>
     </Sphere>
     <Sphere id="right">
         <center>2,0,0</center>
         <radius>1</radius>
         <material>
-            <type>REFLECTIVE</type>
+            <type>SPECULAR</type>
             <kDiffuse>0, 0, 1</kDiffuse>
             <kSpecular>1.0</kSpecular>
             <shininess>150</shininess>
-            <reflectivity>1.0</reflectivity>
-            <refractiveIndex>1.0</refractiveIndex>
+            <reflectivity>0.5</reflectivity>
         </material>
     </Sphere>
     <Sphere id="bottom">
         <center>0,-2,0</center>
         <radius>1</radius>
         <material>
-            <type>REFLECTIVE</type>
+            <type>SPECULAR</type>
             <kDiffuse>1, 0, 1</kDiffuse>
             <kSpecular>1.0</kSpecular>
             <shininess>150</shininess>
-            <reflectivity>1.0</reflectivity>
-            <refractiveIndex>1.0</refractiveIndex>
+            <reflectivity>0.5</reflectivity>
         </material>
     </Sphere>
 </scene>

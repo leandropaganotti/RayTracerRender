@@ -19,7 +19,7 @@
         <point>0</point>
         <normal>0,1,0</normal>
         <material>
-            <type>REFLECTIVE</type>
+            <type>SPECULAR</type>
             <kDiffuse>0.118, 0.565, 1.000</kDiffuse>
             <reflectivity>0.3</reflectivity>
             <kSpecular>1.0</kSpecular>
@@ -29,19 +29,15 @@
         <point>0, 0, -13</point>
         <normal>0,0,1</normal>
         <material>
-            <kDiffuse>0</kDiffuse>
-            <reflectivity>1.0</reflectivity>
+        <type>MIRROR</type>
             <kSpecular>0.9</kSpecular>
-            <shininess>1000</shininess>
         </material>
     </plane>
     <Sphere id="big ball">
         <center>-2.5,1.0, -4.0</center>
         <radius>1.0</radius>
         <material>
-            <type>REFLECTIVE</type>
-            <reflectivity>1.0</reflectivity>
-            <kDiffuse>0</kDiffuse>
+            <type>MIRROR</type>
             <kSpecular>1</kSpecular>
         </material>
     </Sphere>
@@ -49,17 +45,18 @@
         <center>0, 1, 0</center>
         <radius>1.0</radius>
         <material>
-            <type>REFRACTIVE</type>            
-            <kDiffuse>0</kDiffuse>
+            <type>TRANSPARENT</type>
+            <kDiffuse>0,0,1</kDiffuse>
             <kSpecular>1.0</kSpecular>
             <refractiveIndex>1.5</refractiveIndex>
+            <shininess>300</shininess>
         </material>
     </Sphere>
     <Sphere id="red">
         <center>3.5,0.5,-0.5</center>
         <radius>0.5</radius>
         <material>
-            <type>REFLECTIVE</type>
+            <type>SPECULAR</type>
             <kDiffuse>1, 0, 0</kDiffuse>
             <kSpecular>1.0</kSpecular>
             <reflectivity>0.5</reflectivity>
@@ -69,7 +66,7 @@
         <center>2.5,0.5, -3.5</center>
         <radius>0.5</radius>
         <material>
-            <type>REFLECTIVE</type>
+            <type>SPECULAR</type>
             <kDiffuse>0, 1, 0</kDiffuse>
             <kSpecular>1.0</kSpecular>
             <reflectivity>0.7</reflectivity>
@@ -79,7 +76,7 @@
         <center>1.5,0.5, -5.5</center>
         <radius>0.5</radius>
         <material>
-            <type>REFLECTIVE</type>
+            <type>SPECULAR</type>
             <kDiffuse>1, 1, 0</kDiffuse>
             <kSpecular>1.0</kSpecular>
             <reflectivity>0.5</reflectivity>
@@ -89,7 +86,7 @@
         <center>0, 0.5, 4</center>
         <radius>0.5</radius>
         <material>
-            <type>REFLECTIVE</type>
+            <type>SPECULAR</type>
             <kDiffuse>1, 0, 1</kDiffuse>
             <kSpecular>1.0</kSpecular>
             <reflectivity>0.5</reflectivity>
@@ -99,7 +96,7 @@
         <center>-2.5,0.5, -1</center>
         <radius>0.5</radius>
         <material>
-            <type>REFLECTIVE</type>
+            <type>SPECULAR</type>
             <kDiffuse>0, 0, 1</kDiffuse>
             <kSpecular>1.0</kSpecular>
             <reflectivity>0.5</reflectivity>
@@ -109,7 +106,7 @@
         <center>3.5,0.5, -0.5</center>
         <radius>0.5</radius>
         <material>
-            <type>REFLECTIVE</type>
+            <type>SPECULAR</type>
             <kDiffuse>1, 0, 0</kDiffuse>
             <kSpecular>1.0</kSpecular>
             <reflectivity>0.5</reflectivity>
@@ -119,7 +116,7 @@
         <center>3,0.5, 3</center>
         <radius>0.5</radius>
         <material>
-            <type>REFLECTIVE</type>
+            <type>SPECULAR</type>
             <kDiffuse>0, 1, 1</kDiffuse>
             <kSpecular>1.0</kSpecular>
             <reflectivity>0.3</reflectivity>

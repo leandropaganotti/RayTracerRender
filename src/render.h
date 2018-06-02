@@ -20,6 +20,11 @@ class Render: public Camera
     void castRay(const Ray &ray, const ObjectVector &objects, IntersectionData &isec);
     bool castShadowRay(const Ray &ray, const ObjectVector &objects, float tMax);
 
+    Vector3f diffuseMaterial(const Ray &ray, const Scene &scene, const uint8_t, const IntersectionData &isec);
+    Vector3f specularMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec);
+    Vector3f mirrorMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec);
+    Vector3f transparentMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec);
+
 public:
 
     Render() = default;

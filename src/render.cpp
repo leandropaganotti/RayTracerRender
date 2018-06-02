@@ -59,107 +59,26 @@ void Render::renderSingleThread(const Scene *scene, size_t startRow, size_t endR
 
 Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t depth)
 {
-    if(depth == MAX_DEPTH) return Vector3f(0);
+    if(depth == MAX_DEPTH) return Vector3f(0.0f);
 
     IntersectionData isec;
 
     castRay(ray, scene.objects, isec);
 
-    if (isec.object == nullptr) return Vector3f(0);
+    if (isec.object == nullptr) return Vector3f(0.0f);
 
-    //Phong shading down here
-
-    Vector3f phit = ray.origin + isec.tnear * ray.direction;
-    Vector3f normal = isec.object->normal(phit, isec.idx);
-    const Material *material = &isec.object->material;
-
-    Vector3f  phitColor(0), diffuse(0), specular(0);
-
-    //ambient
-    phitColor += material->kDiffuse * scene.kAmbient;
-
-    // diffuse and specular
-    for(auto& light: scene.lights)
-    {
-        Vector3f toLight = light->direction(phit);
-
-        float incidence = normal ^ toLight; //NdotL
-        if( incidence > 0.0f )
-        {
-            if (!castShadowRay(Ray(phit + bias * normal, toLight), scene.objects, light->distance(phit)))
-			{
-                Vector3f lightIntensity = light->intensity(phit);
-
-				//diffuse
-                diffuse = material->kDiffuse * incidence;
-
-				//specular
-				Vector3f toCamera = (ray.origin - phit).normalize();
-                Vector3f reflected = reflect(-toLight, normal);
-                specular = material->kSpecular * pow(std::max(0.0f, toCamera ^ reflected), material->shininess);
-
-                phitColor +=  lightIntensity * (diffuse + specular);
-			}            
-        }
+    switch (isec.object->material.type) {
+    case Material::Type::DIFFUSE:
+        return diffuseMaterial(ray, scene, depth, isec);
+    case Material::Type::SPECULAR:
+        return specularMaterial(ray, scene, depth, isec);
+    case Material::Type::MIRROR:
+        return mirrorMaterial(ray, scene, depth, isec);
+    case Material::Type::TRANSPARENT:
+        return transparentMaterial(ray, scene, depth, isec);
+    default:
+        return Vector3f(0.0f);
     }
-
-    //reflection
-    if(material->type == Material::Type::REFLECTIVE && material->reflectivity)
-    {
-        Ray R;
-        R.origin = phit + bias * normal;
-        R.direction = reflect(ray.direction, normal).normalize();
-        phitColor += rayTrace(R, scene, depth + 1) * material->reflectivity;
-    }
-    else if(material->type == Material::Type::REFRACTIVE)
-    {
-
-        float n, n1, n2, kr, kt;
-        float cosi = normal.dot(ray.direction);
-        if ( cosi < 0.0f) // outside surface
-        {
-            cosi = -cosi;
-            n1 = scene.ambientIndex;
-            n2 = material->refractiveIndex;
-        }
-        else              // inside surface
-        {
-            normal = -normal;
-            n1 = material->refractiveIndex;
-            n2 = scene.ambientIndex;
-        }
-
-        n = n1 / n2;
-        float sint2 = n * n * (1.0f - cosi * cosi);
-
-        if (sint2 > 1.0f) { kr = 1.0f; kt = 0.0f; } // TIR
-
-        //refraction
-        else
-        {
-            // fresnel
-            float cost  = sqrt(1.0f - sint2);
-            float Rs = (n1 * cosi - n2 * cost) / (n1 * cosi + n2 * cost);
-            float Rp = (n2 * cosi - n1 * cost) / (n2 * cosi + n1 * cost);
-
-            kr = (Rs * Rs + Rp * Rp) / 2.0f;
-            kt = 1.0f - kr;
-
-            Ray T;
-            T.origin = phit - bias * normal;
-            T.direction = n * ray.direction + (n * cosi - cost) * normal;
-            T.direction.normalize();
-            phitColor += rayTrace(T, scene, depth + 1) * kt;
-        }
-
-        // reflection
-        Ray R;
-        R.origin = phit + bias * normal;
-        R.direction = reflect(ray.direction, normal).normalize();
-        phitColor += rayTrace(R, scene, depth + 1) * kr ;
-
-    }
-    return phitColor;
 }
 
 inline
@@ -189,11 +108,171 @@ bool Render::castShadowRay(const Ray &ray, const ObjectVector &objects, float tM
     {
         if (object->intersection(ray, tnear))
         {
-            if ( tnear < tMax && object->material.type != Material::Type::REFRACTIVE ) return true;
+            if ( tnear < tMax && object->material.type != Material::Type::TRANSPARENT) return true;
             //if ( tnear < tMax ) return true;
         }
     }
     return false;
+}
+
+inline
+Vector3f Render::diffuseMaterial(const Ray &ray, const Scene &scene, const uint8_t, const IntersectionData &isec)
+{
+    Vector3f phit = ray.origin + isec.tnear * ray.direction;
+    Vector3f normal = isec.object->normal(phit, isec.idx);
+    const Material *material = &isec.object->material;
+
+    //ambient
+    Vector3f phitColor = material->kDiffuse * scene.kAmbient;
+
+    // diffuse
+    for(auto& light: scene.lights)
+    {
+        Vector3f toLight = light->direction(phit);
+
+        float incidence = normal ^ toLight; //NdotL
+        if( incidence > 0.0f )
+        {
+            if (!castShadowRay(Ray(phit + bias * normal, toLight), scene.objects, light->distance(phit)))
+            {
+                phitColor +=  light->intensity(phit) * (material->kDiffuse * incidence);
+            }
+        }
+    }
+    return phitColor;
+}
+
+inline
+Vector3f Render::specularMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
+{
+    Vector3f phit = ray.origin + isec.tnear * ray.direction;
+    Vector3f normal = isec.object->normal(phit, isec.idx);
+    const Material *material = &isec.object->material;
+
+    //ambient
+    Vector3f phitColor = material->kDiffuse * scene.kAmbient;
+
+    // diffuse and specular
+    for(auto& light: scene.lights)
+    {
+        Vector3f toLight = light->direction(phit);
+
+        float incidence = normal ^ toLight; //NdotL
+        if( incidence > 0.0f )
+        {
+            if (!castShadowRay(Ray(phit + bias * normal, toLight), scene.objects, light->distance(phit)))
+            {
+                Vector3f lightIntensity = light->intensity(phit);
+
+                //diffuse
+                Vector3f diffuse = material->kDiffuse * incidence;
+
+                //specular
+                Vector3f toCamera = -ray.direction;
+                Vector3f reflected = reflect(-toLight, normal);
+                Vector3f specular = material->kSpecular * pow(std::max(0.0f, toCamera ^ reflected), material->shininess);
+                phitColor +=  lightIntensity * (diffuse + specular);
+            }
+        }
+    }
+    phitColor *= 1.0f - material->reflectivity;
+
+    Ray R;
+    R.origin = phit + bias * normal;
+    R.direction = reflect(ray.direction, normal).normalize();
+    return phitColor + rayTrace(R, scene, depth + 1) * material->kSpecular * material->reflectivity;
+}
+
+inline
+Vector3f Render::mirrorMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
+{
+    Vector3f phit = ray.origin + isec.tnear * ray.direction;
+    Vector3f normal = isec.object->normal(phit, isec.idx);
+    const Material *material = &isec.object->material;
+
+    Ray R;
+    R.origin = phit + bias * normal;
+    R.direction = reflect(ray.direction, normal).normalize();
+    return rayTrace(R, scene, depth + 1) * material->kSpecular;
+}
+
+inline
+Vector3f Render::transparentMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
+{
+    Vector3f phit = ray.origin + isec.tnear * ray.direction;
+    Vector3f normal = isec.object->normal(phit, isec.idx);
+    const Material *material = &isec.object->material;
+
+    Vector3f phitColor(0.0f);
+
+    // specular
+    for(auto& light: scene.lights)
+    {
+        Vector3f toLight = light->direction(phit);
+
+        float incidence = normal ^ toLight; //NdotL
+        if( incidence > 0.0f )
+        {
+            if (!castShadowRay(Ray(phit + bias * normal, toLight), scene.objects, light->distance(phit)))
+            {
+                //specular
+                Vector3f toCamera = -ray.direction;
+                Vector3f reflected = reflect(-toLight, normal);
+                Vector3f specular = material->kSpecular * pow(std::max(0.0f, toCamera ^ reflected), material->shininess);
+                phitColor +=  light->intensity(phit) * specular;
+            }
+        }
+    }
+
+    // transmited
+    float n, n1, n2, kr, kt;
+    float cosi = normal.dot(ray.direction);
+    if ( cosi < 0.0f) // outside surface
+    {
+        cosi = -cosi;
+        n1 = scene.ambientIndex;
+        n2 = material->refractiveIndex;
+    }
+    else              // inside surface
+    {
+        normal = -normal;
+        n1 = material->refractiveIndex;
+        n2 = scene.ambientIndex;
+    }
+
+    n = n1 / n2;
+    float sint2 = n * n * (1.0f - cosi * cosi);
+
+    if (sint2 > 1.0f) { kr = 1.0f; kt = 0.0f; } // TIR
+
+    //refraction
+    else
+    {
+        // fresnel
+        float cost  = sqrt(1.0f - sint2);
+        float Rs = (n1 * cosi - n2 * cost) / (n1 * cosi + n2 * cost);
+        float Rp = (n2 * cosi - n1 * cost) / (n2 * cosi + n1 * cost);
+
+        kr = (Rs * Rs + Rp * Rp) / 2.0f;
+        kt = 1.0f - kr;
+
+        Ray T;
+        T.origin = phit - bias * normal;
+        T.direction = n * ray.direction + (n * cosi - cost) * normal;
+        T.direction.normalize();
+        phitColor += rayTrace(T, scene, depth + 1) * kt;
+    }
+
+
+    // reflection
+    if(kr)
+    {
+        Ray R;
+        R.origin = phit + bias * normal;
+        R.direction = reflect(ray.direction, normal).normalize();
+        phitColor += rayTrace(R, scene, depth + 1) * material->kSpecular * kr ;
+    }
+    return phitColor;
 }
 
 void Render::render(const Scene &scene, uint8_t nrays, uint8_t nthreads)
