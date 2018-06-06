@@ -122,8 +122,12 @@ Vector3f Render::diffuseMaterial(const Ray &ray, const Scene &scene, const uint8
     Vector3f normal = isec.object->normal(phit, isec.idx);
     const Material *material = &isec.object->material;
 
+    // Texture
+    Vector3f textureColor = isec.object->texture(phit);
+
+
     //ambient
-    Vector3f phitColor = material->kDiffuse * scene.kAmbient;
+    Vector3f phitColor = material->kDiffuse * textureColor * scene.kAmbient;
 
     // diffuse
     for(auto& light: scene.lights)
@@ -135,7 +139,7 @@ Vector3f Render::diffuseMaterial(const Ray &ray, const Scene &scene, const uint8
         {
             if (!castShadowRay(Ray(phit + bias * normal, toLight), scene.objects, light->distance(phit)))
             {
-                phitColor +=  light->intensity(phit) * (material->kDiffuse * incidence);
+                phitColor +=  light->intensity(phit) * (material->kDiffuse * textureColor * incidence);
             }
         }
     }

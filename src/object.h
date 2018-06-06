@@ -43,16 +43,17 @@ struct Material
 class Object
 {   
 public:
-    Object(const Vector3f &color={1.0}):
-        material(color)
-    {
+    Object(const Vector3f &color={1.0}): material(color) { }
+    virtual ~Object() = default;
 
-    }   
     virtual bool intersection(const Ray& ray, IntersectionData &isec) const = 0;
     virtual bool intersection(const Ray& ray, float &tnear) const = 0;
     virtual const Vector3f normal(const Vector3f &phit, size_t idx) const = 0;
 
-    virtual ~Object() = default;
+    virtual const Vector3f texture(const Vector3f &) const
+    {
+    	return Vector3f(1.0f);
+    }
 
     Material material;
 };

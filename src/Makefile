@@ -6,7 +6,7 @@ LIBDIRS = -L/usr/local/lib
 LIBS = -lpthread -lxml2 
 LDFLAGS = $(LIBDIRS) $(LIBS)
 
-OBJECTS = camera.o cube.o image.o light.o main.o mesh.o plane.o render.o scene.o sphere.o xmlparser.o
+OBJECTS = camera.o cube.o image.o light.o main.o mesh.o plane.o render.o scene.o sphere.o xmlparser.o texture.o
 
 all: $(PROGRAM)
 

@@ -2,6 +2,7 @@
 #define PLANE_H
 
 #include "object.h"
+#include "texture.h"
 
 class Plane: public Object
 {
@@ -11,11 +12,15 @@ public:
     bool intersection(const Ray& ray, IntersectionData& isec) const;
     bool intersection(const Ray& ray, float &tnear) const;
     const Vector3f normal(const Vector3f &, size_t) const;
+    const Vector3f texture(const Vector3f &phit) const;
 
     static bool intersection(const Vector3f& P, const Vector3f& n, const Ray& ray, float& tnear);
 
     Vector3f P;    // a point P on the plane
     Vector3f N;    // normal to the plane
+
+private:
+    std::unique_ptr<Texture> tex;
 };
 
 #endif // PLANE_H

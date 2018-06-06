@@ -30,7 +30,7 @@
         <center>0,1.5,-2.5</center>
         <radius>1.5</radius>
         <material>
-            <type>SPECULAR</type>
+            <type>DIFFUSE</type>
             <kDiffuse>0.0, 1, 0.0</kDiffuse>
             <kSpecular>1</kSpecular>
             <shininess>250</shininess>
@@ -48,17 +48,17 @@
             <reflectivity>0.3</reflectivity>
         </material>
     </Sphere>
-    <Sphere id="floor">
-        <center>0,-1e5,0</center>
-        <radius>1e5</radius>
+    <Plane id="floor">
+        <point>0</point>
+        <normal>0,1,0</normal>
         <material>
-            <type>SPECULAR</type>
+            <type>DIFFUSE</type>
             <kDiffuse>1</kDiffuse>
             <kSpecular>1.0</kSpecular>
             <shininess>150</shininess>
             <reflectivity>0.3</reflectivity>
         </material>
-    </Sphere>
+    </Plane>
 </scene>
 
 
