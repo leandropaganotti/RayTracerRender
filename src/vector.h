@@ -83,6 +83,10 @@ struct Vector3
     {
         return rhs * scalar;
     }
+    friend Vector3 operator/(float scalar, const Vector3& rhs)
+    {
+        return {scalar/rhs.x, scalar/rhs.y, scalar/rhs.z};
+    }
     Vector3 operator/(float scalar) const
     {
         return {x/scalar, y/scalar, z/scalar};

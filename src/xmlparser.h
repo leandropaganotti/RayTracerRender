@@ -6,7 +6,8 @@
 #include "scene.h"
 #include "sphere.h"
 #include "plane.h"
-#include "cube.h"
+#include "box.h"
+#include "model.h"
 
 class XMLParser
 {
@@ -31,6 +32,10 @@ public:
     void parsePointLight(xmlNode * xmlPointLightNode, PointLight & light);
 
     void parsePlane(xmlNode * xmlPlaneNode, Plane & plane);
+
+    void parseBox(xmlNode * xmlBoxNode, Box & box);
+
+    void parseModel(xmlNode * xmlModelNode, ModelMatrix & model);
 
 };
 
