@@ -14,11 +14,12 @@ public:
 class ChessBoard: public Texture
 {
 public:
-	ChessBoard(float size=1.0f, const Vector3f &color1={0.0f}, const Vector3f &color2={1.0f});
+	ChessBoard(float width=1.0f, float height=1.0f, const Vector3f &color1={0.0f}, const Vector3f &color2={1.0f});
 	virtual Vector3f get(float u, float v) const;
 
 private:
-	float size;
+	float width;
+	float height;
 	Vector3f color1;
 	Vector3f color2;
 };

@@ -5,7 +5,7 @@
 Sphere::Sphere(const Vector3f &center, const float &radius, const Vector3f &color) :
     Object(color), center(center), radius(radius), radius2(radius * radius)
 {
-	tex.reset(new ChessBoard());
+	//tex.reset(new ChessBoard(0.1, 0.2, {1,1,0 }, {1, 0.5, 0.6}));
 }
 
 Vector3f Sphere::getCenter() const
@@ -71,11 +71,16 @@ const Vector3f Sphere::normal(const Vector3f &phit, size_t) const
 
 const Vector3f Sphere::texture(const Vector3f& phit) const
 {
-	Vector3f d = (phit-center).normalize();
-	float u = 0.5 + atan2f(d.z, d.x) / 2.0f * PI;
-	float v = 0.5 + asinf(d.y) / PI;
-	return tex->get(u, v);
+	if(tex)
+	{
+		Vector3f d = (phit-center).normalize();
+		float u = 0.5 + atan2f(d.z, d.x) / (2.0f * PI);
+		float v = 0.5 - asinf(d.y) / PI;
+		return tex->get(u, v);
+	}
+	return Vector3f(1.0f);
 }
+
 //       analytic solution
 //       Vec3f L = orig - center;
 //       float a = dotProduct(dir, dir);

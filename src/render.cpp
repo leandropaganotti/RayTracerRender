@@ -125,7 +125,6 @@ Vector3f Render::diffuseMaterial(const Ray &ray, const Scene &scene, const uint8
     // Texture
     Vector3f textureColor = isec.object->texture(phit);
 
-
     //ambient
     Vector3f phitColor = material->kDiffuse * textureColor * scene.kAmbient;
 
@@ -153,8 +152,11 @@ Vector3f Render::specularMaterial(const Ray &ray, const Scene &scene, const uint
     Vector3f normal = isec.object->normal(phit, isec.idx);
     const Material *material = &isec.object->material;
 
+    // Texture
+    Vector3f textureColor = isec.object->texture(phit);
+
     //ambient
-    Vector3f phitColor = material->kDiffuse * scene.kAmbient;
+    Vector3f phitColor = material->kDiffuse * textureColor * scene.kAmbient;
 
     // diffuse and specular
     for(auto& light: scene.lights)
@@ -169,7 +171,7 @@ Vector3f Render::specularMaterial(const Ray &ray, const Scene &scene, const uint
                 Vector3f lightIntensity = light->intensity(phit);
 
                 //diffuse
-                Vector3f diffuse = material->kDiffuse * incidence;
+                Vector3f diffuse = material->kDiffuse * textureColor * incidence;
 
                 //specular
                 Vector3f toCamera = -ray.direction;

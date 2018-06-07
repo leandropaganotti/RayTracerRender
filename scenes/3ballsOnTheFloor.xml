@@ -3,20 +3,20 @@
     <ambientIndex>1.0</ambientIndex>
     <kAmbient>0.1</kAmbient>
     <CameraOptions>
-        <position>0,2,10</position>
-        <lookingAt>0,1,0</lookingAt>
+        <position>100,5,0</position>
+        <lookingAt>100,1,-10</lookingAt>
         <fov>35</fov>
         <width>1920</width>
         <height>1080</height>
     </CameraOptions>
     <PointLight>
-        <position>0,3,4</position>
+        <position>100,3,-6</position>
         <color>1, 1, 1</color>
         <strength>1.5</strength>
         <k>0.01</k>
     </PointLight>
-    <Sphere id="1">
-        <center>-2.5,1,0</center>
+   <Sphere id="1">
+        <center>97.5,1,-10</center>
         <radius>1</radius>
         <material>
             <type>SPECULAR</type>
@@ -25,20 +25,20 @@
             <shininess>250</shininess>
             <reflectivity>0.3</reflectivity>
         </material>
-    </Sphere>
+    </Sphere> 
     <Sphere id="2">
-        <center>0,1.5,-2.5</center>
+        <center>100,1.5,-12.5</center>
         <radius>1.5</radius>
         <material>
-            <type>DIFFUSE</type>
-            <kDiffuse>0.0, 1, 0.0</kDiffuse>
+            <type>SPECULAR</type>
+            <kDiffuse>0, 1, 0</kDiffuse>
             <kSpecular>1</kSpecular>
             <shininess>250</shininess>
             <reflectivity>0.5</reflectivity>
         </material>
     </Sphere>
-    <Sphere id="3">
-        <center>2.5,1,0</center>
+  <Sphere id="3">
+        <center>102.5,1,-10</center>
         <radius>1</radius>
         <material>
             <type>SPECULAR</type>
@@ -52,7 +52,7 @@
         <point>0</point>
         <normal>0,1,0</normal>
         <material>
-            <type>DIFFUSE</type>
+            <type>SPECULAR</type>
             <kDiffuse>1</kDiffuse>
             <kSpecular>1.0</kSpecular>
             <shininess>150</shininess>

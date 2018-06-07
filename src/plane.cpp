@@ -3,7 +3,7 @@
 Plane::Plane(const Vector3f &P, const Vector3f &n, const Vector3f& color):
     Object(color), P(P), N(n)
 {
-	tex.reset(new ChessBoard());
+	tex.reset(new ChessBoard(4, 4, 0, 1));
 }
 
 bool Plane::intersection(const Ray &ray, IntersectionData& isec) const
@@ -42,7 +42,8 @@ bool Plane::intersection(const Vector3f &P, const Vector3f &n, const Ray &ray, f
 const Vector3f Plane::texture(const Vector3f& phit) const
 {
 	if(tex)
+	{
 		return tex->get(phit.x, phit.z);
-	else
-		return Vector3f(1.0f);
+	}
+	return Vector3f(1.0f);
 }
