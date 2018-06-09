@@ -4,6 +4,7 @@
 #include "matrix.h"
 #include <math.h>
 #include <sys/time.h>
+#include <cmath>
 
 # define PI           3.14159265358979323846  /* pi */
 
@@ -55,6 +56,12 @@ void fresnel(const Vector3f &I, const Vector3f &N, const float &ior, float &kr)
     }
     // As a consequence of the conservation of energy, transmittance is given by:
     // kt = 1 - kr;
+}
+
+inline
+float modulo(const float x)
+{
+    return x - std::floor(x);
 }
 
 inline

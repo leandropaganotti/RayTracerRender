@@ -284,7 +284,7 @@ void XMLParser::parsePlane(xmlNode *xmlPlaneNode, Plane & plane)
         if (node->type == XML_ELEMENT_NODE)
         {
             if (equals(node->name, "point"))
-                plane.P = toVector(node->children);
+                plane.O = toVector(node->children);
             else if (equals(node->name, "normal"))
                 plane.N = toVector(node->children);
             else if (equals(node->name, "material"))
