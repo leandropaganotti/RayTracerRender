@@ -1,13 +1,8 @@
 #include "texture.h"
 #include "utils.h"
 
-Texture::Texture(float umax, float vmax): umax(umax), vmax(vmax)
-{
-
-}
-
-ChessBoard::ChessBoard(const Vector3f &color1, const Vector3f &color2, size_t rows, size_t cols, float umax, float vmax):
-    Texture(umax, vmax), color1(color1), color2(color2), rows(rows), cols(cols)
+ChessBoard::ChessBoard(const Vector3f &color1, const Vector3f &color2, size_t rows, size_t cols):
+    color1(color1), color2(color2), rows(rows), cols(cols)
 {
 
 }
@@ -20,17 +15,15 @@ Vector3f ChessBoard::get(float u, float v) const
 		return color2;
 }
 
-Tiles::Tiles(float umax, float vmax): Texture(umax, vmax)
+Tiles::Tiles(const Vector3f &colorTile, const Vector3f &colorEdge, float rows, float cols, float uedge, float vedge):
+    colorTile(colorTile), colorEdge(colorEdge), rows(rows), cols(cols), uedge(uedge), vedge(vedge)
 {
-    colorTile = 1;
-    colorEdge = 0;
-    uedge = 0.01;
-    vedge = 0.1;
+
 }
 
 Vector3f Tiles::get(float u, float v) const
 {
-    if (modulo(u) > uedge && modulo(v) > vedge)
+    if (modulo(u*cols) > uedge && modulo(v*rows) > vedge)
         return colorTile;
     else
         return colorEdge;

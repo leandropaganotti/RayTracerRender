@@ -47,20 +47,14 @@ const Vector3f Plane::texture(const Vector3f& phit) const
 
         if(N.x == 1.0f || N.x == -1.0f)
         {
-            v.y = fabs(v.y) / tex->getUmax();
-            v.z = fabs(v.z) / tex->getVmax();
             return tex->get(v.y, v.z);
         }
         else if(N.y == 1.0f || N.y == -1.0f)
         {
-            v.x = fabs(v.x) / tex->getUmax();
-            v.z = fabs(v.z) / tex->getVmax();
             return tex->get(v.x, v.z);
         }
         else
         {
-            v.x = fabs(v.x) / tex->getUmax();
-            v.y = fabs(v.y) / tex->getVmax();
             return tex->get(v.x, v.y);
         }
 	}

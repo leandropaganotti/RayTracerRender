@@ -5,7 +5,7 @@
 Sphere::Sphere(const Vector3f &center, const float &radius, const Vector3f &color) :
     Object(color), center(center), radius(radius), radius2(radius * radius)
 {
-
+    tex.reset(new Tiles());
 }
 
 Vector3f Sphere::getCenter() const
