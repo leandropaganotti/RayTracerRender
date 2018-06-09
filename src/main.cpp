@@ -37,7 +37,7 @@ int main(int argc, char **argv)
     for (unsigned i=0; i <= panoramic; ++i)
     {
         cout << endl << i << " " <<  i*angle << " " << endl;
-        camera.lookAt(Ry(deg2rad( i*angle )) * from, to); // rotate around y-axis
+        camera.lookAt( T(to) * Ry(deg2rad( i*angle )) * T(-to) * from, to); // rotate around y-axis
 
         auto start = chrono::steady_clock::now();       
         render.render(scene, nrays, nthreads);
