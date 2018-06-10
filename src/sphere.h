@@ -22,6 +22,7 @@ public:
     float    getRadius() const;
     void     setRadius(float value);
 
+    std::unique_ptr<Texture>& getTex();
 };
 
 #endif  // SPHERE_H

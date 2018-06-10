@@ -1,8 +1,4 @@
 #include "xmlparser.h"
-#include <string.h>
-#include <iostream>
-
-using namespace std;
 
 bool XMLParser::equals(const xmlChar *lhs, const char *rhs)
 {
@@ -26,10 +22,21 @@ void XMLParser::error(const xmlNode *node)
 
 Vector3f XMLParser::toVector(const xmlNode *node)
 {
-    if (node == NULL) return Vector3f(0);
+    if (node == NULL) return Vector3f(0.0f);
+    return toVector(node->content);
+}
 
-    string text((const char*)node->content);
+Vector3f XMLParser::toVector(const xmlAttr *attr)
+{
+    if (attr == NULL) return Vector3f(0.0f);
+    return toVector(attr->children->content);
+}
 
+Vector3f XMLParser::toVector(const xmlChar *str)
+{
+    if (str == NULL) return Vector3f(0.0f);
+
+    string text((const char*)str);
     size_t first = text.find_first_of(',');
 
     // if Vector is only one float : Vector3f(x)
@@ -46,8 +53,8 @@ Vector3f XMLParser::toVector(const xmlNode *node)
         size_t second = text.find_first_of(',');
         if (second == string::npos)
         {
-            error(node);
-            return Vector3f(0);
+
+            return Vector3f(0.0f);
         }
         else
         {
@@ -55,8 +62,8 @@ Vector3f XMLParser::toVector(const xmlNode *node)
             text.erase(0, second+1);
             if (text.size() == 0)
             {
-                error(node);
-                return Vector3f(0);
+
+                return Vector3f(0.0f);
             }
             else
                 vec.z = stof(text);
@@ -68,6 +75,11 @@ Vector3f XMLParser::toVector(const xmlNode *node)
 float XMLParser::toFloat(const xmlNode *node)
 {
     return node == NULL ? 0.0 : atof((const char*)node->content);
+}
+
+float XMLParser::toFloat(const xmlChar *str)
+{
+    return str == NULL ? 0.0 : atof((const char*)str);
 }
 
 int XMLParser::toInt(const xmlNode *node)
@@ -198,6 +210,8 @@ void XMLParser::parseSphere(xmlNode *xmlSphereNode, Sphere & sphere)
                 sphere.setRadius( toFloat(node->children) );
             else if (equals(node->name, "material"))
                 parseMaterial(node, sphere.material);
+            else if (equals(node->name, "texture"))
+                parseTexture(node, sphere.getTex());
             else
                 error(node);
         }
@@ -289,8 +303,55 @@ void XMLParser::parsePlane(xmlNode *xmlPlaneNode, Plane & plane)
                 plane.N = toVector(node->children);
             else if (equals(node->name, "material"))
                 parseMaterial(node, plane.material);
+            else if (equals(node->name, "texture"))
+                parseTexture(node, plane.getTex());
             else
                 error(node);
         }
     }
+}
+
+void XMLParser::parseTexture(xmlNode *xmlTextureNode, std::unique_ptr<Texture> &tex)
+{
+    if(xmlTextureNode == NULL)
+    {
+         cerr << "error: could not parse Texture, xmlNode pointer is NULL" << endl;
+         return;
+    }
+
+    const xmlAttr *attr = NULL;
+    xmlChar *name=NULL;
+    float rows=1.0f, cols=1.0f, uedge=0.1f, vedge=0.1f, angle=0.0f;
+    Vector3f color1=0, color2=1;
+    for (attr = xmlTextureNode->properties; attr; attr = attr->next)
+    {
+        if (equals(attr->name, "name"))
+            name = attr->children->content;
+        else if (equals(attr->name, "rows"))
+            rows = toFloat(attr->children->content);
+        else if (equals(attr->name, "cols"))
+            cols = toFloat(attr->children->content);
+        else if (equals(attr->name, "uedge"))
+            uedge = toFloat(attr->children->content);
+        else if (equals(attr->name, "vedge"))
+            vedge = toFloat(attr->children->content);
+        else if (equals(attr->name, "colorTiles"))
+            color1 = toVector(attr->children->content);
+        else if (equals(attr->name, "colorEdge"))
+            color2 = toVector(attr->children->content);
+        else if (equals(attr->name, "angle"))
+            angle = toFloat(attr->children->content);
+        else
+            error(xmlTextureNode);
+    }
+    if(name)
+    {
+        if (equals(name, "tiles"))
+            tex.reset(new Tiles(color1, color2, rows, cols, angle, uedge, vedge));
+        else if (equals(name, "chessBoard"))
+            tex.reset(new ChessBoard(color1, color2, rows, cols, angle));
+    }
+    else
+        std::cerr << "Error parsing Texture type attribute not found in " << xmlTextureNode->name << std::endl;
+
 }

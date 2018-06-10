@@ -39,6 +39,11 @@ bool Plane::intersection(const Vector3f &O, const Vector3f &n, const Ray &ray, f
     return false;
 }
 
+std::unique_ptr<Texture>& Plane::getTex()
+{
+    return tex;
+}
+
 const Vector3f Plane::texture(const Vector3f& phit) const
 {
     if(tex)

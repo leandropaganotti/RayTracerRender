@@ -19,6 +19,8 @@ public:
     Vector3f O;    // a point O(origin) on the plane
     Vector3f N;    // normal to the plane
 
+    std::unique_ptr<Texture>& getTex();
+
 private:
     std::unique_ptr<Texture> tex;
 };
