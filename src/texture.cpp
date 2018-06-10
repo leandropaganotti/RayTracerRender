@@ -19,7 +19,7 @@ Vector3f ChessBoard::get(float u, float v) const
 }
 
 Tiles::Tiles(const Vector3f &colorTile, const Vector3f &colorEdge, float rows, float cols, float angle, float uedge, float vedge):
-    colorTile(colorTile), colorEdge(colorEdge), rows(rows), cols(cols), angle(angle), uedge(uedge), vedge(vedge)
+    color1(colorTile), color2(colorEdge), rows(rows), cols(cols), angle(angle), uedge(uedge), vedge(vedge)
 {
 
 }
@@ -29,9 +29,9 @@ Vector3f Tiles::get(float u, float v) const
     float s = u*cos(deg2rad(angle)) - v*sin(deg2rad(angle));
     float t = v*cos(deg2rad(angle)) + u*sin(deg2rad(angle));
     if (modulo(s*cols) > uedge && modulo(t*rows) > vedge)
-        return colorTile;
+        return color1;
     else
-        return colorEdge;
+        return color2;
 }
 
 

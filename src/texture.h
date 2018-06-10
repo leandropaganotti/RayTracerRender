@@ -27,12 +27,12 @@ private:
 class Tiles: public Texture
 {
 public:
-    Tiles(const Vector3f &colorTile={1.0f}, const Vector3f &colorEdge={0.0f}, float rows=1.0f, float cols=1.0f, float angle=0.0f, float uedge=0.01f, float vedge=0.0f);
+    Tiles(const Vector3f &color1={1.0f}, const Vector3f &color2={0.0f}, float rows=1.0f, float cols=1.0f, float angle=0.0f, float uedge=0.01f, float vedge=0.0f);
     Vector3f get(float u, float v) const;
 
 private:
-    Vector3f colorTile;
-    Vector3f colorEdge;
+    Vector3f color1;
+    Vector3f color2;
     float rows;
     float cols;
     float angle;

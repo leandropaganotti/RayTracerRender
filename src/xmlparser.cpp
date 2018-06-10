@@ -335,9 +335,9 @@ void XMLParser::parseTexture(xmlNode *xmlTextureNode, std::unique_ptr<Texture> &
             uedge = toFloat(attr->children->content);
         else if (equals(attr->name, "vedge"))
             vedge = toFloat(attr->children->content);
-        else if (equals(attr->name, "colorTiles"))
+        else if (equals(attr->name, "color1"))
             color1 = toVector(attr->children->content);
-        else if (equals(attr->name, "colorEdge"))
+        else if (equals(attr->name, "color2"))
             color2 = toVector(attr->children->content);
         else if (equals(attr->name, "angle"))
             angle = toFloat(attr->children->content);
