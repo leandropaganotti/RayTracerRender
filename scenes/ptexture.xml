@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scene id="ptexture">
+    <ambientIndex>1.0</ambientIndex>
+    <kAmbient>0.1</kAmbient>
+    <CameraOptions>
+        <position>0,1.5,6</position>
+        <lookingAt>0,1,0</lookingAt>
+        <fov>35</fov>
+        <width>1920</width>
+        <height>1080</height>
+    </CameraOptions>
+    <PointLight>
+        <position>0, 2, 2</position>
+        <color>1</color>
+        <strength>1</strength>
+        <k>0.001</k>
+    </PointLight>
+    <Plane>
+    <point>-100,0, 100</point>
+    <normal>0,1,0</normal>
+    <material>
+        <type>SPECULAR</type>
+        <kdiffuse>0.75, 0.25, 0.25</kdiffuse>
+        <kspecular>1</kspecular>
+        <shininess>25</shininess>
+        <reflectivity>0.2</reflectivity>
+    </material>
+    <texture name="chessBoard" rows="1" cols="1" color1="1" color2="0" angle="45"></texture>
+    </Plane>
+    <Sphere id="left">
+        <center>-2,0.5,0</center>
+        <radius>0.5</radius>
+        <material>
+            <type>MIRROR</type>
+            <kDiffuse>1</kDiffuse>
+            <kSpecular>0.9</kSpecular>
+        </material>
+    </Sphere>
+    <Sphere id="middle">
+        <center>0,0.5,0</center>
+        <radius>0.5</radius>
+        <material>
+            <type>DIFFUSE</type>
+            <kDiffuse>1</kDiffuse>
+            <kSpecular>1</kSpecular>
+            <shininess>250</shininess>
+            <reflectivity>0.5</reflectivity>
+        </material>
+        <texture name="tiles" rows="4" cols="1" angle="30" uedge="0.03" vedge="0.06" color1="0,1,0" color2="0.45,0.45,0"></texture>
+    </Sphere>
+    <Sphere id="right">
+        <center>2,0.5,0</center>
+        <radius>0.5</radius>
+        <material>
+            <type>TRANSPARENT</type>
+            <kDiffuse>0, 1, 0</kDiffuse>
+            <kSpecular>1</kSpecular>
+            <shininess>250</shininess>
+            <refractiveIndex>1.5</refractiveIndex>
+        </material>
+    </Sphere>
+</scene>
+
+
+
