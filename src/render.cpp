@@ -123,7 +123,7 @@ Vector3f Render::diffuseMaterial(const Ray &ray, const Scene &scene, const uint8
     const Material *material = &isec.object->material;
 
     // Texture
-    Vector3f textureColor = isec.object->texture(phit);
+    Vector3f textureColor = isec.object->texture(phit, isec.idx);
 
     //ambient
     Vector3f phitColor = material->kDiffuse * textureColor * scene.kAmbient;
@@ -153,7 +153,7 @@ Vector3f Render::specularMaterial(const Ray &ray, const Scene &scene, const uint
     const Material *material = &isec.object->material;
 
     // Texture
-    Vector3f textureColor = isec.object->texture(phit);
+    Vector3f textureColor = isec.object->texture(phit, isec.idx);
 
     //ambient
     Vector3f phitColor = material->kDiffuse * textureColor * scene.kAmbient;

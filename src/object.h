@@ -50,7 +50,7 @@ public:
     virtual bool intersection(const Ray& ray, float &tnear) const = 0;
     virtual const Vector3f normal(const Vector3f &phit, size_t idx) const = 0;
 
-    virtual const Vector3f texture(const Vector3f &) const
+    virtual const Vector3f texture(const Vector3f &, size_t) const
     {
     	return Vector3f(1.0f);
     }

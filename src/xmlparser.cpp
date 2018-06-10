@@ -378,6 +378,8 @@ void XMLParser::parseBox(xmlNode *xmlBoxNode, Box &box)
                 parseMaterial(node, box.material);
             else if (equals(node->name, "model"))
                 parseModel(node, box.getModel());
+            else if (equals(node->name, "texture"))
+                parseTexture(node, box.getTex());
             else
                 error(node);
         }

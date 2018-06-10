@@ -44,7 +44,7 @@ std::unique_ptr<Texture>& Plane::getTex()
     return tex;
 }
 
-const Vector3f Plane::texture(const Vector3f& phit) const
+const Vector3f Plane::texture(const Vector3f& phit, size_t) const
 {
     if(tex)
 	{       

@@ -15,7 +15,7 @@ public:
     bool  intersection(const Ray &ray, IntersectionData &isec) const;
     bool  intersection(const Ray& ray, float& tnear) const;
     const Vector3f normal(const Vector3f &phit, size_t) const;
-    const Vector3f texture(const Vector3f &phit) const;
+    const Vector3f texture(const Vector3f &phit, size_t) const;
 
     Vector3f getCenter() const;
     void     setCenter(const Vector3f &value);

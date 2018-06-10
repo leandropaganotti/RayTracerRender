@@ -74,7 +74,7 @@ const Vector3f Sphere::normal(const Vector3f &phit, size_t) const
     return (phit-center).normalize();
 }
 
-const Vector3f Sphere::texture(const Vector3f& phit) const
+const Vector3f Sphere::texture(const Vector3f& phit, size_t) const
 {
 	if(tex)
 	{

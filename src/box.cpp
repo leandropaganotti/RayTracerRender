@@ -56,7 +56,6 @@ bool Box::intersection(const Ray &ray, IntersectionData &isec) const
     Vector3f phit = r.origin + isec.tnear * r.direction;
     phit = model * phit;
     isec.tnear = (phit - ray.origin).length();
-
     isec.object = this;
     return true;
 }
@@ -96,10 +95,43 @@ bool Box::intersection(const Ray &ray, float &tnear) const
 
 const Vector3f Box::normal(const Vector3f &, size_t idx) const
 {
-    if (idx == 1) return model.multiVector(Vector3f(-1,0,0)).normalize();
+    if (idx == 1)      return model.multiVector(Vector3f(-1,0,0)).normalize();
     else if (idx == 2) return model.multiVector(Vector3f(1,0,0)).normalize();
     else if (idx == 3) return model.multiVector(Vector3f(0,-1,0)).normalize();
     else if (idx == 4) return model.multiVector(Vector3f(0,1,0)).normalize();
     else if (idx == 5) return model.multiVector(Vector3f(0,0,1)).normalize();
-    else return model.multiVector(Vector3f(0,0,-1)).normalize();
+    else               return model.multiVector(Vector3f(0,0,-1)).normalize();
+}
+
+
+const Vector3f Box::texture(const Vector3f &phit, size_t idx) const
+{
+    if (tex)
+    {
+        float u=0, v=0;
+        Vector3f p = model.getInverse() * phit;
+
+//        p.x *= model[0][0];
+//        p.y *= model[1][1];
+//        p.z *= model[2][2];
+
+        if (idx == 1 || idx == 2)
+        {
+            u = p.z; v = p.y;
+        } else if (idx == 3 || idx == 4)
+        {
+            u = p.x; v = p.z;
+        } else
+        {
+            u = p.x; v = p.y;
+        }
+
+        return tex->get(u, v);
+    }
+    return Vector3f(1.0f);
+}
+
+std::unique_ptr<Texture> &Box::getTex()
+{
+    return tex;
 }
