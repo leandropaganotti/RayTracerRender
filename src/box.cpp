@@ -96,10 +96,10 @@ bool Box::intersection(const Ray &ray, float &tnear) const
 
 const Vector3f Box::normal(const Vector3f &, size_t idx) const
 {
-    if (idx == 1) return model.getInverse().multiVector(Vector3f(-1,0,0)).normalize();
-    else if (idx == 2) return model.getInverse().multiVector(Vector3f(1,0,0)).normalize();
-    else if (idx == 3) return model.getInverse().multiVector(Vector3f(0,-1,0)).normalize();
-    else if (idx == 4) return model.getInverse().multiVector(Vector3f(0,1,0)).normalize();
-    else if (idx == 5) return model.getInverse().multiVector(Vector3f(0,0,1)).normalize();
-    else return Vector3f(0,0,-1);
+    if (idx == 1) return model.multiVector(Vector3f(-1,0,0)).normalize();
+    else if (idx == 2) return model.multiVector(Vector3f(1,0,0)).normalize();
+    else if (idx == 3) return model.multiVector(Vector3f(0,-1,0)).normalize();
+    else if (idx == 4) return model.multiVector(Vector3f(0,1,0)).normalize();
+    else if (idx == 5) return model.multiVector(Vector3f(0,0,1)).normalize();
+    else return model.multiVector(Vector3f(0,0,-1)).normalize();
 }
