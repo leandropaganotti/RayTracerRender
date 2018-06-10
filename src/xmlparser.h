@@ -8,7 +8,8 @@
 #include "scene.h"
 #include "sphere.h"
 #include "plane.h"
-#include "cube.h"
+#include "box.h"
+#include "model.h"
 
 using namespace std;
 
@@ -43,6 +44,10 @@ public:
     void parsePlane(xmlNode * xmlPlaneNode, Plane & plane);
 
     void parseTexture(xmlNode * xmlTextureNode, std::unique_ptr<Texture> &tex);
+
+    void parseBox(xmlNode * xmlBoxNode, Box & box);
+
+    void parseModel(xmlNode * xmlModelNode, ModelMatrix & model);
 
 };
 

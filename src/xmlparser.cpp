@@ -158,6 +158,12 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
                 parsePlane(node, *plane);
                 scene.addObject(plane);
             }
+            else if(equals(node->name, "box"))
+            {
+                Box *box = new Box();
+                parseBox(node, *box);
+                scene.addObject(box);
+            }
             else
                 error(node);
         }
@@ -354,4 +360,57 @@ void XMLParser::parseTexture(xmlNode *xmlTextureNode, std::unique_ptr<Texture> &
     else
         std::cerr << "Error parsing Texture type attribute not found in " << xmlTextureNode->name << std::endl;
 
+}
+
+void XMLParser::parseBox(xmlNode *xmlBoxNode, Box &box)
+{
+    if(xmlBoxNode == NULL)
+    {
+         cerr << "error: could not parse Box, xmlNode pointer is NULL" << endl;
+         return;
+    }
+    xmlNode *node = NULL;
+    for (node = xmlBoxNode->children; node; node = node->next)
+    {
+        if (node->type == XML_ELEMENT_NODE)
+        {
+            if (equals(node->name, "material"))
+                parseMaterial(node, box.material);
+            else if (equals(node->name, "model"))
+                parseModel(node, box.getModel());
+            else
+                error(node);
+        }
+    }
+}
+
+void XMLParser::parseModel(xmlNode *xmlModelNode, ModelMatrix &model)
+{
+    if(xmlModelNode == NULL)
+    {
+         cerr << "error: could not parse Model, xmlNode pointer is NULL" << endl;
+         return;
+    }
+    xmlNode *node = NULL;
+    Vector3f translate(0.0f), rotate(0.0f), scale(1.0f);
+    for (node = xmlModelNode->children; node; node = node->next)
+    {
+        if (node->type == XML_ELEMENT_NODE)
+        {
+            if (equals(node->name, "translate"))
+                translate = toVector(node->children);
+            else if (equals(node->name, "rotate"))
+            {
+                rotate = toVector(node->children);
+                rotate.x = deg2rad(rotate.x);
+                rotate.y = deg2rad(rotate.y);
+                rotate.z = deg2rad(rotate.z);
+            }
+            else if (equals(node->name, "scale"))
+                scale = toVector(node->children);
+            else
+                error(node);
+        }
+    }
+    model.build(translate, rotate, scale);
 }

@@ -11,7 +11,7 @@
 
 class Render: public Camera
 {
-    const float bias = 0.0001;
+    const float bias = 0.001;
 
     void renderSingleThread(const Scene *scene, size_t startRow, size_t endRow, size_t nrays);
 
