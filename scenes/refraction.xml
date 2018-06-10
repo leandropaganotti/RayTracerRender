@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scene id="refraction">
+    <ambientIndex>1.0</ambientIndex>
+    <kAmbient>0.1</kAmbient>
+    <CameraOptions>
+        <position>0,2.5,7</position>
+        <lookingAt>0,0.5,0</lookingAt>
+        <fov>35</fov>
+        <width>1920</width>
+        <height>1080</height>
+    </CameraOptions>
+    <PointLight>
+        <position>0, 3, 2</position>
+        <color>1</color>
+        <strength>1</strength>
+        <k>0.001</k>
+    </PointLight>
+
+    <!--<Plane>
+    <point>-100,0, 100</point>
+    <normal>0,1,0</normal>
+    <material>
+        <type>SPECULAR</type>
+        <kdiffuse>0.5</kdiffuse>
+        <kspecular>1</kspecular>
+        <shininess>25</shininess>
+        <reflectivity>0.5</reflectivity>
+    </material>
+    </Plane>-->
+
+
+    <Box>
+    <model>
+        <translate>0, -2.5, 0</translate>
+        <rotate>90, 0, 0</rotate>
+        <scale>5, 5, 5</scale>
+    </model>
+    <material>
+        <type>DIFFUSE</type>
+        <kdiffuse>0.25, 0.25, 0.75</kdiffuse>
+        <kspecular>1</kspecular>
+        <shininess>250</shininess>
+        <reflectivity>0.3</reflectivity>
+    </material>
+    <texture name="tiles" rows="20" cols="20" color1="1" color2="0" angle="0"></texture>
+    </Box>
+
+
+
+    <Box>
+    <model>
+        <translate>0, 0, -2.5</translate>
+        <rotate>0, 0, 30</rotate>
+        <scale>0.5, 5, 0.5</scale>
+    </model>
+    <material>
+        <type>DIFFUSE</type>
+        <kdiffuse>1, 0, 0</kdiffuse>
+    </material>
+    <texture name="tiles" rows="15" cols="15" color1="1" color2="0.1, 0.1, 0" angle="0"></texture>
+    </Box>
+
+    <Box>
+    <model>
+        <translate>-0.8 , 0, -2.5</translate>
+        <rotate>0, 0, 30</rotate>
+        <scale>0.5, 5, 0.5</scale>
+    </model>
+    <material>
+        <type>DIFFUSE</type>
+        <kdiffuse>0, 1, 0</kdiffuse>
+    </material>
+    <texture name="tiles" rows="15" cols="15" color1="1" color2="0.1, 0.1, 0" angle="0"></texture>
+    </Box>
+
+
+    <Box>
+    <model>
+        <translate>0, 0, -2.51</translate>
+        <rotate>0, 0, -30</rotate>
+        <scale>0.5, 5, 0.5</scale>
+    </model>
+    <material>
+        <type>DIFFUSE</type>
+        <kdiffuse>0, 0, 1</kdiffuse>
+    </material>
+    <texture name="tiles" rows="15" cols="15" color1="1" color2="0.1, 0.1, 0" angle="0"></texture>
+    </Box>
+
+    <Box>
+    <model>
+        <translate>0.8 , 0, -2.5</translate>
+        <rotate>0, 0, -30</rotate>
+        <scale>0.5, 5, 0.5</scale>
+    </model>
+    <material>
+        <type>DIFFUSE</type>
+        <kdiffuse>1, 1, 0</kdiffuse>
+    </material>
+    <texture name="tiles" rows="15" cols="15" color1="1" color2="0.1, 0.1, 0" angle="0"></texture>
+    </Box>
+
+
+
+
+    <Sphere id="left">
+        <center>0,0.55,0</center>
+        <radius>0.5</radius>
+        <material>
+            <type>TRANSPARENT</type>
+            <kDiffuse>0.75, 0.25, 0.0</kDiffuse>
+            <kSpecular>1</kSpecular>
+            <shininess>250</shininess>
+            <reflectivity>0.1</reflectivity>
+            <refractiveIndex>1.5</refractiveIndex>>
+        </material>
+    </Sphere>
+
+
+    <Box>
+    <model>
+        <translate>0, 0, 0.5</translate>
+        <rotate>0, 0, 0</rotate>
+        <scale>3, 0.1, 3</scale>
+    </model>
+    <material>
+        <type>SPECULAR</type>
+        <kdiffuse>0.1, 0.1, 0.3</kdiffuse>
+        <kspecular>1</kspecular>
+        <reflectivity>0.1</reflectivity>
+
+    </material>
+
+    </Box>
+
+</scene>
+
+
+
