@@ -12,26 +12,6 @@ bool XMLParser::equals(const xmlChar *lhs, const char *rhs)
     return true;
 }
 
-void XMLParser::error(const xmlNode *node)
-{
-    if (node && node->parent)
-        cerr << "Error parsing \"" << node->name << "\" inside \"" << node->parent->name << "\"" << endl;
-    else
-        cerr << "Error parsing xml file" << endl;
-}
-
-Vector3f XMLParser::toVector(const xmlNode *node)
-{
-    if (node == NULL) return Vector3f(0.0f);
-    return toVector(node->content);
-}
-
-Vector3f XMLParser::toVector(const xmlAttr *attr)
-{
-    if (attr == NULL) return Vector3f(0.0f);
-    return toVector(attr->children->content);
-}
-
 Vector3f XMLParser::toVector(const xmlChar *str)
 {
     if (str == NULL) return Vector3f(0.0f);
@@ -53,7 +33,6 @@ Vector3f XMLParser::toVector(const xmlChar *str)
         size_t second = text.find_first_of(',');
         if (second == string::npos)
         {
-
             return Vector3f(0.0f);
         }
         else
@@ -72,19 +51,14 @@ Vector3f XMLParser::toVector(const xmlChar *str)
     }
 }
 
-float XMLParser::toFloat(const xmlNode *node)
-{
-    return node == NULL ? 0.0 : atof((const char*)node->content);
-}
-
 float XMLParser::toFloat(const xmlChar *str)
 {
     return str == NULL ? 0.0 : atof((const char*)str);
 }
 
-int XMLParser::toInt(const xmlNode *node)
+int XMLParser::toInt(const xmlChar *str)
 {
-    return node == NULL ? 0 : atoi((const char*)node->content);
+    return str == NULL ? 0 : atoi((const char*)str);
 }
 
 void XMLParser::parseFile(const char *filename, Scene & scene)
@@ -126,7 +100,7 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
     	return;
     }
 
-    if(xmlSceneNode->properties && equals(xmlSceneNode->properties->name, "id"))
+    if(xmlSceneNode->properties && equals(xmlSceneNode->properties->name, "name"))
         scene.id.assign((const char*)xmlSceneNode->properties->children->content);
 
     xmlNode *node = NULL;
@@ -143,7 +117,7 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
                 scene.addObject(sphere);
             }
             else if(equals(node->name, "ambientIndex"))
-               scene.ambientIndex = toFloat(node->children);
+               scene.ambientIndex = toFloat(node->children->content);
             else if(equals(node->name, "PointLight"))
             {
                 PointLight *light = new PointLight();
@@ -151,7 +125,7 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
                 scene.addLight(light);
             }
             else if(equals(node->name, "kAmbient"))
-                scene.kAmbient = toFloat(node->children);
+                scene.kAmbient = toFloat(node->children->content);
             else if(equals(node->name, "plane"))
             {
                 Plane *plane = new Plane();
@@ -165,7 +139,7 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
                 scene.addObject(box);
             }
             else
-                error(node);
+            	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlSceneNode->name << "\'" << endl;
         }
     }
 }
@@ -177,23 +151,30 @@ void XMLParser::parseCameraOptions(xmlNode *xmlCameraOptionsNode, CameraOptions 
 	    cerr << "error: could not parse CameraOptions, xmlNode pointer is NULL" << endl;
 	    return;
     }
+
+    const xmlAttr *attr = NULL;
+	for (attr = xmlCameraOptionsNode->properties; attr; attr = attr->next)
+	{
+		if (equals(attr->name, "position"))
+			options.setFrom( toVector(attr->children->content) );
+		else if (equals(attr->name, "lookingat"))
+			options.setTo( toVector(attr->children->content) );
+		else if (equals(attr->name, "fov"))
+			options.setFov( deg2rad(toFloat(attr->children->content) ));
+		else if (equals(attr->name, "width"))
+			options.setWidth( toInt(attr->children->content) );
+		else if (equals(attr->name, "height"))
+			options.setHeight( toInt(attr->children->content) );
+		else
+			cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlCameraOptionsNode->name << "\'" << endl;
+	}
+
     xmlNode *node = NULL;
     for (node = xmlCameraOptionsNode->children; node; node = node->next)
     {
         if (node->type == XML_ELEMENT_NODE)
         {
-            if (equals(node->name, "position"))
-                options.setFrom( toVector(node->children) );
-            else if (equals(node->name, "lookingAt"))
-                options.setTo( toVector(node->children) );
-            else if (equals(node->name, "fov"))
-                options.setFov( deg2rad(toFloat(node->children) ));
-            else if (equals(node->name, "width"))
-                options.setWidth( toInt(node->children) );
-            else if (equals(node->name, "height"))
-                options.setHeight( toInt(node->children) );
-            else
-                error(node);
+        	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlCameraOptionsNode->name << "\'" << endl;
         }
     }
 }
@@ -205,21 +186,32 @@ void XMLParser::parseSphere(xmlNode *xmlSphereNode, Sphere & sphere)
 	    cerr << "error: could not parse Sphere, xmlNode pointer is NULL" << endl;
 	    return;
     }
+
+    const xmlAttr *attr = NULL;
+    string name("");
+    for (attr = xmlSphereNode->properties; attr; attr = attr->next)
+	{
+    	if (equals(attr->name, "name"))
+    		name = (const char*)attr->children->content;
+    	else if (equals(attr->name, "position"))
+			sphere.setCenter( toVector(attr->children->content) );
+		else if (equals(attr->name, "radius"))
+		    sphere.setRadius( toFloat(attr->children->content) );
+		else
+			cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlSphereNode->name << "\':" << name << endl;
+	}
+
     xmlNode *node = NULL;
     for (node = xmlSphereNode->children; node; node = node->next)
     {
         if (node->type == XML_ELEMENT_NODE)
         {
-            if (equals(node->name, "center"))
-                sphere.setCenter( toVector(node->children) );
-            else if (equals(node->name, "radius"))
-                sphere.setRadius( toFloat(node->children) );
-            else if (equals(node->name, "material"))
+        	if (equals(node->name, "material"))
                 parseMaterial(node, sphere.material);
             else if (equals(node->name, "texture"))
                 parseTexture(node, sphere.getTex());
             else
-                error(node);
+            	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlSphereNode->name << "\'" << endl;
         }
     }
 }
@@ -231,36 +223,44 @@ void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, Material & material)
          cerr << "error: could not parse Material, xmlNode pointer is NULL" << endl;
          return;
     }
+
+    const xmlAttr *attr = NULL;
+    for (attr = xmlMaterialNode->properties; attr; attr = attr->next)
+	{
+    	if (equals(attr->name, "kdiffuse"))
+    		material.kDiffuse = toVector(attr->children->content);
+		else if (equals(attr->name, "kspecular"))
+			material.kSpecular = toVector(attr->children->content);
+		else if (equals(attr->name, "shininess"))
+			material.shininess = toFloat(attr->children->content);
+		else if (equals(attr->name, "reflectivity"))
+			material.reflectivity = toFloat(attr->children->content);
+		else if (equals(attr->name, "refractiveIndex"))
+			material.refractiveIndex = toFloat(attr->children->content);
+		else if (equals(attr->name, "type"))
+		{
+			if (equals(attr->children->content, "DIFFUSE"))
+				material.type = Material::Type::DIFFUSE;
+			else if (equals(attr->children->content, "SPECULAR"))
+				material.type = Material::Type::SPECULAR;
+			else if (equals(attr->children->content, "MIRROR"))
+				material.type = Material::Type::MIRROR;
+			else if (equals(attr->children->content, "TRANSPARENT"))
+				material.type = Material::Type::TRANSPARENT;
+			else
+				cerr << "unrecognized material type \'" << attr->children->content << "\'" << endl;
+		}
+		else
+			cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlMaterialNode->name << "\'" << endl;
+	}
+
+
     xmlNode *node = NULL;
     for (node = xmlMaterialNode->children; node; node = node->next)
     {
         if (node->type == XML_ELEMENT_NODE)
         {
-            if (equals(node->name, "kDiffuse"))
-                material.kDiffuse = toVector(node->children);
-            else if (equals(node->name, "kSpecular"))
-                material.kSpecular = toVector(node->children);
-            else if (equals(node->name, "shininess"))
-                material.shininess = toFloat(node->children);
-            else if (equals(node->name, "reflectivity"))
-                material.reflectivity = toFloat(node->children);
-            else if (equals(node->name, "refractiveIndex"))
-                material.refractiveIndex = toFloat(node->children);
-            else if (equals(node->name, "type"))
-            {
-                if (equals(node->children->content, "DIFFUSE"))
-                    material.type = Material::Type::DIFFUSE;
-                else if (equals(node->children->content, "SPECULAR"))
-                    material.type = Material::Type::SPECULAR;
-                else if (equals(node->children->content, "MIRROR"))
-                    material.type = Material::Type::MIRROR;
-                else if (equals(node->children->content, "TRANSPARENT"))
-                    material.type = Material::Type::TRANSPARENT;
-                else
-                    error(node);
-            }
-            else
-                error(node);
+        	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlMaterialNode->name << "\'" << endl;
         }
     }
 }
@@ -272,21 +272,31 @@ void XMLParser::parsePointLight(xmlNode *xmlPointLightNode, PointLight & light)
          cerr << "error: could not parse PointLight, xmlNode pointer is NULL" << endl;
          return;
     }
+
+    const xmlAttr *attr = NULL;
+	string name("");
+	for (attr = xmlPointLightNode->properties; attr; attr = attr->next)
+	{
+		if (equals(attr->name, "name"))
+			name = (const char*)attr->children->content;
+		else if (equals(attr->name, "position"))
+			light.setPos( toVector(attr->children->content) );
+		else if (equals(attr->name, "color"))
+            light.setColor( toVector(attr->children->content) );
+		else if (equals(attr->name, "strength"))
+            light.setStrength( toFloat(attr->children->content) );
+		else if (equals(attr->name, "k"))
+			light.setK( toFloat(attr->children->content) );
+		else
+			cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlPointLightNode->name << "\':" << name << endl;
+	}
+
     xmlNode *node = NULL;
     for (node = xmlPointLightNode->children; node; node = node->next)
     {
         if (node->type == XML_ELEMENT_NODE)
         {
-            if (equals(node->name, "position"))
-                light.setPos( toVector(node->children) );
-            else if (equals(node->name, "color"))
-                light.setColor( toVector(node->children) );
-            else if (equals(node->name, "strength"))
-                light.setStrength( toFloat(node->children) );
-            else if (equals(node->name, "k"))
-                light.setK( toFloat(node->children) );
-            else
-                error(node);
+        	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlPointLightNode->name << "\'" << endl;
         }
     }
 }
@@ -298,21 +308,32 @@ void XMLParser::parsePlane(xmlNode *xmlPlaneNode, Plane & plane)
          cerr << "error: could not parse Plane, xmlNode pointer is NULL" << endl;
          return;
     }
+
+    const xmlAttr *attr = NULL;
+	string name("");
+	for (attr = xmlPlaneNode->properties; attr; attr = attr->next)
+	{
+		if (equals(attr->name, "name"))
+			name = (const char*)attr->children->content;
+		else if (equals(attr->name, "point"))
+			plane.O = toVector(attr->children->content);
+		else if (equals(attr->name, "normal"))
+			plane.N = toVector(attr->children->content);
+		else
+			cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlPlaneNode->name << "\':" << name << endl;
+	}
+
     xmlNode *node = NULL;
     for (node = xmlPlaneNode->children; node; node = node->next)
     {
         if (node->type == XML_ELEMENT_NODE)
         {
-            if (equals(node->name, "point"))
-                plane.O = toVector(node->children);
-            else if (equals(node->name, "normal"))
-                plane.N = toVector(node->children);
-            else if (equals(node->name, "material"))
+        	if (equals(node->name, "material"))
                 parseMaterial(node, plane.material);
             else if (equals(node->name, "texture"))
                 parseTexture(node, plane.getTex());
             else
-                error(node);
+            	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlPlaneNode->name << "\'" << endl;
         }
     }
 }
@@ -348,7 +369,7 @@ void XMLParser::parseTexture(xmlNode *xmlTextureNode, std::unique_ptr<Texture> &
         else if (equals(attr->name, "angle"))
             angle = toFloat(attr->children->content);
         else
-            error(xmlTextureNode);
+			cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlTextureNode->name << "\'" << endl;
     }
     if(name)
     {
@@ -381,7 +402,7 @@ void XMLParser::parseBox(xmlNode *xmlBoxNode, Box &box)
             else if (equals(node->name, "texture"))
                 parseTexture(node, box.getTex());
             else
-                error(node);
+            	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlBoxNode->name << "\'" << endl;
         }
     }
 }
@@ -400,18 +421,18 @@ void XMLParser::parseModel(xmlNode *xmlModelNode, ModelMatrix &model)
         if (node->type == XML_ELEMENT_NODE)
         {
             if (equals(node->name, "translate"))
-                translate = toVector(node->children);
+                translate = toVector(node->children->content);
             else if (equals(node->name, "rotate"))
             {
-                rotate = toVector(node->children);
+                rotate = toVector(node->children->content);
                 rotate.x = deg2rad(rotate.x);
                 rotate.y = deg2rad(rotate.y);
                 rotate.z = deg2rad(rotate.z);
             }
             else if (equals(node->name, "scale"))
-                scale = toVector(node->children);
+                scale = toVector(node->children->content);
             else
-                error(node);
+            	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlModelNode->name << "\'" << endl;
         }
     }
     model.build(translate, rotate, scale);

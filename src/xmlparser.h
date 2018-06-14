@@ -15,17 +15,6 @@ using namespace std;
 
 class XMLParser
 {
-    bool     equals(const xmlChar *lhs, const char *rhs);
-    void     error(const xmlNode *node);
-
-    Vector3f toVector(const xmlNode *node);
-    Vector3f toVector(const xmlAttr *attr);
-    Vector3f toVector(const xmlChar *str);
-
-    float    toFloat(const xmlNode *node);
-    float    toFloat(const xmlChar *str);
-
-    int      toInt(const xmlNode *node);
 public:
     XMLParser() = default;
 
@@ -49,6 +38,14 @@ public:
 
     void parseModel(xmlNode * xmlModelNode, ModelMatrix & model);
 
+private:
+    bool     equals(const xmlChar *lhs, const char *rhs);
+
+    Vector3f toVector(const xmlChar *str);
+
+    float    toFloat(const xmlChar *str);
+
+    int      toInt(const xmlChar *str);
 };
 
 #endif // XMLPARSER_H
