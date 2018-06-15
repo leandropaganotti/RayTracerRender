@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <thread>
 #include <unistd.h>
 #include <string>
@@ -10,7 +11,7 @@ using namespace std;
 const char *xmlscene = NULL;// xml file with scene description
 unsigned    nthreads = 4;   // number of threads to run
 unsigned    nrays    = 1;   // nrays * nrays rays will be cast for each pixel
-unsigned    panoramic= 0;   // generates 36 images from difterent angles around y-axis
+unsigned    nimages  = 1;   // generates nimages from difterent angles around y-axis
 
 void parseArguments(int argc, char **argv);
 
@@ -24,7 +25,7 @@ int main(int argc, char **argv)
 
     double averageTime=0.0, elapsedTime=0.0;
     char buf[256];
-    float angle = panoramic ? 360.0 / panoramic : 0.0;
+    float angle = nimages ? 360.0 / nimages : 0.0;
 
     Render render;
 
@@ -34,9 +35,9 @@ int main(int argc, char **argv)
 
     const Vector3f from( scene.cameraOptions.getFrom() ), to( scene.cameraOptions.getTo());
 
-    for (unsigned i=0; i <= panoramic; ++i)
+    for (unsigned i=0; i < nimages; ++i)
     {
-        cout << endl << i << " " <<  i*angle << " " << endl;
+        cout << "\r" << i+1 << "/" << nimages << ": at " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) <<  i*angle << "° => ";
         camera.lookAt( T(to) * Ry(deg2rad( i*angle )) * T(-to) * from, to); // rotate around y-axis
 
         auto start = chrono::steady_clock::now();       
@@ -44,29 +45,29 @@ int main(int argc, char **argv)
         auto end = chrono::steady_clock::now();
 
         elapsedTime = chrono::duration_cast<chrono::milliseconds>(end - start).count();
-        cout << "Elapsed time in milliseconds : " << elapsedTime << " ms" << endl;
+        cout << "Time: " << elapsedTime << " ms" << flush;
 
-        sprintf(buf, "%s.%04d.ppm", scene.id.c_str(), i);
+        sprintf(buf, "%s_%04d.ppm", scene.name.c_str(), i);
         render.getImage().save_ppm_bin(buf);
 
         averageTime += chrono::duration_cast<chrono::milliseconds>(end - start).count();
     }
 
-    averageTime = averageTime / (panoramic + 1);
-    cout << endl << "Elapsed time in milliseconds (average): " << averageTime << "ms" << endl;
+    averageTime = averageTime / (nimages);
+    cout << endl << "Average time: " << averageTime << " ms" << endl;
 
     return 0;
 }
 
 void usage (char **argv)
 {
-    fprintf(stderr, "Usage: %s [-t nThreads] [-r nRays] [-p] xmlfile\n\n", argv[0]);
+    fprintf(stderr, "Usage: %s [-t nthreads] [-r nrays] [-i nimages] xmlfile\n\n", argv[0]);
 }
 
 void parseArguments(int argc, char **argv)
 {
     int opt;
-    while ((opt = getopt(argc, argv, "r:t:p")) != -1) {
+    while ((opt = getopt(argc, argv, "r:t:i:")) != -1) {
         switch (opt) {
         case 'r':
             nrays = atoi(optarg);
@@ -74,8 +75,8 @@ void parseArguments(int argc, char **argv)
         case 't':
             nthreads = atoi(optarg);
             break;
-        case 'p':
-            panoramic = 36;
+        case 'i':
+            nimages = atoi(optarg);
             break;
         default: /* '?' */
             usage(argv);
@@ -89,8 +90,9 @@ void parseArguments(int argc, char **argv)
     }
    xmlscene = argv[optind];
 
-   printf("Arguments:\n");
-   printf(" xmlfile: %s\n", xmlscene);
-   printf(" nrays: %d\n", nrays);
-   printf(" nthreads: %d\n", nthreads);
+   cout << "Argument list: " << endl;
+   cout << "xmlfile: " << xmlscene <<  endl;
+   cout << "nimages: " << nimages << endl;
+   cout << "nrays: " << nrays << endl;
+   cout << "nthreads: " << nthreads << endl << endl;
 }
