@@ -36,36 +36,28 @@ void Sphere::setRadius(float value)
 
 bool Sphere::intersection(const Ray &ray, IntersectionData &isec) const
 {
-    Vector3f l = center - ray.origin;
-    float tca = l.dot(ray.direction);
-    if (tca < 0) return false;
-    float d2 = l.dot(l) - tca * tca;
-    if (d2 > radius2) return false;
-
-    float thc = sqrt(radius2 - d2);
-    float t0 = tca - thc;
-    float t1 = tca + thc;
-
-    isec.tnear = t0 < 0 ? t1 : t0;
     isec.object = this;
-
-    return true;
+    return intersection(ray, isec.tnear);;
 }
 
 bool Sphere::intersection(const Ray &ray, float &tnear) const
 {
-    Vector3f l = center - ray.origin;
-    float tca = l.dot(ray.direction);
-    if (tca < 0) return false;
-    float d2 = l.dot(l) - tca * tca;
-    if (d2 > radius2) return false;
+    float t0, t1;
 
-    float thc = sqrt(radius2 - d2);
-    float t0 = tca - thc;
-    float t1 = tca + thc;
+    // analytic solution
+    Vector3f L = ray.origin - center;
+    float a = ray.direction.dot(ray.direction);
+    float b = 2 * ray.direction.dot(L);
+    float c = L.dot(L) - radius2;
+    if (!solveQuadratic(a, b, c, t0, t1)) return false;
 
-    tnear = t0 < 0 ? t1 : t0;
+    if (t0 > t1) std::swap(t0, t1);
 
+    if (t0 < 0) {
+        t0 = t1; // if t0 is negative, let's use t1 instead
+        if (t0 < 0) return false; // both t0 and t1 are negative
+    }
+    tnear = t0;
     return true;
 }
 
