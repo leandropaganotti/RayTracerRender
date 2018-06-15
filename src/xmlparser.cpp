@@ -101,7 +101,7 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
     }
 
     if(xmlSceneNode->properties && equals(xmlSceneNode->properties->name, "name"))
-        scene.id.assign((const char*)xmlSceneNode->properties->children->content);
+        scene.name.assign((const char*)xmlSceneNode->properties->children->content);
 
     xmlNode *node = NULL;
     for (node = xmlSceneNode->children; node; node = node->next)
@@ -414,25 +414,32 @@ void XMLParser::parseModel(xmlNode *xmlModelNode, ModelMatrix &model)
          cerr << "error: could not parse Model, xmlNode pointer is NULL" << endl;
          return;
     }
-    xmlNode *node = NULL;
+
+    const xmlAttr *attr = NULL;
     Vector3f translate(0.0f), rotate(0.0f), scale(1.0f);
+    for (attr = xmlModelNode->properties; attr; attr = attr->next)
+    {
+        if (equals(attr->name, "translate"))
+            translate = toVector(attr->children->content);
+        else if (equals(attr->name, "rotate"))
+        {
+            rotate = toVector(attr->children->content);
+            rotate.x = deg2rad(rotate.x);
+            rotate.y = deg2rad(rotate.y);
+            rotate.z = deg2rad(rotate.z);
+        }
+        else if (equals(attr->name, "scale"))
+            scale = toVector(attr->children->content);
+        else
+            cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlModelNode->name << "\'" << endl;
+    }
+
+    xmlNode *node = NULL;
     for (node = xmlModelNode->children; node; node = node->next)
     {
         if (node->type == XML_ELEMENT_NODE)
         {
-            if (equals(node->name, "translate"))
-                translate = toVector(node->children->content);
-            else if (equals(node->name, "rotate"))
-            {
-                rotate = toVector(node->children->content);
-                rotate.x = deg2rad(rotate.x);
-                rotate.y = deg2rad(rotate.y);
-                rotate.z = deg2rad(rotate.z);
-            }
-            else if (equals(node->name, "scale"))
-                scale = toVector(node->children->content);
-            else
-            	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlModelNode->name << "\'" << endl;
+            cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlModelNode->name << "\'" << endl;
         }
     }
     model.build(translate, rotate, scale);
