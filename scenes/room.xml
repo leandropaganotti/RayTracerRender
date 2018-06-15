@@ -25,7 +25,7 @@
     <Sphere name="back" position="0,0,-100003" radius="100000">
         <material type="diffuse" kdiffuse="0.75"></material>
     </Sphere>
-    <Sphere id="front" position="0,0,100007" radius="100000">
+    <Sphere name="front" position="0,0,100007" radius="100000">
         <material type="diffuse" kdiffuse="0"></material>
     </Sphere>
 </scene>

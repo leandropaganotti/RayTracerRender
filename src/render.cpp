@@ -128,6 +128,11 @@ Vector3f Render::diffuseMaterial(const Ray &ray, const Scene &scene, const uint8
     //ambient
     Vector3f phitColor = material->kDiffuse * textureColor * scene.kAmbient;
 
+    // if inside surface, inverting normal direction
+    float cosi = normal.dot(ray.direction);
+    if ( cosi > 0.0f) // inside surface
+        normal = -normal;
+
     // diffuse
     for(auto& light: scene.lights)
     {
@@ -158,6 +163,11 @@ Vector3f Render::specularMaterial(const Ray &ray, const Scene &scene, const uint
     //ambient
     Vector3f phitColor = material->kDiffuse * textureColor * scene.kAmbient;
 
+    // if inside surface, inverting normal direction
+    float cosi = normal.dot(ray.direction);
+    if ( cosi > 0.0f) // inside surface
+        normal = -normal;
+
     // diffuse and specular
     for(auto& light: scene.lights)
     {
@@ -176,7 +186,7 @@ Vector3f Render::specularMaterial(const Ray &ray, const Scene &scene, const uint
                 //specular
                 Vector3f toCamera = -ray.direction;
                 Vector3f reflected = reflect(-toLight, normal);
-                Vector3f specular = material->kSpecular * pow(std::max(0.0f, toCamera ^ reflected), material->shininess);
+                Vector3f specular = material->kSpecularHighlight * pow(std::max(0.0f, toCamera ^ reflected), material->shininess);
                 phitColor +=  lightIntensity * (diffuse + specular);
             }
         }
@@ -212,7 +222,6 @@ Vector3f Render::transparentMaterial(const Ray &ray, const Scene &scene, const u
     Vector3f phitColor(0.0f);
 
     // specular
-    Vector3f specularColor(0.0f);
     for(auto& light: scene.lights)
     {
         Vector3f toLight = light->direction(phit);
@@ -225,8 +234,8 @@ Vector3f Render::transparentMaterial(const Ray &ray, const Scene &scene, const u
                 //specular
                 Vector3f toCamera = -ray.direction;
                 Vector3f reflected = reflect(-toLight, normal);
-                Vector3f specular = material->kSpecular * pow(std::max(0.0f, toCamera ^ reflected), material->shininess);
-                specularColor +=  light->intensity(phit) * specular;
+                Vector3f specular = material->kSpecularHighlight * pow(std::max(0.0f, toCamera ^ reflected), material->shininess);
+                phitColor +=  light->intensity(phit) * specular;
             }
         }
     }
@@ -277,7 +286,7 @@ Vector3f Render::transparentMaterial(const Ray &ray, const Scene &scene, const u
         Ray R;
         R.origin = phit + bias * normal;
         R.direction = reflect(ray.direction, normal).normalize();
-        phitColor += (rayTrace(R, scene, depth + 1) + specularColor) * kr;
+        phitColor += rayTrace(R, scene, depth + 1) * kr;
     }
     return phitColor;
 }

@@ -14,7 +14,7 @@
     </Box>
     <Box>
         <model translate="0,0,0.5" rotate="0" scale="4,0.1,5"></model>
-        <material type="specular" kdiffuse="0.1,0.1,0.3" kspecular="0.8" reflectivity="0.2"></material>
+        <material type="specular" kdiffuse="0.1,0.1,0.3" kspecular="1.0" reflectivity="0.2"></material>
     </Box>
     <Box>
         <model translate="0,0,-2.8" rotate="0,0,30" scale="0.5,5,0.5"></model>
