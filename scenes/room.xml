@@ -1,85 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scene id="room">
+<scene name="room">
     <ambientIndex>1.0</ambientIndex>
     <kAmbient>0.1</kAmbient>
-    <CameraOptions>
-        <position>0, 1.7, 7</position>
-        <lookingAt>0, 1.7, 0</lookingAt>
-        <fov>35</fov>
-        <width>800</width>
-        <height>600</height>
-    </CameraOptions>
-    <PointLight>
-        <position>0,2.9,0</position>
-        <color>1</color>
-        <k>0.01</k>
-    </PointLight>
-    <Sphere id="mirrorBall">
-        <center>-1, 0.8, -1.5</center>
-        <radius>0.8</radius>
-        <material>
-            <type>MIRROR</type>
-            <kSpecular>0.9</kSpecular>
-        </material>
+    <CameraOptions position="0,1.7,7" lookingat="0,1.7,0" fov="35" width="800" height="600"></CameraOptions>
+    <PointLight position="0,2.9,0" color="1" k="0.01"></PointLight>
+    <Sphere name="mirrorBall" position="-1,0.8,-1.5" radius="0.8">
+        <material type="mirror" kspecular="0.9"></material>
     </Sphere>
-    <Sphere id="glassBall">
-        <center>1, 0.8, 0</center>
-        <radius>0.8</radius>
-        <material>
-            <type>TRANSPARENT</type>
-            <kDiffuse>0</kDiffuse>
-            <kSpecular>1.0</kSpecular>
-            <shininess>150</shininess>
-            <refractiveIndex>1.5</refractiveIndex>
-        </material>
+    <Sphere name="glassBall" position="1,0.8,0" radius="0.8">
+        <material type="transparent" refractiveIndex="1.5" shininess="150" kspecular="1"></material>
     </Sphere>
-    <Sphere id="left">
-        <center>-100002,0,0</center>
-        <radius>100000</radius>
-        <material>
-            <type>DIFFUSE</type>
-            <kDiffuse>.75,.25,.25</kDiffuse>
-        </material>
+    <Sphere name="left" position="-100002,0,0" radius="100000">
+        <material type="diffuse" kdiffuse="0.75, 0.25, 0.25"></material>
     </Sphere>
-    <Sphere id="right">
-        <center>100002,0,0</center>
-        <radius>100000</radius>
-        <material>
-            <type>DIFFUSE</type>
-            <kDiffuse>.25,.25,.75</kDiffuse>
-        </material>
+    <Sphere name="right" position="100002,0,0" radius="100000">
+        <material type="diffuse" kdiffuse="0.25, 0.25, 0.75"></material>
     </Sphere>
-    <Sphere id="top">
-        <center>0,100003,0</center>
-        <radius>100000</radius>
-        <material>
-            <type>DIFFUSE</type>
-            <kDiffuse>.75</kDiffuse>
-        </material>
+    <Sphere name="top" position="0,100003,0" radius="100000">
+        <material type="diffuse" kdiffuse="0.75"></material>
     </Sphere>
-    <Sphere id="floor">
-        <center>0,-100000,0</center>
-        <radius>100000</radius>
-        <material>
-            <type>DIFFUSE</type>
-            <kDiffuse>.75</kDiffuse>
-        </material>
+    <Sphere name="floor" position="0,-100000,0" radius="100000">
+        <material type="diffuse" kdiffuse="0.75"></material>
     </Sphere>
-    <Sphere id="back">
-        <center>0,0,-100003</center>
-        <radius>100000</radius>
-        <material>
-            <type>DIFFUSE</type>
-            <kDiffuse>.75</kDiffuse>
-        </material>
+    <Sphere name="back" position="0,0,-100003" radius="100000">
+        <material type="diffuse" kdiffuse="0.75"></material>
     </Sphere>
-    <Sphere id="front">
-        <center>0,0,100007</center>
-        <radius>100000</radius>
-        <material>
-            <type>DIFFUSE</type>
-            <kDiffuse>0</kDiffuse>
-        </material>
+    <Sphere id="front" position="0,0,100007" radius="100000">
+        <material type="diffuse" kdiffuse="0"></material>
     </Sphere>
 </scene>
 

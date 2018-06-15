@@ -14,6 +14,6 @@
         <material type="specular" kdiffuse="0,0,1" kspecular="1" shininess="250" reflectivity="0.3"></material>
     </Sphere>
     <Plane name="floor" point="0" normal="0,1,0" >
-		<material type="specular" kdiffuse="1" kspecular="1" shininess="150" reflectivity="0.3"></material>
+        <material type="specular" kdiffuse="1" kspecular="1" shininess="150" reflectivity="0.3"></material>
     </Plane>
 </scene>

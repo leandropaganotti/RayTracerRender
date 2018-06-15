@@ -1,133 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scene id="ballsOnTheMirror">
+<scene name="ballsOnTheMirror">
     <ambientIndex>1.0</ambientIndex>
     <kAmbient>0.1</kAmbient>
-    <CameraOptions>
-        <position>0,5,16</position>
-        <lookingAt>0,1,0</lookingAt>
-        <fov>27</fov>
-        <width>1920</width>
-        <height>1080</height>
-    </CameraOptions>
-    <PointLight>
-        <position>1,4,2</position>
-        <color>1</color>
-        <strength>1.5</strength>
-        <k>0.01</k>
-    </PointLight>
-    <plane id="floor">
-        <point>0</point>
-        <normal>0,1,0</normal>
-        <material>
-            <type>SPECULAR</type>
-            <kDiffuse>0.118, 0.565, 1.000</kDiffuse>
-            <reflectivity>0.3</reflectivity>
-            <kSpecular>1.0</kSpecular>
-        </material>
+    <CameraOptions position="0,5,16" lookingat="0, 1, 0" fov="27" width="1920" height="1080"></CameraOptions>
+    <PointLight position="1,4,2" color="1" strength="1.5" k="0.01"></PointLight>
+    <plane name="floor" point="0" normal="0,1,0">
+        <material type="specular" kdiffuse="0.118, 0.565, 1.000" kspecular="1" reflectivity="0.3"></material>
     </plane>
-    <plane id="back wall">
-        <point>0, 0, -13</point>
-        <normal>0,0,1</normal>
-        <material>
-        <type>MIRROR</type>
-            <kSpecular>0.9</kSpecular>
-        </material>
+    <plane name="back wall" point="0,0,-13" normal="0,0,1">
+        <material type="mirror" kspecular="0.9" reflectivity="0.3"></material>
     </plane>
-    <Sphere id="big ball">
-        <center>-2.5,1.0, -4.0</center>
-        <radius>1.0</radius>
-        <material>
-            <type>MIRROR</type>
-            <kSpecular>1</kSpecular>
-        </material>
+    <Sphere name="big mirror ball" position="-2.5,1,-4" radius="1">
+        <material type="mirror" kspecular="1"></material>
     </Sphere>
-    <Sphere id="big ball glass">
-        <center>0, 1, 0</center>
-        <radius>1.0</radius>
-        <material>
-            <type>TRANSPARENT</type>
-            <kDiffuse>0,0,1</kDiffuse>
-            <kSpecular>1.0</kSpecular>
-            <refractiveIndex>1.5</refractiveIndex>
-            <shininess>300</shininess>
-        </material>
+    <Sphere name="big glass ball" position="0,1,0" radius="1">
+        <material type="transparent" kspecular="1" refractiveIndex="1.55" shininess="250"></material>
     </Sphere>
-    <Sphere id="red">
-        <center>3.5,0.5,-0.5</center>
-        <radius>0.5</radius>
-        <material>
-            <type>SPECULAR</type>
-            <kDiffuse>1, 0, 0</kDiffuse>
-            <kSpecular>1.0</kSpecular>
-            <reflectivity>0.5</reflectivity>
-        </material>
+    <Sphere name="red" position="3.5,0.5,-0.5" radius="0.5">
+        <material type="specular" kdiffuse="1,0,0" kspecular="1" reflectivity="0.5" shininess="250"></material>
     </Sphere>
-    <Sphere id="green">
-        <center>2.5,0.5, -3.5</center>
-        <radius>0.5</radius>
-        <material>
-            <type>SPECULAR</type>
-            <kDiffuse>0, 1, 0</kDiffuse>
-            <kSpecular>1.0</kSpecular>
-            <reflectivity>0.7</reflectivity>
-        </material>
+    <Sphere name="green" position="2.5,0.5,-3.5" radius="0.5">
+        <material type="specular" kdiffuse="0,1,0" kspecular="1" reflectivity="0.7" shininess="250"></material>
     </Sphere>
-    <Sphere id="yellow">
-        <center>1.5,0.5, -5.5</center>
-        <radius>0.5</radius>
-        <material>
-            <type>SPECULAR</type>
-            <kDiffuse>1, 1, 0</kDiffuse>
-            <kSpecular>1.0</kSpecular>
-            <reflectivity>0.5</reflectivity>
-        </material>
+    <Sphere name="yellow" position="1.5,0.5,-5.5" radius="0.5">
+        <material type="specular" kdiffuse="1,1,0" kspecular="1" reflectivity="0.5" shininess="250"></material>
     </Sphere>
-    <Sphere id="magenta">
-        <center>0, 0.5, 4</center>
-        <radius>0.5</radius>
-        <material>
-            <type>SPECULAR</type>
-            <kDiffuse>1, 0, 1</kDiffuse>
-            <kSpecular>1.0</kSpecular>
-            <reflectivity>0.5</reflectivity>
-        </material>
+    <Sphere name="magenta" position="0,0.5,4" radius="0.5">
+        <material type="specular" kdiffuse="1,0,1" kspecular="1" reflectivity="0.5" shininess="250"></material>
     </Sphere>
-    <Sphere id="blue">
-        <center>-2.5,0.5, -1</center>
-        <radius>0.5</radius>
-        <material>
-            <type>SPECULAR</type>
-            <kDiffuse>0, 0, 1</kDiffuse>
-            <kSpecular>1.0</kSpecular>
-            <reflectivity>0.5</reflectivity>
-        </material>
+    <Sphere name="blue" position="-2.5,0.5,-1" radius="0.5">
+        <material type="specular" kdiffuse="0,0,1" kspecular="1" reflectivity="0.5" shininess="250"></material>
     </Sphere>
-    <Sphere id="red">
-        <center>3.5,0.5, -0.5</center>
-        <radius>0.5</radius>
-        <material>
-            <type>SPECULAR</type>
-            <kDiffuse>1, 0, 0</kDiffuse>
-            <kSpecular>1.0</kSpecular>
-            <reflectivity>0.5</reflectivity>
-        </material>
+    <Sphere name="cyan" position="3,0.5,3" radius="0.5">
+        <material type="specular" kdiffuse="0,1,1" kspecular="1" reflectivity="0.3" shininess="250"></material>
     </Sphere>
-    <Sphere id="cyan">
-        <center>3,0.5, 3</center>
-        <radius>0.5</radius>
-        <material>
-            <type>SPECULAR</type>
-            <kDiffuse>0, 1, 1</kDiffuse>
-            <kSpecular>1.0</kSpecular>
-            <reflectivity>0.3</reflectivity>
-        </material>
-    </Sphere>
-<!--    <cube id="yeallow box">
-        <center>1.5, 0.5, -2.5</center>
-        <size>1</size>
-        <rotation>0</rotation>
-        <material>
-            <kDiffuse>1, 1, 0</kDiffuse>
-        </material>
-    </cube>-->
 </scene>

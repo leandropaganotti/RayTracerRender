@@ -1,63 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scene id="4balls">
+<scene name="4balls">
     <ambientIndex>1.0</ambientIndex>
     <kAmbient>0.1</kAmbient>
-    <CameraOptions>
-        <position>0,0,10</position>
-        <lookingAt>0,0,0</lookingAt>
-        <fov>35</fov>
-        <width>640</width>
-        <height>480</height>
-    </CameraOptions>
-    <PointLight>
-        <position>0,0,5</position>
-        <color>1, 1, 1</color>
-        <strength>1</strength>
-        <k>0.0</k>
-    </PointLight>
-    <Sphere id="left">
-        <center>-2,0,0</center>
-        <radius>1</radius>
-        <material>
-            <type>SPECULAR</type>
-            <kDiffuse>1, 0, 0</kDiffuse>
-            <kSpecular>1.0</kSpecular>
-            <shininess>150</shininess>
-            <reflectivity>0.5</reflectivity>
-        </material>
+    <CameraOptions position="0,0,10" lookingat="0" fov="35" width="640" height="480"></CameraOptions>
+    <PointLight position="0,0,5" color="1" strength="1.0" k="0.0"></PointLight>
+    <Sphere name="left" position="-2.0,0,0" radius="1">
+        <material type="specular" kdiffuse="1,0,0" kspecular="1" shininess="150" reflectivity="0.5"></material>
     </Sphere>
-    <Sphere id="top">
-        <center>0,2,0</center>
-        <radius>1</radius>
-        <material>
-            <type>SPECULAR</type>
-            <kDiffuse>0, 1, 0</kDiffuse>
-            <kSpecular>1.0</kSpecular>
-            <shininess>150</shininess>
-            <reflectivity>0.5</reflectivity>
-        </material>
+    <Sphere name="top" position="0,2,0" radius="1">
+        <material type="specular" kdiffuse="0,1,0" kspecular="1" shininess="150" reflectivity="0.5"></material>
     </Sphere>
-    <Sphere id="right">
-        <center>2,0,0</center>
-        <radius>1</radius>
-        <material>
-            <type>SPECULAR</type>
-            <kDiffuse>0, 0, 1</kDiffuse>
-            <kSpecular>1.0</kSpecular>
-            <shininess>150</shininess>
-            <reflectivity>0.5</reflectivity>
-        </material>
+    <Sphere name="right" position="2,0,0" radius="1">
+        <material type="specular" kdiffuse="0,0,1" kspecular="1" shininess="150" reflectivity="0.5"></material>
     </Sphere>
-    <Sphere id="bottom">
-        <center>0,-2,0</center>
-        <radius>1</radius>
-        <material>
-            <type>SPECULAR</type>
-            <kDiffuse>1, 0, 1</kDiffuse>
-            <kSpecular>1.0</kSpecular>
-            <shininess>150</shininess>
-            <reflectivity>0.5</reflectivity>
-        </material>
+    <Sphere name="bottom" position="0,-2,0" radius="1">
+        <material type="specular" kdiffuse="1,0,1" kspecular="1" shininess="150" reflectivity="0.5"></material>
     </Sphere>
 </scene>
 
