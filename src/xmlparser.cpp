@@ -231,6 +231,8 @@ void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, Material & material)
     		material.kDiffuse = toVector(attr->children->content);
 		else if (equals(attr->name, "kspecular"))
 			material.kSpecular = toVector(attr->children->content);
+        else if (equals(attr->name, "specularHighlight"))
+            material.specularHighlight = toFloat(attr->children->content);
 		else if (equals(attr->name, "shininess"))
 			material.shininess = toFloat(attr->children->content);
 		else if (equals(attr->name, "reflectivity"))

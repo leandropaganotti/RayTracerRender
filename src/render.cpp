@@ -186,7 +186,7 @@ Vector3f Render::specularMaterial(const Ray &ray, const Scene &scene, const uint
                 //specular
                 Vector3f toCamera = -ray.direction;
                 Vector3f reflected = reflect(-toLight, normal);
-                Vector3f specular = material->kSpecularHighlight * pow(std::max(0.0f, toCamera ^ reflected), material->shininess);
+                Vector3f specular = material->specularHighlight * pow(std::max(0.0f, toCamera ^ reflected), material->shininess);
                 phitColor +=  lightIntensity * (diffuse + specular);
             }
         }
@@ -234,7 +234,7 @@ Vector3f Render::transparentMaterial(const Ray &ray, const Scene &scene, const u
                 //specular
                 Vector3f toCamera = -ray.direction;
                 Vector3f reflected = reflect(-toLight, normal);
-                Vector3f specular = material->kSpecularHighlight * pow(std::max(0.0f, toCamera ^ reflected), material->shininess);
+                Vector3f specular = material->specularHighlight * pow(std::max(0.0f, toCamera ^ reflected), material->shininess);
                 phitColor +=  light->intensity(phit) * specular;
             }
         }

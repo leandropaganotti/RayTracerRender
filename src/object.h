@@ -22,7 +22,7 @@ struct Material
 
     Vector3f kDiffuse;
     Vector3f kSpecular;
-    Vector3f kSpecularHighlight;
+    float specularHighlight;
     float shininess;
     float reflectivity;
     float refractiveIndex;
@@ -32,7 +32,7 @@ struct Material
     {
         kDiffuse = color;
         kSpecular = 1.0f;
-        kSpecularHighlight = 1.0f;
+        specularHighlight = 1.0f;
 
         shininess = 150.0f;
         reflectivity = 0.3f;

@@ -7,7 +7,7 @@
 
 #define NRAYS 1
 #define NTHREADS 4
-#define MAX_DEPTH 5
+#define MAX_DEPTH 3
 
 class Render: public Camera
 {
