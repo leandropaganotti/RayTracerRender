@@ -9,7 +9,6 @@
 using namespace std;
 
 const char *xmlscene = NULL;// xml file with scene description
-unsigned    nrays    = 1;   // nrays * nrays rays will be cast for each pixel
 unsigned    nimages  = 1;   // generates nimages from difterent angles around y-axis
 
 void parseArguments(int argc, char **argv);
@@ -28,7 +27,7 @@ int main(int argc, char **argv)
 
     Render render;
 
-    Camera &camera = render.getCamera();
+    Camera &camera = render;
 
     camera.setOptions(scene.cameraOptions);
 
@@ -46,7 +45,7 @@ int main(int argc, char **argv)
         camera.lookAt( T(to) * Ry(deg2rad( i*angle )) * T(-to) * from, to); // rotate around y-axis
 
         auto start = chrono::steady_clock::now();       
-        render.render(scene, nrays, camera.getHeight());
+        render.render(scene);
         auto end = chrono::steady_clock::now();
 
         elapsedTime = chrono::duration_cast<chrono::milliseconds>(end - start).count();
@@ -66,18 +65,15 @@ int main(int argc, char **argv)
 
 void usage (char **argv)
 {
-    fprintf(stderr, "Usage: %s [-r nrays] [-i nimages] xmlfile\n\n", argv[0]);
+    fprintf(stderr, "Usage: %s [-p nimages] xmlfile\n\n", argv[0]);
 }
 
 void parseArguments(int argc, char **argv)
 {
     int opt;
-    while ((opt = getopt(argc, argv, "r:i:")) != -1) {
+    while ((opt = getopt(argc, argv, "p:")) != -1) {
         switch (opt) {
-        case 'r':
-            nrays = atoi(optarg);
-            break;
-        case 'i':
+        case 'p':
             nimages = atoi(optarg);
             break;
         default: /* '?' */

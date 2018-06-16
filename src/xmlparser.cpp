@@ -100,6 +100,26 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
     	return;
     }
 
+    const xmlAttr *attr = NULL;
+    string name("");
+    for (attr = xmlSceneNode->properties; attr; attr = attr->next)
+    {
+        if (equals(attr->name, "name"))
+            name = (const char*)attr->children->content;
+        else if (equals(attr->name, "nprays"))
+             scene.nprays = toInt(attr->children->content);
+        else if (equals(attr->name, "nsrays"))
+             scene.nsrays = toInt(attr->children->content);
+        else if (equals(attr->name, "nshrays"))
+             scene.nshrays = toInt(attr->children->content);
+        else if (equals(attr->name, "index"))
+             scene.ambientIndex = toFloat(attr->children->content);
+        else if (equals(attr->name, "maxdepth"))
+             scene.maxDepth = toInt(attr->children->content);
+        else
+            cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlSceneNode->name << "\':" << name << endl;
+    }
+
     if(xmlSceneNode->properties && equals(xmlSceneNode->properties->name, "name"))
         scene.name.assign((const char*)xmlSceneNode->properties->children->content);
 

@@ -17,14 +17,19 @@ public:
 
     void load(const char* filename);
 
+    std::string     name;
     float           ambientIndex;
     float           kAmbient;
+    size_t          nprays;
+    size_t          nsrays;
+    size_t          nshrays;
+    size_t          maxDepth;
 
     CameraOptions   cameraOptions;
     ObjectVector    objects;
     LightVector     lights;
 
-    std::string     name{""};
+
     friend std::ostream &operator <<(std::ostream &os, const Scene &scene);
 };
 

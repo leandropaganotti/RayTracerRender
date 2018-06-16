@@ -3,7 +3,7 @@
 #include <string.h>
 #include "xmlparser.h"
 
-Scene::Scene(): ambientIndex(1.0f), kAmbient(0.1), name("") {}
+Scene::Scene(): name("unamed"), ambientIndex(1.0f), kAmbient(0.1), nprays(1), nsrays(1), nshrays(1), maxDepth(3)  {}
 
 void Scene::addObject(Object *obj)
 {

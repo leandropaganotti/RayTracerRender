@@ -1,65 +1,14 @@
 #include "render.h"
 #include <thread>
 
-void Render::setCameraOptions(const CameraOptions &options)
-{
-    setOptions(options);
-}
-
-Camera &Render::getCamera()
-{
-    return *this;
-}
-
 const Image &Render::getImage() const
 {
     return image;
 }
 
-void Render::render(size_t width, size_t height, const Scene &scene, uint8_t nrays, uint8_t nthreads)
-{
-   setResolution(width, height);
-   render(scene, nrays, nthreads);
-}
-
-void Render::render(const CameraOptions &opts, const Scene &scene, uint8_t nrays, uint8_t nthreads)
-{
-    setCameraOptions(opts);
-    render(scene, nrays, nthreads);
-}
-
-void Render::renderSingleThread(const Scene *scene, size_t startRow, size_t endRow, size_t nrays)
-{
-    if (scene == nullptr) return;
-
-    Ray ray;
-    ray.origin = options.from;
-
-    // nrays defines a grid nrays x nrays
-    float dx = 1.0f / ( 1.0f + nrays);
-    float dy = 1.0f / ( 1.0f + nrays);
-
-    for (size_t i = startRow; i < endRow; ++i)
-    {
-        for (size_t j = 0; j < options.width; ++j)
-        {
-            image.at(i, j) = 0;
-            for (size_t y=1; y <= nrays; ++y)
-            {
-                for (size_t x=1; x <= nrays; ++x)
-                {
-                    ray.direction = getRayDirection(i+dy*y, j+dx*x);
-                    image.at(i, j) += rayTrace(ray, *scene, 0);
-                }
-            }
-            image.at(i, j) /= nrays*nrays;
-        }
-    }
-}
-
 Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t depth)
 {
-    if(depth == MAX_DEPTH) return Vector3f(0.0f);
+    if(depth > scene.maxDepth) return Vector3f(0.0f);
 
     IntersectionData isec;
 
@@ -291,13 +240,9 @@ Vector3f Render::transparentMaterial(const Ray &ray, const Scene &scene, const u
     return phitColor;
 }
 
-void Render::render(const Scene &scene, uint8_t nrays, uint8_t nthreads)
+void Render::render(const Scene &scene)
 {       
-    if (nthreads == 0 || nthreads >= options.getHeight())
-        throw std::invalid_argument("# of threads must be > 0 and < image.height ");
-
-    if (nrays == 0)
-        throw std::invalid_argument("# of rays must be greater than 0");
+    size_t nthreads = options.getHeight();
 
     std::vector<std::thread> threads;
 
@@ -305,9 +250,38 @@ void Render::render(const Scene &scene, uint8_t nrays, uint8_t nthreads)
 
     for( i=0 ; i < nthreads - 1u; ++i)
     {
-        threads.push_back( std::thread( &Render::renderSingleThread, this, &scene, i*nrows, (i+1) * nrows, nrays ) );
+        threads.push_back( std::thread( &Render::renderSingleThread, this, &scene, i*nrows, (i+1) * nrows) );
     }
-    threads.push_back( std::thread( &Render::renderSingleThread, this, &scene, i*nrows, options.getHeight(), nrays ) );
+    threads.push_back( std::thread( &Render::renderSingleThread, this, &scene, i*nrows, options.getHeight()) );
 
     for (auto& thread : threads) thread.join();
+}
+
+void Render::renderSingleThread(const Scene *scene, size_t startRow, size_t endRow)
+{
+    if (scene == nullptr) return;
+
+    Ray ray;
+    ray.origin = options.from;
+
+    // nrays defines a grid nrays x nrays
+    float dx = 1.0f / ( 1.0f + scene->nprays);
+    float dy = 1.0f / ( 1.0f + scene->nprays);
+
+    for (size_t i = startRow; i < endRow; ++i)
+    {
+        for (size_t j = 0; j < options.width; ++j)
+        {
+            image.at(i, j) = 0;
+            for (size_t y=1; y <= scene->nprays; ++y)
+            {
+                for (size_t x=1; x <= scene->nprays; ++x)
+                {
+                    ray.direction = getRayDirection(i+dy*y, j+dx*x);
+                    image.at(i, j) += rayTrace(ray, *scene, 1);
+                }
+            }
+            image.at(i, j) /= scene->nprays*scene->nprays;
+        }
+    }
 }
