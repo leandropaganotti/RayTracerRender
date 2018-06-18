@@ -274,7 +274,7 @@ Vector3f Render::diffuseReflection(const Ray &ray, const Scene &scene, const uin
 
     createCoordinateSystem(N, Nt, Nb);
 
-    uint32_t nSamples = 8;
+    uint32_t nSamples = scene.nsrays;
     for (uint32_t n = 0; n < nSamples; ++n)
     {
         float r1 = distribution(generator); // this is cosi
