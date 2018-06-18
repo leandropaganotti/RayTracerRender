@@ -14,6 +14,8 @@ struct IntersectionData
     float tnear;
     size_t idx;
     const Object * object;
+    Vector3f phit;
+    Vector3f normal;
 };
 
 struct Material

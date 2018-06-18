@@ -12,9 +12,8 @@ Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t dept
 
     IntersectionData isec;
 
-    castRay(ray, scene.objects, isec);
-
-    if (isec.object == nullptr) return Vector3f(0.0f);
+    if (!castRay(ray, scene.objects, isec))
+        return Vector3f(0.0f);
 
     switch (isec.object->material.type) {
     case Material::Type::DIFFUSE:
@@ -31,7 +30,7 @@ Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t dept
 }
 
 inline
-void Render::castRay(const Ray &ray, const ObjectVector &objects, IntersectionData &isec)
+bool Render::castRay(const Ray &ray, const ObjectVector &objects, IntersectionData &isec)
 {
     IntersectionData isec_tmp;
     isec.object = nullptr;
@@ -47,6 +46,13 @@ void Render::castRay(const Ray &ray, const ObjectVector &objects, IntersectionDa
             }
         }
     }
+    if(isec.object)
+    {
+        isec.phit = ray.origin + isec.tnear * ray.direction;
+        isec.normal = isec.object->normal(isec.phit, isec.idx);
+        return true;
+    }
+    return false;
 }
 
 inline
@@ -67,22 +73,16 @@ bool Render::castShadowRay(const Ray &ray, const ObjectVector &objects, float tM
 inline
 Vector3f Render::diffuseMaterial(const Ray &ray, const Scene &scene, const uint8_t, const IntersectionData &isec)
 {
-    Vector3f phit = ray.origin + isec.tnear * ray.direction;
-    Vector3f normal = isec.object->normal(phit, isec.idx);
-    const Material *material = &isec.object->material;
+    const Vector3f &phit = isec.phit;
+    const Vector3f normal = isec.normal.dot(ray.direction) > 0.0f ? -isec.normal: isec.normal;
+    const Material &material = isec.object->material;
 
     // Texture
     Vector3f textureColor = isec.object->texture(phit, isec.idx);
 
     //ambient
-    Vector3f phitColor = material->kDiffuse * textureColor * scene.kAmbient;
+    Vector3f phitColor = material.kDiffuse * textureColor * scene.kAmbient;
 
-    // if inside surface, inverting normal direction
-    float cosi = normal.dot(ray.direction);
-    if ( cosi > 0.0f) // inside surface
-        normal = -normal;
-
-    // diffuse
     for(auto& light: scene.lights)
     {
         Vector3f toLight = light->direction(phit);
@@ -92,7 +92,15 @@ Vector3f Render::diffuseMaterial(const Ray &ray, const Scene &scene, const uint8
         {
             if (!castShadowRay(Ray(phit + bias * normal, toLight), scene.objects, light->distance(phit)))
             {
-                phitColor +=  light->intensity(phit) * (material->kDiffuse * textureColor * incidence);
+                //diffuse
+                Vector3f diffuse = material.kDiffuse * textureColor * incidence;
+
+                //specular
+                Vector3f toCamera = -ray.direction;
+                Vector3f reflected = reflect(-toLight, normal);
+                Vector3f specular = material.specularHighlight * pow(std::max(0.0f, toCamera ^ reflected), material.shininess);
+
+                phitColor +=  light->intensity(phit) * (diffuse + specular);
             }
         }
     }
@@ -102,71 +110,31 @@ Vector3f Render::diffuseMaterial(const Ray &ray, const Scene &scene, const uint8
 inline
 Vector3f Render::specularMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
 {
-    Vector3f phit = ray.origin + isec.tnear * ray.direction;
-    Vector3f normal = isec.object->normal(phit, isec.idx);
-    const Material *material = &isec.object->material;
-
-    // Texture
-    Vector3f textureColor = isec.object->texture(phit, isec.idx);
-
-    //ambient
-    Vector3f phitColor = material->kDiffuse * textureColor * scene.kAmbient;
-
-    // if inside surface, inverting normal direction
-    float cosi = normal.dot(ray.direction);
-    if ( cosi > 0.0f) // inside surface
-        normal = -normal;
-
-    // diffuse and specular
-    for(auto& light: scene.lights)
-    {
-        Vector3f toLight = light->direction(phit);
-
-        float incidence = normal ^ toLight; //NdotL
-        if( incidence > 0.0f )
-        {
-            if (!castShadowRay(Ray(phit + bias * normal, toLight), scene.objects, light->distance(phit)))
-            {
-                Vector3f lightIntensity = light->intensity(phit);
-
-                //diffuse
-                Vector3f diffuse = material->kDiffuse * textureColor * incidence;
-
-                //specular
-                Vector3f toCamera = -ray.direction;
-                Vector3f reflected = reflect(-toLight, normal);
-                Vector3f specular = material->specularHighlight * pow(std::max(0.0f, toCamera ^ reflected), material->shininess);
-                phitColor +=  lightIntensity * (diffuse + specular);
-            }
-        }
-    }
-    phitColor *= 1.0f - material->reflectivity;
+    Vector3f phitColor(0.0f);
+    if (isec.object->material.reflectivity < 1.0f )
+        phitColor = diffuseMaterial(ray, scene, depth, isec) * (1.0f - isec.object->material.reflectivity);
 
     Ray R;
-    R.origin = phit + bias * normal;
-    R.direction = reflect(ray.direction, normal).normalize();
-    return phitColor + rayTrace(R, scene, depth + 1) * material->kSpecular * material->reflectivity;
+    R.origin = isec.phit + bias * isec.normal;
+    R.direction = reflect(ray.direction, isec.normal).normalize();
+    return phitColor + rayTrace(R, scene, depth + 1) * isec.object->material.kSpecular * isec.object->material.reflectivity;
 }
 
 inline
 Vector3f Render::mirrorMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
 {
-    Vector3f phit = ray.origin + isec.tnear * ray.direction;
-    Vector3f normal = isec.object->normal(phit, isec.idx);
-    const Material *material = &isec.object->material;
-
     Ray R;
-    R.origin = phit + bias * normal;
-    R.direction = reflect(ray.direction, normal).normalize();
-    return rayTrace(R, scene, depth + 1) * material->kSpecular;
+    R.origin = isec.phit + bias * isec.normal;
+    R.direction = reflect(ray.direction, isec.normal).normalize();
+    return rayTrace(R, scene, depth + 1) * isec.object->material.kSpecular;
 }
 
 inline
 Vector3f Render::transparentMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
 {
-    Vector3f phit = ray.origin + isec.tnear * ray.direction;
-    Vector3f normal = isec.object->normal(phit, isec.idx);
-    const Material *material = &isec.object->material;
+    const Vector3f &phit = isec.phit;
+    Vector3f normal = isec.normal;
+    const Material &material = isec.object->material;
 
     Vector3f phitColor(0.0f);
 
@@ -183,7 +151,7 @@ Vector3f Render::transparentMaterial(const Ray &ray, const Scene &scene, const u
                 //specular
                 Vector3f toCamera = -ray.direction;
                 Vector3f reflected = reflect(-toLight, normal);
-                Vector3f specular = material->specularHighlight * pow(std::max(0.0f, toCamera ^ reflected), material->shininess);
+                Vector3f specular = material.specularHighlight * pow(std::max(0.0f, toCamera ^ reflected), material.shininess);
                 phitColor +=  light->intensity(phit) * specular;
             }
         }
@@ -196,12 +164,12 @@ Vector3f Render::transparentMaterial(const Ray &ray, const Scene &scene, const u
     {
         cosi = -cosi;
         n1 = scene.ambientIndex;
-        n2 = material->refractiveIndex;
+        n2 = material.refractiveIndex;
     }
     else              // inside surface
     {
         normal = -normal;
-        n1 = material->refractiveIndex;
+        n1 = material.refractiveIndex;
         n2 = scene.ambientIndex;
     }
 

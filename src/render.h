@@ -13,7 +13,7 @@ class Render: public Camera
 
     Vector3f rayTrace(const Ray &ray, const Scene &scene, const uint8_t depth);
 
-    void castRay(const Ray &ray, const ObjectVector &objects, IntersectionData &isec);
+    bool castRay(const Ray &ray, const ObjectVector &objects, IntersectionData &isec);
     bool castShadowRay(const Ray &ray, const ObjectVector &objects, float tMax);
 
     Vector3f diffuseMaterial(const Ray &ray, const Scene &scene, const uint8_t, const IntersectionData &isec);
