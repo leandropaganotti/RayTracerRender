@@ -114,13 +114,13 @@ Vector3f Render::diffuseMaterial(const Ray &ray, const Scene &scene, const uint8
 inline
 Vector3f Render::specularMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
 {
-    Vector3f phitColor(0.0f);
-    if (isec.object->material.reflectivity < 1.0f )
-        phitColor = diffuseReflection(ray, scene, depth, isec) * (1.0f - isec.object->material.reflectivity);
-
     Ray R;
     R.origin = isec.phit + bias * isec.normal;
     R.direction = reflect(ray.direction, isec.normal).normalize();
+
+    Vector3f phitColor(0.0f);
+    phitColor = diffuseReflection(ray, scene, depth, isec) / (1.0f - isec.object->material.reflectivity);
+
     return phitColor + rayTrace(R, scene, depth + 1) * isec.object->material.kSpecular * isec.object->material.reflectivity;
 }
 
