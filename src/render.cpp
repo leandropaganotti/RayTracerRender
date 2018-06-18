@@ -1,5 +1,9 @@
 #include "render.h"
 #include <thread>
+#include <random>
+
+std::default_random_engine generator;
+std::uniform_real_distribution<float> distribution(0, 1);
 
 const Image &Render::getImage() const
 {
@@ -13,11 +17,11 @@ Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t dept
     IntersectionData isec;
 
     if (!castRay(ray, scene.objects, isec))
-        return Vector3f(0.0f);
+        return scene.bgcolor;
 
     switch (isec.object->material.type) {
     case Material::Type::DIFFUSE:
-        return diffuseMaterial(ray, scene, depth, isec);
+        return diffuseReflection(ray, scene, depth, isec);
     case Material::Type::SPECULAR:
         return specularMaterial(ray, scene, depth, isec);
     case Material::Type::MIRROR:
@@ -112,7 +116,7 @@ Vector3f Render::specularMaterial(const Ray &ray, const Scene &scene, const uint
 {
     Vector3f phitColor(0.0f);
     if (isec.object->material.reflectivity < 1.0f )
-        phitColor = diffuseMaterial(ray, scene, depth, isec) * (1.0f - isec.object->material.reflectivity);
+        phitColor = diffuseReflection(ray, scene, depth, isec) * (1.0f - isec.object->material.reflectivity);
 
     Ray R;
     R.origin = isec.phit + bias * isec.normal;
@@ -252,4 +256,42 @@ void Render::renderSingleThread(const Scene *scene, size_t startRow, size_t endR
             image.at(i, j) /= scene->nprays*scene->nprays;
         }
     }
+}
+
+Vector3f Render::diffuseReflection(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
+{
+    Vector3f phit = ray.origin + isec.tnear * ray.direction;
+    Vector3f N = isec.object->normal(phit, isec.idx);
+    const Material *material = &isec.object->material;
+
+    Vector3f directLighting = 0;
+
+    if (material->emission.x != 0 || material->emission.y != 0 || material->emission.z != 0)
+        return material->emission;
+
+    Vector3f indirectLigthing(0.0f);
+    Vector3f Nt, Nb;
+
+    createCoordinateSystem(N, Nt, Nb);
+
+    uint32_t nSamples = 8;
+    for (uint32_t n = 0; n < nSamples; ++n)
+    {
+        float r1 = distribution(generator); // this is cosi
+        float r2 = distribution(generator);
+        Vector3f sample = uniformSampleHemisphere(r1, r2);
+        Vector3f sampleWorld(
+                sample.x * Nb.x + sample.y * N.x + sample.z * Nt.x,
+                sample.x * Nb.y + sample.y * N.y + sample.z * Nt.y,
+                sample.x * Nb.z + sample.y * N.z + sample.z * Nt.z);
+
+        Ray R;
+        R.origin = phit + bias * N;
+        R.direction = sampleWorld;
+        indirectLigthing += r1 * rayTrace(R, scene, depth + 1) ;
+    }
+
+    indirectLigthing /= (float)nSamples;
+
+    return (directLighting / M_PI + 2 * indirectLigthing) * material->kDiffuse;
 }

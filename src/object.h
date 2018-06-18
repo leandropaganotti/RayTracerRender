@@ -24,16 +24,18 @@ struct Material
 
     Vector3f kDiffuse;
     Vector3f kSpecular;
+    Vector3f emission;
     float specularHighlight;
     float shininess;
     float reflectivity;
     float refractiveIndex;
-    Type type;
+    Type type;    
 
     Material(const Vector3f &color={1.0})
     {
         kDiffuse = color;
         kSpecular = 1.0f;
+        emission = 0.0f;
         specularHighlight = 1.0f;
 
         shininess = 150.0f;

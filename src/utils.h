@@ -178,4 +178,25 @@ bool solveQuadratic(const float a, const float b, const float c, float &x0, floa
     return true;
 }
 
+inline
+Vector3f uniformSampleHemisphere(const float &r1, const float &r2)
+{
+    // cos(theta) = r1 = y
+    // cos^2(theta) + sin^2(theta) = 1 -> sin(theta) = srtf(1 - cos^2(theta))
+    float sinTheta = sqrtf(1 - r1 * r1);
+    float phi = 2 * M_PI * r2;
+    float x = sinTheta * cosf(phi);
+    float z = sinTheta * sinf(phi);
+    return Vector3f(x, r1, z);
+}
+inline
+void createCoordinateSystem(const Vector3f &N, Vector3f &Nt, Vector3f &Nb)
+{
+    if (std::fabs(N.x) > std::fabs(N.y))
+        Nt = Vector3f(N.z, 0, -N.x) / sqrtf(N.x * N.x + N.z * N.z);
+    else
+        Nt = Vector3f(0, -N.z, N.y) / sqrtf(N.y * N.y + N.z * N.z);
+    Nb = N.cross(Nt);
+}
+
 #endif // UTILS

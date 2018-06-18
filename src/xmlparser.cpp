@@ -128,7 +128,9 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
     {
         if (node->type == XML_ELEMENT_NODE)
         {
-            if (equals(node->name, "CameraOptions"))
+            if (equals(node->name, "bgColor"))
+                scene.bgcolor = toVector(node->children->content);
+            else if (equals(node->name, "CameraOptions"))
                 parseCameraOptions(node, scene.cameraOptions);
             else if (equals(node->name, "Sphere"))
             {
@@ -251,6 +253,8 @@ void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, Material & material)
     		material.kDiffuse = toVector(attr->children->content);
 		else if (equals(attr->name, "kspecular"))
 			material.kSpecular = toVector(attr->children->content);
+        else if (equals(attr->name, "emission"))
+            material.emission = toVector(attr->children->content);
         else if (equals(attr->name, "specularHighlight"))
             material.specularHighlight = toFloat(attr->children->content);
 		else if (equals(attr->name, "shininess"))

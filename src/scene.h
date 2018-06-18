@@ -24,6 +24,7 @@ public:
     size_t          nsrays;
     size_t          nshrays;
     size_t          maxDepth;
+    Vector3f        bgcolor;
 
     CameraOptions   cameraOptions;
     ObjectVector    objects;
