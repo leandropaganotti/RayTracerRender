@@ -45,7 +45,7 @@ int main(int argc, char **argv)
         camera.lookAt( T(to) * Ry(deg2rad( i*angle )) * T(-to) * from, to); // rotate around y-axis
 
         auto start = chrono::steady_clock::now();       
-        render.render(scene);
+        render.render_omp(scene);
         auto end = chrono::steady_clock::now();
 
         elapsedTime = chrono::duration_cast<chrono::milliseconds>(end - start).count();

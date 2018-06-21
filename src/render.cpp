@@ -213,7 +213,7 @@ Vector3f Render::transparentMaterial(const Ray &ray, const Scene &scene, const u
 }
 
 void Render::render(const Scene &scene)
-{       
+{
     size_t nthreads = options.getHeight();
 
     std::vector<std::thread> threads;
@@ -227,6 +227,30 @@ void Render::render(const Scene &scene)
     threads.push_back( std::thread( &Render::renderSingleThread, this, &scene, i*nrows, options.getHeight()) );
 
     for (auto& thread : threads) thread.join();
+}
+
+void Render::render_omp(const Scene &scene)
+{
+    const float dx = 1.0f / ( 1.0f + scene.nprays);
+    const float dy = 1.0f / ( 1.0f + scene.nprays);
+
+    #pragma omp parallel for schedule(dynamic, 1)
+    for (size_t i = 0; i < options.height; ++i)
+    {
+        for (size_t j = 0; j < options.width; ++j)
+        {
+            image.at(i, j) = 0;
+            for (size_t y=1; y <= scene.nprays; ++y)
+            {
+                for (size_t x=1; x <= scene.nprays; ++x)
+                {
+                    Ray ray(options.from, getRayDirection(i+dy*y, j+dx*x));
+                    image.at(i, j) += rayTrace(ray, scene, 1);
+                }
+            }
+            image.at(i, j) /= scene.nprays*scene.nprays;
+        }
+    }
 }
 
 void Render::renderSingleThread(const Scene *scene, size_t startRow, size_t endRow)
@@ -258,7 +282,7 @@ void Render::renderSingleThread(const Scene *scene, size_t startRow, size_t endR
     }
 }
 
-Vector3f Render::diffuseReflection(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
+Vector3f Render::diffuseReflection(const Ray &, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
 {
     const Material *material = &isec.object->material;
 
@@ -283,5 +307,8 @@ Vector3f Render::diffuseReflection(const Ray &ray, const Scene &scene, const uin
     R.direction = sampleWorld;
     indirectLigthing += r1 * rayTrace(R, scene, depth + 1) ;
 
-    return material->emission + (2 * indirectLigthing) * material->kDiffuse;
+    // Texture
+    Vector3f textureColor = isec.object->texture(isec.phit, isec.idx);
+
+    return material->emission + (2 * indirectLigthing) * material->kDiffuse * textureColor;
 }
