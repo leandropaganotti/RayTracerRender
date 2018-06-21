@@ -119,7 +119,7 @@ Vector3f Render::specularMaterial(const Ray &ray, const Scene &scene, const uint
     R.direction = reflect(ray.direction, isec.normal).normalize();
 
     Vector3f phitColor(0.0f);
-    phitColor = diffuseReflection(ray, scene, depth, isec) / (1.0f - isec.object->material.reflectivity);
+    phitColor = diffuseReflection(ray, scene, depth, isec) * (1.0f - isec.object->material.reflectivity);
 
     return phitColor + rayTrace(R, scene, depth + 1) * isec.object->material.kSpecular * isec.object->material.reflectivity;
 }
@@ -260,11 +260,7 @@ void Render::renderSingleThread(const Scene *scene, size_t startRow, size_t endR
 
 Vector3f Render::diffuseReflection(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
 {
-    Vector3f phit = ray.origin + isec.tnear * ray.direction;
-    Vector3f N = isec.object->normal(phit, isec.idx);
     const Material *material = &isec.object->material;
-
-    Vector3f directLighting = 0;
 
     if (material->emission.x != 0 || material->emission.y != 0 || material->emission.z != 0)
         return material->emission;
@@ -272,26 +268,20 @@ Vector3f Render::diffuseReflection(const Ray &ray, const Scene &scene, const uin
     Vector3f indirectLigthing(0.0f);
     Vector3f Nt, Nb;
 
-    createCoordinateSystem(N, Nt, Nb);
+    createCoordinateSystem(isec.normal, Nt, Nb);
 
-    uint32_t nSamples = scene.nsrays;
-    for (uint32_t n = 0; n < nSamples; ++n)
-    {
-        float r1 = distribution(generator); // this is cosi
-        float r2 = distribution(generator);
-        Vector3f sample = uniformSampleHemisphere(r1, r2);
-        Vector3f sampleWorld(
-                sample.x * Nb.x + sample.y * N.x + sample.z * Nt.x,
-                sample.x * Nb.y + sample.y * N.y + sample.z * Nt.y,
-                sample.x * Nb.z + sample.y * N.z + sample.z * Nt.z);
+    float r1 = distribution(generator); // this is cosi
+    float r2 = distribution(generator);
+    Vector3f sample = uniformSampleHemisphere(r1, r2);
+    Vector3f sampleWorld(
+            sample.x * Nb.x + sample.y * isec.normal.x + sample.z * Nt.x,
+            sample.x * Nb.y + sample.y * isec.normal.y + sample.z * Nt.y,
+            sample.x * Nb.z + sample.y * isec.normal.z + sample.z * Nt.z);
 
-        Ray R;
-        R.origin = phit + bias * N;
-        R.direction = sampleWorld;
-        indirectLigthing += r1 * rayTrace(R, scene, depth + 1) ;
-    }
+    Ray R;
+    R.origin = isec.phit + bias * isec.normal;
+    R.direction = sampleWorld;
+    indirectLigthing += r1 * rayTrace(R, scene, depth + 1) ;
 
-    indirectLigthing /= (float)nSamples;
-
-    return (directLighting / M_PI + 2 * indirectLigthing) * material->kDiffuse;
+    return material->emission + (2 * indirectLigthing) * material->kDiffuse;
 }
