@@ -34,6 +34,7 @@ public:
     void render(const Scene &scene);
 
 
+    void render_omp(const Scene &scene);
 };
 
 #endif // RENDER_H
