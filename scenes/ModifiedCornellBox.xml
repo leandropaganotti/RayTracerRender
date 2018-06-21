@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scene name="room" nprays="4" index="1.0" maxdepth="5">
+    <bgcolor>1</bgcolor>
+    <CameraOptions position="0,1.7,5" lookingat="0,1.7,0" fov="50" width="640" height="480"></CameraOptions>
+    <Sphere name="mirrorBall" position="-2,0.8,-1.5" radius="0.8">
+        <material type="mirror" kspecular="0.9"></material>
+    </Sphere>
+    <Sphere name="glassBall" position="1.8,1.5,0.2" radius="0.5">
+        <material type="transparent" refractiveIndex="1.5" shininess="150" kspecular="1"></material>
+    </Sphere>
+    <plane name="left" point="-3,0,0" normal="1,0,0">
+        <material type="diffuse" kdiffuse="0.5, 0.0, 0.0" ></material>
+    </plane>
+    <plane name="right" point="3,0,0" normal="-1,0,0">
+        <material type="diffuse" kdiffuse="0, 0.5, 0" ></material>
+    </plane>
+    <plane name="top" point="0,3.5,0" normal="0,-1,0">
+        <material type="diffuse" kdiffuse="0.75" ></material>
+    </plane>
+    <plane name="floor" point="0,0,0" normal="0,1,0">
+        <material type="diffuse" kdiffuse="0.70" ></material>
+        <texture name="tiles" rows="10" cols="10" color1="1" color2="0.1, 0.1, 0" angle="0"></texture>
+    </plane>
+    <plane name="back" point="0,0,-3" normal="0,0,1">
+        <material type="diffuse" kdiffuse="0.75" ></material>
+    </plane>
+    <plane name="front" point="0,0,5.1" normal="0,0,-1">
+        <material type="diffuse" kdiffuse="0.75" ></material>
+    </plane>
+    <Box>
+        <model translate="1.8,0.5,0.2" rotate="0, 45, 0" scale="1, 1, 1"></model>
+        <material type="diffuse" kdiffuse="1"></material>
+    </Box>
+
+    <Sphere name="yellow" position="-2.3,0.3,0" radius="0.3">
+        <material type="diffuse" kdiffuse="1,1,0"></material>
+    </Sphere>
+    <Sphere name="blue" position="1.2,0.4,-2.5" radius="0.4">
+        <material type="diffuse" kdiffuse="0,0,1"></material>
+    </Sphere>
+    <Box>
+        <model translate="0,3.5,0" rotate="0" scale="5, 0.1, 1.5"></model>
+        <material type="diffuse" kdiffuse="1" emission="7"></material>
+    </Box>
+</scene>
+
+
+

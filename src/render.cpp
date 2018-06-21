@@ -1,6 +1,9 @@
 #include "render.h"
 #include <thread>
 #include <random>
+#include <atomic>
+#include <iomanip>
+#include <sstream>
 
 std::default_random_engine generator;
 std::uniform_real_distribution<float> distribution(0, 1);
@@ -67,8 +70,7 @@ bool Render::castShadowRay(const Ray &ray, const ObjectVector &objects, float tM
     {
         if (object->intersection(ray, tnear))
         {
-            if ( tnear < tMax && object->material.type != Material::Type::TRANSPARENT) return true;
-            //if ( tnear < tMax ) return true;
+            if ( tnear < tMax ) return true;
         }
     }
     return false;
@@ -234,9 +236,15 @@ void Render::render_omp(const Scene &scene)
     const float dx = 1.0f / ( 1.0f + scene.nprays);
     const float dy = 1.0f / ( 1.0f + scene.nprays);
 
-    #pragma omp parallel for schedule(dynamic, 1)
+    int count = 0;
+
+    std::cout << std::endl;
+    std::cout << "\r -> 0.00% completed" << std::flush;
+
+    #pragma omp parallel for schedule(dynamic, 1) shared(count)
     for (size_t i = 0; i < options.height; ++i)
     {
+        std::ostringstream stdStream;
         for (size_t j = 0; j < options.width; ++j)
         {
             image.at(i, j) = 0;
@@ -250,6 +258,9 @@ void Render::render_omp(const Scene &scene)
             }
             image.at(i, j) /= scene.nprays*scene.nprays;
         }
+        ++count;
+        stdStream << "\r -> " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) << count/float(options.height) * 100.0f << "% completed";
+        std::cout << stdStream.str() << std::flush;
     }
 }
 

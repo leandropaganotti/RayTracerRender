@@ -34,14 +34,16 @@ int main(int argc, char **argv)
     const Vector3f from( scene.cameraOptions.getFrom() ), to( scene.cameraOptions.getTo());
 
     cout << "Render parameters:" << endl;
-    cout << "- scene file: " << xmlscene << endl;
-    cout << "- # of image around y-axis: " << nimages << endl;
-    cout << "- image output resolution: " << camera.getWidth() << "x" << camera.getHeight() << endl;
-    cout << "- # of threads: " << camera.getHeight() << endl;
+    cout << "- scene: " << xmlscene << endl;
+    cout << "- #angles (y-axis): " << nimages << endl;
+    cout << "- resolution: " << camera.getWidth() << "x" << camera.getHeight() << endl;
+    cout << "- spp: " << scene.nprays * scene.nprays << endl;
+
+    cout << endl;
 
     for (unsigned i=0; i < nimages; ++i)
     {
-        cout << "\r" << i+1 << "/" << nimages << ": at " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) <<  i*angle << "° => ";
+        cout << "\n" << i+1 << "/" << nimages << ": at " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) <<  i*angle << "°" << flush;
         camera.lookAt( T(to) * Ry(deg2rad( i*angle )) * T(-to) * from, to); // rotate around y-axis
 
         auto start = chrono::steady_clock::now();       
@@ -49,7 +51,7 @@ int main(int argc, char **argv)
         auto end = chrono::steady_clock::now();
 
         elapsedTime = chrono::duration_cast<chrono::milliseconds>(end - start).count();
-        cout << "Time: " << elapsedTime << " ms" << flush;
+        cout << ", Time: " << elapsedTime << " ms" << flush;
 
         sprintf(buf, "%s_%04d.ppm", scene.name.c_str(), i);
         render.getImage().save_ppm_bin(buf);
