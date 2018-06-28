@@ -24,7 +24,7 @@ Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t dept
 
     switch (isec.object->material.type) {
     case Material::Type::DIFFUSE:
-        return diffuseReflection(ray, scene, depth, isec);
+        return diffuseReflection_GI(ray, scene, depth, isec);
     case Material::Type::SPECULAR:
         return specularMaterial(ray, scene, depth, isec);
     case Material::Type::MIRROR:
@@ -121,7 +121,7 @@ Vector3f Render::specularMaterial(const Ray &ray, const Scene &scene, const uint
     R.direction = reflect(ray.direction, isec.normal).normalize();
 
     Vector3f phitColor(0.0f);
-    phitColor = diffuseReflection(ray, scene, depth, isec) * (1.0f - isec.object->material.reflectivity);
+    phitColor = diffuseMaterial(ray, scene, depth, isec) * (1.0f - isec.object->material.reflectivity);
 
     return phitColor + rayTrace(R, scene, depth + 1) * isec.object->material.kSpecular * isec.object->material.reflectivity;
 }
@@ -249,7 +249,7 @@ void Render::render_omp(const Scene &scene)
             image.at(i, j) = 0;
             for (size_t y=0; y < scene.nprays; ++y)
             {
-                unsigned short Xi[3]={0,0,y*y*y};
+                unsigned short Xi[3]={0,0,(short unsigned int)(y*y*y)};
                 for (size_t x=0; x < scene.nprays; ++x)
                 {
                     float randX = erand48(Xi) * grid;
@@ -295,7 +295,7 @@ void Render::renderSingleThread(const Scene *scene, size_t startRow, size_t endR
     }
 }
 
-Vector3f Render::diffuseReflection(const Ray &, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
+Vector3f Render::diffuseReflection_GI(const Ray &, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
 {
     const Material *material = &isec.object->material;
 

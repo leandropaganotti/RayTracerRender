@@ -36,7 +36,7 @@ public:
     void render_omp(const Scene &scene);
 
 private:
-    Vector3f diffuseReflection(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec);
+    Vector3f diffuseReflection_GI(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec);
 };
 
 #endif // RENDER_H
