@@ -233,8 +233,7 @@ void Render::render(const Scene &scene)
 
 void Render::render_omp(const Scene &scene)
 {
-    const float dx = 1.0f / ( 1.0f + scene.nprays);
-    const float dy = 1.0f / ( 1.0f + scene.nprays);
+    const float grid = 1.0f / scene.nprays;
 
     int count = 0;
 
@@ -248,11 +247,14 @@ void Render::render_omp(const Scene &scene)
         for (size_t j = 0; j < options.width; ++j)
         {
             image.at(i, j) = 0;
-            for (size_t y=1; y <= scene.nprays; ++y)
+            for (size_t y=0; y < scene.nprays; ++y)
             {
-                for (size_t x=1; x <= scene.nprays; ++x)
+                unsigned short Xi[3]={0,0,y*y*y};
+                for (size_t x=0; x < scene.nprays; ++x)
                 {
-                    Ray ray(options.from, getRayDirection(i+dy*y, j+dx*x));
+                    float randX = erand48(Xi) * grid;
+                    float randY = erand48(Xi) * grid;
+                    Ray ray(options.from, getRayDirection(i + grid*y + randY, j + grid*x + randX));
                     image.at(i, j) += rayTrace(ray, scene, 1);
                 }
             }
