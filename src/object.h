@@ -21,7 +21,7 @@ struct IntersectionData
 struct Material
 {
     enum class Type { DIFFUSE, SPECULAR, MIRROR, TRANSPARENT };
-
+    Type type;
     Vector3f kDiffuse;
     Vector3f kSpecular;
     Vector3f emission;
@@ -29,7 +29,6 @@ struct Material
     float shininess;
     float reflectivity;
     float refractiveIndex;
-    Type type;    
 
     Material(const Vector3f &color={1.0})
     {
@@ -37,11 +36,9 @@ struct Material
         kSpecular = 1.0f;
         emission = 0.0f;
         specularHighlight = 1.0f;
-
-        shininess = 150.0f;
+        shininess = 30.0f;
         reflectivity = 0.3f;
         refractiveIndex = 1.55f;
-
         type = Type::DIFFUSE;
     }
 };

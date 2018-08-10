@@ -1,6 +1,7 @@
 #ifndef UTILS
 #define UTILS
 
+#include <ctime>
 #include "matrix.h"
 #include <math.h>
 #include <sys/time.h>
@@ -182,7 +183,7 @@ inline
 Vector3f uniformSampleHemisphere(const float &r1, const float &r2)
 {
     // cos(theta) = r1 = y
-    // cos^2(theta) + sin^2(theta) = 1 -> sin(theta) = srtf(1 - cos^2(theta))
+    // cos^2(theta) + sin^2(theta) = 1^2 -> sin(theta) = srtf(1 - cos^2(theta))
     float sinTheta = sqrtf(1 - r1 * r1);
     float phi = 2 * M_PI * r2;
     float x = sinTheta * cosf(phi);
@@ -199,4 +200,17 @@ void createCoordinateSystem(const Vector3f &N, Vector3f &Nt, Vector3f &Nb)
     Nb = N.cross(Nt);
 }
 
+inline
+std::string timestamp2string(std::time_t timestamp, const char* format="%FT%T")
+{
+    struct tm t;
+    if ( gmtime_r( &timestamp, &t ) == nullptr )
+    {
+        timestamp = 0;
+        gmtime_r( &timestamp, &t );
+    }
+    char buffer[64] = { };
+    strftime( buffer, 64, format, &t );
+    return buffer;
+}
 #endif // UTILS

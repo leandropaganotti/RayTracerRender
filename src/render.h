@@ -11,7 +11,7 @@ class Render: public Camera
 
     void renderSingleThread(const Scene *scene, size_t startRow, size_t endRow);
 
-    Vector3f rayTrace(const Ray &ray, const Scene &scene, const uint8_t depth);
+    Vector3f rayTrace(const Ray &ray, const Scene &scene, const uint8_t depth, const uint8_t E=1);
 
     bool castRay(const Ray &ray, const ObjectVector &objects, IntersectionData &isec);
     bool castShadowRay(const Ray &ray, const ObjectVector &objects, float tMax);
@@ -36,7 +36,7 @@ public:
     void render_omp(const Scene &scene);
 
 private:
-    Vector3f diffuseReflection_GI(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec);
+    Vector3f diffuseReflection_GI(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, const uint8_t E=1);
 };
 
 #endif // RENDER_H

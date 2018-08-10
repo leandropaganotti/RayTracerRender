@@ -146,6 +146,12 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
                 parsePointLight(node, *light);
                 scene.addLight(light);
             }
+            else if(equals(node->name, "DistantLight"))
+            {
+                DistantLight *light = new DistantLight();
+                parseDistantLight(node, *light);
+                scene.addLight(light);
+            }
             else if(equals(node->name, "kAmbient"))
                 scene.kAmbient = toFloat(node->children->content);
             else if(equals(node->name, "plane"))
@@ -323,6 +329,40 @@ void XMLParser::parsePointLight(xmlNode *xmlPointLightNode, PointLight & light)
         if (node->type == XML_ELEMENT_NODE)
         {
         	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlPointLightNode->name << "\'" << endl;
+        }
+    }
+}
+
+void XMLParser::parseDistantLight(xmlNode *xmlDistantLightNode, DistantLight &light)
+{
+    if(xmlDistantLightNode == NULL)
+    {
+         cerr << "error: could not parse PointLight, xmlNode pointer is NULL" << endl;
+         return;
+    }
+
+    const xmlAttr *attr = NULL;
+    string name("");
+    for (attr = xmlDistantLightNode->properties; attr; attr = attr->next)
+    {
+        if (equals(attr->name, "name"))
+            name = (const char*)attr->children->content;
+        else if (equals(attr->name, "direction"))
+            light.setDir( toVector(attr->children->content) );
+        else if (equals(attr->name, "color"))
+            light.setColor( toVector(attr->children->content) );
+        else if (equals(attr->name, "strength"))
+            light.setStrength( toFloat(attr->children->content) );
+        else
+            cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlDistantLightNode->name << "\':" << name << endl;
+    }
+
+    xmlNode *node = NULL;
+    for (node = xmlDistantLightNode->children; node; node = node->next)
+    {
+        if (node->type == XML_ELEMENT_NODE)
+        {
+            cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlDistantLightNode->name << "\'" << endl;
         }
     }
 }

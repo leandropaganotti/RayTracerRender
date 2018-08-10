@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 {
     parseArguments(argc, argv);
 
-    double averageTime=0.0, elapsedTime=0.0;
+    double time_in_ms_avg=0.0, time_in_ms=0.0;
     float angle = nimages ? 360.0 / nimages : 0.0;
 
     std::string output(xmlscene);
@@ -36,11 +36,13 @@ int main(int argc, char **argv)
 
     const Vector3f from( scene.cameraOptions.getFrom() ), to( scene.cameraOptions.getTo());
 
+    size_t spp = roundf(scene.nprays/(4))*4;
+
     cout << "Render parameters:" << endl;
     cout << "- scene: " << xmlscene << endl;
     cout << "- #angles (y-axis): " << nimages << endl;
     cout << "- resolution: " << camera.getWidth() << "x" << camera.getHeight() << endl;
-    cout << "- spp: " << scene.nprays * scene.nprays << endl << endl;
+    cout << "- spp: " << spp << endl << endl;
 
     std::stringstream ss;
     ss << output;
@@ -53,17 +55,21 @@ int main(int argc, char **argv)
         render.render_omp(scene);
         auto end = chrono::steady_clock::now();
 
-        elapsedTime = chrono::duration_cast<chrono::milliseconds>(end - start).count();
-        cout << ", Time: " << elapsedTime << " ms" << flush;
+        time_in_ms = chrono::duration_cast<chrono::milliseconds>(end - start).count();
 
-        ss << "_" << std::setw(4) << std::setfill('0') << i << "_" << scene.nprays * scene.nprays << "_" << elapsedTime << ".ppm";
+        std::stringstream time_str ;
+        time_str << timestamp2string(time_in_ms / 1000, "%T") << ":" << std::setw(3) << std::setfill('0') << (unsigned long long)time_in_ms % 1000;
+
+        cout << ", Time: " << time_str.str() << flush;
+
+        ss << "_IMG" << std::setw(4) << std::setfill('0') << i << "_SPP" << spp << "_T" << time_str.str() << ".ppm";
         render.getImage().save_ppm_bin(ss.str().c_str());
 
-        averageTime += chrono::duration_cast<chrono::milliseconds>(end - start).count();
+        time_in_ms_avg += time_in_ms;
     }
 
-    averageTime = averageTime / (nimages);
-    cout << endl << "Average time: " << averageTime << " ms" << endl;
+    time_in_ms_avg = time_in_ms_avg / (nimages);
+    cout << ", Average in ms: " << time_in_ms_avg << endl;
 
     return 0;
 }

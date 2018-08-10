@@ -4,16 +4,20 @@
 #include <atomic>
 #include <iomanip>
 #include <sstream>
+#include "sphere.h"
+#include <iostream>
 
-std::default_random_engine generator;
-std::uniform_real_distribution<float> distribution(0, 1);
+
+std::random_device rd;  //Will be used to obtain a seed for the random number engine
+std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+std::uniform_real_distribution<float> dis(0, 1);
 
 const Image &Render::getImage() const
 {
     return image;
 }
 
-Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t depth)
+Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t depth, const uint8_t E)
 {
     if(depth > scene.maxDepth) return Vector3f(0.0f);
 
@@ -24,7 +28,7 @@ Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t dept
 
     switch (isec.object->material.type) {
     case Material::Type::DIFFUSE:
-        return diffuseReflection_GI(ray, scene, depth, isec);
+        return diffuseReflection_GI(ray, scene, depth, isec, E);
     case Material::Type::SPECULAR:
         return specularMaterial(ray, scene, depth, isec);
     case Material::Type::MIRROR:
@@ -231,9 +235,49 @@ void Render::render(const Scene &scene)
     for (auto& thread : threads) thread.join();
 }
 
+//void Render::render_omp(const Scene &scene)
+//{
+//    const size_t nrays = roundf(sqrtf(scene.nprays));
+
+//    const float grid = 1.0f / nrays;
+
+//    int count = 0;
+
+//    std::cout << std::endl;
+//    std::cout << "\r -> 0.00% completed" << std::flush;
+
+//    #pragma omp parallel for schedule(dynamic, 1) shared(count)
+//    for (size_t i = 0; i < options.height; ++i)
+//    {
+//        std::ostringstream stdStream;
+//        for (size_t j = 0; j < options.width; ++j)
+//        {
+//            image.at(i, j) = 0;
+//            for (size_t y=0; y < nrays; ++y)
+//            {
+//                unsigned short Xi[3]={0,0,(short unsigned int)(y*y*y)};
+//                for (size_t x=0; x < nrays; ++x)
+//                {
+//                    float randX = erand48(Xi) * grid;
+//                    float randY = erand48(Xi) * grid;
+//                    Ray ray(options.from, getRayDirection(i + grid*y + randY, j + grid*x + randX));
+//                    image.at(i, j) += rayTrace(ray, scene, 1);
+//                }
+//            }
+//            image.at(i, j) /= nrays*nrays;
+//        }
+//        ++count;
+//        stdStream << "\r -> " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) << count/float(options.height) * 100.0f << "% completed";
+//        std::cout << stdStream.str() << std::flush;
+//    }
+//}
+
 void Render::render_omp(const Scene &scene)
 {
-    const float grid = 1.0f / scene.nprays;
+    const float grid = 2;
+    const float gridSize = 1/grid;
+
+    const size_t nrays = roundf(scene.nprays/(grid*grid));
 
     int count = 0;
 
@@ -247,18 +291,21 @@ void Render::render_omp(const Scene &scene)
         for (size_t j = 0; j < options.width; ++j)
         {
             image.at(i, j) = 0;
-            for (size_t y=0; y < scene.nprays; ++y)
+            for (size_t y=0; y < grid; ++y)
             {
-                unsigned short Xi[3]={0,0,(short unsigned int)(y*y*y)};
-                for (size_t x=0; x < scene.nprays; ++x)
+                for (size_t x=0; x < grid; ++x)
                 {
-                    float randX = erand48(Xi) * grid;
-                    float randY = erand48(Xi) * grid;
-                    Ray ray(options.from, getRayDirection(i + grid*y + randY, j + grid*x + randX));
-                    image.at(i, j) += rayTrace(ray, scene, 1);
+                    for (size_t n = 0; n < nrays; ++n)
+                    {
+                        float r1 = dis(gen) * gridSize;
+                        float r2 = dis(gen) * gridSize;
+                        //std::cout << i+grid*gridSize+r1 << " " << j+grid*gridSize+r2 << std::endl;
+                        Ray ray(options.from, getRayDirection(i+x*gridSize+r1, j+y*gridSize+r2));
+                        image.at(i, j) += rayTrace(ray, scene, 1);
+                    }
                 }
             }
-            image.at(i, j) /= scene.nprays*scene.nprays;
+            image.at(i, j) /= nrays*grid*grid;
         }
         ++count;
         stdStream << "\r -> " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) << count/float(options.height) * 100.0f << "% completed";
@@ -295,21 +342,67 @@ void Render::renderSingleThread(const Scene *scene, size_t startRow, size_t endR
     }
 }
 
-Vector3f Render::diffuseReflection_GI(const Ray &, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
+inline
+Vector3f Render::diffuseReflection_GI(const Ray &, const Scene &scene, const uint8_t depth, const IntersectionData &isec, const uint8_t E)
 {
     const Material *material = &isec.object->material;
 
     if (material->emission.x != 0 || material->emission.y != 0 || material->emission.z != 0)
-        return material->emission;
+    {
+        float max = material->emission.x>material->emission.y &&
+                    material->emission.x>material->emission.z ? material->emission.x :
+                    material->emission.y>material->emission.z ? material->emission.y :
+                    material->emission.z; // max refl
+        return material->emission/max;
+    }
+    // Texture
+    Vector3f textureColor = isec.object->texture(isec.phit, isec.idx);
 
-    Vector3f indirectLigthing(0.0f);
-    Vector3f Nt, Nb;
+    Vector3f brdf = (material->kDiffuse * textureColor) / M_PI;
 
+    //direct light
+    Vector3f directLigthing(0.0f),indirectLigthing(0.0f), Nt, Nb;
+
+    for(auto &obj : scene.objects)
+    {
+        if (obj->material.emission.x == 0 && obj->material.emission.y == 0 && obj->material.emission.z == 0) continue; // skip non light
+
+        Sphere *sphere = dynamic_cast<Sphere*>(obj.get());
+        Vector3f N = (sphere->getCenter() - isec.phit).normalize();
+        createCoordinateSystem(N, Nt, Nb);
+
+        float r1 = dis(gen);
+        float r2 = dis(gen);
+        float dist2 = (isec.phit - sphere->getCenter()).length(); dist2*=dist2;
+        float cos_a_max = sqrt(1 - (sphere->getRadius()*sphere->getRadius())/dist2);
+        float cos_a = 1 - r2*(1-cos_a_max);
+        float sin_a = sqrtf(1-cos_a*cos_a);
+        float phi = 2 * M_PI * r1;
+        float pdf = 1/(2*M_PI*(1-cos_a_max));
+
+        Vector3f sample(cos(phi)*sin_a, cos_a, sin(phi)*sin_a);
+        Vector3f toLight(
+                sample.x * Nb.x + sample.y * N.x + sample.z * Nt.x,
+                sample.x * Nb.y + sample.y * N.y + sample.z * Nt.y,
+                sample.x * Nb.z + sample.y * N.z + sample.z * Nt.z);
+
+        float cosTheta = isec.normal ^ toLight;
+        if( cosTheta > 0.0f )
+        {
+            float dist = (isec.phit - sphere->getCenter()).length() - sphere->getRadius() - bias;
+            if (!castShadowRay(Ray(isec.phit + bias * isec.normal, toLight), scene.objects, dist))
+            {
+                directLigthing += brdf * sphere->material.emission * cosTheta / pdf;
+            }
+        }
+    }
+
+    //indirect light
     createCoordinateSystem(isec.normal, Nt, Nb);
-
-    float r1 = distribution(generator); // this is cosi
-    float r2 = distribution(generator);
+    float r1 = dis(gen); // this is cosi
+    float r2 = dis(gen);
     Vector3f sample = uniformSampleHemisphere(r1, r2);
+    float pdf = 1 / (2 * M_PI);
     Vector3f sampleWorld(
             sample.x * Nb.x + sample.y * isec.normal.x + sample.z * Nt.x,
             sample.x * Nb.y + sample.y * isec.normal.y + sample.z * Nt.y,
@@ -318,10 +411,11 @@ Vector3f Render::diffuseReflection_GI(const Ray &, const Scene &scene, const uin
     Ray R;
     R.origin = isec.phit + bias * isec.normal;
     R.direction = sampleWorld;
-    indirectLigthing += r1 * rayTrace(R, scene, depth + 1) ;
+    indirectLigthing = brdf * rayTrace(R, scene, depth + 1, 0) * r1 / pdf;
 
-    // Texture
-    Vector3f textureColor = isec.object->texture(isec.phit, isec.idx);
+    if(directLigthing.x>material->kDiffuse.x) directLigthing.x=material->kDiffuse.x;
+    if(directLigthing.y>material->kDiffuse.y) directLigthing.y=material->kDiffuse.y;
+    if(directLigthing.z>material->kDiffuse.z) directLigthing.z=material->kDiffuse.z;
 
-    return material->emission + (2 * indirectLigthing) * material->kDiffuse * textureColor;
+    return indirectLigthing + directLigthing;
 }
