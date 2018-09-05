@@ -2,7 +2,7 @@
 Simple Ray Tracer 3D image render developed in pure C++ with no additional graphic API.
 
 ### Features
-* Phong model;
+* Phong model illumination;
 * Shadows;
 * Reflection;
 * Refraction;
@@ -11,11 +11,10 @@ Simple Ray Tracer 3D image render developed in pure C++ with no additional graph
 ### Video Demo
 https://www.youtube.com/watch?v=JMeM5K6cYeA
 
-### Images
+### Images Samples
 More samples in images directory.
 
-
-![ModifiedCornellBox|250x250](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/ModifiedCornellBox_0000.png)
+![Alt ModifiedCornellBox](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/ModifiedCornellBox_0000.png)
 ![Alt room](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/room_0000.png)
 ![Alt ballsOnTheMirror](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/ballsOnTheMirror.0000.jpg)
 ![Alt refraction](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/refraction.0000.png)
