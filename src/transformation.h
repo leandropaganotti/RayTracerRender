@@ -5,10 +5,10 @@
 #include "matrix.h"
 
 // object-to-world
-class ModelMatrix: public Matrix4x4f
+class Transformation: public Matrix4x4f
 {
 public:
-    ModelMatrix() = default;
+    Transformation() = default;
 
     void build(const Vector3f &translate, const Vector3f &rotate, const Vector3f &scale);
 

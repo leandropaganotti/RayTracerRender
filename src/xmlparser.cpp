@@ -423,7 +423,7 @@ void XMLParser::parseBox(xmlNode *xmlBoxNode, Box &box)
         {
             if (equals(node->name, "material"))
                 parseMaterial(node, box.material);
-            else if (equals(node->name, "model"))
+            else if (equals(node->name, "transformation"))
                 parseModel(node, box.getModel());
             else if (equals(node->name, "texture"))
                 parseTexture(node, box.getTex());
@@ -433,7 +433,7 @@ void XMLParser::parseBox(xmlNode *xmlBoxNode, Box &box)
     }
 }
 
-void XMLParser::parseModel(xmlNode *xmlModelNode, ModelMatrix &model)
+void XMLParser::parseModel(xmlNode *xmlModelNode, Transformation &model)
 {
     if(xmlModelNode == NULL)
     {
