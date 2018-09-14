@@ -24,7 +24,7 @@ Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t dept
 
     switch (isec.object->material.type) {
     case Material::Type::DIFFUSE:
-        return diffuseReflection_GI(ray, scene, depth, isec);
+        return diffuseMaterial(ray, scene, depth, isec);
     case Material::Type::SPECULAR:
         return specularMaterial(ray, scene, depth, isec);
     case Material::Type::MIRROR:
@@ -82,7 +82,6 @@ Vector3f Render::diffuseMaterial(const Ray &ray, const Scene &scene, const uint8
     const Vector3f &phit = isec.phit;
     const Vector3f normal = isec.normal.dot(ray.direction) > 0.0f ? -isec.normal: isec.normal;
     const Material &material = isec.object->material;
-
     // Texture
     Vector3f textureColor = isec.object->texture(phit, isec.idx);
 
@@ -239,7 +238,6 @@ void Render::render_omp(const Scene &scene)
 
     std::cout << std::endl;
     std::cout << "\r -> 0.00% completed" << std::flush;
-
     #pragma omp parallel for schedule(dynamic, 1) shared(count)
     for (size_t i = 0; i < options.height; ++i)
     {

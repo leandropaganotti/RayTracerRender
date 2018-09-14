@@ -1,5 +1,5 @@
-#ifndef MODEL_H
-#define MODEL_H
+#ifndef TRANSFORMATION_H
+#define TRANSFORMATION_H
 
 #include "vector.h"
 #include "matrix.h"
@@ -27,4 +27,4 @@ private:
     Matrix4x4f inverseTranspose;    // matrix for normals transformation
 };
 
-#endif // MODEL_H
+#endif // TRANSFORMATION_H

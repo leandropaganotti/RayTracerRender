@@ -160,6 +160,12 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
                 parseBox(node, *box);
                 scene.addObject(box);
             }
+            else if(equals(node->name, "model"))
+            {
+                Model *model = new Model();
+                parseModel(node, *model);
+                scene.addObject(model);
+            }
             else
             	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlSceneNode->name << "\'" << endl;
         }
@@ -239,7 +245,7 @@ void XMLParser::parseSphere(xmlNode *xmlSphereNode, Sphere & sphere)
 }
 
 void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, Material & material)
-{
+{    
     if(xmlMaterialNode == NULL)
     {
          cerr << "error: could not parse Material, xmlNode pointer is NULL" << endl;
@@ -279,7 +285,6 @@ void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, Material & material)
 		else
 			cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlMaterialNode->name << "\'" << endl;
 	}
-
 
     xmlNode *node = NULL;
     for (node = xmlMaterialNode->children; node; node = node->next)
@@ -360,7 +365,7 @@ void XMLParser::parsePlane(xmlNode *xmlPlaneNode, Plane & plane)
                 parseTexture(node, plane.getTex());
             else
             	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlPlaneNode->name << "\'" << endl;
-        }
+        }cerr << "error: could not parse Material, xmlNode pointer is NULL" << endl;
     }
 }
 
@@ -424,7 +429,7 @@ void XMLParser::parseBox(xmlNode *xmlBoxNode, Box &box)
             if (equals(node->name, "material"))
                 parseMaterial(node, box.material);
             else if (equals(node->name, "transformation"))
-                parseModel(node, box.getModel());
+                parseTransformation(node, box.getTransformation());
             else if (equals(node->name, "texture"))
                 parseTexture(node, box.getTex());
             else
@@ -433,9 +438,9 @@ void XMLParser::parseBox(xmlNode *xmlBoxNode, Box &box)
     }
 }
 
-void XMLParser::parseModel(xmlNode *xmlModelNode, Transformation &model)
+void XMLParser::parseTransformation(xmlNode *xmlTrnasformationNode, Transformation &transformation)
 {
-    if(xmlModelNode == NULL)
+    if(xmlTrnasformationNode == NULL)
     {
          cerr << "error: could not parse Model, xmlNode pointer is NULL" << endl;
          return;
@@ -443,7 +448,7 @@ void XMLParser::parseModel(xmlNode *xmlModelNode, Transformation &model)
 
     const xmlAttr *attr = NULL;
     Vector3f translate(0.0f), rotate(0.0f), scale(1.0f);
-    for (attr = xmlModelNode->properties; attr; attr = attr->next)
+    for (attr = xmlTrnasformationNode->properties; attr; attr = attr->next)
     {
         if (equals(attr->name, "translate"))
             translate = toVector(attr->children->content);
@@ -457,6 +462,37 @@ void XMLParser::parseModel(xmlNode *xmlModelNode, Transformation &model)
         else if (equals(attr->name, "scale"))
             scale = toVector(attr->children->content);
         else
+            cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlTrnasformationNode->name << "\'" << endl;
+    }
+
+    xmlNode *node = NULL;
+    for (node = xmlTrnasformationNode->children; node; node = node->next)
+    {
+        if (node->type == XML_ELEMENT_NODE)
+        {
+            cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlTrnasformationNode->name << "\'" << endl;
+        }
+    }
+    transformation.build(translate, rotate, scale);
+}
+
+void XMLParser::parseModel(xmlNode *xmlModelNode, Model &model)
+{
+    if(xmlModelNode == NULL)
+    {
+         cerr << "error: could not parse Model, xmlNode pointer is NULL" << endl;
+         return;
+    }
+
+    const xmlAttr *attr = NULL;
+    std::string name;
+    for (attr = xmlModelNode->properties; attr; attr = attr->next)
+    {
+        if (equals(attr->name, "name"))
+            name = (const char*)attr->children->content;
+        else if (equals(attr->name, "path"))
+            model.load((const char*)attr->children->content);
+        else
             cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlModelNode->name << "\'" << endl;
     }
 
@@ -465,8 +501,12 @@ void XMLParser::parseModel(xmlNode *xmlModelNode, Transformation &model)
     {
         if (node->type == XML_ELEMENT_NODE)
         {
-            cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlModelNode->name << "\'" << endl;
+            if (equals(node->name, "material"))
+                parseMaterial(node, model.material);
+            else
+            {
+                cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlModelNode->name << "\'" << endl;
+            }
         }
     }
-    model.build(translate, rotate, scale);
 }

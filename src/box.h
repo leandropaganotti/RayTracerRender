@@ -16,9 +16,9 @@ public:
     const Vector3f normal(const Vector3f &, size_t idx) const;
     const Vector3f texture(const Vector3f &phit, size_t idx) const;
 
-    Transformation& getModel()
+    Transformation& getTransformation()
     {
-        return model;
+        return transformation;
     }
 
     std::unique_ptr<Texture>& getTex();
@@ -27,7 +27,7 @@ private:
     Vector3f min;
     Vector3f max;
 
-    Transformation model;
+    Transformation transformation;
 
     std::unique_ptr<Texture> tex;
 };

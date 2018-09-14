@@ -14,8 +14,8 @@ bool Box::intersection(const Ray &ray, IntersectionData &isec) const
 {
     Ray r ;
 
-    r.origin = model.getInverse() * ray.origin;
-    r.direction = model.getInverse().multiVector(ray.direction).normalize();
+    r.origin = transformation.getInverse() * ray.origin;
+    r.direction = transformation.getInverse().multiVector(ray.direction).normalize();
 
     Vector3f invdir;
     invdir.x = 1.0f / r.direction.x;
@@ -54,7 +54,7 @@ bool Box::intersection(const Ray &ray, IntersectionData &isec) const
     if(tmin < 0) { isec.tnear = tmax; } else { isec.tnear = tmin; }
 
     Vector3f phit = r.origin + isec.tnear * r.direction;
-    phit = model * phit;
+    phit = transformation * phit;
     isec.tnear = (phit - ray.origin).length();
     isec.object = this;
     return true;
@@ -64,8 +64,8 @@ bool Box::intersection(const Ray &ray, float &tnear) const
 {
     Ray r ;
 
-    r.origin = model.getInverse() * ray.origin;
-    r.direction = model.getInverse().multiVector(ray.direction).normalize();
+    r.origin = transformation.getInverse() * ray.origin;
+    r.direction = transformation.getInverse().multiVector(ray.direction).normalize();
 
     Vector3f invdir;
     invdir.x = 1.0f / r.direction.x;
@@ -87,7 +87,7 @@ bool Box::intersection(const Ray &ray, float &tnear) const
     if(tmin < 0) { tnear = tmax; } else { tnear = tmin; }
 
     Vector3f phit = r.origin + tnear * r.direction;
-    phit = model * phit;
+    phit = transformation * phit;
     tnear = (phit - ray.origin).length();
 
     return true;
@@ -95,12 +95,12 @@ bool Box::intersection(const Ray &ray, float &tnear) const
 
 const Vector3f Box::normal(const Vector3f &, size_t idx) const
 {
-    if (idx == 1)      return model.multiVector(Vector3f(-1,0,0)).normalize();
-    else if (idx == 2) return model.multiVector(Vector3f(1,0,0)).normalize();
-    else if (idx == 3) return model.multiVector(Vector3f(0,-1,0)).normalize();
-    else if (idx == 4) return model.multiVector(Vector3f(0,1,0)).normalize();
-    else if (idx == 5) return model.multiVector(Vector3f(0,0,1)).normalize();
-    else               return model.multiVector(Vector3f(0,0,-1)).normalize();
+    if (idx == 1)      return transformation.multiVector(Vector3f(-1,0,0)).normalize();
+    else if (idx == 2) return transformation.multiVector(Vector3f(1,0,0)).normalize();
+    else if (idx == 3) return transformation.multiVector(Vector3f(0,-1,0)).normalize();
+    else if (idx == 4) return transformation.multiVector(Vector3f(0,1,0)).normalize();
+    else if (idx == 5) return transformation.multiVector(Vector3f(0,0,1)).normalize();
+    else               return transformation.multiVector(Vector3f(0,0,-1)).normalize();
 }
 
 
@@ -109,7 +109,7 @@ const Vector3f Box::texture(const Vector3f &phit, size_t idx) const
     if (tex)
     {
         float u=0, v=0;
-        Vector3f p = model.getInverse() * phit;
+        Vector3f p = transformation.getInverse() * phit;
 
 //        p.x *= model[0][0];
 //        p.y *= model[1][1];
