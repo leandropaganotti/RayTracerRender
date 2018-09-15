@@ -256,11 +256,11 @@ void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, Material & material)
     for (attr = xmlMaterialNode->properties; attr; attr = attr->next)
 	{
     	if (equals(attr->name, "kdiffuse"))
-    		material.kDiffuse = toVector(attr->children->content);
+    		material.kd = toVector(attr->children->content);
 		else if (equals(attr->name, "kspecular"))
-			material.kSpecular = toVector(attr->children->content);
+			material.ks = toVector(attr->children->content);
         else if (equals(attr->name, "emission"))
-            material.emission = toVector(attr->children->content);
+            material.Le = toVector(attr->children->content);
         else if (equals(attr->name, "specularHighlight"))
             material.specularHighlight = toFloat(attr->children->content);
 		else if (equals(attr->name, "shininess"))

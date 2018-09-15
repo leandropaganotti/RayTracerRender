@@ -4,10 +4,9 @@
 #include <vector>
 #include "vector.h"
 #include "ray.h"
+#include "texture.h"
 
 class Object;
-
-typedef std::vector<std::unique_ptr<Object>> ObjectVector;
 
 struct IntersectionData
 {
@@ -22,22 +21,26 @@ struct Material
 {
     enum class Type { DIFFUSE, SPECULAR, MIRROR, TRANSPARENT };
     Type type;
-    Vector3f kDiffuse;
-    Vector3f kSpecular;
-    Vector3f emission;
+    Vector3f ka;
+    Vector3f kd;
+    Vector3f ks;
+    Vector3f Le;    
     float specularHighlight;
     float shininess;
     float reflectivity;
     float refractiveIndex;
 
+    std::unique_ptr<Texture> tex;
+
+
     Material(const Vector3f &color={1.0})
     {
-        kDiffuse = color;
-        kSpecular = 1.0f;
-        emission = 0.0f;
-        specularHighlight = 1.0f;
+        kd = color;
+        ks = 1.0f;
+        Le = 0.0f;
+        specularHighlight = 0.0f;
         shininess = 30.0f;
-        reflectivity = 0.3f;
+        reflectivity = 0.0f;
         refractiveIndex = 1.55f;
         type = Type::DIFFUSE;
     }
@@ -60,5 +63,8 @@ public:
 
     Material material;
 };
+
+typedef std::vector<std::unique_ptr<Object>> ObjectVector;
+
 
 #endif // OBJECT_H

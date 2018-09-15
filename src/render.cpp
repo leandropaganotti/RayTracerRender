@@ -17,29 +17,6 @@ const Image &Render::getImage() const
     return image;
 }
 
-Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t depth, const uint8_t E)
-{
-    if(depth > scene.maxDepth) return Vector3f(0.0f);
-
-    IntersectionData isec;
-
-    if (!castRay(ray, scene.objects, isec))
-        return scene.bgcolor;
-
-    switch (isec.object->material.type) {
-    case Material::Type::DIFFUSE:
-        return diffuseReflection_GI(ray, scene, depth, isec, E);
-    case Material::Type::SPECULAR:
-        return specularMaterial(ray, scene, depth, isec);
-    case Material::Type::MIRROR:
-        return mirrorMaterial(ray, scene, depth, isec);
-    case Material::Type::TRANSPARENT:
-        return transparentMaterial(ray, scene, depth, isec);
-    default:
-        return Vector3f(0.0f);
-    }
-}
-
 inline
 bool Render::castRay(const Ray &ray, const ObjectVector &objects, IntersectionData &isec)
 {
@@ -81,7 +58,7 @@ bool Render::castShadowRay(const Ray &ray, const ObjectVector &objects, float tM
 }
 
 inline
-Vector3f Render::diffuseMaterial(const Ray &ray, const Scene &scene, const uint8_t, const IntersectionData &isec)
+Vector3f Render::phongReflection(const Ray &ray, const Scene &scene, const uint8_t, const IntersectionData &isec)
 {
     const Vector3f &phit = isec.phit;
     const Vector3f normal = isec.normal.dot(ray.direction) > 0.0f ? -isec.normal: isec.normal;
@@ -91,7 +68,7 @@ Vector3f Render::diffuseMaterial(const Ray &ray, const Scene &scene, const uint8
     Vector3f textureColor = isec.object->texture(phit, isec.idx);
 
     //ambient
-    Vector3f phitColor = material.kDiffuse * textureColor * scene.kAmbient;
+    Vector3f phitColor = material.kd * textureColor * scene.kAmbient;
 
     for(auto& light: scene.lights)
     {
@@ -103,7 +80,7 @@ Vector3f Render::diffuseMaterial(const Ray &ray, const Scene &scene, const uint8
             if (!castShadowRay(Ray(phit + bias * normal, toLight), scene.objects, light->distance(phit)))
             {
                 //diffuse
-                Vector3f diffuse = material.kDiffuse * textureColor * incidence;
+                Vector3f diffuse = material.kd * textureColor * incidence;
 
                 //specular
                 Vector3f toCamera = -ray.direction;
@@ -125,18 +102,18 @@ Vector3f Render::specularMaterial(const Ray &ray, const Scene &scene, const uint
     R.direction = reflect(ray.direction, isec.normal).normalize();
 
     Vector3f phitColor(0.0f);
-    phitColor = diffuseMaterial(ray, scene, depth, isec) * (1.0f - isec.object->material.reflectivity);
+    phitColor = phongReflection(ray, scene, depth, isec) * (1.0f - isec.object->material.reflectivity);
 
-    return phitColor + rayTrace(R, scene, depth + 1) * isec.object->material.kSpecular * isec.object->material.reflectivity;
+    return phitColor + rayTrace(R, scene, depth + 1) * isec.object->material.ks * isec.object->material.reflectivity;
 }
 
 inline
-Vector3f Render::mirrorMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
+Vector3f Render::specularReflection(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
 {
     Ray R;
     R.origin = isec.phit + bias * isec.normal;
     R.direction = reflect(ray.direction, isec.normal).normalize();
-    return rayTrace(R, scene, depth + 1) * isec.object->material.kSpecular;
+    return rayTrace(R, scene, depth + 1) * isec.object->material.ks;
 }
 
 inline
@@ -220,60 +197,6 @@ Vector3f Render::transparentMaterial(const Ray &ray, const Scene &scene, const u
 
 void Render::render(const Scene &scene)
 {
-    size_t nthreads = options.getHeight();
-
-    std::vector<std::thread> threads;
-
-    size_t nrows = options.getHeight() / nthreads, i;
-
-    for( i=0 ; i < nthreads - 1u; ++i)
-    {
-        threads.push_back( std::thread( &Render::renderSingleThread, this, &scene, i*nrows, (i+1) * nrows) );
-    }
-    threads.push_back( std::thread( &Render::renderSingleThread, this, &scene, i*nrows, options.getHeight()) );
-
-    for (auto& thread : threads) thread.join();
-}
-
-//void Render::render_omp(const Scene &scene)
-//{
-//    const size_t nrays = roundf(sqrtf(scene.nprays));
-
-//    const float grid = 1.0f / nrays;
-
-//    int count = 0;
-
-//    std::cout << std::endl;
-//    std::cout << "\r -> 0.00% completed" << std::flush;
-
-//    #pragma omp parallel for schedule(dynamic, 1) shared(count)
-//    for (size_t i = 0; i < options.height; ++i)
-//    {
-//        std::ostringstream stdStream;
-//        for (size_t j = 0; j < options.width; ++j)
-//        {
-//            image.at(i, j) = 0;
-//            for (size_t y=0; y < nrays; ++y)
-//            {
-//                unsigned short Xi[3]={0,0,(short unsigned int)(y*y*y)};
-//                for (size_t x=0; x < nrays; ++x)
-//                {
-//                    float randX = erand48(Xi) * grid;
-//                    float randY = erand48(Xi) * grid;
-//                    Ray ray(options.from, getRayDirection(i + grid*y + randY, j + grid*x + randX));
-//                    image.at(i, j) += rayTrace(ray, scene, 1);
-//                }
-//            }
-//            image.at(i, j) /= nrays*nrays;
-//        }
-//        ++count;
-//        stdStream << "\r -> " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) << count/float(options.height) * 100.0f << "% completed";
-//        std::cout << stdStream.str() << std::flush;
-//    }
-//}
-
-void Render::render_omp(const Scene &scene)
-{
     const float grid = 2;
     const float gridSize = 1/grid;
 
@@ -313,59 +236,56 @@ void Render::render_omp(const Scene &scene)
     }
 }
 
-void Render::renderSingleThread(const Scene *scene, size_t startRow, size_t endRow)
+Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t depth)
 {
-    if (scene == nullptr) return;
+    if(depth > scene.maxDepth) return Vector3f(0.0f);
 
-    Ray ray;
-    ray.origin = options.from;
+    IntersectionData isec;
 
-    // nrays defines a grid nrays x nrays
-    float dx = 1.0f / ( 1.0f + scene->nprays);
-    float dy = 1.0f / ( 1.0f + scene->nprays);
+    if (!castRay(ray, scene.objects, isec))
+        return scene.bgcolor;
 
-    for (size_t i = startRow; i < endRow; ++i)
-    {
-        for (size_t j = 0; j < options.width; ++j)
-        {
-            image.at(i, j) = 0;
-            for (size_t y=1; y <= scene->nprays; ++y)
-            {
-                for (size_t x=1; x <= scene->nprays; ++x)
-                {
-                    ray.direction = getRayDirection(i+dy*y, j+dx*x);
-                    image.at(i, j) += rayTrace(ray, *scene, 1);
-                }
-            }
-            image.at(i, j) /= scene->nprays*scene->nprays;
-        }
-    }
+    Material::Type type = isec.object->material.type;
+
+    if (type == Material::Type::DIFFUSE)
+        return phongReflection(ray, scene, depth, isec);
+    else if (type == Material::Type::MIRROR)
+        return 0;
+    else if (type == Material::Type::SPECULAR){
+
+        float c = 1 - (isec.normal ^ -ray.direction);
+        float R0 = isec.object->material.reflectivity;
+        float R = R0 + (1-R0) * c * c * c * c * c;
+        float T = 1-R;
+        return 0.7*phongReflection(ray, scene, depth, isec) + 0.3*specularReflection(ray, scene, depth, isec);
+    }else
+        return 0;
 }
 
 inline
-Vector3f Render::diffuseReflection_GI(const Ray &, const Scene &scene, const uint8_t depth, const IntersectionData &isec, const uint8_t E)
+Vector3f Render::diffuseReflection_GI(const Ray &, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
 {
     const Material *material = &isec.object->material;
 
-    if (material->emission.x != 0 || material->emission.y != 0 || material->emission.z != 0)
+    if (material->Le.x != 0 || material->Le.y != 0 || material->Le.z != 0)
     {
-        float max = material->emission.x>material->emission.y &&
-                    material->emission.x>material->emission.z ? material->emission.x :
-                    material->emission.y>material->emission.z ? material->emission.y :
-                    material->emission.z; // max refl
-        return material->emission/max;
+        float max = material->Le.x>material->Le.y &&
+                    material->Le.x>material->Le.z ? material->Le.x :
+                    material->Le.y>material->Le.z ? material->Le.y :
+                    material->Le.z; // max refl
+        return material->Le/max;
     }
     // Texture
     Vector3f textureColor = isec.object->texture(isec.phit, isec.idx);
 
-    Vector3f brdf = (material->kDiffuse * textureColor) / M_PI;
+    Vector3f brdf = (material->kd * textureColor) / M_PI;
 
     //direct light
     Vector3f directLigthing(0.0f),indirectLigthing(0.0f), Nt, Nb;
 
     for(auto &obj : scene.objects)
     {
-        if (obj->material.emission.x == 0 && obj->material.emission.y == 0 && obj->material.emission.z == 0) continue; // skip non light
+        if (obj->material.Le.x == 0 && obj->material.Le.y == 0 && obj->material.Le.z == 0) continue; // skip non light
 
         Sphere *sphere = dynamic_cast<Sphere*>(obj.get());
         Vector3f N = (sphere->getCenter() - isec.phit).normalize();
@@ -392,7 +312,7 @@ Vector3f Render::diffuseReflection_GI(const Ray &, const Scene &scene, const uin
             float dist = (isec.phit - sphere->getCenter()).length() - sphere->getRadius() - bias;
             if (!castShadowRay(Ray(isec.phit + bias * isec.normal, toLight), scene.objects, dist))
             {
-                directLigthing += brdf * sphere->material.emission * cosTheta / pdf;
+                directLigthing += brdf * sphere->material.Le * cosTheta / pdf;
             }
         }
     }
@@ -411,11 +331,11 @@ Vector3f Render::diffuseReflection_GI(const Ray &, const Scene &scene, const uin
     Ray R;
     R.origin = isec.phit + bias * isec.normal;
     R.direction = sampleWorld;
-    indirectLigthing = brdf * rayTrace(R, scene, depth + 1, 0) * r1 / pdf;
+    indirectLigthing = brdf * rayTrace(R, scene, depth + 1) * r1 / pdf;
 
-    if(directLigthing.x>material->kDiffuse.x) directLigthing.x=material->kDiffuse.x;
-    if(directLigthing.y>material->kDiffuse.y) directLigthing.y=material->kDiffuse.y;
-    if(directLigthing.z>material->kDiffuse.z) directLigthing.z=material->kDiffuse.z;
+    if(directLigthing.x>material->kd.x) directLigthing.x=material->kd.x;
+    if(directLigthing.y>material->kd.y) directLigthing.y=material->kd.y;
+    if(directLigthing.z>material->kd.z) directLigthing.z=material->kd.z;
 
     return indirectLigthing + directLigthing;
 }

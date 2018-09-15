@@ -46,8 +46,7 @@ public:
     float attenuation(const Vector3f &point) const
     {
         float d = distance(point);
-//      return 1.0f / ( 1.0f + k * d * d);
-        return 1.0f / (4 * M_PI * d*d);
+        return 1.0f / ( 1.0f + k * d * d);
     }
 
     Vector3f getPos() const;
