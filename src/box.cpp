@@ -6,7 +6,7 @@
 
 Box::Box() : min(-0.5f, -0.5f, 0.5f), max(0.5f,0.5f,-0.5f)
 {
-    material.kDiffuse = 1;
+    material.kd = 1;
     material.type = Material::Type::DIFFUSE;
 }
 

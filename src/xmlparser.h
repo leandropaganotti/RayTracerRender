@@ -30,6 +30,8 @@ public:
 
     void parsePointLight(xmlNode * xmlPointLightNode, PointLight & light);
 
+    void parseDistantLight(xmlNode * xmlDistantLightNode, DistantLight & light);
+
     void parsePlane(xmlNode * xmlPlaneNode, Plane & plane);
 
     void parseTexture(xmlNode * xmlTextureNode, std::unique_ptr<Texture> &tex);

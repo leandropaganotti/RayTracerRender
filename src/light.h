@@ -45,7 +45,6 @@ public:
     }
     float attenuation(const Vector3f &point) const
     {
-        //attenuation = 1.0f / ( 1.0f + scene.lights[i].attenuation * distToLight * distToLight);
         float d = distance(point);
         return 1.0f / ( 1.0f + k * d * d);
     }
@@ -81,12 +80,18 @@ public:
     }
     Vector3f direction(const Vector3f &) const
     {
-        return dir;
+        return -dir;
     }
     Vector3f intensity(const Vector3f &) const
     {
         return strength * color;
     }
+    Vector3f getDir() const;
+    void     setDir(const Vector3f &value);
+    Vector3f getColor() const;
+    void     setColor(const Vector3f &value);
+    float    getStrength() const;
+    void     setStrength(float value);
 };
 
 #endif // LIGHT_H
