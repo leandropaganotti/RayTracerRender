@@ -3,7 +3,7 @@
 #include <string.h>
 #include "xmlparser.h"
 
-Scene::Scene(): name("unamed"), ambientIndex(1.0f), kAmbient(0.1), nprays(1), nsrays(1), nshrays(1), maxDepth(3)  {}
+Scene::Scene(): name("unamed"), ambientIndex(1.0f), ka(0.1), spp(1), grid(1), maxDepth(3), bgColor(0){}
 
 void Scene::addObject(Object *obj)
 {
@@ -23,7 +23,7 @@ void Scene::load(const char *filename)
 std::ostream &operator <<(std::ostream &os, const Scene &scene)
 {
     os << "Scene: " << scene.cameraOptions << std::endl <<
-          "ambientIndex: " << scene.ambientIndex << ", ambientCoefficient: " << scene.kAmbient;
+          "ambientIndex: " << scene.ambientIndex << ", ambientCoefficient: " << scene.ka;
     return os;
 }
 

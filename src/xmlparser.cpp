@@ -106,16 +106,16 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
     {
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
-        else if (equals(attr->name, "nprays"))
-             scene.nprays = toInt(attr->children->content);
-        else if (equals(attr->name, "nsrays"))
-             scene.nsrays = toInt(attr->children->content);
-        else if (equals(attr->name, "nshrays"))
-             scene.nshrays = toInt(attr->children->content);
+        else if (equals(attr->name, "ssp"))
+             scene.spp = toInt(attr->children->content);
         else if (equals(attr->name, "index"))
              scene.ambientIndex = toFloat(attr->children->content);
         else if (equals(attr->name, "maxdepth"))
              scene.maxDepth = toInt(attr->children->content);
+        else if (equals(attr->name, "bgcolor"))
+             scene.bgColor = toVector(attr->children->content);
+        else if (equals(attr->name, "ka"))
+             scene.ka = toFloat(attr->children->content);
         else
             cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlSceneNode->name << "\':" << name << endl;
     }
@@ -128,9 +128,7 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
     {
         if (node->type == XML_ELEMENT_NODE)
         {
-            if (equals(node->name, "bgColor"))
-                scene.bgcolor = toVector(node->children->content);
-            else if (equals(node->name, "CameraOptions"))
+            if (equals(node->name, "CameraOptions"))
                 parseCameraOptions(node, scene.cameraOptions);
             else if (equals(node->name, "Sphere"))
             {
@@ -153,7 +151,7 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
                 scene.addLight(light);
             }
             else if(equals(node->name, "kAmbient"))
-                scene.kAmbient = toFloat(node->children->content);
+                scene.ka = toFloat(node->children->content);
             else if(equals(node->name, "plane"))
             {
                 Plane *plane = new Plane();
@@ -262,7 +260,7 @@ void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, Material & material)
         else if (equals(attr->name, "emission"))
             material.Le = toVector(attr->children->content);
         else if (equals(attr->name, "specularHighlight"))
-            material.specularHighlight = toFloat(attr->children->content);
+            material.highlight = toFloat(attr->children->content);
 		else if (equals(attr->name, "shininess"))
 			material.shininess = toFloat(attr->children->content);
 		else if (equals(attr->name, "reflectivity"))
@@ -274,9 +272,7 @@ void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, Material & material)
 			if (equals(attr->children->content, "DIFFUSE"))
 				material.type = Material::Type::DIFFUSE;
 			else if (equals(attr->children->content, "SPECULAR"))
-				material.type = Material::Type::SPECULAR;
-			else if (equals(attr->children->content, "MIRROR"))
-				material.type = Material::Type::MIRROR;
+				material.type = Material::Type::SPECULAR;			
 			else if (equals(attr->children->content, "TRANSPARENT"))
 				material.type = Material::Type::TRANSPARENT;
 			else

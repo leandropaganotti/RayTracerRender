@@ -68,7 +68,7 @@ Vector3f Render::phongReflection(const Ray &ray, const Scene &scene, const uint8
     Vector3f textureColor = isec.object->texture(phit, isec.idx);
 
     //ambient
-    Vector3f phitColor = material.kd * textureColor * scene.kAmbient;
+    Vector3f phitColor = material.kd * textureColor * scene.ka;
 
     for(auto& light: scene.lights)
     {
@@ -85,7 +85,7 @@ Vector3f Render::phongReflection(const Ray &ray, const Scene &scene, const uint8
                 //specular
                 Vector3f toCamera = -ray.direction;
                 Vector3f reflected = reflect(-toLight, normal);
-                Vector3f specular = material.specularHighlight * pow(std::max(0.0f, toCamera ^ reflected), material.shininess);
+                Vector3f specular = material.highlight * pow(std::max(0.0f, toCamera ^ reflected), material.shininess);
 
                 phitColor +=  light->intensity(phit) * (diffuse + specular);
             }
@@ -138,7 +138,7 @@ Vector3f Render::transparentMaterial(const Ray &ray, const Scene &scene, const u
                 //specular
                 Vector3f toCamera = -ray.direction;
                 Vector3f reflected = reflect(-toLight, normal);
-                Vector3f specular = material.specularHighlight * pow(std::max(0.0f, toCamera ^ reflected), material.shininess);
+                Vector3f specular = material.highlight * pow(std::max(0.0f, toCamera ^ reflected), material.shininess);
                 phitColor +=  light->intensity(phit) * specular;
             }
         }
@@ -197,10 +197,10 @@ Vector3f Render::transparentMaterial(const Ray &ray, const Scene &scene, const u
 
 void Render::render(const Scene &scene)
 {
-    const float grid = 2;
+    const float grid = scene.grid;
     const float gridSize = 1/grid;
 
-    const size_t nrays = roundf(scene.nprays/(grid*grid));
+    const size_t nrays = roundf(scene.spp/(grid*grid));
 
     int count = 0;
 
@@ -243,23 +243,28 @@ Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t dept
     IntersectionData isec;
 
     if (!castRay(ray, scene.objects, isec))
-        return scene.bgcolor;
+        return scene.bgColor;
 
     Material::Type type = isec.object->material.type;
 
     if (type == Material::Type::DIFFUSE)
-        return phongReflection(ray, scene, depth, isec);
-    else if (type == Material::Type::MIRROR)
-        return 0;
-    else if (type == Material::Type::SPECULAR){
-
+        return phongReflection(ray, scene, depth, isec);    
+    else if (type == Material::Type::SPECULAR)
+    {
         float c = 1 - (isec.normal ^ -ray.direction);
         float R0 = isec.object->material.reflectivity;
         float R = R0 + (1-R0) * c * c * c * c * c;
         float T = 1-R;
-        return 0.7*phongReflection(ray, scene, depth, isec) + 0.3*specularReflection(ray, scene, depth, isec);
-    }else
-        return 0;
+        return T*phongReflection(ray, scene, depth, isec) + R*specularReflection(ray, scene, depth, isec);
+    }
+    else if (type == Material::Type::TRANSPARENT)
+    {
+        return transparentMaterial(ray, scene, depth, isec);
+    }
+    else
+    {
+        return Vector3f(0.0f);
+    }
 }
 
 inline

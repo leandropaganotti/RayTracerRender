@@ -17,14 +17,13 @@ public:
 
     void load(const char* filename);
 
-    std::string     name;
     float           ambientIndex;
-    float           kAmbient;
-    size_t          nprays;
-    size_t          nsrays;
-    size_t          nshrays;
+    float           ka;
+    size_t          spp;
+    size_t          grid;
     size_t          maxDepth;
-    Vector3f        bgcolor;
+    Vector3f        bgColor;
+    std::string     name;
 
     CameraOptions   cameraOptions;
     ObjectVector    objects;

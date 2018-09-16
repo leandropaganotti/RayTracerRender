@@ -19,26 +19,24 @@ struct IntersectionData
 
 struct Material
 {
-    enum class Type { DIFFUSE, SPECULAR, MIRROR, TRANSPARENT };
+    enum class Type { DIFFUSE, SPECULAR, TRANSPARENT };
     Type type;
-    Vector3f ka;
     Vector3f kd;
     Vector3f ks;
     Vector3f Le;    
-    float specularHighlight;
+    float highlight;
     float shininess;
     float reflectivity;
     float refractiveIndex;
 
     std::unique_ptr<Texture> tex;
 
-
     Material(const Vector3f &color={1.0})
     {
         kd = color;
         ks = 1.0f;
         Le = 0.0f;
-        specularHighlight = 0.0f;
+        highlight = 0.0f;
         shininess = 30.0f;
         reflectivity = 0.0f;
         refractiveIndex = 1.55f;
