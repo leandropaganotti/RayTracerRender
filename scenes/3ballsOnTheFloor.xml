@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scene name="3ballsOnTheFloor">
-    <ambientIndex>1.0</ambientIndex>
-    <kAmbient>0.1</kAmbient>
-    <CameraOptions position="0,5,13" lookingat="0" fov="35" width="1920" height="1080"></CameraOptions>
-    <PointLight position="0,3,6.5" color="1" strength="1.5" k="0.01"></PointLight>
+<scene name="3ballsOnTheFloor" grid="2" ssp="16" index="1.0" maxdepth="3" bgcolor="0" ka="0.1">
+    <CameraOptions position="0,2,13" lookingat="0" fov="35" width="1280" height="720"></CameraOptions>
+    <PointLight position="0,3,6.5" color="1" strength="1.5" k="0.05"></PointLight>
     <Sphere name="left" position="-2.5,1,2.5" radius="1">
-        <material type="specular" kdiffuse="1,0,0" kspecular="1" shininess="250" reflectivity="0.3"></material>
-    </Sphere> 
+        <material type="specular" kdiffuse="1,0,0" kspecular="1" shininess="250" reflectivity="0.03" specularHighlight="1"></material>
+    </Sphere>
     <Sphere name="middle" position="0,1.5,0" radius="1.5">
-        <material type="specular" kdiffuse="0,1,0" kspecular="1" shininess="250" reflectivity="0.5"></material>
+        <material type="specular" kdiffuse="0,1,0" kspecular="1" shininess="250" reflectivity="0.3" specularHighlight="1"></material>
     </Sphere>
     <Sphere name="right" position="2.5, 1, 2.5" radius="1">
-        <material type="specular" kdiffuse="0,0,1" kspecular="1" shininess="250" reflectivity="0.3"></material>
+        <material type="specular" kdiffuse="0,0,1" kspecular="1" shininess="250" reflectivity="0.03" specularHighlight="1"></material>
     </Sphere>
     <Plane name="floor" point="0" normal="0,1,0" >
         <material type="specular" kdiffuse="1" kspecular="1" shininess="150" reflectivity="0.3"></material>

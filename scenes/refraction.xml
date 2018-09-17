@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scene name="refraction" nprays="6" maxdepth="5" index="1.0">
-    <kAmbient>0.1</kAmbient>
+<scene name="refraction" grid="2" ssp="16" maxdepth="5" index="1.0" bgcolor="0">
     <CameraOptions position="0,3.5,7.5" lookingat="0, 0.5, 0" fov="45" width="1920" height="1080"></CameraOptions>
-    <PointLight position="0,2.5,1.5" color="1" strength="1.5" k="0.001"></PointLight>
+    <PointLight position="0,5.5,0" color="1" strength="1.5" k="0.001"></PointLight>
     <Sphere name="glass" position="0, 1.2, 0" radius="0.8">
         <material type="transparent" kspecular="1" shininess="150" refractiveIndex="1.55" specularHighlight="1"></material>
     </Sphere>
