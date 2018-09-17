@@ -3,17 +3,28 @@
 
 std::vector<Vertex>   Mesh::vertexBuffer;
 
+std::vector<Vertex>   Mesh::normalBuffer;
+
 Mesh::Mesh(const Vector3f &color):
 	Object(color)
 {
 
 }
 
-Face::Face(size_t v0, size_t v1, size_t v2, const Vector3f &normal): v0(v0), v1(v1), v2(v2), normal(normal)
+Face::Face(size_t v0, size_t v1, size_t v2, size_t nv0, size_t nv1, size_t nv2): v0(v0), v1(v1), v2(v2), nv0(nv0), nv1(nv1), nv2(nv2)
 {
     size_t vbs = Mesh::vertexBuffer.size();
     if(v0 >= vbs || v1 >= vbs || v2 >= vbs)
         throw std::out_of_range("Vertex index is out of Range");
+
+    size_t nbs = Mesh::normalBuffer.size();
+    if(nv0 >= nbs || nv1 >= nbs || nv2 >= nbs)
+        throw std::out_of_range("Normal index is out of Range");
+
+    nf = (Mesh::normalBuffer[nv0] + Mesh::normalBuffer[nv1] + Mesh::normalBuffer[nv2]).normalize();
+
+
+    area = ((Mesh::vertexBuffer[v1] - Mesh::vertexBuffer[v0]) % (Mesh::vertexBuffer[v2] - Mesh::vertexBuffer[v0])).length() / 2;
 }
 
 size_t Mesh::addVertex(const Vertex &v)
@@ -22,6 +33,12 @@ size_t Mesh::addVertex(const Vertex &v)
     size_t idx = vertexBuffer.size() - 1;
     vertices.push_back(idx);
     return idx;
+}
+
+size_t Mesh::addNormal(const Vertex &v)
+{
+    normalBuffer.push_back(v);
+    return normalBuffer.size() - 1;
 }
 
 size_t Mesh::addFace(const Face &t)
@@ -67,9 +84,15 @@ bool Mesh::intersection(const Ray& ray, float &tnear) const
     return tnear < FLT_MAX ? true : false;
 }
 
-const Vector3f Mesh::normal(const Vector3f &, size_t idx) const
-{
-    return faces[idx].normal;
+const Vector3f Mesh::normal(const Vector3f &phit, size_t idx) const
+{    
+    float u = (((Mesh::vertexBuffer[faces[idx].v2] - Mesh::vertexBuffer[faces[idx].v1]) % (phit - Mesh::vertexBuffer[faces[idx].v1])).length() / 2) / faces[idx].area;
+    float v = (((Mesh::vertexBuffer[faces[idx].v0] - Mesh::vertexBuffer[faces[idx].v2]) % (phit - Mesh::vertexBuffer[faces[idx].v2])).length() / 2) / faces[idx].area;
+    float w = 1 - u - v;
+
+    return u*Mesh::normalBuffer[faces[idx].nv0] + v*Mesh::normalBuffer[faces[idx].nv1] +w*Mesh::normalBuffer[faces[idx].nv2];
+
+    //return faces[idx].nf;
 }
 
 std::ostream &operator <<(std::ostream &os, const Mesh &m)
@@ -88,7 +111,7 @@ std::ostream &operator <<(std::ostream &os, const Mesh &m)
 
 std::ostream& operator <<(std::ostream &os, const Face &f)
 {
-    return os << f.v0 << " " << f.v1 << " " << f.v2 << " ---> " << Mesh::vertexBuffer[f.v0] << Mesh::vertexBuffer[f.v1] << Mesh::vertexBuffer[f.v2] << "  " << f.normal ;
+    return os << f.v0 << " " << f.v1 << " " << f.v2 << " ---> " << Mesh::vertexBuffer[f.v0] << Mesh::vertexBuffer[f.v1] << Mesh::vertexBuffer[f.v2] << "  " << f.nf ;
 }
 
 inline

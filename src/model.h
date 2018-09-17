@@ -1,30 +1,21 @@
 #ifndef MODEL_H
 #define MODEL_H
+#include <string>
+#include "mesh.h"
+#include "transformation.h"
 
-#include "vector.h"
-#include "matrix.h"
-
-// object-to-world
-class ModelMatrix: public Matrix4x4f
+class Model: public Mesh
 {
+
+
 public:
-    ModelMatrix() = default;
+    Model();
 
-    void build(const Vector3f &translate, const Vector3f &rotate, const Vector3f &scale);
+    void load(std::string path);
 
-    const Matrix4x4f& getInverse() const
-    {
-        return inverse;
-    }
+    // Object interface
+public:
 
-    const Matrix4x4f& getInverseTranspose() const
-    {
-        return inverseTranspose;
-    }
-
-private:
-    Matrix4x4f inverse;             // world-to-object
-    Matrix4x4f inverseTranspose;    // matrix for normals transformation
 };
 
 #endif // MODEL_H

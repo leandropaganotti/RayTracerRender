@@ -23,14 +23,17 @@ class Face
 {
 public:
 	Face() = delete;
-    Face(size_t v0, size_t v1, size_t v2, const Vector3f& normal);
+    Face(size_t v0, size_t v1, size_t v2, size_t nv0, size_t nv1, size_t nv2);
 
     bool intersection(const Ray &ray, float &tnear) const;
 
     size_t v0, v1, v2;  // 3 vertex indexes
-    Vector3f normal;    // normal
+    size_t nv0, nv1, nv2;  // 3 vertex indexes
+    Vector3f nf;    // normal
 
     friend std::ostream &operator <<(std::ostream &os, const Face &f);
+
+    float area;
 };
 
 class Mesh: public Object
@@ -38,15 +41,17 @@ class Mesh: public Object
 protected:
     friend class Face;
 
-    static std::vector<Vertex>   vertexBuffer;
-
     std::vector<size_t> vertices;
     std::vector<Face>   faces;
 
 public:
+    static std::vector<Vertex>   vertexBuffer;
+    static std::vector<Vertex>   normalBuffer;
+
     Mesh(const Vector3f &color={1.0f});
 
     size_t addVertex(const Vertex& v);
+    size_t addNormal(const Vertex& v);
     size_t addFace(const Face& t);
 
     bool  intersection(const Ray& ray, IntersectionData& isec) const;

@@ -9,8 +9,8 @@
 #include "sphere.h"
 #include "plane.h"
 #include "box.h"
+#include "transformation.h"
 #include "model.h"
-
 using namespace std;
 
 class XMLParser
@@ -38,7 +38,9 @@ public:
 
     void parseBox(xmlNode * xmlBoxNode, Box & box);
 
-    void parseModel(xmlNode * xmlModelNode, ModelMatrix & model);
+    void parseTransformation(xmlNode * xmlTrnasformationNode, Transformation & model);
+
+    void parseModel(xmlNode * xmlModelNode, Model & model);
 
 private:
     bool     equals(const xmlChar *lhs, const char *rhs);
