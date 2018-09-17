@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scene name="ptexture" grid="2" ssp="16" index="1.0" maxdepth="5" bgcolor="0,1,1" ka="0.1">
-    <CameraOptions position="0,1.5,6" lookingat="0, 1, 0" fov="35" width="1920" height="1080"></CameraOptions>
+    <CameraOptions position="0,1.5,6" lookingat="0, 1, 0" fov="35" width="1280" height="720"></CameraOptions>
     <PointLight position="0,2,2" color="1" strength="1.0" k="0.001"></PointLight>
     <plane name="floor" point="-100, 0, 100" normal="0,1,0">
         <material type="specular" kdiffuse="0.75, 0.25, 0.25" kspecular="1" reflectivity="0.03"></material>
