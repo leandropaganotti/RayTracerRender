@@ -104,7 +104,7 @@ Vector3f Render::specularMaterial(const Ray &ray, const Scene &scene, const uint
     Vector3f phitColor(0.0f);
     phitColor = phongReflection(ray, scene, depth, isec) * (1.0f - isec.object->material.reflectivity);
 
-    return phitColor + rayTrace(R, scene, depth + 1) * isec.object->material.ks * isec.object->material.reflectivity;
+    return phitColor + trace(R, scene, depth + 1) * isec.object->material.ks * isec.object->material.reflectivity;
 }
 
 inline
@@ -113,7 +113,7 @@ Vector3f Render::specularReflection(const Ray &ray, const Scene &scene, const ui
     Ray R;
     R.origin = isec.phit + bias * isec.normal;
     R.direction = reflect(ray.direction, isec.normal).normalize();
-    return rayTrace(R, scene, depth + 1) * isec.object->material.ks;
+    return trace(R, scene, depth + 1) * isec.object->material.ks;
 }
 
 inline
@@ -180,7 +180,7 @@ Vector3f Render::transparentMaterial(const Ray &ray, const Scene &scene, const u
         T.origin = phit - bias * normal;
         T.direction = n * ray.direction + (n * cosi - cost) * normal;
         T.direction.normalize();
-        phitColor += rayTrace(T, scene, depth + 1) * kt;
+        phitColor += trace(T, scene, depth + 1) * kt;
     }
 
 
@@ -190,7 +190,7 @@ Vector3f Render::transparentMaterial(const Ray &ray, const Scene &scene, const u
         Ray R;
         R.origin = phit + bias * normal;
         R.direction = reflect(ray.direction, normal).normalize();
-        phitColor += rayTrace(R, scene, depth + 1) * kr;
+        phitColor += trace(R, scene, depth + 1) * kr;
     }
     return phitColor;
 }
@@ -198,7 +198,7 @@ Vector3f Render::transparentMaterial(const Ray &ray, const Scene &scene, const u
 void Render::render(const Scene &scene)
 {
     const float grid = scene.grid;
-    const float gridSize = 1/grid;
+    const float gridSize = 1.0f/grid;
 
     const size_t nrays = roundf(scene.spp/(grid*grid));
 
@@ -210,33 +210,34 @@ void Render::render(const Scene &scene)
     #pragma omp parallel for schedule(dynamic, 1) shared(count)
     for (size_t i = 0; i < options.height; ++i)
     {
-        std::ostringstream stdStream;
+        std::ostringstream ss;
         for (size_t j = 0; j < options.width; ++j)
         {
             image.at(i, j) = 0;
-            for (size_t y=0; y < grid; ++y)
+            for (size_t ii=0; ii < grid; ++ii)
             {
-                for (size_t x=0; x < grid; ++x)
+                unsigned short Xi[3]={0,0,(short unsigned int)(ii*ii*ii)};
+                for (size_t jj=0; jj < grid; ++jj)
                 {
                     for (size_t n = 0; n < nrays; ++n)
                     {
-                        float r1 = dis(gen) * gridSize;
-                        float r2 = dis(gen) * gridSize;
-                        //std::cout << i+grid*gridSize+r1 << " " << j+grid*gridSize+r2 << std::endl;
-                        Ray ray(options.from, getRayDirection(i+x*gridSize+r1, j+y*gridSize+r2));
-                        image.at(i, j) += rayTrace(ray, scene, 1);
+                        float r1 = erand48(Xi) * gridSize;
+                        float r2 = erand48(Xi) * gridSize;
+                        //std::cout << r1 << " " << r2 <<  " " << gridSize  << std::endl;
+                        Ray ray(options.from, getRayDirection(i + gridSize*ii + r1, j + gridSize*jj + r2));
+                        image.at(i, j) += trace(ray, scene, 1);
                     }
                 }
             }
             image.at(i, j) /= nrays*grid*grid;
         }
         ++count;
-        stdStream << "\r -> " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) << count/float(options.height) * 100.0f << "% completed";
-        std::cout << stdStream.str() << std::flush;
+        ss << "\r -> " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) << count/float(options.height) * 100.0f << "% completed";
+        std::cout << ss.str() << std::flush;
     }
 }
 
-Vector3f Render::rayTrace(const Ray &ray, const Scene &scene, const uint8_t depth)
+Vector3f Render::trace(const Ray &ray, const Scene &scene, const uint8_t depth)
 {
     if(depth > scene.maxDepth) return Vector3f(0.0f);
 
@@ -336,7 +337,7 @@ Vector3f Render::diffuseReflection_GI(const Ray &, const Scene &scene, const uin
     Ray R;
     R.origin = isec.phit + bias * isec.normal;
     R.direction = sampleWorld;
-    indirectLigthing = brdf * rayTrace(R, scene, depth + 1) * r1 / pdf;
+    indirectLigthing = brdf * trace(R, scene, depth + 1) * r1 / pdf;
 
     if(directLigthing.x>material->kd.x) directLigthing.x=material->kd.x;
     if(directLigthing.y>material->kd.y) directLigthing.y=material->kd.y;

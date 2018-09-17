@@ -17,7 +17,7 @@ class Render: public Camera
     Vector3f specularReflection(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec);
     Vector3f transparentMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec);
 
-    Vector3f rayTrace(const Ray &ray, const Scene &scene, const uint8_t depth);
+    Vector3f trace(const Ray &ray, const Scene &scene, const uint8_t depth);
     Vector3f globalIlumination(const Scene &scene);
     Vector3f diffuseReflection_GI(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec);
 

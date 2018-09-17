@@ -108,6 +108,8 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "ssp"))
              scene.spp = toInt(attr->children->content);
+        else if (equals(attr->name, "grid"))
+             scene.grid = toInt(attr->children->content);
         else if (equals(attr->name, "index"))
              scene.ambientIndex = toFloat(attr->children->content);
         else if (equals(attr->name, "maxdepth"))
