@@ -223,7 +223,6 @@ void Render::render(const Scene &scene)
                     {
                         float r1 = erand48(Xi) * gridSize;
                         float r2 = erand48(Xi) * gridSize;
-                        //std::cout << r1 << " " << r2 <<  " " << gridSize  << std::endl;
                         Ray ray(options.from, getRayDirection(i + gridSize*ii + r1, j + gridSize*jj + r2));
                         image.at(i, j) += trace(ray, scene, 1);
                     }
