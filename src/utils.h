@@ -6,6 +6,8 @@
 #include <math.h>
 #include <sys/time.h>
 #include <cmath>
+#include <sstream>
+#include <vector>
 
 # define PI           3.14159265358979323846  /* pi */
 
@@ -212,5 +214,17 @@ std::string timestamp2string(std::time_t timestamp, const char* format="%FT%T")
     char buffer[64] = { };
     strftime( buffer, 64, format, &t );
     return buffer;
+}
+
+inline
+std::vector<std::string> split(const std::string &s, char delim) {
+  std::stringstream ss(s);
+  std::string item;
+  std::vector<std::string> elems;
+  while (std::getline(ss, item, delim)) {
+    //elems.push_back(item);
+    elems.push_back(std::move(item)); // if C++11 (based on comment from @mchiasson)
+  }
+  return std::move(elems);
 }
 #endif // UTILS

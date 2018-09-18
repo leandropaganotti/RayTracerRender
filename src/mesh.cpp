@@ -47,6 +47,11 @@ size_t Mesh::addFace(const Face &t)
     return faces.size() - 1;
 }
 
+void Mesh::clear()
+{
+
+}
+
 bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
 {   
     float tnear;

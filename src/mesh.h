@@ -54,6 +54,8 @@ public:
     size_t addNormal(const Vertex& v);
     size_t addFace(const Face& t);
 
+    void clear();
+
     bool  intersection(const Ray& ray, IntersectionData& isec) const;
     bool  intersection(const Ray& ray, float& tnear) const;
     const Vector3f normal(const Vector3f &, size_t idx) const;
