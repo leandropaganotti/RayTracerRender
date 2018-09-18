@@ -1,55 +1,50 @@
 #include "mesh.h"
 #include <float.h>
 
-std::vector<Vertex>   Mesh::vertexBuffer;
-
-std::vector<Vertex>   Mesh::normalBuffer;
-
 Mesh::Mesh(const Vector3f &color):
 	Object(color)
 {
 
 }
 
-Face::Face(size_t v0, size_t v1, size_t v2, size_t nv0, size_t nv1, size_t nv2): v0(v0), v1(v1), v2(v2), nv0(nv0), nv1(nv1), nv2(nv2)
+void Mesh::addVertex(const Vector3f &v)
 {
-    size_t vbs = Mesh::vertexBuffer.size();
+    vertices.push_back(v);
+}
+
+void Mesh::addNormal(const Vector3f &v)
+{
+    normals.push_back(v);
+}
+
+void Mesh::addFace(size_t v0, size_t v1, size_t v2, size_t nv0, size_t nv1, size_t nv2)
+{
+    Triangle tri;
+
+    size_t vbs = vertices.size();
     if(v0 >= vbs || v1 >= vbs || v2 >= vbs)
         throw std::out_of_range("Vertex index is out of Range");
 
-    size_t nbs = Mesh::normalBuffer.size();
+    size_t nbs = normals.size();
     if(nv0 >= nbs || nv1 >= nbs || nv2 >= nbs)
         throw std::out_of_range("Normal index is out of Range");
 
-    nf = (Mesh::normalBuffer[nv0] + Mesh::normalBuffer[nv1] + Mesh::normalBuffer[nv2]).normalize();
-
-
-    area = ((Mesh::vertexBuffer[v1] - Mesh::vertexBuffer[v0]) % (Mesh::vertexBuffer[v2] - Mesh::vertexBuffer[v0])).length() / 2;
-}
-
-size_t Mesh::addVertex(const Vertex &v)
-{
-    vertexBuffer.push_back(v);
-    size_t idx = vertexBuffer.size() - 1;
-    vertices.push_back(idx);
-    return idx;
-}
-
-size_t Mesh::addNormal(const Vertex &v)
-{
-    normalBuffer.push_back(v);
-    return normalBuffer.size() - 1;
-}
-
-size_t Mesh::addFace(const Face &t)
-{
-    faces.push_back(t);
-    return faces.size() - 1;
+    tri.v0 = v0;
+    tri.v1 = v1;
+    tri.v2 = v2;
+    tri.nv0 = nv0;
+    tri.nv1 = nv1;
+    tri.nv2 = nv2;
+    tri.nf = (normals[nv0] + normals[nv1] + normals[nv2]).normalize();
+    tri.area = ((vertices[v1] - vertices[v0]) % (vertices[v2] - vertices[v0])).length() / 2;
+    faces.push_back(tri);
 }
 
 void Mesh::clear()
 {
-
+    vertices.clear();
+    normals.clear();
+    faces.clear();
 }
 
 bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
@@ -58,7 +53,7 @@ bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
     isec.tnear = FLT_MAX;
     for (size_t i=0 ; i < faces.size(); ++i)
     {
-        if (faces[i].intersection(ray, tnear))
+        if (faces[i].intersection(vertices, ray, tnear))
         {
             if (tnear < isec.tnear)
             {
@@ -81,7 +76,7 @@ bool Mesh::intersection(const Ray& ray, float &tnear) const
     tnear = FLT_MAX;
     for (size_t i=0 ; i < faces.size(); ++i)
     {
-        if (faces[i].intersection(ray, t))
+        if (faces[i].intersection(vertices, ray, t))
         {
             if (t < tnear) tnear = t;
         }
@@ -91,13 +86,11 @@ bool Mesh::intersection(const Ray& ray, float &tnear) const
 
 const Vector3f Mesh::normal(const Vector3f &phit, size_t idx) const
 {    
-    float u = (((Mesh::vertexBuffer[faces[idx].v2] - Mesh::vertexBuffer[faces[idx].v1]) % (phit - Mesh::vertexBuffer[faces[idx].v1])).length() / 2) / faces[idx].area;
-    float v = (((Mesh::vertexBuffer[faces[idx].v0] - Mesh::vertexBuffer[faces[idx].v2]) % (phit - Mesh::vertexBuffer[faces[idx].v2])).length() / 2) / faces[idx].area;
+    float u = (((vertices[faces[idx].v2] - vertices[faces[idx].v1]) % (phit - vertices[faces[idx].v1])).length() / 2) / faces[idx].area;
+    float v = (((vertices[faces[idx].v0] - vertices[faces[idx].v2]) % (phit - vertices[faces[idx].v2])).length() / 2) / faces[idx].area;
     float w = 1 - u - v;
 
-    return u*Mesh::normalBuffer[faces[idx].nv0] + v*Mesh::normalBuffer[faces[idx].nv1] +w*Mesh::normalBuffer[faces[idx].nv2];
-
-    //return faces[idx].nf;
+    return u*normals[faces[idx].nv0] + v*normals[faces[idx].nv1] +w*normals[faces[idx].nv2];
 }
 
 std::ostream &operator <<(std::ostream &os, const Mesh &m)
@@ -105,7 +98,7 @@ std::ostream &operator <<(std::ostream &os, const Mesh &m)
     os << "Mesh:" << std::endl;
     os << "|Vertices: " << std::endl;
     for(size_t i= 0 ; i < m.vertices.size(); ++i)
-        std::cout << "||" << i << ":" << m.vertices[i] << " ---> " << m.vertexBuffer[m.vertices[i]] << std::endl;
+        std::cout << "||" << i << ":" << m.vertices[i] << " ---> " << m.vertices[i] << std::endl;
 
     os << "|Faces: " << std::endl;
     for(size_t i= 0 ; i < m.faces.size(); ++i)
@@ -114,14 +107,18 @@ std::ostream &operator <<(std::ostream &os, const Mesh &m)
     return os ;
 }
 
-std::ostream& operator <<(std::ostream &os, const Face &f)
+std::ostream& operator <<(std::ostream &os, const Mesh::Triangle &f)
 {
-    return os << f.v0 << " " << f.v1 << " " << f.v2 << " ---> " << Mesh::vertexBuffer[f.v0] << Mesh::vertexBuffer[f.v1] << Mesh::vertexBuffer[f.v2] << "  " << f.nf ;
+    return os << f.v0 << " " << f.v1 << " " << f.v2 << " - " << "  " << f.nf ;
 }
 
 inline
-bool Triangle::intersection(const Vector3f &p0, const Vector3f &p1, const Vector3f &p2, const Ray &ray, float &tnear)
+bool Mesh::Triangle::intersection(const std::vector<Vector3f> &vertices, const Ray &ray, float &tnear) const
 {
+    const Vector3f &p0 = vertices[ v0 ];
+    const Vector3f &p1 = vertices[ v1 ];
+    const Vector3f &p2 = vertices[ v2 ];
+
     float A = p0.x - p1.x;
     float B = p0.y - p1.y;
     float C = p0.z - p1.z;
@@ -160,14 +157,4 @@ bool Triangle::intersection(const Vector3f &p0, const Vector3f &p1, const Vector
     tnear = -(F*AKJB + E*JCAL + D*BLKC  ) / denon;
 
     return tnear > 0.0f ? true : false;
-}
-
-inline
-bool Face::intersection(const Ray &ray, float &tnear) const
-{
-    const Vector3f *p0 = &Mesh::vertexBuffer[ v0 ];
-    const Vector3f *p1 = &Mesh::vertexBuffer[ v1 ];
-    const Vector3f *p2 = &Mesh::vertexBuffer[ v2 ];
-
-    return Triangle::intersection(*p0, *p1, *p2, ray, tnear);
 }
