@@ -2,9 +2,11 @@
 #define MESH_H
 #include <vector>
 #include "plane.h"
+#include "box.h"
 
 class Mesh: public Object
 {
+    Box aabb;
 public:    
     struct Triangle
     {
@@ -33,6 +35,9 @@ public:
     std::vector<Vector3f>   vertices;
     std::vector<Vector3f>   normals;
     std::vector<Triangle>   faces;
+
+    void computeAABB();
+
 };
 
 
