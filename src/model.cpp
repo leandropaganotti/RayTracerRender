@@ -14,4 +14,5 @@ Model::Model(const Vector3f &color): Mesh(color)
 void Model::load(std::string path)
 {
     OBJParser::Parse(path, *this);
+    computeAABB();
 }

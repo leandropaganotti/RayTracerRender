@@ -48,8 +48,12 @@ void Mesh::clear()
 }
 
 bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
-{   
+{
     float tnear;
+
+    if (!aabb.intersection(ray, tnear))
+        return false;
+
     isec.tnear = FLT_MAX;
     for (size_t i=0 ; i < faces.size(); ++i)
     {
@@ -71,7 +75,10 @@ bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
 }
 
 bool Mesh::intersection(const Ray& ray, float &tnear) const
-{
+{    
+    if (!aabb.intersection(ray, tnear))
+        return false;
+
     float t;
     tnear = FLT_MAX;
     for (size_t i=0 ; i < faces.size(); ++i)
@@ -121,9 +128,9 @@ void Mesh::computeAABB()
     scale.y = maxY - minY;
     scale.z = maxZ - minZ;
 
-    translate.x = (maxX - minX) / 2.0f;
-    translate.y = (maxY - minY) / 2.0f;
-    translate.z = (maxZ - minZ) / 2.0f;
+    translate.x = minX + (maxX - minX) / 2.0f;
+    translate.y = minY + (maxY - minY) / 2.0f;
+    translate.z = minZ + (maxZ - minZ) / 2.0f;
 
     aabb.getTransformation().build(translate, {}, scale);
 }
