@@ -1,9 +1,9 @@
 #include "scene.h"
 #include <stdio.h>
 #include <string.h>
-#include "xmlparser.h"
+#include <xmlparser.h>
 
-Scene::Scene(): name("unamed"), ambientIndex(1.0f), ka(0.1), spp(1), grid(1), maxDepth(3), bgColor(0){}
+Scene::Scene(): name("unamed"), ambientIndex(1.0f), ka(0.1), spp(1), grid(1), maxDepth(3), bgColor(0), shade(Shade::PHONG){}
 
 void Scene::addObject(Object *obj)
 {

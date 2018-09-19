@@ -118,6 +118,17 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
              scene.bgColor = toVector(attr->children->content);
         else if (equals(attr->name, "ka"))
              scene.ka = toFloat(attr->children->content);
+        else if (equals(attr->name, "shade"))
+        {
+            if (equals(attr->children->content, "gi"))
+                scene.shade = Shade::GI;
+            else if (equals(attr->children->content, "gi_d"))
+                scene.shade = Shade::GI_D;
+            else if (equals(attr->children->content, "gi_i"))
+                scene.shade = Shade::GI_I;
+            else
+                scene.shade = Shade::PHONG;
+        }
         else
             cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlSceneNode->name << "\':" << name << endl;
     }
@@ -175,7 +186,7 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
             else
             	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlSceneNode->name << "\'" << endl;
         }
-    }
+    }    
 }
 
 void XMLParser::parseCameraOptions(xmlNode *xmlCameraOptionsNode, CameraOptions & options)
@@ -267,7 +278,7 @@ void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, Material & material)
 			material.ks = toVector(attr->children->content);
         else if (equals(attr->name, "emission"))
             material.Le = toVector(attr->children->content);
-        else if (equals(attr->name, "specularHighlight"))
+        else if (equals(attr->name, "highlight"))
             material.highlight = toFloat(attr->children->content);
 		else if (equals(attr->name, "shininess"))
 			material.shininess = toFloat(attr->children->content);
@@ -282,7 +293,7 @@ void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, Material & material)
 			else if (equals(attr->children->content, "SPECULAR"))
 				material.type = Material::Type::SPECULAR;			
 			else if (equals(attr->children->content, "TRANSPARENT"))
-				material.type = Material::Type::TRANSPARENT;
+				material.type = Material::Type::TRANSPARENT;            
 			else
 				cerr << "unrecognized material type \'" << attr->children->content << "\'" << endl;
 		}

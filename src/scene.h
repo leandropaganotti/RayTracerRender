@@ -6,6 +6,7 @@
 #include "object.h"
 #include "light.h"
 #include "camera.h"
+#include "consts.h"
 
 class Scene
 {
@@ -24,11 +25,11 @@ public:
     size_t          grid;
     size_t          maxDepth;
     Vector3f        bgColor;    
+    Shade           shade;
 
     CameraOptions   cameraOptions;
     ObjectVector    objects;
     LightVector     lights;
-
 
     friend std::ostream &operator <<(std::ostream &os, const Scene &scene);
 };

@@ -6,7 +6,7 @@
 #include <sstream>
 #include "sphere.h"
 #include <iostream>
-
+#include "consts.h"
 
 std::random_device rd;  //Will be used to obtain a seed for the random number engine
 std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
@@ -91,19 +91,6 @@ Vector3f Render::phongReflection(const Ray &ray, const Scene &scene, const uint8
         }
     }
     return phitColor;
-}
-
-inline
-Vector3f Render::specularMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
-{
-    Ray R;
-    R.origin = isec.phit + bias * isec.normal;
-    R.direction = reflect(ray.direction, isec.normal).normalize();
-
-    Vector3f phitColor(0.0f);
-    phitColor = phongReflection(ray, scene, depth, isec) * (1.0f - isec.object->material.reflectivity);
-
-    return phitColor + trace(R, scene, depth + 1) * isec.object->material.ks * isec.object->material.reflectivity;
 }
 
 inline
@@ -246,7 +233,12 @@ Vector3f Render::trace(const Ray &ray, const Scene &scene, const uint8_t depth)
     Material::Type type = isec.object->material.type;
 
     if (type == Material::Type::DIFFUSE)
-        return phongReflection(ray, scene, depth, isec);    
+    {
+        if (scene.shade == Shade::PHONG)
+            return phongReflection(ray, scene, depth, isec);
+        else
+            return pathTrace(ray, scene, depth, isec);
+    }
     else if (type == Material::Type::SPECULAR)
     {
         float c = 1 - (isec.normal ^ -ray.direction);
@@ -258,7 +250,7 @@ Vector3f Render::trace(const Ray &ray, const Scene &scene, const uint8_t depth)
     else if (type == Material::Type::TRANSPARENT)
     {
         return transparentMaterial(ray, scene, depth, isec);
-    }
+    }    
     else
     {
         return Vector3f(0.0f);
@@ -266,7 +258,7 @@ Vector3f Render::trace(const Ray &ray, const Scene &scene, const uint8_t depth)
 }
 
 inline
-Vector3f Render::diffuseReflection_GI(const Ray &, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
+Vector3f Render::pathTrace(const Ray &, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
 {
     const Material *material = &isec.object->material;
 
