@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 #include "render.h"
+#include "transformation.h"
 
 using namespace std;
 
@@ -49,7 +50,7 @@ int main(int argc, char **argv)
     for (unsigned i=0; i < nimages; ++i)
     {
         cout << "\n" << i+1 << "/" << nimages << ": at " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) <<  i*angle << "°" << flush;
-        camera.lookAt( T(to) * Ry(deg2rad( i*angle )) * T(-to) * from, to); // rotate around y-axis
+        camera.lookAt( Transformation::T(to) * Transformation::Ry(deg2rad( i*angle )) * Transformation::T(-to) * from, to); // rotate around y-axis
 
         auto start = chrono::steady_clock::now();       
         render.render(scene);

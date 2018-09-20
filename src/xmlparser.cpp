@@ -414,7 +414,7 @@ void XMLParser::parsePlane(xmlNode *xmlPlaneNode, Plane & plane)
                 parseTexture(node, plane.getTex());
             else
             	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlPlaneNode->name << "\'" << endl;
-        }cerr << "error: could not parse Material, xmlNode pointer is NULL" << endl;
+        }
     }
 }
 
@@ -478,7 +478,7 @@ void XMLParser::parseBox(xmlNode *xmlBoxNode, Box &box)
             if (equals(node->name, "material"))
                 parseMaterial(node, box.material);
             else if (equals(node->name, "transformation"))
-                parseTransformation(node, box.getTransformation());
+                parseTransformation(node, box);
             else if (equals(node->name, "texture"))
                 parseTexture(node, box.getTex());
             else
@@ -522,7 +522,7 @@ void XMLParser::parseTransformation(xmlNode *xmlTrnasformationNode, Transformati
             cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlTrnasformationNode->name << "\'" << endl;
         }
     }
-    transformation.build(translate, rotate, scale);
+    transformation.setTransformation(translate, rotate, scale);
 }
 
 void XMLParser::parseModel(xmlNode *xmlModelNode, Model &model)

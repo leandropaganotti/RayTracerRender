@@ -14,8 +14,8 @@ bool Box::intersection(const Ray &ray, IntersectionData &isec) const
 {
     Ray r ;
 
-    r.origin = transformation.getInverse() * ray.origin;
-    r.direction = transformation.getInverse().multiVector(ray.direction).normalize();
+    r.origin = inverse * ray.origin;
+    r.direction = inverse.multiVector(ray.direction).normalize();
 
     Vector3f invdir;
     invdir.x = 1.0f / r.direction.x;
@@ -64,8 +64,8 @@ bool Box::intersection(const Ray &ray, float &tnear) const
 {
     Ray r ;
 
-    r.origin = transformation.getInverse() * ray.origin;
-    r.direction = transformation.getInverse().multiVector(ray.direction).normalize();
+    r.origin = inverse * ray.origin;
+    r.direction = inverse.multiVector(ray.direction).normalize();
 
     Vector3f invdir;
     invdir.x = 1.0f / r.direction.x;
@@ -109,7 +109,7 @@ const Vector3f Box::texture(const Vector3f &phit, size_t idx) const
     if (tex)
     {
         float u=0, v=0;
-        Vector3f p = transformation.getInverse() * phit;
+        Vector3f p = inverse * phit;
 
 //        p.x *= model[0][0];
 //        p.y *= model[1][1];

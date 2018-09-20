@@ -5,6 +5,8 @@
 #include "vector.h"
 #include "ray.h"
 #include "texture.h"
+#include "matrix.h"
+#include "transformation.h"
 
 class Object;
 
@@ -44,8 +46,8 @@ struct Material
     }
 };
 
-class Object
-{   
+class Object: public Transformation
+{       
 public:
     Object(const Vector3f &color={1.0}): material(color) { }
     virtual ~Object() = default;
@@ -59,7 +61,7 @@ public:
     	return Vector3f(1.0f);
     }
 
-    Material material;
+    Material material;    
 };
 
 typedef std::vector<std::unique_ptr<Object>> ObjectVector;

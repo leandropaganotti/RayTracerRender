@@ -132,7 +132,7 @@ void Mesh::computeAABB()
     translate.y = minY + (maxY - minY) / 2.0f;
     translate.z = minZ + (maxZ - minZ) / 2.0f;
 
-    aabb.getTransformation().build(translate, {}, scale);
+    aabb.setTransformation(translate, {}, scale);
 }
 
 std::ostream &operator <<(std::ostream &os, const Mesh &m)
