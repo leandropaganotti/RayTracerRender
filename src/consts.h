@@ -2,9 +2,8 @@
 #define CONSTS_H
 
 enum class Shade {  PHONG,
-                    GI,     // Global Ilumination: Direct + Indirect Light
-                    GI_D,   // Global Ilumination: Direct Light only
-                    GI_I    // Global Ilumination: Indirect Light only
+                    GI,         // Global Ilumination: Indirect Light
+                    GI_DIRECT   // Global Ilumination: Direct + Indirect Light
                  };
 
 

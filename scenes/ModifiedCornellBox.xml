@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scene name="ModifiedCornellBox" grid="2" ssp="16" index="1.0" maxdepth="5" bgcolor="0" ka="0.1">
+<scene name="ModifiedCornellBox" grid="8" ssp="4096" index="1.0" maxdepth="5" bgcolor="0" ka="0.1" shade="gi">
     <CameraOptions position="0,1.7,5" lookingat="0,1.7,0" fov="50" width="640" height="480"></CameraOptions>
     <Sphere name="mirrorBall" position="-2,0.8,-1.5" radius="0.8">
-        <material type="mirror" kspecular="0.9"></material>
+        <material type="specular" kspecular="0.9" reflectivity="1"></material>
     </Sphere>
     <Sphere name="glassBall" position="1.8,1.5,0.2" radius="0.5">
         <material type="transparent" refractiveIndex="1.5" shininess="150" kspecular="1"></material>
@@ -27,7 +27,7 @@
         <material type="diffuse" kdiffuse="0.75" ></material>
     </plane>
     <Box>
-        <model translate="1.8,0.5,0.2" rotate="0, 45, 0" scale="1, 1, 1"></model>
+        <transformation translate="1.8,0.5,0.2" rotate="0, 45, 0" scale="1, 1, 1"></transformation>
         <material type="diffuse" kdiffuse="1"></material>
     </Box>
 
@@ -38,8 +38,8 @@
         <material type="diffuse" kdiffuse="0,0,1"></material>
     </Sphere>
     <Box>
-        <model translate="0,3.5,0" rotate="0" scale="5, 0.1, 1.5"></model>
-        <material type="diffuse" kdiffuse="1" emission="5"></material>
+        <transformation translate="0,3.5,0" rotate="0" scale="5, 0.1, 1.5"></transformation>
+        <material type="diffuse" kdiffuse="1" emission="8"></material>
     </Box>
 </scene>
 

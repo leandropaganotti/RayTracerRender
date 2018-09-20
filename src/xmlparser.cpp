@@ -122,10 +122,8 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
         {
             if (equals(attr->children->content, "gi"))
                 scene.shade = Shade::GI;
-            else if (equals(attr->children->content, "gi_d"))
-                scene.shade = Shade::GI_D;
-            else if (equals(attr->children->content, "gi_i"))
-                scene.shade = Shade::GI_I;
+            else if (equals(attr->children->content, "gi_direct"))
+                scene.shade = Shade::GI_DIRECT;
             else
                 scene.shade = Shade::PHONG;
         }

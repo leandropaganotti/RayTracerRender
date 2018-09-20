@@ -264,11 +264,13 @@ Vector3f Render::pathTrace(const Ray &, const Scene &scene, const uint8_t depth,
 
     if (material->Le.x != 0 || material->Le.y != 0 || material->Le.z != 0)
     {
-        float max = material->Le.x>material->Le.y &&
-                    material->Le.x>material->Le.z ? material->Le.x :
-                    material->Le.y>material->Le.z ? material->Le.y :
-                    material->Le.z; // max refl
-        return material->Le/max;
+        return material->Le;
+        /* this here for better direct sample */
+//        float max = material->Le.x>material->Le.y &&
+//                    material->Le.x>material->Le.z ? material->Le.x :
+//                    material->Le.y>material->Le.z ? material->Le.y :
+//                    material->Le.z; // max refl
+//        return material->Le/max;
     }
     // Texture
     Vector3f textureColor = isec.object->texture(isec.phit, isec.idx);
@@ -278,7 +280,7 @@ Vector3f Render::pathTrace(const Ray &, const Scene &scene, const uint8_t depth,
     //direct light
     Vector3f directLigthing(0.0f),indirectLigthing(0.0f), Nt, Nb;
 
-    if( scene.shade == Shade::GI || scene.shade == Shade::GI_D)
+    if( scene.shade == Shade::GI_DIRECT)
     for(auto &obj : scene.objects)
     {
         if (obj->material.Le.x == 0 && obj->material.Le.y == 0 && obj->material.Le.z == 0) continue; // skip non light
@@ -313,25 +315,21 @@ Vector3f Render::pathTrace(const Ray &, const Scene &scene, const uint8_t depth,
         }
     }
 
-    if( scene.shade == Shade::GI || scene.shade == Shade::GI_I)
-    {
-        //indirect light
-        createCoordinateSystem(isec.normal, Nt, Nb);
-        float r1 = dis(gen); // this is cosi
-        float r2 = dis(gen);
-        Vector3f sample = uniformSampleHemisphere(r1, r2);
-        float pdf = 1 / (2 * M_PI);
-        Vector3f sampleWorld(
-                sample.x * Nb.x + sample.y * isec.normal.x + sample.z * Nt.x,
-                sample.x * Nb.y + sample.y * isec.normal.y + sample.z * Nt.y,
-                sample.x * Nb.z + sample.y * isec.normal.z + sample.z * Nt.z);
+    //indirect light
+    createCoordinateSystem(isec.normal, Nt, Nb);
+    float r1 = dis(gen); // this is cosi
+    float r2 = dis(gen);
+    Vector3f sample = uniformSampleHemisphere(r1, r2);
+    float pdf = 1 / (2 * M_PI);
+    Vector3f sampleWorld(
+            sample.x * Nb.x + sample.y * isec.normal.x + sample.z * Nt.x,
+            sample.x * Nb.y + sample.y * isec.normal.y + sample.z * Nt.y,
+            sample.x * Nb.z + sample.y * isec.normal.z + sample.z * Nt.z);
 
-        Ray R;
-        R.origin = isec.phit + bias * isec.normal;
-        R.direction = sampleWorld;
-        indirectLigthing = brdf * trace(R, scene, depth + 1) * r1 / pdf;
-    }
-
+    Ray R;
+    R.origin = isec.phit + bias * isec.normal;
+    R.direction = sampleWorld;
+    indirectLigthing = brdf * trace(R, scene, depth + 1) * r1 / pdf;
 
     if(directLigthing.x>material->kd.x) directLigthing.x=material->kd.x;
     if(directLigthing.y>material->kd.y) directLigthing.y=material->kd.y;
