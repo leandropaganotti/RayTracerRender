@@ -34,7 +34,7 @@ public:
 
     void parsePlane(xmlNode * xmlPlaneNode, Plane & plane);
 
-    void parseTexture(xmlNode * xmlTextureNode, std::unique_ptr<Texture> &tex);
+    void parseTexture(xmlNode * xmlTextureNode, std::shared_ptr<Texture> &tex);
 
     void parseBox(xmlNode * xmlBoxNode, Box & box);
 

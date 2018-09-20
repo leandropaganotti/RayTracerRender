@@ -7,7 +7,7 @@ ChessBoard::ChessBoard(const Vector3f &color1, const Vector3f &color2, float row
 
 }
 
-Vector3f ChessBoard::get(float u, float v) const
+const Vector3f& ChessBoard::get(float u, float v) const
 {
     float s = u*cos(deg2rad(angle)) - v*sin(deg2rad(angle));
     float t = v*cos(deg2rad(angle)) + u*sin(deg2rad(angle));
@@ -24,7 +24,7 @@ Tiles::Tiles(const Vector3f &colorTile, const Vector3f &colorEdge, float rows, f
 
 }
 
-Vector3f Tiles::get(float u, float v) const
+const Vector3f& Tiles::get(float u, float v) const
 {
     float s = u*cos(deg2rad(angle)) - v*sin(deg2rad(angle));
     float t = v*cos(deg2rad(angle)) + u*sin(deg2rad(angle));

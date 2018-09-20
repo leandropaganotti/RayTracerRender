@@ -1,11 +1,4 @@
 #include "sphere.h"
-#include <math.h>
-#include "utils.h"
-
-std::unique_ptr<Texture> &Sphere::getTex()
-{
-    return tex;
-}
 
 Sphere::Sphere(const Vector3f &center, const float &radius, const Vector3f &color) :
     Object(color), center(center), radius(radius), radius2(radius * radius)
@@ -66,18 +59,6 @@ const Vector3f Sphere::normal(const Vector3f &phit, size_t) const
     return (phit-center).normalize();
 }
 
-const Vector3f Sphere::texture(const Vector3f& phit, size_t) const
-{
-	if(tex)
-	{
-		Vector3f d = (phit-center).normalize();
-		float u = 0.5 + atan2f(d.z, d.x) / (2.0f * PI);
-		float v = 0.5 - asinf(d.y) / PI;
-		return tex->get(u, v);
-	}
-	return Vector3f(1.0f);
-}
-
 //       analytic solution
 //       Vec3f L = orig - center;
 //       float a = dotProduct(dir, dir);
@@ -89,3 +70,6 @@ const Vector3f Sphere::texture(const Vector3f& phit, size_t) const
 //       if (t0 < 0) return false;
 //       tnear = t0;
 //       return true;
+
+
+

@@ -252,7 +252,11 @@ void XMLParser::parseSphere(xmlNode *xmlSphereNode, Sphere & sphere)
         	if (equals(node->name, "material"))
                 parseMaterial(node, sphere.material);
             else if (equals(node->name, "texture"))
-                parseTexture(node, sphere.getTex());
+            {
+                std::shared_ptr<Texture> tex;
+                parseTexture(node, tex);
+                sphere.setTexture(tex);
+            }
             else
             	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlSphereNode->name << "\'" << endl;
         }
@@ -409,14 +413,18 @@ void XMLParser::parsePlane(xmlNode *xmlPlaneNode, Plane & plane)
         	if (equals(node->name, "material"))
                 parseMaterial(node, plane.material);
             else if (equals(node->name, "texture"))
-                parseTexture(node, plane.getTex());
+            {
+                std::shared_ptr<Texture> tex;
+                parseTexture(node, tex);
+                plane.setTexture(tex);
+            }
             else
             	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlPlaneNode->name << "\'" << endl;
         }
     }
 }
 
-void XMLParser::parseTexture(xmlNode *xmlTextureNode, std::unique_ptr<Texture> &tex)
+void XMLParser::parseTexture(xmlNode *xmlTextureNode, std::shared_ptr<Texture> &tex)
 {
     if(xmlTextureNode == NULL)
     {
@@ -478,7 +486,11 @@ void XMLParser::parseBox(xmlNode *xmlBoxNode, Box &box)
             else if (equals(node->name, "transformation"))
                 parseTransformation(node, box);
             else if (equals(node->name, "texture"))
-                parseTexture(node, box.getTex());
+            {
+                std::shared_ptr<Texture> tex;
+                parseTexture(node, tex);
+                box.setTexture(tex);
+            }
             else
             	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlBoxNode->name << "\'" << endl;
         }

@@ -7,6 +7,8 @@
 #include "texture.h"
 #include "matrix.h"
 #include "transformation.h"
+#include <utility>
+#include "consts.h"
 
 class Object;
 
@@ -31,8 +33,6 @@ struct Material
     float reflectivity;
     float refractiveIndex;
 
-    std::unique_ptr<Texture> tex;
-
     Material(const Vector3f &color={1.0})
     {
         kd = color;
@@ -48,23 +48,45 @@ struct Material
 
 class Object: public Transformation
 {       
+    std::shared_ptr<Texture> tex;
+    virtual const std::pair<float, float> texUV(const Vector3f &, size_t) const;
+
 public:
     Object(const Vector3f &color={1.0}): material(color) { }
     virtual ~Object() = default;
 
     virtual bool intersection(const Ray& ray, IntersectionData &isec) const = 0;
     virtual bool intersection(const Ray& ray, float &tnear) const = 0;
-    virtual const Vector3f normal(const Vector3f &phit, size_t idx) const = 0;
 
-    virtual const Vector3f texture(const Vector3f &, size_t) const
-    {
-    	return Vector3f(1.0f);
-    }
+    virtual const Vector3f normal(const Vector3f &phit, size_t idx) const = 0;
+    virtual const Vector3f& texture(const Vector3f &phit, size_t idx) const;
 
     Material material;    
+    void setTexture(std::shared_ptr<Texture> tex);
 };
 
 typedef std::vector<std::unique_ptr<Object>> ObjectVector;
 
+inline
+const std::pair<float, float> Object::texUV(const Vector3f &, size_t) const
+{
+    return std::make_pair(0,0);
+}
+
+inline
+const Vector3f &Object::texture(const Vector3f &phit, size_t idx) const
+{
+    if (!tex) return Color::WHITE;
+
+    float u, v;
+    std::tie(u, v) = texUV(phit, idx);
+    return tex->get(u, v) ;
+}
+
+inline
+void Object::setTexture(std::shared_ptr<Texture> tex)
+{
+    this->tex = tex;
+}
 
 #endif // OBJECT_H

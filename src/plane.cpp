@@ -39,29 +39,4 @@ bool Plane::intersection(const Vector3f &O, const Vector3f &n, const Ray &ray, f
     return false;
 }
 
-std::unique_ptr<Texture>& Plane::getTex()
-{
-    return tex;
-}
 
-const Vector3f Plane::texture(const Vector3f& phit, size_t) const
-{
-    if(tex)
-	{       
-        Vector3f v = phit - O;
-
-        if(N.x == 1.0f || N.x == -1.0f)
-        {
-            return tex->get(v.y, v.z);
-        }
-        else if(N.y == 1.0f || N.y == -1.0f)
-        {
-            return tex->get(v.x, v.z);
-        }
-        else
-        {
-            return tex->get(v.x, v.y);
-        }
-	}
-	return Vector3f(1.0f);
-}

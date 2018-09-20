@@ -63,11 +63,12 @@ Vector3f Render::phongReflection(const Ray &ray, const Scene &scene, const uint8
     const Vector3f &phit = isec.phit;
     const Vector3f normal = isec.normal.dot(ray.direction) > 0.0f ? -isec.normal: isec.normal;
     const Material &material = isec.object->material;
+
     // Texture
-    Vector3f textureColor = isec.object->texture(phit, isec.idx);
+    Vector3f texture = isec.object->texture(phit, isec.idx);
 
     //ambient
-    Vector3f phitColor = material.kd * textureColor * scene.ka;
+    Vector3f phitColor = material.kd * 1 * scene.ka;
 
     for(auto& light: scene.lights)
     {
@@ -79,7 +80,7 @@ Vector3f Render::phongReflection(const Ray &ray, const Scene &scene, const uint8
             if (!castShadowRay(Ray(phit + bias * normal, toLight), scene.objects, light->distance(phit)))
             {
                 //diffuse
-                Vector3f diffuse = material.kd * textureColor * incidence;
+                Vector3f diffuse = material.kd * texture * incidence;
 
                 //specular
                 Vector3f toCamera = -ray.direction;

@@ -37,7 +37,6 @@ public:
     std::vector<Triangle>   faces;
 
     void computeAABB();
-
 };
 
 
