@@ -11,8 +11,8 @@ Model::Model(const Vector3f &color): Mesh(color)
 {
 }
 
-void Model::load(std::string path)
+void Model::loadFromFile(std::string path)
 {
     OBJParser::Parse(path, *this);
-    computeAABB();
+    aabb.create(vertices); // create AABB
 }

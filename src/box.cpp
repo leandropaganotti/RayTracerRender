@@ -104,5 +104,21 @@ const Vector3f Box::normal(const Vector3f &, size_t idx) const
     else               return transformation.multiVector(Vector3f(0,0,-1)).normalize();
 }
 
+const std::pair<float, float> Box::texUV(const Vector3f &phit, size_t idx) const
+{
+    float u=0, v=0;
+    Vector3f p = inverse * phit;
 
+    if (idx == 1 || idx == 2)
+    {
+        u = p.z; v = p.y;
+    } else if (idx == 3 || idx == 4)
+    {
+        u = p.x; v = p.z;
+    } else
+    {
+        u = p.x; v = p.y;
+    }
 
+    return std::make_pair(u, v);
+}

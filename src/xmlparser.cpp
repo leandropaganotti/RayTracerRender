@@ -550,7 +550,7 @@ void XMLParser::parseModel(xmlNode *xmlModelNode, Model &model)
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "path"))
-            model.load((const char*)attr->children->content);
+            model.loadFromFile((const char*)attr->children->content);
         else
             cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlModelNode->name << "\'" << endl;
     }

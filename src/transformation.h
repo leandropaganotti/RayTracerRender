@@ -11,6 +11,7 @@ public:
     virtual ~Transformation() = default;
 
     virtual void setTransformation(const Vector3f &translate, const Vector3f &rotate, const Vector3f &scale);
+    virtual void setTransformation(const Matrix4x4f& transformation);
 
     const Matrix4x4f& getTransformation() const;
 

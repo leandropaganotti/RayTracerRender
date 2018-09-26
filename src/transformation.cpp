@@ -10,6 +10,11 @@ void Transformation::setTransformation(const Vector3f &translate, const Vector3f
     inverseTranspose = inverse.transpose();
 }
 
+void Transformation::setTransformation(const Matrix4x4f &transformation)
+{
+    this->transformation = transformation;
+}
+
 Matrix4x4f Transformation::T(const Vector3f &v)
 {
     Matrix4x4f m;
