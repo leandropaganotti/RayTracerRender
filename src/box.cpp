@@ -13,15 +13,9 @@ Box::Box() : min(-0.5f, -0.5f, 0.5f), max(0.5f,0.5f,-0.5f)
 
 bool Box::intersection(const Ray &ray, IntersectionData &isec) const
 {
-    Ray r ;
+    Ray r = inverse * ray;
 
-    r.origin = inverse * ray.origin;
-    r.direction = inverse.multiVector(ray.direction).normalize();
-
-    Vector3f invdir;
-    invdir.x = 1.0f / r.direction.x;
-    invdir.y = 1.0f / r.direction.y;
-    invdir.z = 1.0f / r.direction.z;
+    Vector3f invdir = 1.0f / r.direction ;
 
     float t1 = (min.x - r.origin.x)*invdir.x;
     float t2 = (max.x - r.origin.x)*invdir.x;
@@ -63,15 +57,9 @@ bool Box::intersection(const Ray &ray, IntersectionData &isec) const
 
 bool Box::intersection(const Ray &ray, float &tnear) const
 {
-    Ray r ;
+    Ray r = inverse * ray;
 
-    r.origin = inverse * ray.origin;
-    r.direction = inverse.multiVector(ray.direction).normalize();
-
-    Vector3f invdir;
-    invdir.x = 1.0f / r.direction.x;
-    invdir.y = 1.0f / r.direction.y;
-    invdir.z = 1.0f / r.direction.z;
+    Vector3f invdir = 1.0f / r.direction;
 
     float t1 = (min.x - r.origin.x)*invdir.x;
     float t2 = (max.x - r.origin.x)*invdir.x;

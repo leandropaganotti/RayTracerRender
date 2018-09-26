@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "vector.h"
+#include "ray.h"
 
 template<typename T>
 struct Matrix4x4
@@ -28,7 +29,7 @@ struct Matrix4x4
     Vector3<T> multiVector(const Vector3<T>& V) const
     {
         Vector3<T> R;
-        multiply_4x4_Vector(R.vec, V.vec);
+        multiply_4x4_Vector(R.vec, mat, V.vec);
         return R;
     }
 
@@ -54,6 +55,15 @@ struct Matrix4x4
         Vector3<T> R;
         multiply_4x4_Point(R.vec, M.mat, V.vec);
         return R;
+    }
+
+    friend Ray operator * (const Matrix4x4& M, const Ray& ray)
+    {
+        Ray r;
+        multiply_4x4_Point(r.origin.vec, M.mat, ray.origin.vec);
+        multiply_4x4_Vector(r.direction.vec, M.mat, ray.direction.vec);
+        r.direction.normalize();
+        return r;
     }
 
     friend std::ostream& operator << (std::ostream &os, Matrix4x4 m)
@@ -86,12 +96,12 @@ private:
         R[2] = M[2][0] * P[0] + M[2][1] * P[1] + M[2][2] * P[2] + M[2][3];
     }
 
-    //R = mat * V
-    void multiply_4x4_Vector(T R[], const T V[]) const
+    //R = M * V
+    static void multiply_4x4_Vector(T R[], const T M[][4], const T V[])
     {
-        R[0] = mat[0][0] * V[0] + mat[0][1] * V[1] + mat[0][2] * V[2];
-        R[1] = mat[1][0] * V[0] + mat[1][1] * V[1] + mat[1][2] * V[2];
-        R[2] = mat[2][0] * V[0] + mat[2][1] * V[1] + mat[2][2] * V[2];
+        R[0] = M[0][0] * V[0] + M[0][1] * V[1] + M[0][2] * V[2];
+        R[1] = M[1][0] * V[0] + M[1][1] * V[1] + M[1][2] * V[2];
+        R[2] = M[2][0] * V[0] + M[2][1] * V[1] + M[2][2] * V[2];
     }
 
 };
