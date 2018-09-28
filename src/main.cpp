@@ -45,8 +45,6 @@ int main(int argc, char **argv)
     cout << "- resolution: " << camera.getWidth() << "x" << camera.getHeight() << endl;
     cout << "- spp: " << spp << endl << endl;
 
-    std::stringstream ss;
-    ss << output;
     for (unsigned i=0; i < nimages; ++i)
     {
         cout << "\n" << i+1 << "/" << nimages << ": at " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) <<  i*angle << "°" << flush;
@@ -63,6 +61,8 @@ int main(int argc, char **argv)
 
         cout << ", Time: " << time_str.str() << flush;
 
+        std::stringstream ss;
+        ss << output;
         ss << "_IMG" << std::setw(4) << std::setfill('0') << i << "_SPP" << spp << "_T" << time_str.str() << ".ppm";
         render.getImage().save_ppm_bin(ss.str().c_str());
 
