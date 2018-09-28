@@ -9,8 +9,8 @@ public:
     AABB() = default;
     virtual ~AABB() = default;
 
-    virtual void create(const std::vector<Vector3f>& vertices);
-    virtual Vector3f getPosition();
+    virtual void create(const std::vector<Vector3>& vertices);
+    virtual Vector3 getPosition();
 
     // Object interface
 public:
@@ -18,8 +18,8 @@ public:
 
     // Transformation interface
 public:
-    void setTransformation(const Vector3f &translate, const Vector3f &rotate, const Vector3f &scale);
-    void setTransformation(const Matrix4x4f &transformation);
+    void setTransformation(const Vector3 &translate, const Vector3 &rotate, const Vector3 &scale);
+    void setTransformation(const Matrix4 &transformation);
 };
 
 inline

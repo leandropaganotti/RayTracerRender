@@ -12,28 +12,28 @@ bool XMLParser::equals(const xmlChar *lhs, const char *rhs)
     return true;
 }
 
-Vector3f XMLParser::toVector(const xmlChar *str)
+Vector3 XMLParser::toVector(const xmlChar *str)
 {
-    if (str == NULL) return Vector3f(0.0f);
+    if (str == NULL) return Vector3(0.0f);
 
     string text((const char*)str);
     size_t first = text.find_first_of(',');
 
-    // if Vector is only one float : Vector3f(x)
+    // if Vector is only one float : Vector3(x)
     if (first == string::npos)
     {
-        return Vector3f(stof(text));
+        return Vector3(stof(text));
     }
-    // if Vector is 3 floats: Vector3f(x, y, z)
+    // if Vector is 3 floats: Vector3(x, y, z)
     else
     {
-        Vector3f vec;
+        Vector3 vec;
         vec.x = stof(text.substr(0, first));
         text.erase(0, first+1);
         size_t second = text.find_first_of(',');
         if (second == string::npos)
         {
-            return Vector3f(0.0f);
+            return Vector3(0.0f);
         }
         else
         {
@@ -42,7 +42,7 @@ Vector3f XMLParser::toVector(const xmlChar *str)
             if (text.size() == 0)
             {
 
-                return Vector3f(0.0f);
+                return Vector3(0.0f);
             }
             else
                 vec.z = stof(text);
@@ -435,7 +435,7 @@ void XMLParser::parseTexture(xmlNode *xmlTextureNode, std::shared_ptr<Texture> &
     const xmlAttr *attr = NULL;
     xmlChar *name=NULL;
     float rows=1.0f, cols=1.0f, uedge=0.1f, vedge=0.1f, angle=0.0f;
-    Vector3f color1=0, color2=1;
+    Vector3 color1=0, color2=1;
     for (attr = xmlTextureNode->properties; attr; attr = attr->next)
     {
         if (equals(attr->name, "name"))
@@ -506,7 +506,7 @@ void XMLParser::parseTransformation(xmlNode *xmlTrnasformationNode, Transformati
     }
 
     const xmlAttr *attr = NULL;
-    Vector3f translate(0.0f), rotate(0.0f), scale(1.0f);
+    Vector3 translate(0.0f), rotate(0.0f), scale(1.0f);
     for (attr = xmlTrnasformationNode->properties; attr; attr = attr->next)
     {
         if (equals(attr->name, "translate"))

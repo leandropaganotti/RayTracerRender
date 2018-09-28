@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 
     camera.setOptions(scene.cameraOptions);
 
-    const Vector3f from( scene.cameraOptions.getFrom() ), to( scene.cameraOptions.getTo());
+    const Vector3 from( scene.cameraOptions.getFrom() ), to( scene.cameraOptions.getTo());
 
     size_t spp = roundf(scene.spp/(4)) * 4;
 

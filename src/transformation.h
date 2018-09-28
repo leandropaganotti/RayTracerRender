@@ -10,43 +10,43 @@ public:
     Transformation() = default;
     virtual ~Transformation() = default;
 
-    virtual void setTransformation(const Vector3f &translate, const Vector3f &rotate, const Vector3f &scale);
-    virtual void setTransformation(const Matrix4x4f& transformation);
+    virtual void setTransformation(const Vector3 &translate, const Vector3 &rotate, const Vector3 &scale);
+    virtual void setTransformation(const Matrix4& transformation);
 
-    const Matrix4x4f& getTransformation() const;
+    const Matrix4& getTransformation() const;
 
-    const Matrix4x4f& getInverse() const;
+    const Matrix4& getInverse() const;
 
-    const Matrix4x4f& getInverseTranspose() const;
+    const Matrix4& getInverseTranspose() const;
 
-    static Matrix4x4f T(const Vector3f& v);
+    static Matrix4 T(const Vector3& v);
 
-    static Matrix4x4f S(const Vector3f& v);
+    static Matrix4 S(const Vector3& v);
 
-    static Matrix4x4f Rx(float angle);
+    static Matrix4 Rx(float angle);
 
-    static Matrix4x4f Ry(float angle);
+    static Matrix4 Ry(float angle);
 
-    static Matrix4x4f Rz(float angle);
+    static Matrix4 Rz(float angle);
 
 protected:
-    Matrix4x4f transformation;      // object-to-world
-    Matrix4x4f inverse;             // world-to-object
-    Matrix4x4f inverseTranspose;    // matrix for normals transformation
+    Matrix4 transformation;      // object-to-world
+    Matrix4 inverse;             // world-to-object
+    Matrix4 inverseTranspose;    // matrix for normals transformation
 };
 
 inline
-const Matrix4x4f &Transformation::getTransformation() const
+const Matrix4 &Transformation::getTransformation() const
 {
     return transformation;
 }
 inline
-const Matrix4x4f &Transformation::getInverse() const
+const Matrix4 &Transformation::getInverse() const
 {
     return inverse;
 }
 inline
-const Matrix4x4f &Transformation::getInverseTranspose() const
+const Matrix4 &Transformation::getInverseTranspose() const
 {
     return inverseTranspose;
 }

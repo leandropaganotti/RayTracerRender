@@ -2,18 +2,18 @@
 #include <float.h>
 #include <objparser.h>
 
-Mesh::Mesh(const Vector3f &color):
+Mesh::Mesh(const Vector3 &color):
 	Object(color)
 {
 
 }
 
-void Mesh::addVertex(const Vector3f &v)
+void Mesh::addVertex(const Vector3 &v)
 {
     vertices.push_back(v);
 }
 
-void Mesh::addNormal(const Vector3f &v)
+void Mesh::addNormal(const Vector3 &v)
 {
     normals.push_back(v);
 }
@@ -92,7 +92,7 @@ bool Mesh::intersection(const Ray& ray, float &tnear) const
     return tnear < FLT_MAX ? true : false;
 }
 
-const Vector3f Mesh::normal(const Vector3f &phit, size_t idx) const
+const Vector3 Mesh::normal(const Vector3 &phit, size_t idx) const
 {    
     float u = (((vertices[faces[idx].v2] - vertices[faces[idx].v1]) % (phit - vertices[faces[idx].v1])).length() / 2) / faces[idx].area;
     float v = (((vertices[faces[idx].v0] - vertices[faces[idx].v2]) % (phit - vertices[faces[idx].v2])).length() / 2) / faces[idx].area;
@@ -121,11 +121,11 @@ std::ostream& operator <<(std::ostream &os, const Mesh::Triangle &f)
 }
 
 inline
-bool Mesh::Triangle::intersection(const std::vector<Vector3f> &vertices, const Ray &ray, float &tnear) const
+bool Mesh::Triangle::intersection(const std::vector<Vector3> &vertices, const Ray &ray, float &tnear) const
 {
-    const Vector3f &p0 = vertices[ v0 ];
-    const Vector3f &p1 = vertices[ v1 ];
-    const Vector3f &p2 = vertices[ v2 ];
+    const Vector3 &p0 = vertices[ v0 ];
+    const Vector3 &p1 = vertices[ v1 ];
+    const Vector3 &p2 = vertices[ v2 ];
 
     float A = p0.x - p1.x;
     float B = p0.y - p1.y;

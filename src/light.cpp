@@ -1,21 +1,21 @@
 #include "light.h"
 
-Vector3f PointLight::getPos() const
+Vector3 PointLight::getPos() const
 {
     return pos;
 }
 
-void PointLight::setPos(const Vector3f &value)
+void PointLight::setPos(const Vector3 &value)
 {
     pos = value;
 }
 
-Vector3f PointLight::getColor() const
+Vector3 PointLight::getColor() const
 {
     return color;
 }
 
-void PointLight::setColor(const Vector3f &value)
+void PointLight::setColor(const Vector3 &value)
 {
     color = value;
 }
@@ -41,12 +41,12 @@ void PointLight::setK(float value)
 }
 
 
-Vector3f DistantLight::getColor() const
+Vector3 DistantLight::getColor() const
 {
     return color;
 }
 
-void DistantLight::setColor(const Vector3f &value)
+void DistantLight::setColor(const Vector3 &value)
 {
     color = value;
 }
@@ -61,12 +61,12 @@ void DistantLight::setStrength(float value)
     strength = value;
 }
 
-Vector3f DistantLight::getDir() const
+Vector3 DistantLight::getDir() const
 {
     return dir;
 }
 
-void DistantLight::setDir(const Vector3f &value)
+void DistantLight::setDir(const Vector3 &value)
 {
     dir = value;
 }

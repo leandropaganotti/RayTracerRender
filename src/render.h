@@ -12,12 +12,12 @@ class Render: public Camera
     bool castRay(const Ray &ray, const ObjectVector &objects, IntersectionData &isec);
     bool castShadowRay(const Ray &ray, const ObjectVector &objects, float tMax);
 
-    Vector3f phongReflection(const Ray &ray, const Scene &scene, const uint8_t, const IntersectionData &isec);
-    Vector3f specularReflection(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec);
-    Vector3f transparentMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec);
+    Vector3 phongReflection(const Ray &ray, const Scene &scene, const uint8_t, const IntersectionData &isec);
+    Vector3 specularReflection(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec);
+    Vector3 transparentMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec);
 
-    Vector3f trace(const Ray &ray, const Scene &scene, const uint8_t depth);
-    Vector3f pathTrace(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec);
+    Vector3 trace(const Ray &ray, const Scene &scene, const uint8_t depth);
+    Vector3 pathTrace(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec);
 
 public:
 

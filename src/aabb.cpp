@@ -1,12 +1,12 @@
 #include "aabb.h"
 #include <float.h>
 
-Vector3f AABB::getPosition()
+Vector3 AABB::getPosition()
 {
-    return Vector3f(transformation[0][3], transformation[1][3], transformation[2][3]);
+    return Vector3(transformation[0][3], transformation[1][3], transformation[2][3]);
 }
 
-void AABB::create(const std::vector<Vector3f> &vertices)
+void AABB::create(const std::vector<Vector3> &vertices)
 {
     float minX=FLT_MAX, maxX=FLT_MIN;
     float minY=FLT_MAX, maxY=FLT_MIN;
@@ -28,7 +28,7 @@ void AABB::create(const std::vector<Vector3f> &vertices)
         if (vertices[i].z > maxZ)
             maxZ = vertices[i].z;
     }
-    Vector3f translate, scale;
+    Vector3 translate, scale;
 
     scale.x = maxX - minX;
     scale.y = maxY - minY;
@@ -38,15 +38,15 @@ void AABB::create(const std::vector<Vector3f> &vertices)
     translate.y =  (maxY + minY) / 2.0f;
     translate.z =  (maxZ + minZ) / 2.0f;
 
-    setTransformation(translate, Vector3f(0.0f), scale);
+    setTransformation(translate, Vector3(0.0f), scale);
 }
 
-void AABB::setTransformation(const Vector3f &translate, const Vector3f &rotate, const Vector3f &scale)
+void AABB::setTransformation(const Vector3 &translate, const Vector3 &rotate, const Vector3 &scale)
 {
     Box::setTransformation(translate, rotate, scale);
 }
 
-void AABB::setTransformation(const Matrix4x4f &transformation)
+void AABB::setTransformation(const Matrix4 &transformation)
 {
     Box::setTransformation(transformation);
 }

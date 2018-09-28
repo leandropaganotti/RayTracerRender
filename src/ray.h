@@ -7,15 +7,15 @@ class Ray
 {
 public:
     Ray() = default;
-    Ray(const Vector3f& origin, const Vector3f& direction): origin(origin), direction(direction){}
+    Ray(const Vector3& origin, const Vector3& direction): origin(origin), direction(direction){}
 
     friend std::ostream& operator<< (std::ostream& os, const Ray& r)
     {
         return os << r.origin << " " << r.direction ;
     }
 
-    Vector3f origin;
-    Vector3f direction;
+    Vector3 origin;
+    Vector3 direction;
 };
 
 #endif // RAY_H

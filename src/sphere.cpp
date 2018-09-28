@@ -1,17 +1,17 @@
 #include "sphere.h"
 
-Sphere::Sphere(const Vector3f &center, const float &radius, const Vector3f &color) :
+Sphere::Sphere(const Vector3 &center, const float &radius, const Vector3 &color) :
     Object(color), center(center), radius(radius), radius2(radius * radius)
 {
 
 }
 
-Vector3f Sphere::getCenter() const
+Vector3 Sphere::getCenter() const
 {
     return center;
 }
 
-void Sphere::setCenter(const Vector3f &value)
+void Sphere::setCenter(const Vector3 &value)
 {
     center = value;
 }
@@ -38,7 +38,7 @@ bool Sphere::intersection(const Ray &ray, float &tnear) const
     float t0, t1;
 
     // analytic solution
-    Vector3f L = ray.origin - center;
+    Vector3 L = ray.origin - center;
     float a = ray.direction.dot(ray.direction);
     float b = 2 * ray.direction.dot(L);
     float c = L.dot(L) - radius2;
@@ -54,7 +54,7 @@ bool Sphere::intersection(const Ray &ray, float &tnear) const
     return true;
 }
 
-const Vector3f Sphere::normal(const Vector3f &phit, size_t) const
+const Vector3 Sphere::normal(const Vector3 &phit, size_t) const
 {
     return (phit-center).normalize();
 }

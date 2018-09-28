@@ -6,11 +6,11 @@ Camera::Camera()
     image.resize(options.width, options.height);
 }
 
-void Camera::lookAt(const Vector3f &from, const Vector3f &to, const Vector3f &up)
+void Camera::lookAt(const Vector3 &from, const Vector3 &to, const Vector3 &up)
 {
-    Vector3f zaxis = (from - to).normalize();
-    Vector3f xaxis = (up % zaxis).normalize();
-    Vector3f yaxis = zaxis % xaxis;
+    Vector3 zaxis = (from - to).normalize();
+    Vector3 xaxis = (up % zaxis).normalize();
+    Vector3 yaxis = zaxis % xaxis;
 
     cameraToWorld[0][0] = xaxis.x;
     cameraToWorld[1][0] = xaxis.y;
@@ -32,7 +32,7 @@ void Camera::lookAt(const Vector3f &from, const Vector3f &to, const Vector3f &up
     options.to	 = to;
 }
 
-const Vector3f& Camera::getPosition() const
+const Vector3& Camera::getPosition() const
 {
     return options.from;
 }
@@ -77,16 +77,16 @@ std::ostream &operator <<(std::ostream &os, const Camera &cam)
     return os << "Camera: " << cam.options;
 }
 
-CameraOptions::CameraOptions(const Vector3f &from, const Vector3f &to, float fov, size_t width, size_t height):
+CameraOptions::CameraOptions(const Vector3 &from, const Vector3 &to, float fov, size_t width, size_t height):
     from(from), to(to), fov(fov), width(width), height(height), aspectRatio(float(width)/height)
 {}
 
-Vector3f CameraOptions::getTo() const
+Vector3 CameraOptions::getTo() const
 {
     return to;
 }
 
-void CameraOptions::setTo(const Vector3f &value)
+void CameraOptions::setTo(const Vector3 &value)
 {
     to = value;
 }
@@ -128,12 +128,12 @@ float CameraOptions::getAspectRatio() const
     return aspectRatio;
 }
 
-Vector3f CameraOptions::getFrom() const
+Vector3 CameraOptions::getFrom() const
 {
     return from;
 }
 
-void CameraOptions::setFrom(const Vector3f &value)
+void CameraOptions::setFrom(const Vector3 &value)
 {
     from = value;
 }

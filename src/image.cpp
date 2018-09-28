@@ -76,7 +76,7 @@ void Image::resize(size_t width, size_t height)
     if (width > 0 && height > 0)
     {
     	destroy();
-        buffer = new_array_2d<Vector3f>(width, height);
+        buffer = new_array_2d<Vector3>(width, height);
         this->_width = width;
         this->_height = height;
     }
@@ -90,7 +90,7 @@ void Image::destroy()
 {
     if(buffer)
     {
-        del_array_2d<Vector3f>(buffer, _height);
+        del_array_2d<Vector3>(buffer, _height);
         buffer = nullptr;
         _width = _height = 0;
     }

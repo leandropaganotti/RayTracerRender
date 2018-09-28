@@ -6,7 +6,7 @@
 class Model: public Mesh
 {
 public:
-    Model(const Vector3f &color={1.0f});
+    Model(const Vector3 &color={1.0f});
     void loadFromFile(std::string path);
 };
 

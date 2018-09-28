@@ -7,27 +7,27 @@
 class Plane: public Object
 {
 public:       
-    Plane(const Vector3f& O={0.0f}, const Vector3f& N={0.0f, 1.0f, 0.0f}, const Vector3f& color={1.0f});
+    Plane(const Vector3& O={0.0f}, const Vector3& N={0.0f, 1.0f, 0.0f}, const Vector3& color={1.0f});
 
     bool intersection(const Ray& ray, IntersectionData& isec) const;
     bool intersection(const Ray& ray, float &tnear) const;
-    const Vector3f normal(const Vector3f &, size_t) const;    
+    const Vector3 normal(const Vector3 &, size_t) const;    
 
-    static bool intersection(const Vector3f& O, const Vector3f& n, const Ray& ray, float& tnear);
+    static bool intersection(const Vector3& O, const Vector3& n, const Ray& ray, float& tnear);
 
-    Vector3f O;    // a point O(origin) on the plane
-    Vector3f N;    // normal to the plane
+    Vector3 O;    // a point O(origin) on the plane
+    Vector3 N;    // normal to the plane
 
 private:
-    const std::pair<float, float> texUV(const Vector3f& phit, size_t) const;
+    const std::pair<float, float> texUV(const Vector3& phit, size_t) const;
 
 };
 
 inline
-const std::pair<float, float> Plane::texUV(const Vector3f &phit, size_t) const
+const std::pair<float, float> Plane::texUV(const Vector3 &phit, size_t) const
 {
 
-    Vector3f v = phit - O;
+    Vector3 v = phit - O;
 
     if(N.x == 1.0f || N.x == -1.0f)
     {

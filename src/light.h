@@ -8,10 +8,10 @@
 class Light
 {
 public:     
-    virtual Vector3f position  () const = 0;
-    virtual float    distance  (const Vector3f &point) const = 0;
-    virtual Vector3f direction (const Vector3f &point) const = 0;
-    virtual Vector3f intensity (const Vector3f &point) const = 0;
+    virtual Vector3 position  () const = 0;
+    virtual float    distance  (const Vector3 &point) const = 0;
+    virtual Vector3 direction (const Vector3 &point) const = 0;
+    virtual Vector3 intensity (const Vector3 &point) const = 0;
     virtual ~Light() = default;
 };
 
@@ -19,40 +19,40 @@ typedef std::vector<std::unique_ptr<Light>> LightVector;
 
 class PointLight: public Light
 {
-    Vector3f pos;
-    Vector3f color;
+    Vector3 pos;
+    Vector3 color;
     float strength;
     float k;
 public:
-    PointLight(const Vector3f &pos={0.0f}, const Vector3f &color={1.0f}, float strength=1.0f, float k=0.01f):
+    PointLight(const Vector3 &pos={0.0f}, const Vector3 &color={1.0f}, float strength=1.0f, float k=0.01f):
         pos(pos), color(color), strength(strength), k(k)
     {}
-    Vector3f position() const
+    Vector3 position() const
     {
         return pos;
     }
-    float distance(const Vector3f &point) const
+    float distance(const Vector3 &point) const
     {
         return (point - pos).length();
     }
-    Vector3f direction(const Vector3f &point) const
+    Vector3 direction(const Vector3 &point) const
     {
         return (pos - point).normalize();
     }
-    Vector3f intensity(const Vector3f &point) const
+    Vector3 intensity(const Vector3 &point) const
     {
         return strength * color * attenuation(point);
     }
-    float attenuation(const Vector3f &point) const
+    float attenuation(const Vector3 &point) const
     {
         float d = distance(point);
         return 1.0f / ( 1.0f + k * d * d);
     }
 
-    Vector3f getPos() const;
-    void     setPos(const Vector3f &value);
-    Vector3f getColor() const;
-    void     setColor(const Vector3f &value);
+    Vector3 getPos() const;
+    void     setPos(const Vector3 &value);
+    Vector3 getColor() const;
+    void     setColor(const Vector3 &value);
     float    getStrength() const;
     void     setStrength(float value);
     float    getK() const;
@@ -61,35 +61,35 @@ public:
 
 class DistantLight: public Light
 {
-    Vector3f dir;
-    Vector3f color;
+    Vector3 dir;
+    Vector3 color;
     float strength;
 public:
-    DistantLight(const Vector3f &dir={0.0f, -1.0f, 0.0f}, const Vector3f &color={1.0f}, float strength=1.0f):
+    DistantLight(const Vector3 &dir={0.0f, -1.0f, 0.0f}, const Vector3 &color={1.0f}, float strength=1.0f):
         dir(dir), color(color), strength(strength)
     {
         this->dir.normalize();
     }
-    Vector3f position() const
+    Vector3 position() const
     {
         return FLT_MAX;
     }
-    float distance(const Vector3f &) const
+    float distance(const Vector3 &) const
     {
         return FLT_MAX;
     }
-    Vector3f direction(const Vector3f &) const
+    Vector3 direction(const Vector3 &) const
     {
         return -dir;
     }
-    Vector3f intensity(const Vector3f &) const
+    Vector3 intensity(const Vector3 &) const
     {
         return strength * color;
     }
-    Vector3f getDir() const;
-    void     setDir(const Vector3f &value);
-    Vector3f getColor() const;
-    void     setColor(const Vector3f &value);
+    Vector3 getDir() const;
+    void     setDir(const Vector3 &value);
+    Vector3 getColor() const;
+    void     setColor(const Vector3 &value);
     float    getStrength() const;
     void     setStrength(float value);
 };

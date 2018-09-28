@@ -45,7 +45,7 @@ public:
 private:
     bool     equals(const xmlChar *lhs, const char *rhs);
 
-    Vector3f toVector(const xmlChar *str);
+    Vector3 toVector(const xmlChar *str);
 
     float    toFloat(const xmlChar *str);
 

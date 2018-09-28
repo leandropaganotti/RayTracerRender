@@ -10,8 +10,8 @@ enum class Shade
 };
 
 namespace Color {
-    const Vector3f WHITE(1.0f);
-    const Vector3f BLACK(0.0f);
+    const Vector3 WHITE(1.0f);
+    const Vector3 BLACK(0.0f);
 }
 
 #endif // CONSTS_H

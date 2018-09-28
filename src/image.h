@@ -9,7 +9,7 @@ class Image
     size_t _width;
     size_t _height;
 
-    Vector3f **buffer;
+    Vector3 **buffer;
 
 public:
     Image(size_t width=0, size_t height=0);
@@ -24,7 +24,7 @@ public:
     void resize(size_t width, size_t height);
     void destroy();
 
-    Vector3f & at(size_t i, size_t j);
+    Vector3 & at(size_t i, size_t j);
 
     void save_ppm(const char* filename) const;
     void save_ppm_bin(const char * filename) const;
@@ -41,7 +41,7 @@ public:
 
 
 inline
-Vector3f &Image::at(size_t i, size_t j)
+Vector3 &Image::at(size_t i, size_t j)
 {
     return buffer[i][j];
 }

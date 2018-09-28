@@ -15,14 +15,14 @@ typedef struct timeval timestamp;
 
 
 inline
-Vector3f reflect(const Vector3f &I, const Vector3f &N)
+Vector3 reflect(const Vector3 &I, const Vector3 &N)
 {
     //I-2(N.I)N => N.I = cosi
     return (I - 2.0f * I.dot(N) * N).normalize();
 }
 
 inline
-Vector3f refract(const Vector3f &I, const Vector3f &N, float n1, float n2)
+Vector3 refract(const Vector3 &I, const Vector3 &N, float n1, float n2)
 {
     //n  = n1 / n2
     float n = n1 / n2;
@@ -33,13 +33,13 @@ Vector3f refract(const Vector3f &I, const Vector3f &N, float n1, float n2)
     // sin2t = n^2(1-cosi^2)
     float sin2t = n * n * (1.0f - cosi * cosi);
 
-    if (sin2t > 1.0f) return Vector3f(0);
+    if (sin2t > 1.0f) return Vector3(0);
 
     return n * I + (n * cosi - sqrt(1.0f - sin2t)) * N;
 }
 
 inline
-void fresnel(const Vector3f &I, const Vector3f &N, const float &ior, float &kr)
+void fresnel(const Vector3 &I, const Vector3 &N, const float &ior, float &kr)
 {
     float cosi = N.dot(I);
     float etai = 1, etat = ior;
@@ -135,7 +135,7 @@ bool solveQuadratic(const float a, const float b, const float c, float &x0, floa
 }
 
 inline
-Vector3f uniformSampleHemisphere(const float &r1, const float &r2)
+Vector3 uniformSampleHemisphere(const float &r1, const float &r2)
 {
     // cos(theta) = r1 = y
     // cos^2(theta) + sin^2(theta) = 1^2 -> sin(theta) = srtf(1 - cos^2(theta))
@@ -143,15 +143,15 @@ Vector3f uniformSampleHemisphere(const float &r1, const float &r2)
     float phi = 2 * M_PI * r2;
     float x = sinTheta * cosf(phi);
     float z = sinTheta * sinf(phi);
-    return Vector3f(x, r1, z);
+    return Vector3(x, r1, z);
 }
 inline
-void createCoordinateSystem(const Vector3f &N, Vector3f &Nt, Vector3f &Nb)
+void createCoordinateSystem(const Vector3 &N, Vector3 &Nt, Vector3 &Nb)
 {
     if (std::fabs(N.x) > std::fabs(N.y))
-        Nt = Vector3f(N.z, 0, -N.x) / sqrtf(N.x * N.x + N.z * N.z);
+        Nt = Vector3(N.z, 0, -N.x) / sqrtf(N.x * N.x + N.z * N.z);
     else
-        Nt = Vector3f(0, -N.z, N.y) / sqrtf(N.y * N.y + N.z * N.z);
+        Nt = Vector3(0, -N.z, N.y) / sqrtf(N.y * N.y + N.z * N.z);
     Nb = N.cross(Nt);
 }
 

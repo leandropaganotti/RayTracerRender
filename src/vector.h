@@ -5,48 +5,26 @@
 #include <iostream>
 #include <math.h>
 
-template<typename T>
-struct Vector3;
 
-typedef Vector3<float> Vector3f;
 
-template<typename T>
 struct Vector3
 {
     union
     {
-        T vec[3];
-        struct {T x, y, z;};
-        struct {T r, g, b;};
+        float vec[3];
+        struct {float x, y, z;};
+        struct {float r, g, b;};
     };
 
     Vector3() = default;
-    Vector3(T x): x(x), y(x), z(x){}
-    Vector3(T x, T y, T z): x(x), y(y), z(z){}
+    Vector3(float x): x(x), y(x), z(x){}
+    Vector3(float x, float y, float z): x(x), y(y), z(z){}
     
-    T& operator[](size_t i) { return vec[i]; }
-    const T& operator[](size_t i) const { return vec[i]; }
-    
-    T dot(const Vector3& v) const
-    {
-        return x*v.x + y*v.y + z*v.z;
-    }
-    Vector3 cross(const Vector3 & v) const
-    {
-        return {y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x};
-    }
-    float length() const
-    {
-        return sqrtf(x*x + y*y + z*z);
-    }
-    const Vector3& normalize()
-    {
-        float m = length(); x/=m; y/=m; z/=m; return *this;
-    }
-    bool operator==(const Vector3f& rhs) const
-    {
-        return x==rhs.x && y==rhs.y && z==rhs.z;
-    }
+    float& operator[](size_t i) { return vec[i]; }
+    const float& operator[](size_t i) const { return vec[i]; }
+            
+    /** Basic operations */
+    // op -
     Vector3 operator-() const
     {
         return {-x, -y, -z};
@@ -59,6 +37,8 @@ struct Vector3
     {
 	    x -= rhs.x; y -= rhs.y; z -= rhs.z;
     }
+
+    // op +
     Vector3 operator+(const Vector3& rhs) const
     {
         return {x+rhs.x, y+rhs.y, z+rhs.z};
@@ -67,6 +47,8 @@ struct Vector3
     {
         x+=rhs.x; y+=rhs.y; z+=rhs.z;
     }
+
+    // op *
     Vector3 operator*(float scalar) const
     {
         return { scalar * x, scalar * y, scalar * z};
@@ -83,6 +65,8 @@ struct Vector3
     {
         return rhs * scalar;
     }
+
+    // op /
     friend Vector3 operator/(float scalar, const Vector3& rhs)
     {
         return {scalar/rhs.x, scalar/rhs.y, scalar/rhs.z};
@@ -102,6 +86,36 @@ struct Vector3
     void operator/=(const Vector3& v)
     {
         x/=v.x, y/=v.y, z/=v.z;
+    }    
+
+    // logical operations
+    bool operator==(const Vector3& rhs) const
+    {
+        return x==rhs.x && y==rhs.y && z==rhs.z;
+    }
+
+    // distance
+    float distance(const Vector3& rhs)
+    {
+        return (*this - rhs).length();
+    }
+
+    /** Math cector functions */
+    float dot(const Vector3& v) const
+    {
+        return x*v.x + y*v.y + z*v.z;
+    }
+    Vector3 cross(const Vector3 & v) const
+    {
+        return {y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x};
+    }
+    float length() const
+    {
+        return sqrtf(x*x + y*y + z*z);
+    }
+    const Vector3& normalize()
+    {
+        float m = length(); x/=m; y/=m; z/=m; return *this;
     }
     float operator^(const Vector3& rhs) const //dot
     {
@@ -112,6 +126,7 @@ struct Vector3
         return cross(rhs);
     }
 
+    /** Print function */
     friend std::ostream& operator<< (std::ostream& os, const Vector3& v)
     {
         return os << std::fixed << "[ " << v.x << " " << v.y << " " << v.z <<  " ]";
