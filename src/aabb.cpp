@@ -3,7 +3,7 @@
 
 Vector3 AABB::getPosition()
 {
-    return Vector3(transformation[0][3], transformation[1][3], transformation[2][3]);
+    return Vector3(getModelMatrix()[0][3], getModelMatrix()[1][3], getModelMatrix()[2][3]);
 }
 
 void AABB::create(const std::vector<Vector3> &vertices)
@@ -41,12 +41,12 @@ void AABB::create(const std::vector<Vector3> &vertices)
     setTransformation(translate, Vector3(0.0f), scale);
 }
 
-void AABB::setTransformation(const Vector3 &translate, const Vector3 &rotate, const Vector3 &scale)
-{
-    Box::setTransformation(translate, rotate, scale);
-}
+//void AABB::setTransformation(const Vector3 &translate, const Vector3 &rotate, const Vector3 &scale)
+//{
+//    Box::setTransformation(translate, rotate, scale);
+//}
 
-void AABB::setTransformation(const Matrix4 &transformation)
-{
-    Box::setTransformation(transformation);
-}
+//void AABB::setTransformation(const Matrix4 &transformation)
+//{
+//    Box::setTransformation(transformation);
+//}

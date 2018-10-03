@@ -11,9 +11,8 @@ public:
     virtual ~Transformation() = default;
 
     virtual void setTransformation(const Vector3 &translate, const Vector3 &rotate, const Vector3 &scale);
-    virtual void setTransformation(const Matrix4& transformation);
 
-    const Matrix4& getTransformation() const;
+    const Matrix4& getModelMatrix() const;
 
     const Matrix4& getInverse() const;
 
@@ -29,16 +28,16 @@ public:
 
     static Matrix4 Rz(float angle);
 
-protected:
-    Matrix4 transformation;      // object-to-world
+private:
+    Matrix4 modelMatrix;         // object-to-world
     Matrix4 inverse;             // world-to-object
     Matrix4 inverseTranspose;    // matrix for normals transformation
 };
 
 inline
-const Matrix4 &Transformation::getTransformation() const
+const Matrix4 &Transformation::getModelMatrix() const
 {
-    return transformation;
+    return modelMatrix;
 }
 inline
 const Matrix4 &Transformation::getInverse() const

@@ -31,13 +31,13 @@ public:
 public:
     bool  intersection(const Ray& ray, IntersectionData& isec) const;
     bool  intersection(const Ray& ray, float& tnear) const;
-    const Vector3 normal(const Vector3 &, size_t idx) const;
+    const Vector3 normal(const Vector3 &phit, size_t idx) const;
 
-protected:
+public:
     AABB aabb;
     std::vector<Vector3>   vertices;
     std::vector<Vector3>   normals;
-    std::vector<Triangle>   faces;
+    std::vector<Triangle>  faces;
 };
 
 

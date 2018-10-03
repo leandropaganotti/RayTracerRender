@@ -7,9 +7,13 @@
 
 struct Matrix4
 {
-    float mat[4][4]={{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
+    float mat[4][4];
 
-    Matrix4() = default;
+    Matrix4(): mat{ {1,0,0,0},
+                    {0,1,0,0},
+                    {0,0,1,0},
+                    {0,0,0,1}}
+    {}
 
     Matrix4(float a00, float a01, float a02, float a03,
             float a10, float a11, float a12, float a13,
@@ -41,7 +45,7 @@ struct Matrix4
 
     Vector3 operator * (const Vector3& P) const
     {
-        Vector3 R;
+        Vector3 R = 0;
         R[0] = mat[0][0] * P[0] + mat[0][1] * P[1] + mat[0][2] * P[2] + mat[0][3];
         R[1] = mat[1][0] * P[0] + mat[1][1] * P[1] + mat[1][2] * P[2] + mat[1][3];
         R[2] = mat[2][0] * P[0] + mat[2][1] * P[1] + mat[2][2] * P[2] + mat[2][3];
@@ -52,7 +56,7 @@ struct Matrix4
     {
         Ray R;
         R.origin = (*this) * ray.origin;
-        R.direction = ((*this) * ray.direction).normalize();
+        R.direction = multiplyVector(ray.direction).normalize();
         return R;
     }
 

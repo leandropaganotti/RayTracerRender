@@ -16,7 +16,7 @@ struct Vector3
         struct {float r, g, b;};
     };
 
-    Vector3() = default;
+    Vector3(): vec{0.0f, 0.0f, 0.0f}{}
     Vector3(float x): x(x), y(x), z(x){}
     Vector3(float x, float y, float z): x(x), y(y), z(z){}
     

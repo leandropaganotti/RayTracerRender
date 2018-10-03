@@ -68,7 +68,7 @@ Vector3 Render::phongReflection(const Ray &ray, const Scene &scene, const uint8_
     Vector3 texture = isec.object->texture(phit, isec.idx);
 
     //ambient
-    Vector3 phitColor = material.kd * 1 * scene.ka;
+    Vector3 phitColor = material.kd * texture * scene.ka;
 
     for(auto& light: scene.lights)
     {

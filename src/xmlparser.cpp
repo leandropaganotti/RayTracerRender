@@ -562,10 +562,14 @@ void XMLParser::parseModel(xmlNode *xmlModelNode, Model &model)
         {
             if (equals(node->name, "material"))
                 parseMaterial(node, model.material);
+            else if (equals(node->name, "transformation"))
+            {                                
+                parseTransformation(node, model);                
+            }
             else
             {
                 cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlModelNode->name << "\'" << endl;
             }
         }
-    }
+    }    
 }

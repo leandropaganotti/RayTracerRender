@@ -13,7 +13,7 @@ Box::Box() : min(-0.5f, -0.5f, 0.5f), max(0.5f,0.5f,-0.5f)
 
 bool Box::intersection(const Ray &ray, IntersectionData &isec) const
 {
-    Ray r = inverse * ray;
+    Ray r = getInverse() * ray;
 
     Vector3 invdir = 1.0f / r.direction ;
 
@@ -49,7 +49,7 @@ bool Box::intersection(const Ray &ray, IntersectionData &isec) const
     if(tmin < 0) { isec.tnear = tmax; } else { isec.tnear = tmin; }
 
     Vector3 phit = r.origin + isec.tnear * r.direction;
-    phit = transformation * phit;
+    phit = getModelMatrix() * phit;
     isec.tnear = (phit - ray.origin).length();
     isec.object = this;
     return true;
@@ -57,7 +57,7 @@ bool Box::intersection(const Ray &ray, IntersectionData &isec) const
 
 bool Box::intersection(const Ray &ray, float &tnear) const
 {
-    Ray r = inverse * ray;
+    Ray r = getInverse() * ray;
 
     Vector3 invdir = 1.0f / r.direction;
 
@@ -76,7 +76,7 @@ bool Box::intersection(const Ray &ray, float &tnear) const
     if(tmin < 0) { tnear = tmax; } else { tnear = tmin; }
 
     Vector3 phit = r.origin + tnear * r.direction;
-    phit = transformation * phit;
+    phit = getModelMatrix() * phit;
     tnear = (phit - ray.origin).length();
 
     return true;
@@ -84,18 +84,18 @@ bool Box::intersection(const Ray &ray, float &tnear) const
 
 const Vector3 Box::normal(const Vector3 &, size_t idx) const
 {
-    if (idx == 1)      return transformation.multiplyVector(Vector3(-1,0,0)).normalize();
-    else if (idx == 2) return transformation.multiplyVector(Vector3(1,0,0)).normalize();
-    else if (idx == 3) return transformation.multiplyVector(Vector3(0,-1,0)).normalize();
-    else if (idx == 4) return transformation.multiplyVector(Vector3(0,1,0)).normalize();
-    else if (idx == 5) return transformation.multiplyVector(Vector3(0,0,1)).normalize();
-    else               return transformation.multiplyVector(Vector3(0,0,-1)).normalize();
+    if (idx == 1)      return (getInverseTranspose() * Vector3(-1,0,0)).normalize();
+    else if (idx == 2) return (getInverseTranspose() * Vector3(1,0,0)).normalize();
+    else if (idx == 3) return (getInverseTranspose() * Vector3(0,-1,0)).normalize();
+    else if (idx == 4) return (getInverseTranspose() * Vector3(0,1,0)).normalize();
+    else if (idx == 5) return (getInverseTranspose() * Vector3(0,0,1)).normalize();
+    else               return (getInverseTranspose() * Vector3(0,0,-1)).normalize();
 }
 
 const std::pair<float, float> Box::texUV(const Vector3 &phit, size_t idx) const
 {
     float u=0, v=0;
-    Vector3 p = inverse * phit;
+    Vector3 p = getInverse() * phit;
 
     if (idx == 1 || idx == 2)
     {
