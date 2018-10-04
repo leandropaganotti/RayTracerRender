@@ -4,10 +4,9 @@
 
 void Transformation::setTransformation(const Vector3 &translate, const Vector3 &rotate, const Vector3 &scale)
 {
-    Matrix4 src = T(translate) * Rz(rotate.z) * Ry(rotate.y) * Rx(rotate.x) * S(scale);
-    memcpy(modelMatrix.mat, src.mat, sizeof(float) * 16);
-    inverse = S(1.0f/scale) * Rx(-rotate.x) * Ry(-rotate.y) * Rz(-rotate.z) * T(-translate);
-    inverseTranspose = inverse.transpose();
+    modelMatrix = T(translate) * Rz(rotate.z) * Ry(rotate.y) * Rx(rotate.x) * S(scale);
+    inverse = modelMatrix.getInverse();
+    inverseTranspose = inverse.getTranspose();
 }
 
 Matrix4 Transformation::T(const Vector3 &v)

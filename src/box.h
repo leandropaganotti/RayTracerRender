@@ -19,8 +19,8 @@ private:
     const std::pair<float, float> texUV(const Vector3 &phit, size_t idx) const;
 
 private:
-    Vector3 min;
-    Vector3 max;    
+    static Vector3 min;
+    static Vector3 max;
 };
 
 #endif // BOX_H
