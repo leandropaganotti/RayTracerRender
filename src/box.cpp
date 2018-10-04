@@ -5,7 +5,10 @@
 #include "utils.h"
 #include <utility>
 
-Box::Box() : min(-0.5f, -0.5f, 0.5f), max(0.5f,0.5f,-0.5f)
+Vector3 Box::min = Vector3(-0.5f, -0.5f, 0.5f);
+Vector3 Box::max = Vector3(0.5f,0.5f,-0.5f);
+
+Box::Box()
 {
     material.kd = 1;
     material.type = Material::Type::DIFFUSE;

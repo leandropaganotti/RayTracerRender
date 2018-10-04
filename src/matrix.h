@@ -26,7 +26,13 @@ public:
 
     Matrix4 getTranspose()  const;
     Matrix4 getInverse()    const;
-    float determinant()     const;
+    float   determinant()   const;
+
+    static Matrix4 T(const Vector3& v);
+    static Matrix4 S(const Vector3& v);
+    static Matrix4 Rx(float angle);
+    static Matrix4 Ry(float angle);
+    static Matrix4 Rz(float angle);
 
     friend std::ostream& operator << (std::ostream &os, Matrix4 m);
 
@@ -36,6 +42,7 @@ private:
     float det3(float a00, float a, float c, float d, float e, float f, float g, float h, float i) const;
 };
 
+inline
 Matrix4::Matrix4():
     mat{{1,0,0,0},
         {0,1,0,0},
@@ -45,6 +52,7 @@ Matrix4::Matrix4():
 
 }
 
+inline
 Matrix4::Matrix4(float a00, float a01, float a02, float a03, float a10, float a11, float a12, float a13, float a20, float a21, float a22, float a23, float a30, float a31, float a32, float a33)
 {
     mat[0][0] = a00, mat[0][1] = a01, mat[0][2] = a02, mat[0][3] = a03;
@@ -190,6 +198,60 @@ float Matrix4::determinant() const
     return det;
 }
 
+inline
+Matrix4 Matrix4::T(const Vector3 &v)
+{
+    Matrix4 m;
+    m[0][3] = v.x;
+    m[1][3] = v.y;
+    m[2][3] = v.z;
+    return m;
+}
+
+inline
+Matrix4 Matrix4::S(const Vector3 &v)
+{
+    Matrix4 m;
+    m[0][0] = v.x;
+    m[1][1] = v.y;
+    m[2][2] = v.z;
+    return m;
+}
+
+inline
+Matrix4 Matrix4::Rx(float angle)
+{
+    Matrix4 m;
+    m[1][1] = cos(angle);
+    m[1][2] = -sin(angle);
+    m[2][1] = sin(angle);
+    m[2][2] = cos(angle);
+    return m;
+}
+
+inline
+Matrix4 Matrix4::Ry(float angle)
+{
+    Matrix4 m;
+    m[0][0] = cos(angle);
+    m[0][2] = sin(angle);
+    m[2][0] = -sin(angle);
+    m[2][2] = cos(angle);
+    return m;
+}
+
+inline
+Matrix4 Matrix4::Rz(float angle)
+{
+    Matrix4 m;
+    m[0][0] = cos(angle);
+    m[0][1] = -sin(angle);
+    m[1][0] = sin(angle);
+    m[1][1] = cos(angle);
+    return m;
+}
+
+inline
 std::ostream& operator <<(std::ostream &os, Matrix4 m)
 {
     size_t i;

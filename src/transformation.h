@@ -18,16 +18,6 @@ public:
 
     const Matrix4& getInverseTranspose() const;
 
-    static Matrix4 T(const Vector3& v);
-
-    static Matrix4 S(const Vector3& v);
-
-    static Matrix4 Rx(float angle);
-
-    static Matrix4 Ry(float angle);
-
-    static Matrix4 Rz(float angle);
-
 private:
     Matrix4 modelMatrix;         // object-to-world
     Matrix4 inverse;             // world-to-object
