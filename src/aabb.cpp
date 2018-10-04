@@ -1,52 +1,47 @@
 #include "aabb.h"
 #include <float.h>
 
-Vector3 AABB::getPosition()
+Vector3 AABB::getCenter()
 {
-    return Vector3(getModel()[0][3], getModel()[1][3], getModel()[2][3]);
+    return (min + max ) * 0.5f;
+}
+const Vector3 &AABB::getMin() const
+{
+    return min;
+}
+const Vector3 &AABB::getMax() const
+{
+    return max;
+}
+void AABB::setMin(const Vector3 &value)
+{
+    min = value;
+}
+void AABB::setMax(const Vector3 &value)
+{
+    max = value;
 }
 
 void AABB::create(const std::vector<Vector3> &vertices)
 {
-    float minX=FLT_MAX, maxX=FLT_MIN;
-    float minY=FLT_MAX, maxY=FLT_MIN;
-    float minZ=FLT_MAX, maxZ=FLT_MIN;
+    min.x=FLT_MAX, max.x=FLT_MIN;
+    min.y=FLT_MAX, max.y=FLT_MIN;
+    min.z=FLT_MAX, max.z=FLT_MIN;
 
     for(size_t i= 0 ; i < vertices.size(); ++i)
     {
-        if (vertices[i].x < minX)
-            minX = vertices[i].x;
-        if (vertices[i].y < minY)
-            minY = vertices[i].y;
-        if (vertices[i].z < minZ)
-            minZ = vertices[i].z;
+        if (vertices[i].x < min.x)
+            min.x = vertices[i].x;
+        if (vertices[i].y < min.y)
+            min.y = vertices[i].y;
+        if (vertices[i].z < min.z)
+            min.z = vertices[i].z;
 
-        if (vertices[i].x > maxX)
-            maxX = vertices[i].x;
-        if (vertices[i].y > maxY)
-            maxY = vertices[i].y;
-        if (vertices[i].z > maxZ)
-            maxZ = vertices[i].z;
-    }
-    Vector3 translate, scale;
-
-    scale.x = maxX - minX;
-    scale.y = maxY - minY;
-    scale.z = maxZ - minZ;
-
-    translate.x =  (maxX + minX) / 2.0f;
-    translate.y =  (maxY + minY) / 2.0f;
-    translate.z =  (maxZ + minZ) / 2.0f;
-
-    setTransformation(translate, Vector3(0.0f), scale);
+        if (vertices[i].x > max.x)
+            max.x = vertices[i].x;
+        if (vertices[i].y > max.y)
+            max.y = vertices[i].y;
+        if (vertices[i].z > max.z)
+            max.z = vertices[i].z;
+    }    
 }
-
-//void AABB::setTransformation(const Vector3 &translate, const Vector3 &rotate, const Vector3 &scale)
-//{
-//    Box::setTransformation(translate, rotate, scale);
-//}
-
-//void AABB::setTransformation(const Matrix4 &transformation)
-//{
-//    Box::setTransformation(transformation);
-//}

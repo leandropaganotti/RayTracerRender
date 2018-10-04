@@ -52,10 +52,11 @@ bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
 {    
     Ray r = getInverse() * ray;
 
-    //    if (!aabb.intersection(r, tnear))
-    //        return false;
-
     float t;
+
+    if (!aabb.intersection(r, t))
+        return false;
+
     isec.tnear = FLT_MAX;
     for (size_t i=0 ; i < faces.size(); ++i)
     {
@@ -83,10 +84,10 @@ bool Mesh::intersection(const Ray& ray, float &tnear) const
 {
     Ray r = getInverse() * ray;
 
-//    if (!aabb.intersection(r, tnear))
-//        return false;
-
     float t;
+    if (!aabb.intersection(r, t))
+        return false;
+
     tnear = FLT_MAX;
     for (size_t i=0 ; i < faces.size(); ++i)
     {
