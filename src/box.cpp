@@ -52,7 +52,7 @@ bool Box::intersection(const Ray &ray, IntersectionData &isec) const
     if(tmin < 0) { isec.tnear = tmax; } else { isec.tnear = tmin; }
 
     Vector3 phit = r.origin + isec.tnear * r.direction;
-    phit = getModelMatrix() * phit;
+    phit = getModel() * phit;
     isec.tnear = (phit - ray.origin).length();
     isec.object = this;
     return true;
@@ -79,7 +79,7 @@ bool Box::intersection(const Ray &ray, float &tnear) const
     if(tmin < 0) { tnear = tmax; } else { tnear = tmin; }
 
     Vector3 phit = r.origin + tnear * r.direction;
-    phit = getModelMatrix() * phit;
+    phit = getModel() * phit;
     tnear = (phit - ray.origin).length();
 
     return true;

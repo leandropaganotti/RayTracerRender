@@ -72,7 +72,7 @@ bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
     {        
         isec.object = this;        
         Vector3 phit = r.origin + isec.tnear * r.direction;
-        phit = getModelMatrix() * phit;
+        phit = getModel() * phit;
         isec.tnear = (phit - ray.origin).length();
         return true;
     }
@@ -98,7 +98,7 @@ bool Mesh::intersection(const Ray& ray, float &tnear) const
     if (tnear < FLT_MAX)
     {
         Vector3 phit = r.origin + tnear * r.direction;
-        phit = getModelMatrix() * phit;
+        phit = getModel() * phit;
         tnear = (phit - ray.origin).length();
         return true;
     }

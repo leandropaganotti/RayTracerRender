@@ -3,7 +3,7 @@
 
 Vector3 AABB::getPosition()
 {
-    return Vector3(getModelMatrix()[0][3], getModelMatrix()[1][3], getModelMatrix()[2][3]);
+    return Vector3(getModel()[0][3], getModel()[1][3], getModel()[2][3]);
 }
 
 void AABB::create(const std::vector<Vector3> &vertices)
