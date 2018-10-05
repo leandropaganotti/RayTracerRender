@@ -2,7 +2,7 @@
 #define CONSTS_H
 #include "vector.h"
 
-enum class Shade
+enum class Shader
 {
     PHONG,
     GI,         // Global Ilumination: Indirect Light

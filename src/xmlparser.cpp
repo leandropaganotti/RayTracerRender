@@ -118,14 +118,14 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
              scene.bgColor = toVector(attr->children->content);
         else if (equals(attr->name, "ka"))
              scene.ka = toFloat(attr->children->content);
-        else if (equals(attr->name, "shade"))
+        else if (equals(attr->name, "shader"))
         {
             if (equals(attr->children->content, "gi"))
-                scene.shade = Shade::GI;
+                scene.shade = Shader::GI;
             else if (equals(attr->children->content, "gi_direct"))
-                scene.shade = Shade::GI_DIRECT;
+                scene.shade = Shader::GI_DIRECT;
             else
-                scene.shade = Shade::PHONG;
+                scene.shade = Shader::PHONG;
         }
         else
             cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlSceneNode->name << "\':" << name << endl;

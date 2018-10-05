@@ -24,8 +24,8 @@ public:
     size_t          spp;
     size_t          grid;
     size_t          maxDepth;
-    Vector3        bgColor;    
-    Shade           shade;
+    Vector3         bgColor;
+    Shader           shade;
 
     CameraOptions   cameraOptions;
     ObjectVector    objects;
