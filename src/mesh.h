@@ -4,7 +4,7 @@
 #include "plane.h"
 #include "aabb.h"
 
-class Mesh: public Object
+class Mesh: public Object, public Transformation
 {    
 public:    
     Mesh(const Vector3 &color={1.0f});
@@ -13,7 +13,7 @@ public:
     {
         size_t v0, v1, v2;      // 3 vertex indexes
         size_t nv0, nv1, nv2;   // 3 normal indexes for vertices
-        Vector3 nf;            // face normal
+        Vector3 nf;             // face normal
         float area;
         bool intersection(const std::vector<Vector3>   &vertices, const Ray &ray, float &tnear) const;
     };
@@ -28,12 +28,11 @@ public:
     friend std::ostream& operator << (std::ostream &os, const Triangle &f);
 
     // Object interface
-public:
     bool  intersection(const Ray& ray, IntersectionData& isec) const;
     bool  intersection(const Ray& ray, float& tnear) const;
     const Vector3 normal(const Vector3 &phit, size_t idx) const;
 
-public:
+protected:
     AABB aabb;
     std::vector<Vector3>   vertices;
     std::vector<Vector3>   normals;

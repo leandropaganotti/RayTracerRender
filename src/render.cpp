@@ -224,7 +224,7 @@ void Render::render(const Scene &scene)
 
 Vector3 Render::trace(const Ray &ray, const Scene &scene, const uint8_t depth)
 {
-    if(depth > scene.maxDepth) return Vector3(0.0f);
+    if(depth > scene.maxDepth) return Color::BLACK;
 
     IntersectionData isec;
 
@@ -254,7 +254,7 @@ Vector3 Render::trace(const Ray &ray, const Scene &scene, const uint8_t depth)
     }    
     else
     {
-        return Vector3(0.0f);
+        return Color::BLACK;
     }
 }
 

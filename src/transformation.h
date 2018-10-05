@@ -18,9 +18,9 @@ public:
     const Matrix4& getInverseTranspose()    const;
 
 
-    /**
-      TBD
-    */
+    /**************************************************
+      TODO
+    **************************************************/
     /*virtual void transform(const Matrix4 &M);
     virtual void translate(const Vector3 &T);
     virtual void scale(const Vector3 &S);

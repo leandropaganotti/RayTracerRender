@@ -46,7 +46,7 @@ struct Material
     }
 };
 
-class Object: public Transformation
+class Object
 {       
     std::shared_ptr<Texture> tex;
     virtual const std::pair<float, float> texUV(const Vector3 &, size_t) const;

@@ -6,7 +6,7 @@
 #include "transformation.h"
 #include "texture.h"
 
-class Box : public Object
+class Box : public Object, public Transformation
 {
 public:
     Box();
