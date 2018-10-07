@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scene name="3ballsOnTheFloor" grid="4" ssp="16" index="1.0" maxdepth="7" bgcolor="0.3" ka="0.1" >
+    <CameraOptions position="0,4,8" lookingat="0, 1.5, 0" fov="40" width="720" height="640"></CameraOptions>
+    <PointLight position="-3.5,3,3" color="1" strength="1.5" k="0.05"></PointLight>
+    <!--<Box>
+        <transformation translate="-3.5, 3, 3" rotate="0, -45, 0" scale="5, 5, 0.1"></transformation>
+        <material type="diffuse" kdiffuse="1" emission="3"></material>
+    </Box>-->
+    <Box>
+        <transformation translate="0" rotate="0" scale="5, 0.1, 5"></transformation>
+        <material type="diffuse" kdiffuse="0.447,0.184,0.216" emission="0"></material>
+    </Box>
+    <model name = "glass" path="../obj/glass.obj">
+        <material type="transparent" kdiffuse="1" kspecular="1" shininess="150" refractiveIndex="1.55" reflectivity="0.3" highlight="1"></material>
+        <transformation translate="0,0,0" rotate="0" scale="1" ></transformation>
+    </model>
+</scene>
