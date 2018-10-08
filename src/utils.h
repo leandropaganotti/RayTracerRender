@@ -140,10 +140,8 @@ Vector3 uniformSampleHemisphere(const float &r1, const float &r2)
     // cos(theta) = r1 = y
     // cos^2(theta) + sin^2(theta) = 1^2 -> sin(theta) = srtf(1 - cos^2(theta))
     float sinTheta = sqrtf(1 - r1 * r1);
-    float phi = 2 * M_PI * r2;
-    float x = sinTheta * cosf(phi);
-    float z = sinTheta * sinf(phi);
-    return Vector3(x, r1, z);
+    float phi = 2 * M_PI * r2;    
+    return Vector3(sinTheta * cosf(phi), sinTheta * sinf(phi), r1);
 }
 inline
 void createCoordinateSystem(const Vector3 &N, Vector3 &Nt, Vector3 &Nb)
