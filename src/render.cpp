@@ -44,17 +44,26 @@ bool Render::castRay(const Ray &ray, const ObjectVector &objects, IntersectionDa
 }
 
 inline
-bool Render::castShadowRay(const Ray &ray, const ObjectVector &objects, float tMax)
+float Render::castShadowRay(const Ray &ray, const ObjectVector &objects, float tMax)
 {
     float tnear;
+    float vis = 1.0f;
     for(auto &object : objects)
     {
         if (object->intersection(ray, tnear))
         {
-            if ( tnear < tMax ) return true;
+            if ( tnear < tMax )
+            {
+                if (object->material.type != Material::Type::TRANSPARENT)
+                    return 0.0f;
+                else
+                {
+                    vis -= 0.3f;
+                }
+            }
         }
     }
-    return false;
+    return vis;
 }
 
 inline
@@ -77,7 +86,8 @@ Vector3 Render::diffusePhongReflection(const Ray &ray, const Scene &scene, const
         float incidence = normal ^ toLight; //NdotL
         if( incidence > 0.0f )
         {
-            if (!castShadowRay(Ray(phit + bias * normal, toLight), scene.objects, light->distance(phit)))
+            float vis = castShadowRay(Ray(phit + bias * normal, toLight), scene.objects, light->distance(phit));
+            if (vis)
             {
                 //diffuse
                 Vector3 diffuse = material.kd * texture * incidence;
@@ -87,7 +97,7 @@ Vector3 Render::diffusePhongReflection(const Ray &ray, const Scene &scene, const
                 Vector3 reflected = reflect(-toLight, normal);
                 Vector3 specular = material.highlight * pow(std::max(0.0f, toCamera ^ reflected), material.shininess);
 
-                phitColor +=  light->intensity(phit) * (diffuse + specular);
+                phitColor +=  light->intensity(phit) * (diffuse + specular) * vis;
             }
         }
     }
@@ -233,43 +243,58 @@ Vector3 Render::shader(const Ray &ray, const Scene &scene, const uint8_t depth, 
 
     Material::Type type = isec.object->material.type;
 
-    if (type == Material::Type::DIFFUSE)
+    if (scene.shader == Shader::PHONG)
     {
-        if (scene.shade == Shader::PHONG)
-            return diffusePhongReflection(ray, scene, depth, isec, E);
-        else
-            return pathTrace(ray, scene, depth, isec, E);
-    }
-    else if (type == Material::Type::SPECULAR)
-    {
-        float c = 1.0f - (isec.normal ^ -ray.direction);
-        float R0 = isec.object->material.reflectivity;
-        float R = R0 + (1.0f-R0) * c * c * c * c * c;
-        float T = 1.0f - R;
-        if (!T)
-            return specularReflection(ray, scene, depth, isec, E);
-        else
+        if (type == Material::Type::DIFFUSE)
         {
-            if (scene.shade == Shader::PHONG)
-                return T*diffusePhongReflection(ray, scene, depth, isec, E) + R*specularReflection(ray, scene, depth, isec, E);
+            return diffusePhongReflection(ray, scene, depth, isec);
+        }
+        else if (type == Material::Type::SPECULAR)
+        {
+            float c = 1.0f - (isec.normal ^ -ray.direction);
+            float R0 = isec.object->material.reflectivity;
+            float R = R0 + (1.0f-R0) * c * c * c * c * c;
+            float T = 1.0f - R;
+            if (!T)
+
+                return specularReflection(ray, scene, depth, isec);
             else
-                return T*pathTrace(ray, scene, depth, isec, E) + R*specularReflection(ray, scene, depth, isec, E);
+            {
+                return T*diffusePhongReflection(ray, scene, depth, isec) + R*specularReflection(ray, scene, depth, isec);
+            }
+        }
+        else if (type == Material::Type::TRANSPARENT)
+        {
+            return transparentMaterial(ray, scene, depth, isec);
         }
     }
-    else if (type == Material::Type::TRANSPARENT)
+    else if (scene.shader == Shader::GI || scene.shader == Shader::GI_DIRECT)
     {
-        return transparentMaterial(ray, scene, depth, isec, E);
+        return pathTrace(ray, scene, depth, isec, E);
     }
     else
     {
-        return Color::BLACK;
+        std::cerr << "Shader not recognized" << std::endl;
+        exit(0);
     }
 }
 
 inline
 Vector3 Render::pathTrace(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float E)
-{
+{    
     const Material *material = &isec.object->material;
+
+    if (material->type == Material::Type::TRANSPARENT)
+        return transparentMaterial(ray, scene, depth, isec, E);
+    else if (material->type == Material::Type::SPECULAR)
+    {
+        float c = 1.0f - (isec.normal ^ -ray.direction);
+        float R0 = material->reflectivity;
+        float R = R0 + (1.0f-R0) * c * c * c * c * c;
+        float T = 1.0f - R;
+        if (!T) return specularReflection(ray, scene, depth, isec, E);
+        return T*pathTrace(ray, scene, depth, isec, E) + R*specularReflection(ray, scene, depth, isec, E);
+    }
 
     // Texture
     Vector3 textureColor = isec.object->texture(isec.phit, isec.idx);
@@ -279,16 +304,19 @@ Vector3 Render::pathTrace(const Ray &ray, const Scene &scene, const uint8_t dept
     //direct light
     Vector3 directLigthing(0.0f),indirectLigthing(0.0f);
 
-    //if( scene.shade == Shader::GI_DIRECT)
+    if( scene.shader == Shader::GI_DIRECT)
     for(auto &obj : scene.objects)
     {
-        if (obj->material.Le.x == 0 && obj->material.Le.y == 0 && obj->material.Le.z == 0) continue; // skip non light
+        if (obj->material.Le == Vector::ZERO) continue; // skip non light
+
+        //if (typeid(obj) != typeid(Sphere)) continue;    // only sphere sampling
 
         Sphere *sphere = dynamic_cast<Sphere*>(obj.get());
         if (isec.object == sphere) continue;
 
-        Vector3 Nt, Nb, N = (sphere->getCenter() - isec.phit).normalize();
-        createCoordinateSystem(N, Nt, Nb);
+        Vector3 u,v, w=(sphere->getCenter() - isec.phit).normalize(), n(1,0,0),m(0,1,0);
+        u = w%n; if(u.length()<0.01f)u = w%m;
+        v=w%u;
 
         float r1 = dis(gen);
         float r2 = dis(gen);
@@ -299,22 +327,21 @@ Vector3 Render::pathTrace(const Ray &ray, const Scene &scene, const uint8_t dept
         float phi = 2 * M_PI * r1;
         float pdf = 1/(2*M_PI*(1-cos_a_max));
 
-        Vector3 sample(cos(phi)*sin_a, cos_a, sin(phi)*sin_a);
-        Vector3 toLight(
-                sample.x * Nb.x + sample.y * N.x + sample.z * Nt.x,
-                sample.x * Nb.y + sample.y * N.y + sample.z * Nt.y,
-                sample.x * Nb.z + sample.y * N.z + sample.z * Nt.z);
+        Vector3 sample(cos(phi)*sin_a, sin(phi)*sin_a, cos_a);
 
-        float cosTheta = isec.normal ^ toLight;
+        Vector3 sampleWorld = sample.x*u + sample.y*v + sample.z*w;
+
+        float cosTheta = isec.normal ^ sampleWorld;
         if( cosTheta > 0.0f )
         {
             float dist = (isec.phit - sphere->getCenter()).length() - sphere->getRadius() - bias;
-            if (!castShadowRay(Ray(isec.phit + bias * isec.normal, toLight), scene.objects, dist))
+            float vis = castShadowRay(Ray(isec.phit + bias * isec.normal, sampleWorld), scene.objects, dist);
+            if (vis)
             {
-                directLigthing += brdf * sphere->material.Le * cosTheta / pdf;
+                directLigthing += vis * brdf * sphere->material.Le * cosTheta / pdf;
             }
         }
-    }
+    }        
 
     //indirect light    
     Vector3 u,v, w=isec.normal, n(1,0,0),m(0,1,0);
@@ -330,7 +357,7 @@ Vector3 Render::pathTrace(const Ray &ray, const Scene &scene, const uint8_t dept
     Ray R;
     R.origin = isec.phit + bias * isec.normal;
     R.direction = sampleWorld;
-    indirectLigthing = E*material->Le + material->kd * shader(R, scene, depth+1, 0.0f);
+    indirectLigthing = E * material->Le + material->kd * textureColor * shader(R, scene, depth+1, scene.shader == Shader::GI_DIRECT ? 0.0f : 1.0f);
 
     return directLigthing + indirectLigthing;
 }
