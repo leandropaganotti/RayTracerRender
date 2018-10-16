@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scene name="ModifiedCornellBox" grid="4" spp="512" index="1.0" maxdepth="5" shader="gi_direct">
+<scene name="ModifiedCornellBox" grid="4" spp="32" index="1.0" maxdepth="5" shader="gi_direct">
     <CameraOptions position="0,1.7,5" lookingat="0,1.7,0" fov="50" width="640" height="480"></CameraOptions>
     <Sphere name="mirrorBall" position="-2,0.8,-1.5" radius="0.8">
         <material type="specular" kspecular="0.9" kdiffuse="1" reflectivity="1"></material>
@@ -38,6 +38,6 @@
         <material type="diffuse" kdiffuse="0,0,1"></material>
     </Sphere>
     <Sphere name="light" position="0,3.0,0" radius="0.05">
-        <material type="diffuse" kdiffuse="1" emission="1650"></material>
+        <material type="diffuse" kdiffuse="1" emission="1800"></material>
     </Sphere>
 </scene>
