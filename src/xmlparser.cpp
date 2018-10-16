@@ -121,11 +121,11 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
         else if (equals(attr->name, "shader"))
         {
             if (equals(attr->children->content, "gi"))
-                scene.shade = Shader::GI;
+                scene.shader = Shader::GI;
             else if (equals(attr->children->content, "gi_direct"))
-                scene.shade = Shader::GI_DIRECT;
+                scene.shader = Shader::GI_DIRECT;
             else
-                scene.shade = Shader::PHONG;
+                scene.shader = Shader::PHONG;
         }
         else
             cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlSceneNode->name << "\':" << name << endl;
