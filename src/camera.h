@@ -15,8 +15,8 @@ class CameraOptions
     friend class Camera;
     friend class Render;
 
-    Vector3 from;
-    Vector3 to;
+    Vector3  from;
+    Vector3  to;
     float    fov;
     size_t   width;
     size_t   height;
@@ -25,9 +25,9 @@ class CameraOptions
 public:
     CameraOptions(const Vector3& from={0}, const Vector3& to={0,0,-1}, float fov=FOV, size_t width=WIDTH, size_t height=HEIGHT);
 
-    Vector3 getFrom() const;
+    Vector3  getFrom() const;
     void     setFrom(const Vector3 &value);
-    Vector3 getTo() const;
+    Vector3  getTo() const;
     void     setTo(const Vector3 &value);
     float    getFov() const;
     void     setFov(float value);

@@ -9,7 +9,7 @@ enum class Shader
     GI_DIRECT   // Global Ilumination: Direct + Indirect Light
 };
 
-namespace Color {
+namespace Color {    
     const Vector3 WHITE(1.0f);
     const Vector3 BLACK(0.0f);
     const Vector3 RED(1.0f, 0.0f, 0.0f);
@@ -21,6 +21,10 @@ namespace Color {
     const Vector3 PURPLE(0.5f, 0.0f, 0.5f);
     const Vector3 ORANGE(1.0f, 0.65f, 0.0f);
     const Vector3 GRAY(0.5f, 0.5f, 0.5f);
+}
+
+namespace Vector {
+    const Vector3 ZERO(0.0f);
 }
 
 #endif // CONSTS_H
