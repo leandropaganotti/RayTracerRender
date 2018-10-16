@@ -37,7 +37,7 @@ int main(int argc, char **argv)
 
     const Vector3 from( scene.cameraOptions.getFrom() ), to( scene.cameraOptions.getTo());
 
-    size_t spp = roundf(scene.spp/(4)) * 4;
+    size_t spp = roundf(scene.spp/(scene.grid*scene.grid));
 
     cout << "Render parameters:" << endl;
     cout << "- scene: " << xmlscene << endl;
