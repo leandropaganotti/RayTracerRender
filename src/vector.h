@@ -94,6 +94,11 @@ struct Vector3
         return x==rhs.x && y==rhs.y && z==rhs.z;
     }
 
+    bool operator!=(const Vector3& rhs) const
+    {
+        return !((*this) == rhs);
+    }
+
     // distance
     float distance(const Vector3& rhs)
     {
