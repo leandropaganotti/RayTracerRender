@@ -11,14 +11,10 @@
 std::random_device rd;  //Will be used to obtain a seed for the random number engine
 std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
 std::uniform_real_distribution<float> dis(0, 1);
-
-const Image &Render::getImage() const
-{
-    return image;
-}
+const float bias = 0.001;
 
 inline
-bool Render::castRay(const Ray &ray, const ObjectVector &objects, IntersectionData &isec)
+bool Render::closestIntersection(const Ray &ray, const ObjectVector &objects, IntersectionData &isec)
 {
     IntersectionData isec_tmp;
     isec.object = nullptr;
@@ -110,7 +106,7 @@ Vector3 Render::specularReflection(const Ray &ray, const Scene &scene, const uin
     Ray R;
     R.origin = isec.phit + bias * isec.normal;
     R.direction = reflect(ray.direction, isec.normal).normalize();
-    return shader(R, scene, depth + 1, E) * isec.object->material.ks;
+    return castRay(R, scene, depth + 1, E) * isec.object->material.ks;
 }
 
 inline
@@ -177,7 +173,7 @@ Vector3 Render::transparentMaterial(const Ray &ray, const Scene &scene, const ui
         T.origin = phit - bias * normal;
         T.direction = n * ray.direction + (n * cosi - cost) * normal;
         T.direction.normalize();
-        phitColor += shader(T, scene, depth + 1, E) * kt;
+        phitColor += castRay(T, scene, depth + 1, E) * kt;
     }
 
 
@@ -187,12 +183,12 @@ Vector3 Render::transparentMaterial(const Ray &ray, const Scene &scene, const ui
         Ray R;
         R.origin = phit + bias * normal;
         R.direction = reflect(ray.direction, normal).normalize();
-        phitColor += shader(R, scene, depth + 1, E) * kr;
+        phitColor += castRay(R, scene, depth + 1, E) * kr;
     }
     return phitColor;
 }
 
-void Render::render(const Scene &scene)
+void Render::capture(const Scene &scene)
 {
     const float grid = scene.grid;
     const float gridSize = 1.0f/grid;
@@ -220,7 +216,7 @@ void Render::render(const Scene &scene)
                         float r1 = erand48(Xi) * gridSize;
                         float r2 = erand48(Xi) * gridSize;
                         Ray ray(options.from, getRayDirection(i + gridSize*ii + r1, j + gridSize*jj + r2));
-                        image.at(i, j) += shader(ray, scene, 1);
+                        image.at(i, j) += castRay(ray, scene, 1);
                     }
                 }
             }
@@ -232,55 +228,63 @@ void Render::render(const Scene &scene)
     }
 }
 
-Vector3 Render::shader(const Ray &ray, const Scene &scene, const uint8_t depth, float E)
+Vector3 Render::castRay(const Ray &ray, const Scene &scene, const uint8_t depth, float E)
 {
     if(depth > scene.maxDepth) return Color::BLACK;
 
     IntersectionData isec;
 
-    if (!castRay(ray, scene.objects, isec))
+    if (!closestIntersection(ray, scene.objects, isec))
         return scene.bgColor;
-
-    Material::Type type = isec.object->material.type;
 
     if (scene.shader == Shader::PHONG)
     {
-        if (type == Material::Type::DIFFUSE)
-        {
-            return diffusePhongReflection(ray, scene, depth, isec);
-        }
-        else if (type == Material::Type::SPECULAR)
-        {
-            float c = 1.0f - (isec.normal ^ -ray.direction);
-            float R0 = isec.object->material.reflectivity;
-            float R = R0 + (1.0f-R0) * c * c * c * c * c;
-            float T = 1.0f - R;
-            if (!T)
-
-                return specularReflection(ray, scene, depth, isec);
-            else
-            {
-                return T*diffusePhongReflection(ray, scene, depth, isec) + R*specularReflection(ray, scene, depth, isec);
-            }
-        }
-        else if (type == Material::Type::TRANSPARENT)
-        {
-            return transparentMaterial(ray, scene, depth, isec);
-        }
+        return phongIllumination(ray, scene, depth, isec, E);
     }
     else if (scene.shader == Shader::GI || scene.shader == Shader::GI_DIRECT)
     {
-        return pathTrace(ray, scene, depth, isec, E);
+        return globalIllumination(ray, scene, depth, isec, E);
     }
     else
     {
         std::cerr << "Shader not recognized" << std::endl;
         exit(0);
     }
+    return Vector::ZERO;
 }
 
 inline
-Vector3 Render::pathTrace(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float E)
+Vector3 Render::phongIllumination(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float)
+{
+    Material::Type type = isec.object->material.type;
+
+    if (type == Material::Type::DIFFUSE)
+    {
+        return diffusePhongReflection(ray, scene, depth, isec);
+    }
+    else if (type == Material::Type::SPECULAR)
+    {
+        float c = 1.0f - (isec.normal ^ -ray.direction);
+        float R0 = isec.object->material.reflectivity;
+        float R = R0 + (1.0f-R0) * c * c * c * c * c;
+        float T = 1.0f - R;
+        if (!T)
+
+            return specularReflection(ray, scene, depth, isec);
+        else
+        {
+            return T*diffusePhongReflection(ray, scene, depth, isec) + R*specularReflection(ray, scene, depth, isec);
+        }
+    }
+    else if (type == Material::Type::TRANSPARENT)
+    {
+        return transparentMaterial(ray, scene, depth, isec);
+    }
+    return Vector::ZERO;
+}
+
+inline
+Vector3 Render::globalIllumination(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float E)
 {    
     const Material *material = &isec.object->material;
 
@@ -293,7 +297,7 @@ Vector3 Render::pathTrace(const Ray &ray, const Scene &scene, const uint8_t dept
         float R = R0 + (1.0f-R0) * c * c * c * c * c;
         float T = 1.0f - R;
         if (!T) return specularReflection(ray, scene, depth, isec, E);
-        return T*pathTrace(ray, scene, depth, isec, E) + R*specularReflection(ray, scene, depth, isec, E);
+        return T*globalIllumination(ray, scene, depth, isec, E) + R*specularReflection(ray, scene, depth, isec, E);
     }
 
     // Texture
@@ -357,7 +361,7 @@ Vector3 Render::pathTrace(const Ray &ray, const Scene &scene, const uint8_t dept
     Ray R;
     R.origin = isec.phit + bias * isec.normal;
     R.direction = sampleWorld;
-    indirectLigthing = E * material->Le + material->kd * textureColor * shader(R, scene, depth+1, scene.shader == Shader::GI_DIRECT ? 0.0f : 1.0f);
+    indirectLigthing = E * material->Le + material->kd * textureColor * castRay(R, scene, depth+1, scene.shader == Shader::GI_DIRECT ? 0.0f : 1.0f);
 
     return directLigthing + indirectLigthing;
 }

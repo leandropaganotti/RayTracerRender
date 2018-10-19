@@ -5,8 +5,8 @@
 #include <vector>
 #include "object.h"
 #include "light.h"
-#include "camera.h"
 #include "consts.h"
+#include "cameraoptions.h"
 
 class Scene
 {
@@ -25,7 +25,7 @@ public:
     size_t          grid;
     size_t          maxDepth;
     Vector3         bgColor;
-    Shader           shader;
+    Shader          shader;
 
     CameraOptions   cameraOptions;
     ObjectVector    objects;

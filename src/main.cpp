@@ -27,8 +27,8 @@ int main(int argc, char **argv)
     output = output.substr(output.find_last_of("/")+1);
     output = output.substr(0, output.find_last_of("."));
 
-    Render render;
-    Camera &camera = render;
+    Render rayTracer;
+    Camera &camera = rayTracer;
 
     Scene scene;
     scene.load(xmlscene);
@@ -51,7 +51,7 @@ int main(int argc, char **argv)
         camera.lookAt( Matrix4::T(to) * Matrix4::Ry(deg2rad( i*angle )) * Matrix4::T(-to) * from, to); // rotate around y-axis
 
         auto start = chrono::steady_clock::now();       
-        render.render(scene);
+        rayTracer.capture(scene);
         auto end = chrono::steady_clock::now();
 
         time_in_ms = chrono::duration_cast<chrono::milliseconds>(end - start).count();
@@ -64,7 +64,7 @@ int main(int argc, char **argv)
         std::stringstream ss;
         ss << output;
         ss << "_IMG" << std::setw(4) << std::setfill('0') << i << "_SPP" << spp << "_T" << time_str.str() << ".ppm";
-        render.getImage().save_ppm_bin(ss.str().c_str());
+        rayTracer.getImage().save_ppm_bin(ss.str().c_str());
 
         time_in_ms_avg += time_in_ms;
     }
