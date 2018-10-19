@@ -7,7 +7,7 @@
 
 class RayTracer: public Camera
 {    
-    Vector3 getRayDirection(float i, float j) const;
+    Vector3 getDirection(float i, float j) const;
     Vector3 castRay(const Ray &ray, const Scene &scene, const uint8_t depth, float E=1.0f);
 
     bool    closestIntersection(const Ray &ray, const ObjectVector &objects, IntersectionData &isec);
