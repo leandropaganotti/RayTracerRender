@@ -25,6 +25,13 @@ namespace Color {
 
 namespace Vector {
     const Vector3 ZERO(0.0f);
+    const Vector3 ORIGIN(0.0f);
+    const Vector3 UP(0.0f, 1.0f, 0.0f);
+    const Vector3 DOWN(0.0f, -1.0f, 0.0f);
+    const Vector3 LEFT(-1.0f, 0.0f, 0.0f);
+    const Vector3 RIGHT(1.0f, 0.0f, 0.0f);
+    const Vector3 FRONTWARD(0.0f, 0.0f, -1.0f);
+    const Vector3 BACKWARD(0.0f, 0.0f, 1.0f);
 }
 
 #endif // CONSTS_H

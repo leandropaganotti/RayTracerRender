@@ -1,4 +1,4 @@
-#include "render.h"
+#include "raytracer.h"
 #include <thread>
 #include <random>
 #include <atomic>
@@ -14,7 +14,7 @@ std::uniform_real_distribution<float> dis(0, 1);
 const float bias = 0.001;
 
 inline
-bool Render::closestIntersection(const Ray &ray, const ObjectVector &objects, IntersectionData &isec)
+bool RayTracer::closestIntersection(const Ray &ray, const ObjectVector &objects, IntersectionData &isec)
 {
     IntersectionData isec_tmp;
     isec.object = nullptr;
@@ -40,7 +40,7 @@ bool Render::closestIntersection(const Ray &ray, const ObjectVector &objects, In
 }
 
 inline
-float Render::castShadowRay(const Ray &ray, const ObjectVector &objects, float tMax)
+float RayTracer::castShadowRay(const Ray &ray, const ObjectVector &objects, float tMax)
 {
     float tnear;
     float vis = 1.0f;
@@ -63,7 +63,7 @@ float Render::castShadowRay(const Ray &ray, const ObjectVector &objects, float t
 }
 
 inline
-Vector3 Render::diffusePhongReflection(const Ray &ray, const Scene &scene, const uint8_t, const IntersectionData &isec, float)
+Vector3 RayTracer::diffusePhongReflection(const Ray &ray, const Scene &scene, const uint8_t, const IntersectionData &isec, float)
 {
     const Vector3 &phit = isec.phit;
     const Vector3 normal = isec.normal.dot(ray.direction) > 0.0f ? -isec.normal: isec.normal;
@@ -101,7 +101,7 @@ Vector3 Render::diffusePhongReflection(const Ray &ray, const Scene &scene, const
 }
 
 inline
-Vector3 Render::specularReflection(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float E)
+Vector3 RayTracer::specularReflection(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float E)
 {
     Ray R;
     R.origin = isec.phit + bias * isec.normal;
@@ -110,7 +110,7 @@ Vector3 Render::specularReflection(const Ray &ray, const Scene &scene, const uin
 }
 
 inline
-Vector3 Render::transparentMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float E)
+Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float E)
 {
     const Vector3 &phit = isec.phit;
     Vector3 normal = isec.normal;
@@ -188,7 +188,7 @@ Vector3 Render::transparentMaterial(const Ray &ray, const Scene &scene, const ui
     return phitColor;
 }
 
-void Render::capture(const Scene &scene)
+void RayTracer::capture(const Scene &scene)
 {
     const float grid = scene.grid;
     const float gridSize = 1.0f/grid;
@@ -200,10 +200,10 @@ void Render::capture(const Scene &scene)
     std::cout << std::endl;
     std::cout << "\r -> 0.00% completed" << std::flush;
     #pragma omp parallel for schedule(dynamic, 1) shared(count)
-    for (size_t i = 0; i < options.height; ++i)
+    for (size_t i = 0; i < getHeight(); ++i)
     {
         std::ostringstream ss;
-        for (size_t j = 0; j < options.width; ++j)
+        for (size_t j = 0; j < getWidth(); ++j)
         {
             image.at(i, j) = 0;
             for (size_t ii=0; ii < grid; ++ii)
@@ -215,7 +215,7 @@ void Render::capture(const Scene &scene)
                     {
                         float r1 = erand48(Xi) * gridSize;
                         float r2 = erand48(Xi) * gridSize;
-                        Ray ray(options.from, getRayDirection(i + gridSize*ii + r1, j + gridSize*jj + r2));
+                        Ray ray(getPosition(), getDirection(i + gridSize*ii + r1, j + gridSize*jj + r2));
                         image.at(i, j) += castRay(ray, scene, 1);
                     }
                 }
@@ -223,12 +223,22 @@ void Render::capture(const Scene &scene)
             image.at(i, j) /= nrays*grid*grid;
         }
         ++count;
-        ss << "\r -> " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) << count/float(options.height) * 100.0f << "% completed";
+        ss << "\r -> " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) << count/float(getHeight()) * 100.0f << "% completed";
         std::cout << ss.str() << std::flush;
     }
 }
 
-Vector3 Render::castRay(const Ray &ray, const Scene &scene, const uint8_t depth, float E)
+inline
+Vector3 RayTracer::getDirection(float i, float j) const
+{
+    float Px = (2.0f * ((j) / getWidth()) - 1.0f) * tan(getFov() / 2.0f ) * getRatio();
+    float Py = (1.0f - 2.0f * ((i) / getHeight())) * tan(getFov() / 2.0f);
+    Vector3 dir = (cameraToWorld * Vector3(Px, Py, -1.0f)) - getPosition();
+    return dir.normalize();
+}
+
+inline
+Vector3 RayTracer::castRay(const Ray &ray, const Scene &scene, const uint8_t depth, float E)
 {
     if(depth > scene.maxDepth) return Color::BLACK;
 
@@ -254,7 +264,7 @@ Vector3 Render::castRay(const Ray &ray, const Scene &scene, const uint8_t depth,
 }
 
 inline
-Vector3 Render::phongIllumination(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float)
+Vector3 RayTracer::phongIllumination(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float)
 {
     Material::Type type = isec.object->material.type;
 
@@ -284,7 +294,7 @@ Vector3 Render::phongIllumination(const Ray &ray, const Scene &scene, const uint
 }
 
 inline
-Vector3 Render::globalIllumination(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float E)
+Vector3 RayTracer::globalIllumination(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float E)
 {    
     const Material *material = &isec.object->material;
 

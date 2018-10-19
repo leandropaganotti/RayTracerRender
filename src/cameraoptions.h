@@ -9,8 +9,26 @@
 
 class CameraOptions
 {
+public:
+    CameraOptions();
+
+    Vector3  getFrom() const { return from; }
+    Vector3  getTo() const { return to; }
+    float    getFov() const { return fov; }
+    size_t   getWidth() const { return width; }
+    size_t   getHeight() const { return height; }
+    float    getAspectRatio() const { return aspectRatio; }
+
+    void     setFrom(const Vector3 &value);
+    void     setTo(const Vector3 &value);
+    void     setFov(float value);
+    void     setWidth(const size_t &value);
+    void     setHeight(const size_t &value);
+
+    friend std::ostream &operator <<(std::ostream &os, const CameraOptions &opt);
+
+protected:
     friend class Camera;
-    friend class Render;
 
     Vector3  from;
     Vector3  to;
@@ -18,23 +36,6 @@ class CameraOptions
     size_t   width;
     size_t   height;
     float    aspectRatio;
-
-public:
-    CameraOptions(const Vector3& from={0}, const Vector3& to={0,0,-1}, float fov=FOV, size_t width=WIDTH, size_t height=HEIGHT);
-
-    Vector3  getFrom() const;
-    void     setFrom(const Vector3 &value);
-    Vector3  getTo() const;
-    void     setTo(const Vector3 &value);
-    float    getFov() const;
-    void     setFov(float value);
-    size_t   getWidth() const;
-    void     setWidth(const size_t &value);
-    size_t   getHeight() const;
-    void     setHeight(const size_t &value);
-    float    getAspectRatio() const;
-
-    friend std::ostream &operator <<(std::ostream &os, const CameraOptions &opt);
 };
 
 #endif // CAMERAOPTIONS_H

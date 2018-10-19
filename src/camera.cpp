@@ -32,37 +32,26 @@ void Camera::lookAt(const Vector3 &from, const Vector3 &to, const Vector3 &up)
     options.to	 = to;
 }
 
-const Vector3& Camera::getPosition() const
-{
-    return options.from;
-}
-
-const CameraOptions& Camera::getOptions() const
-{
-    return options;    
-}
-
-size_t Camera::getWidth() const
-{
-    return options.width;
-}
-
-size_t Camera::getHeight() const
-{
-    return options.height;
-}
-
-const Image &Camera::getImage() const
-{
-    return image;
-}
-
 void Camera::setResolution(size_t width, size_t height)
 {
     options.width = width;
     options.height = height;
     options.aspectRatio = float(width) / height;
     image.resize(options.width, options.height);
+}
+
+void Camera::setWidth(float width)
+{
+    options.width = width;
+    options.aspectRatio = float(width) / options.height;
+    image.resize(options.width, options.height);
+}
+
+void Camera::setHeight(float height)
+{
+    options.height = height;
+    options.aspectRatio = float(options.width) / height;
+    image.resize(options.width, height);
 }
 
 void Camera::setFov(float fov)

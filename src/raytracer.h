@@ -1,12 +1,13 @@
-#ifndef RENDER_H
-#define RENDER_H
+#ifndef RAYTRACER_H
+#define RAYTRACER_H
 
 #include "image.h"
 #include "camera.h"
 #include "scene.h"
 
-class Render: public Camera
-{
+class RayTracer: public Camera
+{    
+    Vector3 getRayDirection(float i, float j) const;
     Vector3 castRay(const Ray &ray, const Scene &scene, const uint8_t depth, float E=1.0f);
 
     bool    closestIntersection(const Ray &ray, const ObjectVector &objects, IntersectionData &isec);
@@ -26,4 +27,4 @@ public:
     void capture(const Scene &scene);
 };
 
-#endif // RENDER_H
+#endif // RAYTRACER_H
