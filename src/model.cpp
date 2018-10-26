@@ -7,7 +7,7 @@
 #include <algorithm>
 #include "objparser.h"
 
-Model::Model(const Vector3 &color): Mesh(color)
+Model::Model()
 {
 }
 

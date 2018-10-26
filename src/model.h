@@ -14,7 +14,7 @@ current implementation loads a mesh from .obj file
 class Model: public Mesh
 {
 public:
-    Model(const Vector3 &color={1.0f});
+    Model();
     void loadFromFile(std::string path);
 };
 

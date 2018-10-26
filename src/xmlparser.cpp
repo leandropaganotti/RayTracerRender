@@ -250,7 +250,11 @@ void XMLParser::parseSphere(xmlNode *xmlSphereNode, Sphere & sphere)
         if (node->type == XML_ELEMENT_NODE)
         {
         	if (equals(node->name, "material"))
-                parseMaterial(node, sphere.material);
+            {
+                Material material;
+                parseMaterial(node, material);
+                sphere.setMaterial(material);
+            }
             else if (equals(node->name, "texture"))
             {
                 std::shared_ptr<Texture> tex;
@@ -411,7 +415,11 @@ void XMLParser::parsePlane(xmlNode *xmlPlaneNode, Plane & plane)
         if (node->type == XML_ELEMENT_NODE)
         {
         	if (equals(node->name, "material"))
-                parseMaterial(node, plane.material);
+            {
+                Material material;
+                parseMaterial(node, material);
+                plane.setMaterial(material);
+            }
             else if (equals(node->name, "texture"))
             {
                 std::shared_ptr<Texture> tex;
@@ -482,7 +490,11 @@ void XMLParser::parseBox(xmlNode *xmlBoxNode, Box &box)
         if (node->type == XML_ELEMENT_NODE)
         {
             if (equals(node->name, "material"))
-                parseMaterial(node, box.material);
+            {
+                Material material;
+                parseMaterial(node, material);
+                box.setMaterial(material);
+            }
             else if (equals(node->name, "transformation"))
                 parseTransformation(node, box);
             else if (equals(node->name, "texture"))
@@ -561,7 +573,11 @@ void XMLParser::parseModel(xmlNode *xmlModelNode, Model &model)
         if (node->type == XML_ELEMENT_NODE)
         {
             if (equals(node->name, "material"))
-                parseMaterial(node, model.material);
+            {
+                Material material;
+                parseMaterial(node, material);
+                model.setMaterial(material);
+            }
             else if (equals(node->name, "transformation"))
             {                                
                 parseTransformation(node, model);                

@@ -1,7 +1,7 @@
 #include "plane.h"
 
-Plane::Plane(const Vector3 &O, const Vector3 &n, const Vector3& color):
-    Object(color), O(O), N(n)
+Plane::Plane(const Vector3 &O, const Vector3 &n):
+    O(O), N(n)
 {
 
 }

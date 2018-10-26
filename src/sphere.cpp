@@ -1,7 +1,7 @@
 #include "sphere.h"
 
-Sphere::Sphere(const Vector3 &center, const float &radius, const Vector3 &color) :
-    Object(color), center(center), radius(radius), radius2(radius * radius)
+Sphere::Sphere(const Vector3 &center, const float &radius) :
+    center(center), radius(radius), radius2(radius * radius)
 {
 
 }

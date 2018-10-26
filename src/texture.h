@@ -2,6 +2,7 @@
 #define TEXTURE_H_
 
 #include "vector.h"
+#include "consts.h"
 
 class Texture
 {
@@ -9,6 +10,13 @@ public:
     Texture() = default;
 	virtual ~Texture() = default;
     virtual const Vector3& get(float u, float v) const = 0;
+};
+
+class DefaultWhite: public Texture
+{
+public:
+    DefaultWhite(){}
+    const Vector3& get(float, float) const { return Color::WHITE; }
 };
 
 class ChessBoard: public Texture

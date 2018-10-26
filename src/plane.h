@@ -7,7 +7,7 @@
 class Plane: public Object
 {
 public:       
-    Plane(const Vector3& O={0.0f}, const Vector3& N={0.0f, 1.0f, 0.0f}, const Vector3& color={1.0f});
+    Plane(const Vector3& O={0.0f}, const Vector3& N={0.0f, 1.0f, 0.0f});
 
     bool intersection(const Ray& ray, IntersectionData& isec) const;
     bool intersection(const Ray& ray, float &tnear) const;
@@ -19,12 +19,12 @@ public:
     Vector3 N;    // normal to the plane
 
 private:
-    const std::pair<float, float> texUV(const Vector3& phit, size_t) const;
+    const std::pair<float, float> uv(const Vector3& phit, size_t) const;
 
 };
 
 inline
-const std::pair<float, float> Plane::texUV(const Vector3 &phit, size_t) const
+const std::pair<float, float> Plane::uv(const Vector3 &phit, size_t) const
 {
 
     Vector3 v = phit - O;

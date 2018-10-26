@@ -50,7 +50,7 @@ float RayTracer::castShadowRay(const Ray &ray, const ObjectVector &objects, floa
         {
             if ( tnear < tMax )
             {
-                if (object->material.type != Material::Type::TRANSPARENT)
+                if (object->getMaterial().type != Material::Type::TRANSPARENT)
                     return 0.0f;
                 else
                 {
@@ -67,10 +67,11 @@ Vector3 RayTracer::diffusePhongReflection(const Ray &ray, const Scene &scene, co
 {
     const Vector3 &phit = isec.phit;
     const Vector3 normal = isec.normal.dot(ray.direction) > 0.0f ? -isec.normal: isec.normal;
-    const Material &material = isec.object->material;
+    const Material &material = isec.object->getMaterial();
+    const std::pair<float, float> uv = isec.object->uv(phit, isec.idx);
 
     // Texture
-    Vector3 texture = isec.object->texture(phit, isec.idx);
+    Vector3 texture = isec.object->getTexture()->get(uv.first, uv.second);
 
     //ambient
     Vector3 phitColor = material.kd * texture * scene.ka;
@@ -106,7 +107,7 @@ Vector3 RayTracer::specularReflection(const Ray &ray, const Scene &scene, const 
     Ray R;
     R.origin = isec.phit + bias * isec.normal;
     R.direction = reflect(ray.direction, isec.normal).normalize();
-    return castRay(R, scene, depth + 1, E) * isec.object->material.ks;
+    return castRay(R, scene, depth + 1, E) * isec.object->getMaterial().ks;
 }
 
 inline
@@ -114,7 +115,7 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const
 {
     const Vector3 &phit = isec.phit;
     Vector3 normal = isec.normal;
-    const Material &material = isec.object->material;
+    const Material &material = isec.object->getMaterial();
 
     Vector3 phitColor(0.0f);
 
@@ -260,13 +261,13 @@ Vector3 RayTracer::castRay(const Ray &ray, const Scene &scene, const uint8_t dep
         std::cerr << "Shader not recognized" << std::endl;
         exit(0);
     }
-    return Vector::ZERO;
+    return Color::BLACK;
 }
 
 inline
 Vector3 RayTracer::phongIllumination(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float)
 {
-    Material::Type type = isec.object->material.type;
+    Material::Type type = isec.object->getMaterial().type;
 
     if (type == Material::Type::DIFFUSE)
     {
@@ -275,7 +276,7 @@ Vector3 RayTracer::phongIllumination(const Ray &ray, const Scene &scene, const u
     else if (type == Material::Type::SPECULAR)
     {
         float c = 1.0f - (isec.normal ^ -ray.direction);
-        float R0 = isec.object->material.reflectivity;
+        float R0 = isec.object->getMaterial().reflectivity;
         float R = R0 + (1.0f-R0) * c * c * c * c * c;
         float T = 1.0f - R;
         if (!T)
@@ -296,7 +297,7 @@ Vector3 RayTracer::phongIllumination(const Ray &ray, const Scene &scene, const u
 inline
 Vector3 RayTracer::globalIllumination(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float E)
 {    
-    const Material *material = &isec.object->material;
+    const Material *material = &isec.object->getMaterial();
 
     if (material->type == Material::Type::TRANSPARENT)
         return transparentMaterial(ray, scene, depth, isec, E);
@@ -311,7 +312,10 @@ Vector3 RayTracer::globalIllumination(const Ray &ray, const Scene &scene, const 
     }
 
     // Texture
-    Vector3 textureColor = isec.object->texture(isec.phit, isec.idx);
+    const std::pair<float, float> uv = isec.object->uv(isec.phit, isec.idx);
+
+    // Texture
+    Vector3 textureColor = isec.object->getTexture()->get(uv.first, uv.second);
 
     Vector3 brdf = (material->kd * textureColor) / M_PI;
 
@@ -321,7 +325,7 @@ Vector3 RayTracer::globalIllumination(const Ray &ray, const Scene &scene, const 
     if( scene.shader == Shader::GI_DIRECT)
     for(auto &obj : scene.objects)
     {
-        if (obj->material.Le == Vector::ZERO) continue; // skip non light
+        if (obj->getMaterial().Le == Vector::ZERO) continue; // skip non light
 
         //if (typeid(obj) != typeid(Sphere)) continue;    // only sphere sampling
 
@@ -352,7 +356,7 @@ Vector3 RayTracer::globalIllumination(const Ray &ray, const Scene &scene, const 
             float vis = castShadowRay(Ray(isec.phit + bias * isec.normal, sampleWorld), scene.objects, dist);
             if (vis)
             {
-                directLigthing += vis * brdf * sphere->material.Le * cosTheta / pdf;
+                directLigthing += vis * brdf * sphere->getMaterial().Le * cosTheta / pdf;
             }
         }
     }        
