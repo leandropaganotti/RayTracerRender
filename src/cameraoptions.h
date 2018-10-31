@@ -9,15 +9,17 @@
 
 class CameraOptions
 {
+    friend class Camera;
+
 public:
     CameraOptions();
 
-    Vector3  getFrom() const { return from; }
-    Vector3  getTo() const { return to; }
-    float    getFov() const { return fov; }
-    size_t   getWidth() const { return width; }
-    size_t   getHeight() const { return height; }
-    float    getAspectRatio() const { return aspectRatio; }
+    Vector3  getFrom()      const { return from; }
+    Vector3  getTo()        const { return to; }
+    float    getFov()       const { return fov; }
+    size_t   getWidth()     const { return width; }
+    size_t   getHeight()    const { return height; }
+    float    getRatio()     const { return aspectRatio; }
 
     void     setFrom(const Vector3 &value);
     void     setTo(const Vector3 &value);
@@ -27,9 +29,7 @@ public:
 
     friend std::ostream &operator <<(std::ostream &os, const CameraOptions &opt);
 
-protected:
-    friend class Camera;
-
+protected:    
     Vector3  from;
     Vector3  to;
     float    fov;

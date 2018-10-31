@@ -49,7 +49,7 @@ struct Material
 class Object
 {           
 public:
-    Object(){ tex = std::shared_ptr<Texture>(new DefaultWhite); }
+    Object(){ tex = std::shared_ptr<Texture>(new SolidWhite); }
     virtual ~Object() = default;
 
     virtual bool intersection(const Ray& ray, IntersectionData &isec) const = 0;
