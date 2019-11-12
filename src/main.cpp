@@ -4,13 +4,14 @@
 #include <unistd.h>
 #include <string>
 #include <sstream>
-#include "render.h"
+#include "raytracer.h"
 #include "transformation.h"
 
 using namespace std;
 
 const char *xmlscene = NULL;// xml file with scene description
 unsigned    nimages  = 1;   // generates nimages from difterent angles around y-axis
+bool        detailedName = false;
 
 void parseArguments(int argc, char **argv);
 
@@ -27,31 +28,24 @@ int main(int argc, char **argv)
     output = output.substr(output.find_last_of("/")+1);
     output = output.substr(0, output.find_last_of("."));
 
-    Render render;
-    Camera &camera = render;
+    Scene scene(xmlscene);
+    cout << scene << endl;
 
-    Scene scene;
-    scene.load(xmlscene);
-
+    RayTracer raytracer;
+    Camera &camera = raytracer.getCamera();
     camera.setOptions(scene.cameraOptions);
 
     const Vector3 from( scene.cameraOptions.getFrom() ), to( scene.cameraOptions.getTo());
 
-    size_t spp = roundf(scene.spp/(scene.grid*scene.grid));
-
-    cout << "Render parameters:" << endl;
-    cout << "- scene: " << xmlscene << endl;
-    cout << "- #angles (y-axis): " << nimages << endl;
-    cout << "- resolution: " << camera.getWidth() << "x" << camera.getHeight() << endl;
-    cout << "- spp: " << spp << endl << endl;
+    size_t spp = roundf(scene.spp/(scene.grid*scene.grid)) * scene.grid * scene.grid;
 
     for (unsigned i=0; i < nimages; ++i)
     {
         cout << "\n" << i+1 << "/" << nimages << ": at " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) <<  i*angle << "°" << flush;
         camera.lookAt( Matrix4::T(to) * Matrix4::Ry(deg2rad( i*angle )) * Matrix4::T(-to) * from, to); // rotate around y-axis
 
-        auto start = chrono::steady_clock::now();       
-        render.render(scene);
+        auto start = chrono::steady_clock::now();
+        raytracer.render(scene);
         auto end = chrono::steady_clock::now();
 
         time_in_ms = chrono::duration_cast<chrono::milliseconds>(end - start).count();
@@ -63,8 +57,10 @@ int main(int argc, char **argv)
 
         std::stringstream ss;
         ss << output;
-        ss << "_IMG" << std::setw(4) << std::setfill('0') << i << "_SPP" << spp << "_T" << time_str.str() << ".ppm";
-        render.getImage().save_ppm_bin(ss.str().c_str());
+        ss << "_IMG" << std::setw(4) << std::setfill('0') << i;
+        if (detailedName) ss << "_SPP" << spp << "_T" << time_str.str();
+        ss << ".ppm";
+        raytracer.getBuffer().save_ppm_bin(ss.str().c_str());
 
         time_in_ms_avg += time_in_ms;
     }
@@ -77,14 +73,21 @@ int main(int argc, char **argv)
 
 void usage (char **argv)
 {
-    fprintf(stderr, "Usage: %s [-p nimages] xmlfile\n\n", argv[0]);
+    fprintf(stderr, "Usage: %s OPTIONS xmlfile\n\n", argv[0]);
+    //[-p nimages] [-d]
+    fprintf(stderr, "OPTIONS:\n");
+    fprintf(stderr, "\t-p nimages : number of images to generate around y-axis\n");
+    fprintf(stderr, "\t-d : detailed file name output with SPP and time for image creation\n");
 }
 
 void parseArguments(int argc, char **argv)
 {
     int opt;
-    while ((opt = getopt(argc, argv, "p:")) != -1) {
+    while ((opt = getopt(argc, argv, "dp:")) != -1) {
         switch (opt) {
+        case 'd':
+            detailedName = true;
+            break;
         case 'p':
             nimages = atoi(optarg);
             break;

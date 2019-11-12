@@ -5,19 +5,21 @@
 #include <vector>
 #include "object.h"
 #include "light.h"
-#include "camera.h"
 #include "consts.h"
+#include "cameraoptions.h"
 
 class Scene
 {
 public:
     Scene();
+    Scene(const std::string &fileName);
 
     void addObject(Object * obj);
     void addLight(Light * light);
 
-    void load(const char* filename);
+    void load(const std::string &fileName);
 
+    std::string     fileName;
     std::string     name;
     float           ambientIndex;
     float           ka;
@@ -25,7 +27,7 @@ public:
     size_t          grid;
     size_t          maxDepth;
     Vector3         bgColor;
-    Shader           shader;
+    Shader          shader;
 
     CameraOptions   cameraOptions;
     ObjectVector    objects;

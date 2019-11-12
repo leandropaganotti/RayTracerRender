@@ -33,9 +33,9 @@ struct Material
     float reflectivity;
     float refractiveIndex;
 
-    Material(const Vector3 &color={1.0})
+    Material()
     {
-        kd = color;
+        kd = Color::WHITE;
         ks = 1.0f;
         Le = 0.0f;
         highlight = 0.0f;
@@ -47,46 +47,26 @@ struct Material
 };
 
 class Object
-{       
-    std::shared_ptr<Texture> tex;
-    virtual const std::pair<float, float> texUV(const Vector3 &, size_t) const;
-
+{           
 public:
-    Object(const Vector3 &color={1.0}): material(color) { }
+    Object(){ tex = std::shared_ptr<Texture>(new SolidWhite); }
     virtual ~Object() = default;
 
     virtual bool intersection(const Ray& ray, IntersectionData &isec) const = 0;
     virtual bool intersection(const Ray& ray, float &tnear) const = 0;
-
     virtual const Vector3 normal(const Vector3 &phit, size_t idx) const = 0;
-    virtual const Vector3& texture(const Vector3 &phit, size_t idx) const;
+    virtual const std::pair<float, float> uv(const Vector3 &, size_t) const { return std::make_pair(0.0f,0.0f); }
 
-    Material material;    
-    void setTexture(std::shared_ptr<Texture> tex);
+    const std::shared_ptr<Texture> & getTexture() const { return tex; }
+    void setTexture(const std::shared_ptr<Texture> &tex) { if (tex != nullptr) this->tex = tex; }
+    const Material & getMaterial() const { return material; }
+    void setMaterial(const Material &material) { this->material = material; }
+
+private:
+    std::shared_ptr<Texture> tex;
+    Material material;
 };
 
 typedef std::vector<std::unique_ptr<Object>> ObjectVector;
-
-inline
-const std::pair<float, float> Object::texUV(const Vector3 &, size_t) const
-{
-    return std::make_pair(0,0);
-}
-
-inline
-const Vector3 &Object::texture(const Vector3 &phit, size_t idx) const
-{
-    if (!tex) return Color::WHITE;
-
-    float u, v;
-    std::tie(u, v) = texUV(phit, idx);
-    return tex->get(u, v) ;
-}
-
-inline
-void Object::setTexture(std::shared_ptr<Texture> tex)
-{
-    this->tex = tex;
-}
 
 #endif // OBJECT_H

@@ -16,7 +16,7 @@ public:
     const Vector3 normal(const Vector3 &, size_t idx) const;
 
 private:
-    const std::pair<float, float> texUV(const Vector3 &phit, size_t idx) const;
+    const std::pair<float, float> uv(const Vector3 &phit, size_t idx) const;
 
 private:
     static Vector3 min;

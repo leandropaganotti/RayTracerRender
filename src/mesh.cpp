@@ -2,8 +2,7 @@
 #include <float.h>
 #include <objparser.h>
 
-Mesh::Mesh(const Vector3 &color):
-	Object(color)
+Mesh::Mesh()
 {
 
 }

@@ -9,9 +9,7 @@ Vector3 Box::min = Vector3(-0.5f, -0.5f, 0.5f);
 Vector3 Box::max = Vector3(0.5f,0.5f,-0.5f);
 
 Box::Box()
-{
-    material.kd = 1;
-    material.type = Material::Type::DIFFUSE;
+{    
 }
 
 bool Box::intersection(const Ray &ray, IntersectionData &isec) const
@@ -95,7 +93,7 @@ const Vector3 Box::normal(const Vector3 &, size_t idx) const
     else               return (getInverseTranspose() * Vector3(0,0,-1)).normalize();
 }
 
-const std::pair<float, float> Box::texUV(const Vector3 &phit, size_t idx) const
+const std::pair<float, float> Box::uv(const Vector3 &phit, size_t idx) const
 {
     float u=0, v=0;
     Vector3 p = getInverse() * phit;

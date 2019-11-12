@@ -5,6 +5,11 @@
 
 Scene::Scene(): name("unamed"), ambientIndex(1.0f), ka(0.1), spp(1), grid(1), maxDepth(3), bgColor(0), shader(Shader::PHONG){}
 
+Scene::Scene(const std::string &fileName): name("unamed"), ambientIndex(1.0f), ka(0.1), spp(1), grid(1), maxDepth(3), bgColor(0), shader(Shader::PHONG)
+{
+    load(fileName);
+}
+
 void Scene::addObject(Object *obj)
 {
     objects.emplace_back(obj);
@@ -15,15 +20,18 @@ void Scene::addLight(Light *light)
     lights.emplace_back(light);
 }
 
-void Scene::load(const char *filename)
+void Scene::load(const std::string &fileName)
 {
-    XMLParser().parseFile(filename, *this);
+    this->fileName = fileName;
+    XMLParser().parseFile(fileName.c_str(), *this);
 }
 
 std::ostream &operator <<(std::ostream &os, const Scene &scene)
 {
-    os << "Scene: " << scene.cameraOptions << std::endl <<
-          "ambientIndex: " << scene.ambientIndex << ", ambientCoefficient: " << scene.ka;
+    os << "Scene: " << scene.name << " : " << scene.fileName << std::endl
+    << "\t" << scene.cameraOptions << std::endl <<
+    "\tambientIndex: " << scene.ambientIndex << ", ka: " << scene.ka << ", spp: " <<
+    scene.spp << ", grid: " << scene.grid << ", bgColor: " << scene.bgColor;
     return os;
 }
 

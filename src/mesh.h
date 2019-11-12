@@ -7,7 +7,7 @@
 class Mesh: public Object, public Transformation
 {    
 public:    
-    Mesh(const Vector3 &color={1.0f});
+    Mesh();
 
     struct Triangle
     {
