@@ -12,12 +12,14 @@ class Scene
 {
 public:
     Scene();
+    Scene(const std::string &fileName);
 
     void addObject(Object * obj);
     void addLight(Light * light);
 
-    void load(const char* filename);
+    void load(const std::string &fileName);
 
+    std::string     fileName;
     std::string     name;
     float           ambientIndex;
     float           ka;
