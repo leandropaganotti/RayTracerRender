@@ -3,7 +3,7 @@
 Camera::Camera()
 {
     lookAt(options.from, options.to);
-    image.resize(options.width, options.height);
+    buffer.resize(options.width, options.height);
 }
 
 void Camera::lookAt(const Vector3 &from, const Vector3 &to, const Vector3 &up)
@@ -37,21 +37,21 @@ void Camera::setResolution(size_t width, size_t height)
     options.width = width;
     options.height = height;
     options.aspectRatio = float(width) / height;
-    image.resize(options.width, options.height);
+    buffer.resize(options.width, options.height);
 }
 
 void Camera::setWidth(float width)
 {
     options.width = width;
     options.aspectRatio = float(width) / options.height;
-    image.resize(options.width, options.height);
+    buffer.resize(options.width, options.height);
 }
 
 void Camera::setHeight(float height)
 {
     options.height = height;
     options.aspectRatio = float(options.width) / height;
-    image.resize(options.width, height);
+    buffer.resize(options.width, height);
 }
 
 void Camera::setFov(float fov)
@@ -63,7 +63,7 @@ void Camera::setOptions(const CameraOptions& options)
 {
     this->options = options;
     lookAt(options.from, options.to);
-    image.resize(options.width, options.height);
+    buffer.resize(options.width, options.height);
 }
 
 std::ostream &operator <<(std::ostream &os, const Camera &cam)

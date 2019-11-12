@@ -62,7 +62,7 @@ int main(int argc, char **argv)
         ss << "_IMG" << std::setw(4) << std::setfill('0') << i;
         if (detailedName) ss << "_SPP" << spp << "_T" << time_str.str();
         ss << ".ppm";
-        render.getImage().save_ppm_bin(ss.str().c_str());
+        render.getBuffer().save_ppm_bin(ss.str().c_str());
 
         time_in_ms_avg += time_in_ms;
     }

@@ -21,7 +21,7 @@ public:
     size_t getHeight()                  const { return options.height; }
     float  getFov()                     const { return options.fov; }
     float  getRatio()                   const { return options.aspectRatio; }
-    const Image& getImage()             const { return image; }
+    const Image& getBuffer()            const { return buffer; }
 
     void setOptions(const CameraOptions& options);
     void setResolution(size_t width, size_t height);
@@ -34,7 +34,7 @@ public:
 protected:
     CameraOptions 	options;
     Matrix4  		cameraToWorld;
-    Image			image;
+    Image			buffer;
 };
 
 #endif // CAMERA_H

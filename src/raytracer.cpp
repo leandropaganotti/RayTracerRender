@@ -206,7 +206,7 @@ void RayTracer::capture(const Scene &scene)
         std::ostringstream ss;
         for (size_t j = 0; j < getWidth(); ++j)
         {
-            image.at(i, j) = 0;
+            buffer.at(i, j) = 0;
             for (size_t ii=0; ii < grid; ++ii)
             {
                 unsigned short Xi[3]={0,0,(short unsigned int)(ii*ii*ii)};
@@ -216,12 +216,12 @@ void RayTracer::capture(const Scene &scene)
                     {
                         float r1 = erand48(Xi) * gridSize;
                         float r2 = erand48(Xi) * gridSize;
-                        Ray ray(getPosition(), getDirection(i + gridSize*ii + r1, j + gridSize*jj + r2));
-                        image.at(i, j) += castRay(ray, scene, 1);
+                        Ray ray(getPosition(), rayDirection(i + gridSize*ii + r1, j + gridSize*jj + r2));
+                        buffer.at(i, j) += castRay(ray, scene, 1);
                     }
                 }
             }
-            image.at(i, j) /= nrays*grid*grid;
+            buffer.at(i, j) /= nrays*grid*grid;
         }
         ++count;
         ss << "\r -> " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) << count/float(getHeight()) * 100.0f << "% completed";
@@ -230,7 +230,7 @@ void RayTracer::capture(const Scene &scene)
 }
 
 inline
-Vector3 RayTracer::getDirection(float i, float j) const
+Vector3 RayTracer::rayDirection(float i, float j) const
 {
     float Px = (2.0f * ((j) / getWidth()) - 1.0f) * tan(getFov() / 2.0f ) * getRatio();
     float Py = (1.0f - 2.0f * ((i) / getHeight())) * tan(getFov() / 2.0f);
@@ -296,7 +296,7 @@ Vector3 RayTracer::phongIllumination(const Ray &ray, const Scene &scene, const u
 
 inline
 Vector3 RayTracer::globalIllumination(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float E)
-{    
+{
     const Material *material = &isec.object->getMaterial();
 
     if (material->type == Material::Type::TRANSPARENT)
@@ -359,9 +359,9 @@ Vector3 RayTracer::globalIllumination(const Ray &ray, const Scene &scene, const 
                 directLigthing += vis * brdf * sphere->getMaterial().Le * cosTheta / pdf;
             }
         }
-    }        
+    }
 
-    //indirect light    
+    //indirect light
     Vector3 u,v, w=isec.normal, n(1,0,0),m(0,1,0);
     u = w%n; if(u.length()<0.01f)u = w%m;
     v=w%u;
