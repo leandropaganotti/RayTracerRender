@@ -29,7 +29,7 @@ public:
 
     friend std::ostream &operator <<(std::ostream &os, const CameraOptions &opt);
 
-protected:    
+protected:
     Vector3  from;
     Vector3  to;
     float    fov;

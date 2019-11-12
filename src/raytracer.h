@@ -5,8 +5,17 @@
 #include "camera.h"
 #include "scene.h"
 
-class RayTracer: public Camera
+class RayTracer
 {
+public:
+    void render(const Scene& scene);
+
+    Camera& getCamera() { return camera; }
+
+    const Camera& getCamera() const { return camera; }
+    const Image&  getBuffer() const { return buffer; }
+
+private:
     Vector3 rayDirection(float i, float j) const;
     Vector3 castRay(const Ray &ray, const Scene &scene, const uint8_t depth, float E=1.0f);
 
@@ -20,11 +29,9 @@ class RayTracer: public Camera
     Vector3 phongIllumination(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float E=1.0f);
     Vector3 globalIllumination(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float E=1.0f);
 
-public:
-    /*
-     * This is Ray Tracer core algorithm
-    */
-    void capture(const Scene &scene);
+private:
+    Camera camera;
+    Image  buffer;
 };
 
 #endif // RAYTRACER_H

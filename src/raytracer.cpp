@@ -189,7 +189,7 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const
     return phitColor;
 }
 
-void RayTracer::capture(const Scene &scene)
+void RayTracer::render(const Scene& scene)
 {
     const float grid = scene.grid;
     const float gridSize = 1.0f/grid;
@@ -198,13 +198,15 @@ void RayTracer::capture(const Scene &scene)
 
     int count = 0;
 
+    buffer.resize(camera.getWidth(), camera.getHeight());
+
     std::cout << std::endl;
     std::cout << "\r -> 0.00% completed" << std::flush;
     #pragma omp parallel for schedule(dynamic, 1) shared(count)
-    for (size_t i = 0; i < getHeight(); ++i)
+    for (size_t i = 0; i < camera.getHeight(); ++i)
     {
         std::ostringstream ss;
-        for (size_t j = 0; j < getWidth(); ++j)
+        for (size_t j = 0; j < camera.getWidth(); ++j)
         {
             buffer.at(i, j) = 0;
             for (size_t ii=0; ii < grid; ++ii)
@@ -216,7 +218,7 @@ void RayTracer::capture(const Scene &scene)
                     {
                         float r1 = erand48(Xi) * gridSize;
                         float r2 = erand48(Xi) * gridSize;
-                        Ray ray(getPosition(), rayDirection(i + gridSize*ii + r1, j + gridSize*jj + r2));
+                        Ray ray(camera.getPosition(), rayDirection(i + gridSize*ii + r1, j + gridSize*jj + r2));
                         buffer.at(i, j) += castRay(ray, scene, 1);
                     }
                 }
@@ -224,7 +226,7 @@ void RayTracer::capture(const Scene &scene)
             buffer.at(i, j) /= nrays*grid*grid;
         }
         ++count;
-        ss << "\r -> " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) << count/float(getHeight()) * 100.0f << "% completed";
+        ss << "\r -> " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) << count/float(camera.getHeight()) * 100.0f << "% completed";
         std::cout << ss.str() << std::flush;
     }
 }
@@ -232,9 +234,9 @@ void RayTracer::capture(const Scene &scene)
 inline
 Vector3 RayTracer::rayDirection(float i, float j) const
 {
-    float Px = (2.0f * ((j) / getWidth()) - 1.0f) * tan(getFov() / 2.0f ) * getRatio();
-    float Py = (1.0f - 2.0f * ((i) / getHeight())) * tan(getFov() / 2.0f);
-    Vector3 dir = (cameraToWorld * Vector3(Px, Py, -1.0f)) - getPosition();
+    float Px = (2.0f * ((j) / camera.getWidth()) - 1.0f) * tan(camera.getFov() / 2.0f ) * camera.getRatio();
+    float Py = (1.0f - 2.0f * ((i) / camera.getHeight())) * tan(camera.getFov() / 2.0f);
+    Vector3 dir = (camera.getCameraToWorld() * Vector3(Px, Py, -1.0f)) - camera.getPosition();
     return dir.normalize();
 }
 

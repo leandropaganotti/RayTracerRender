@@ -13,7 +13,6 @@ class Camera
 public:
     Camera();
     void lookAt(const Vector3 &from, const Vector3 &to, const Vector3& up=Vector::UP);
-    virtual void capture(const Scene &scene) = 0;
 
     const CameraOptions& getOptions()   const { return options; }
     const Vector3& getPosition()        const { return options.from; }
@@ -21,7 +20,7 @@ public:
     size_t getHeight()                  const { return options.height; }
     float  getFov()                     const { return options.fov; }
     float  getRatio()                   const { return options.aspectRatio; }
-    const Image& getBuffer()            const { return buffer; }
+    const Matrix4& getCameraToWorld()   const { return cameraToWorld; }
 
     void setOptions(const CameraOptions& options);
     void setResolution(size_t width, size_t height);
@@ -34,7 +33,6 @@ public:
 protected:
     CameraOptions 	options;
     Matrix4  		cameraToWorld;
-    Image			buffer;
 };
 
 #endif // CAMERA_H

@@ -73,16 +73,19 @@ std::ostream& operator <<(std::ostream &os, Image &img)
 
 void Image::resize(size_t width, size_t height)
 {
-    if (width > 0 && height > 0)
+    if (this->_width != width || this->_height != height)
     {
-    	destroy();
-        buffer = new_array_2d<Vector3>(width, height);
-        this->_width = width;
-        this->_height = height;
-    }
-    else
-    {
-    	std::cerr << "error: image resize failed: new image size not valid" << std::endl;
+        if (width > 0 && height > 0)
+        {
+            destroy();
+            buffer = new_array_2d<Vector3>(width, height);
+            this->_width = width;
+            this->_height = height;
+        }
+        else
+        {
+            std::cerr << "error: image resize failed: new image size not valid" << std::endl;
+        }
     }
 }
 
