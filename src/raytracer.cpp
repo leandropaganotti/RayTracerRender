@@ -193,8 +193,8 @@ void RayTracer::render(const Scene& scene)
 {
     const float grid = scene.grid;
     const float gridSize = 1.0f/grid;
-
-    const size_t nrays = ceilf(scene.spp/(grid*grid));
+    const size_t nrays_persubpixel = ceilf(scene.spp/(grid*grid));
+    const size_t nrays_perpixel = nrays_persubpixel * grid * grid;
 
     int count = 0;
 
@@ -214,7 +214,7 @@ void RayTracer::render(const Scene& scene)
                 unsigned short Xi[3]={0,0,(short unsigned int)(ii*ii*ii)};
                 for (size_t jj=0; jj < grid; ++jj)
                 {
-                    for (size_t n = 0; n < nrays; ++n)
+                    for (size_t n = 0; n < nrays_persubpixel; ++n)
                     {
                         float r1 = erand48(Xi) * gridSize;
                         float r2 = erand48(Xi) * gridSize;
@@ -223,7 +223,7 @@ void RayTracer::render(const Scene& scene)
                     }
                 }
             }
-            buffer.at(i, j) /= nrays*grid*grid;
+            buffer.at(i, j) /= nrays_perpixel;
         }
         ++count;
         ss << "\r -> " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) << count/float(camera.getHeight()) * 100.0f << "% completed";

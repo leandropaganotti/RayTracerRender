@@ -40,7 +40,7 @@ struct Material
         Le = 0.0f;
         highlight = 0.0f;
         shininess = 30.0f;
-        reflectivity = 0.0f;
+        reflectivity = 1.0f;
         refractiveIndex = 1.55f;
         type = Type::DIFFUSE;
     }
