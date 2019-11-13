@@ -194,7 +194,7 @@ void RayTracer::render(const Scene& scene)
     const float grid = scene.grid;
     const float gridSize = 1.0f/grid;
 
-    const size_t nrays = roundf(scene.spp/(grid*grid));
+    const size_t nrays = ceilf(scene.spp/(grid*grid));
 
     int count = 0;
 
