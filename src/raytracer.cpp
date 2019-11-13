@@ -1,4 +1,5 @@
 #include "raytracer.h"
+#include <typeinfo>
 #include <thread>
 #include <random>
 #include <atomic>
@@ -329,10 +330,9 @@ Vector3 RayTracer::globalIllumination(const Ray &ray, const Scene &scene, const 
     {
         if (obj->getMaterial().Le == Vector::ZERO) continue; // skip non light
 
-        //if (typeid(obj) != typeid(Sphere)) continue;    // only sphere sampling
-
         Sphere *sphere = dynamic_cast<Sphere*>(obj.get());
-        if (isec.object == sphere) continue;
+
+        if (!sphere) continue; // only supported sphere for direct light
 
         Vector3 u,v, w=(sphere->getCenter() - isec.phit).normalize(), n(1,0,0),m(0,1,0);
         u = w%n; if(u.length()<0.01f)u = w%m;
