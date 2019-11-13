@@ -77,7 +77,7 @@ void XMLParser::parseFile(const char *filename, Scene & scene)
 
     if (doc == NULL)
     {
-        cerr << "error: could not parse file " << filename << endl;
+        cerr << "\x1b[33;1m" << "error: could not parse file " << filename << "\x1b[0m" << endl;
     }
     else
     {
@@ -96,7 +96,7 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
 {
     if(xmlSceneNode == NULL)
     {
-    	cerr << "error: could not parse Scene, xmlNode pointer is NULL" << endl;
+        cerr << "\x1b[33;1m" << "error: could not parse Scene, xmlNode pointer is NULL" << "\x1b[0m" << endl;
     	return;
     }
 
@@ -128,7 +128,7 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
                 scene.shader = Shader::PHONG;
         }
         else
-            cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlSceneNode->name << "\':" << name << endl;
+            cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlSceneNode->name << "\':" << name << "\x1b[0m" << endl;
     }
 
     if(xmlSceneNode->properties && equals(xmlSceneNode->properties->name, "name"))
@@ -182,7 +182,7 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
                 scene.addObject(model);
             }
             else
-            	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlSceneNode->name << "\'" << endl;
+                cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlSceneNode->name << "\'" << "\x1b[0m" << endl;
         }
     }    
 }
@@ -191,7 +191,7 @@ void XMLParser::parseCameraOptions(xmlNode *xmlCameraOptionsNode, CameraOptions 
 {
     if(xmlCameraOptionsNode == NULL)
     {
-	    cerr << "error: could not parse CameraOptions, xmlNode pointer is NULL" << endl;
+        cerr << "\x1b[33;1m" << "error: could not parse CameraOptions, xmlNode pointer is NULL" << "\x1b[0m" << endl;
 	    return;
     }
 
@@ -209,7 +209,7 @@ void XMLParser::parseCameraOptions(xmlNode *xmlCameraOptionsNode, CameraOptions 
 		else if (equals(attr->name, "height"))
 			options.setHeight( toInt(attr->children->content) );
 		else
-			cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlCameraOptionsNode->name << "\'" << endl;
+            cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlCameraOptionsNode->name << "\'" << "\x1b[0m" << endl;
 	}
 
     xmlNode *node = NULL;
@@ -217,7 +217,7 @@ void XMLParser::parseCameraOptions(xmlNode *xmlCameraOptionsNode, CameraOptions 
     {
         if (node->type == XML_ELEMENT_NODE)
         {
-        	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlCameraOptionsNode->name << "\'" << endl;
+            cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlCameraOptionsNode->name << "\'" << "\x1b[0m" << endl;
         }
     }
 }
@@ -226,7 +226,7 @@ void XMLParser::parseSphere(xmlNode *xmlSphereNode, Sphere & sphere)
 {
     if(xmlSphereNode == NULL)
     {
-	    cerr << "error: could not parse Sphere, xmlNode pointer is NULL" << endl;
+        cerr << "\x1b[33;1m" << "error: could not parse Sphere, xmlNode pointer is NULL" << "\x1b[0m" << endl;
 	    return;
     }
 
@@ -241,7 +241,7 @@ void XMLParser::parseSphere(xmlNode *xmlSphereNode, Sphere & sphere)
 		else if (equals(attr->name, "radius"))
 		    sphere.setRadius( toFloat(attr->children->content) );
 		else
-			cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlSphereNode->name << "\':" << name << endl;
+            cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlSphereNode->name << "\':" << name << "\x1b[0m" << endl;
 	}
 
     xmlNode *node = NULL;
@@ -262,7 +262,7 @@ void XMLParser::parseSphere(xmlNode *xmlSphereNode, Sphere & sphere)
                 sphere.setTexture(tex);
             }
             else
-            	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlSphereNode->name << "\'" << endl;
+                cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlSphereNode->name << "\'" << "\x1b[0m" << endl;
         }
     }
 }
@@ -271,14 +271,17 @@ void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, Material & material)
 {    
     if(xmlMaterialNode == NULL)
     {
-         cerr << "error: could not parse Material, xmlNode pointer is NULL" << endl;
+         cerr << "\x1b[33;1m" << "error: could not parse Material, xmlNode pointer is NULL" << "\x1b[0m" << endl;
          return;
     }
 
     const xmlAttr *attr = NULL;
+    string name("");
     for (attr = xmlMaterialNode->properties; attr; attr = attr->next)
 	{
-    	if (equals(attr->name, "kdiffuse"))
+        if (equals(attr->name, "name"))
+            name = (const char*)attr->children->content;
+        else if (equals(attr->name, "kdiffuse"))
     		material.kd = toVector(attr->children->content);
 		else if (equals(attr->name, "kspecular"))
 			material.ks = toVector(attr->children->content);
@@ -301,10 +304,10 @@ void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, Material & material)
 			else if (equals(attr->children->content, "TRANSPARENT"))
 				material.type = Material::Type::TRANSPARENT;            
 			else
-				cerr << "unrecognized material type \'" << attr->children->content << "\'" << endl;
+                cerr << "\x1b[33;1m" << "unrecognized material type \'" << attr->children->content << "\'" << "\x1b[0m" << endl;
 		}
 		else
-			cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlMaterialNode->name << "\'" << endl;
+            cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlMaterialNode->name << "\':" << name << "\x1b[0m" << endl;
 	}
 
     xmlNode *node = NULL;
@@ -312,7 +315,7 @@ void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, Material & material)
     {
         if (node->type == XML_ELEMENT_NODE)
         {
-        	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlMaterialNode->name << "\'" << endl;
+            cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlMaterialNode->name << "\'" << "\x1b[0m" << endl;
         }
     }
 }
@@ -321,7 +324,7 @@ void XMLParser::parsePointLight(xmlNode *xmlPointLightNode, PointLight & light)
 {
     if(xmlPointLightNode == NULL)
     {
-         cerr << "error: could not parse PointLight, xmlNode pointer is NULL" << endl;
+         cerr << "\x1b[33;1m" << "error: could not parse PointLight, xmlNode pointer is NULL" << "\x1b[0m" << endl;
          return;
     }
 
@@ -340,7 +343,7 @@ void XMLParser::parsePointLight(xmlNode *xmlPointLightNode, PointLight & light)
 		else if (equals(attr->name, "k"))
 			light.setK( toFloat(attr->children->content) );
 		else
-			cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlPointLightNode->name << "\':" << name << endl;
+            cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlPointLightNode->name << "\':" << name << "\x1b[0m" << endl;
 	}
 
     xmlNode *node = NULL;
@@ -348,7 +351,7 @@ void XMLParser::parsePointLight(xmlNode *xmlPointLightNode, PointLight & light)
     {
         if (node->type == XML_ELEMENT_NODE)
         {
-        	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlPointLightNode->name << "\'" << endl;
+            cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlPointLightNode->name << "\'" << "\x1b[0m" << endl;
         }
     }
 }
@@ -357,7 +360,7 @@ void XMLParser::parseDistantLight(xmlNode *xmlDistantLightNode, DistantLight &li
 {
     if(xmlDistantLightNode == NULL)
     {
-         cerr << "error: could not parse PointLight, xmlNode pointer is NULL" << endl;
+         cerr << "\x1b[33;1m" << "error: could not parse PointLight, xmlNode pointer is NULL" << "\x1b[0m" << endl;
          return;
     }
 
@@ -374,7 +377,7 @@ void XMLParser::parseDistantLight(xmlNode *xmlDistantLightNode, DistantLight &li
         else if (equals(attr->name, "strength"))
             light.setStrength( toFloat(attr->children->content) );
         else
-            cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlDistantLightNode->name << "\':" << name << endl;
+            cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlDistantLightNode->name << "\':" << name << "\x1b[0m" << endl;
     }
 
     xmlNode *node = NULL;
@@ -382,7 +385,7 @@ void XMLParser::parseDistantLight(xmlNode *xmlDistantLightNode, DistantLight &li
     {
         if (node->type == XML_ELEMENT_NODE)
         {
-            cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlDistantLightNode->name << "\'" << endl;
+            cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlDistantLightNode->name << "\'" << "\x1b[0m" << endl;
         }
     }
 }
@@ -391,7 +394,7 @@ void XMLParser::parsePlane(xmlNode *xmlPlaneNode, Plane & plane)
 {
     if(xmlPlaneNode == NULL)
     {
-         cerr << "error: could not parse Plane, xmlNode pointer is NULL" << endl;
+         cerr << "\x1b[33;1m" << "error: could not parse Plane, xmlNode pointer is NULL" << "\x1b[0m" << endl;
          return;
     }
 
@@ -406,7 +409,7 @@ void XMLParser::parsePlane(xmlNode *xmlPlaneNode, Plane & plane)
 		else if (equals(attr->name, "normal"))
 			plane.N = toVector(attr->children->content);
 		else
-			cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlPlaneNode->name << "\':" << name << endl;
+            cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlPlaneNode->name << "\':" << name << "\x1b[0m" << endl;
 	}
 
     xmlNode *node = NULL;
@@ -427,7 +430,7 @@ void XMLParser::parsePlane(xmlNode *xmlPlaneNode, Plane & plane)
                 plane.setTexture(tex);
             }
             else
-            	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlPlaneNode->name << "\'" << endl;
+                cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlPlaneNode->name << "\'" << "\x1b[0m" << endl;
         }
     }
 }
@@ -436,7 +439,7 @@ void XMLParser::parseTexture(xmlNode *xmlTextureNode, std::shared_ptr<Texture> &
 {
     if(xmlTextureNode == NULL)
     {
-         cerr << "error: could not parse Texture, xmlNode pointer is NULL" << endl;
+         cerr << "\x1b[33;1m" << "error: could not parse Texture, xmlNode pointer is NULL" << "\x1b[0m" << endl;
          return;
     }
 
@@ -463,7 +466,7 @@ void XMLParser::parseTexture(xmlNode *xmlTextureNode, std::shared_ptr<Texture> &
         else if (equals(attr->name, "angle"))
             angle = toFloat(attr->children->content);
         else
-			cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlTextureNode->name << "\'" << endl;
+            cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlTextureNode->name << "\'" << "\x1b[0m" << endl;
     }
     if(name)
     {
@@ -473,7 +476,7 @@ void XMLParser::parseTexture(xmlNode *xmlTextureNode, std::shared_ptr<Texture> &
             tex.reset(new ChessBoard(color1, color2, rows, cols, angle));
     }
     else
-        std::cerr << "Error parsing Texture type attribute not found in " << xmlTextureNode->name << std::endl;
+        cerr << "\x1b[33;1m" << "Error parsing Texture type attribute not found in " << xmlTextureNode->name << "\x1b[0m" << endl;
 
 }
 
@@ -481,7 +484,7 @@ void XMLParser::parseBox(xmlNode *xmlBoxNode, Box &box)
 {
     if(xmlBoxNode == NULL)
     {
-         cerr << "error: could not parse Box, xmlNode pointer is NULL" << endl;
+         cerr << "\x1b[33;1m" << "error: could not parse Box, xmlNode pointer is NULL" << "\x1b[0m" << endl;
          return;
     }
     xmlNode *node = NULL;
@@ -504,7 +507,7 @@ void XMLParser::parseBox(xmlNode *xmlBoxNode, Box &box)
                 box.setTexture(tex);
             }
             else
-            	cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlBoxNode->name << "\'" << endl;
+                cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlBoxNode->name << "\'" << "\x1b[0m" << endl;
         }
     }
 }
@@ -513,7 +516,7 @@ void XMLParser::parseTransformation(xmlNode *xmlTrnasformationNode, Transformati
 {
     if(xmlTrnasformationNode == NULL)
     {
-         cerr << "error: could not parse Model, xmlNode pointer is NULL" << endl;
+         cerr << "\x1b[33;1m" << "error: could not parse Model, xmlNode pointer is NULL" << "\x1b[0m" << endl;
          return;
     }
 
@@ -533,7 +536,7 @@ void XMLParser::parseTransformation(xmlNode *xmlTrnasformationNode, Transformati
         else if (equals(attr->name, "scale"))
             scale = toVector(attr->children->content);
         else
-            cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlTrnasformationNode->name << "\'" << endl;
+            cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlTrnasformationNode->name << "\'" << "\x1b[0m" << endl;
     }
 
     xmlNode *node = NULL;
@@ -541,7 +544,7 @@ void XMLParser::parseTransformation(xmlNode *xmlTrnasformationNode, Transformati
     {
         if (node->type == XML_ELEMENT_NODE)
         {
-            cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlTrnasformationNode->name << "\'" << endl;
+            cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlTrnasformationNode->name << "\'" << "\x1b[0m" << endl;
         }
     }
     transformation.setTransformation(translate, rotate, scale);
@@ -551,7 +554,7 @@ void XMLParser::parseModel(xmlNode *xmlModelNode, Model &model)
 {
     if(xmlModelNode == NULL)
     {
-         cerr << "error: could not parse Model, xmlNode pointer is NULL" << endl;
+         cerr << "\x1b[33;1m" << "error: could not parse Model, xmlNode pointer is NULL" << "\x1b[0m" << endl;
          return;
     }
 
@@ -564,7 +567,7 @@ void XMLParser::parseModel(xmlNode *xmlModelNode, Model &model)
         else if (equals(attr->name, "path"))
             model.loadFromFile((const char*)attr->children->content);
         else
-            cerr << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlModelNode->name << "\'" << endl;
+            cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlModelNode->name << "\'" << "\x1b[0m" << endl;
     }
 
     xmlNode *node = NULL;
@@ -584,7 +587,7 @@ void XMLParser::parseModel(xmlNode *xmlModelNode, Model &model)
             }
             else
             {
-                cerr << "unrecognized element \'" << node->name << "\' in element \'" << xmlModelNode->name << "\'" << endl;
+                cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlModelNode->name << "\'" << "\x1b[0m" << endl;
             }
         }
     }    
