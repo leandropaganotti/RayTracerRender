@@ -135,55 +135,16 @@ void RayTracer::setTracer(RayTracerType type){
 }
 
 inline
-Vector3 RayTracer::diffusePhongReflection(const Ray &ray, const Scene &scene, const uint8_t, const IntersectionData &isec, float)
-{
-    const Vector3 &phit = isec.phit;
-    const Vector3 normal = isec.normal.dot(ray.direction) > 0.0f ? -isec.normal: isec.normal;
-    const Material &material = isec.object->getMaterial();
-    const std::pair<float, float> uv = isec.object->uv(phit, isec.idx);
-
-    // Texture
-    Vector3 texture = isec.object->getTexture()->get(uv.first, uv.second);
-
-    //ambient
-    Vector3 phitColor = material.kd * texture * scene.ka;
-
-    for(auto& light: scene.lights)
-    {
-        Vector3 toLight = light->direction(phit);
-
-        float incidence = normal ^ toLight; //NdotL
-        if( incidence > 0.0f )
-        {
-            float vis = castShadowRay(Ray(phit + bias * normal, toLight), scene.objects, light->distance(phit));
-            if (vis)
-            {
-                //diffuse
-                Vector3 diffuse = material.kd * texture * incidence;
-
-                //specular
-                Vector3 toCamera = -ray.direction;
-                Vector3 reflected = reflect(-toLight, normal);
-                Vector3 specular = material.highlight * pow(std::max(0.0f, toCamera ^ reflected), material.shininess);
-
-                phitColor +=  light->intensity(phit) * (diffuse + specular) * vis;
-            }
-        }
-    }
-    return phitColor;
-}
-
-inline
-Vector3 RayTracer::specularReflection(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float E)
+Vector3 RayTracer::specularReflection(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
 {
     Ray R;
     R.origin = isec.phit + bias * isec.normal;
     R.direction = reflect(ray.direction, isec.normal).normalize();
-    return oldTracer(R, scene, depth + 1, E) * isec.object->getMaterial().ks;
+    return tracer(R, scene, depth + 1) * isec.object->getMaterial().ks;
 }
 
 inline
-Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float E)
+Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
 {
     const Vector3 &phit = isec.phit;
     Vector3 normal = isec.normal;
@@ -246,7 +207,7 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const
         T.origin = phit - bias * normal;
         T.direction = n * ray.direction + (n * cosi - cost) * normal;
         T.direction.normalize();
-        phitColor += oldTracer(T, scene, depth + 1, E) * kt;
+        phitColor += tracer(T, scene, depth + 1) * kt;
     }
 
 
@@ -256,151 +217,95 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const
         Ray R;
         R.origin = phit + bias * normal;
         R.direction = reflect(ray.direction, normal).normalize();
-        phitColor += oldTracer(R, scene, depth + 1, E) * kr;
+        phitColor += tracer(R, scene, depth + 1) * kr;
     }
     return phitColor;
 }
 
-inline
-Vector3 RayTracer::oldTracer(const Ray &ray, const Scene &scene, const uint8_t depth, float E)
-{
-    if(depth > scene.maxDepth) return Color::BLACK;
+//inline
+//Vector3 RayTracer::globalIllumination(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float E)
+//{
+//    const Material *material = &isec.object->getMaterial();
 
-    IntersectionData isec;
+//    if (material->type == Material::Type::TRANSPARENT)
+//        return transparentMaterial(ray, scene, depth, isec, E);
+//    else if (material->type == Material::Type::SPECULAR)
+//    {
+//        float c = 1.0f - (isec.normal ^ -ray.direction);
+//        float R0 = material->reflectivity;
+//        float R = R0 + (1.0f-R0) * c * c * c * c * c;
+//        float T = 1.0f - R;
+//        if (!T) return specularReflection(ray, scene, depth, isec, E);
+//        return T*globalIllumination(ray, scene, depth, isec, E) + R*specularReflection(ray, scene, depth, isec, E);
+//    }
 
-    if (!castRay(ray, scene.objects, isec))
-        return scene.bgColor;
+//    // Texture
+//    const std::pair<float, float> uv = isec.object->uv(isec.phit, isec.idx);
 
-    if (scene.raytracer == RayTracerType::Phong)
-    {
-        return phongIllumination(ray, scene, depth, isec, E);
-    }
-    else if (scene.raytracer == RayTracerType::PathTracer || scene.raytracer == RayTracerType::PathTracerWithDirectLightSampling)
-    {
-        return globalIllumination(ray, scene, depth, isec, E);
-    }
-    else
-    {
-        std::cerr << "Shader not recognized" << std::endl;
-        exit(0);
-    }
-    return Color::BLACK;
-}
+//    // Texture
+//    Vector3 textureColor = isec.object->getTexture()->get(uv.first, uv.second);
 
-inline
-Vector3 RayTracer::phongIllumination(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float)
-{
-    Material::Type type = isec.object->getMaterial().type;
+//    Vector3 brdf = (material->kd * textureColor) / M_PI;
 
-    if (type == Material::Type::DIFFUSE)
-    {
-        return diffusePhongReflection(ray, scene, depth, isec);
-    }
-    else if (type == Material::Type::SPECULAR)
-    {
-        float c = 1.0f - (isec.normal ^ -ray.direction);
-        float R0 = isec.object->getMaterial().reflectivity;
-        float R = R0 + (1.0f-R0) * c * c * c * c * c;
-        float T = 1.0f - R;
-        if (!T)
+//    //direct light
+//    Vector3 directLigthing(0.0f),indirectLigthing(0.0f);
 
-            return specularReflection(ray, scene, depth, isec);
-        else
-        {
-            return T*diffusePhongReflection(ray, scene, depth, isec) + R*specularReflection(ray, scene, depth, isec);
-        }
-    }
-    else if (type == Material::Type::TRANSPARENT)
-    {
-        return transparentMaterial(ray, scene, depth, isec);
-    }
-    return Vector::ZERO;
-}
+//    if( scene.raytracer == RayTracerType::PathTracerWithDirectLightSampling)
+//    for(auto &obj : scene.objects)
+//    {
+//        if (obj->getMaterial().Le == Vector::ZERO) continue; // skip non light
 
-inline
-Vector3 RayTracer::globalIllumination(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float E)
-{
-    const Material *material = &isec.object->getMaterial();
+//        Sphere *sphere = dynamic_cast<Sphere*>(obj.get());
 
-    if (material->type == Material::Type::TRANSPARENT)
-        return transparentMaterial(ray, scene, depth, isec, E);
-    else if (material->type == Material::Type::SPECULAR)
-    {
-        float c = 1.0f - (isec.normal ^ -ray.direction);
-        float R0 = material->reflectivity;
-        float R = R0 + (1.0f-R0) * c * c * c * c * c;
-        float T = 1.0f - R;
-        if (!T) return specularReflection(ray, scene, depth, isec, E);
-        return T*globalIllumination(ray, scene, depth, isec, E) + R*specularReflection(ray, scene, depth, isec, E);
-    }
+//        if (!sphere) continue; // only supported sphere for direct light
 
-    // Texture
-    const std::pair<float, float> uv = isec.object->uv(isec.phit, isec.idx);
+//        Vector3 u,v, w=(sphere->getCenter() - isec.phit).normalize(), n(1,0,0),m(0,1,0);
+//        u = w%n; if(u.length()<0.01f)u = w%m;
+//        v=w%u;
 
-    // Texture
-    Vector3 textureColor = isec.object->getTexture()->get(uv.first, uv.second);
+//        float r1 = dis(gen);
+//        float r2 = dis(gen);
+//        float dist2 = (isec.phit - sphere->getCenter()).length(); dist2*=dist2;
+//        float cos_a_max = sqrt(1 - (sphere->getRadius()*sphere->getRadius())/dist2);
+//        float cos_a = 1 - r2*(1-cos_a_max);
+//        float sin_a = sqrtf(1-cos_a*cos_a);
+//        float phi = 2 * M_PI * r1;
+//        float pdf = 1/(2*M_PI*(1-cos_a_max));
 
-    Vector3 brdf = (material->kd * textureColor) / M_PI;
+//        Vector3 sample(cos(phi)*sin_a, sin(phi)*sin_a, cos_a);
 
-    //direct light
-    Vector3 directLigthing(0.0f),indirectLigthing(0.0f);
+//        Vector3 sampleWorld = sample.x*u + sample.y*v + sample.z*w;
 
-    if( scene.raytracer == RayTracerType::PathTracerWithDirectLightSampling)
-    for(auto &obj : scene.objects)
-    {
-        if (obj->getMaterial().Le == Vector::ZERO) continue; // skip non light
+//        float cosTheta = isec.normal ^ sampleWorld;
+//        if( cosTheta > 0.0f )
+//        {
+//            float dist = (isec.phit - sphere->getCenter()).length() - sphere->getRadius() - bias;
+//            float vis = castShadowRay(Ray(isec.phit + bias * isec.normal, sampleWorld), scene.objects, dist);
+//            if (vis)
+//            {
+//                directLigthing += vis * brdf * sphere->getMaterial().Le * cosTheta / pdf;
+//            }
+//        }
+//    }
 
-        Sphere *sphere = dynamic_cast<Sphere*>(obj.get());
+//    //indirect light
+//    Vector3 u,v, w=isec.normal, n(1,0,0),m(0,1,0);
+//    u = w%n; if(u.length()<0.01f)u = w%m;
+//    v=w%u;
 
-        if (!sphere) continue; // only supported sphere for direct light
+//    float r1 = dis(gen); // this is cosi
+//    float r2 = dis(gen);
 
-        Vector3 u,v, w=(sphere->getCenter() - isec.phit).normalize(), n(1,0,0),m(0,1,0);
-        u = w%n; if(u.length()<0.01f)u = w%m;
-        v=w%u;
+//    Vector3 sample = uniformSampleHemisphere(r1, r2);
+//    Vector3 sampleWorld = sample.x*u + sample.y*v + sample.z*w;
 
-        float r1 = dis(gen);
-        float r2 = dis(gen);
-        float dist2 = (isec.phit - sphere->getCenter()).length(); dist2*=dist2;
-        float cos_a_max = sqrt(1 - (sphere->getRadius()*sphere->getRadius())/dist2);
-        float cos_a = 1 - r2*(1-cos_a_max);
-        float sin_a = sqrtf(1-cos_a*cos_a);
-        float phi = 2 * M_PI * r1;
-        float pdf = 1/(2*M_PI*(1-cos_a_max));
+//    Ray R;
+//    R.origin = isec.phit + bias * isec.normal;
+//    R.direction = sampleWorld;
+//    indirectLigthing = E * material->Le + material->kd * textureColor * oldTracer(R, scene, depth+1, scene.raytracer == RayTracerType::PathTracerWithDirectLightSampling ? 0.0f : 1.0f);
 
-        Vector3 sample(cos(phi)*sin_a, sin(phi)*sin_a, cos_a);
-
-        Vector3 sampleWorld = sample.x*u + sample.y*v + sample.z*w;
-
-        float cosTheta = isec.normal ^ sampleWorld;
-        if( cosTheta > 0.0f )
-        {
-            float dist = (isec.phit - sphere->getCenter()).length() - sphere->getRadius() - bias;
-            float vis = castShadowRay(Ray(isec.phit + bias * isec.normal, sampleWorld), scene.objects, dist);
-            if (vis)
-            {
-                directLigthing += vis * brdf * sphere->getMaterial().Le * cosTheta / pdf;
-            }
-        }
-    }
-
-    //indirect light
-    Vector3 u,v, w=isec.normal, n(1,0,0),m(0,1,0);
-    u = w%n; if(u.length()<0.01f)u = w%m;
-    v=w%u;
-
-    float r1 = dis(gen); // this is cosi
-    float r2 = dis(gen);
-
-    Vector3 sample = uniformSampleHemisphere(r1, r2);
-    Vector3 sampleWorld = sample.x*u + sample.y*v + sample.z*w;
-
-    Ray R;
-    R.origin = isec.phit + bias * isec.normal;
-    R.direction = sampleWorld;
-    indirectLigthing = E * material->Le + material->kd * textureColor * oldTracer(R, scene, depth+1, scene.raytracer == RayTracerType::PathTracerWithDirectLightSampling ? 0.0f : 1.0f);
-
-    return directLigthing + indirectLigthing;
-}
+//    return directLigthing + indirectLigthing;
+//}
 
 Vector3 RayTracer::rayTracer(const Ray &ray, const Scene &scene, const uint8_t depth)
 {
