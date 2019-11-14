@@ -9,10 +9,55 @@
 #include <iostream>
 #include "consts.h"
 
-std::random_device rd;  //Will be used to obtain a seed for the random number engine
-std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
-std::uniform_real_distribution<float> dis(0, 1);
 const float bias = 0.001;
+
+RayTracer::RayTracer()
+{
+    setTracer(Shader::GI);
+}
+
+void RayTracer::render(const Scene& scene)
+{
+    const float grid = scene.grid;
+    const float gridSize = 1.0f/grid;
+    const size_t nrays_persubpixel = ceilf(scene.spp/(grid*grid));
+    const size_t nrays_perpixel = nrays_persubpixel * grid * grid;
+
+    int count = 0;
+
+    buffer.resize(camera.getWidth(), camera.getHeight());
+    setTracer(scene.shader);
+
+    std::cout << std::endl;
+    std::cout << "\r -> 0.00% completed" << std::flush;
+    #pragma omp parallel for schedule(dynamic, 1) shared(count)
+    for (size_t i = 0; i < camera.getHeight(); ++i)
+    {
+        std::ostringstream ss;
+        for (size_t j = 0; j < camera.getWidth(); ++j)
+        {
+            buffer.at(i, j) = 0;
+            for (size_t ii=0; ii < grid; ++ii)
+            {
+                unsigned short Xi[3]={0,0,(short unsigned int)(ii*ii*ii)};
+                for (size_t jj=0; jj < grid; ++jj)
+                {
+                    for (size_t n = 0; n < nrays_persubpixel; ++n)
+                    {
+                        float r1 = erand48(Xi) * gridSize;
+                        float r2 = erand48(Xi) * gridSize;
+                        Ray ray(camera.getPosition(), rayDirection(i + gridSize*ii + r1, j + gridSize*jj + r2));
+                        buffer.at(i, j) += tracer(ray, scene, 1);
+                    }
+                }
+            }
+            buffer.at(i, j) /= nrays_perpixel;
+        }
+        ++count;
+        ss << "\r -> " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) << count/float(camera.getHeight()) * 100.0f << "% completed";
+        std::cout << ss.str() << std::flush;
+    }
+}
 
 inline
 bool RayTracer::closestIntersection(const Ray &ray, const ObjectVector &objects, IntersectionData &isec)
@@ -190,47 +235,7 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const
     return phitColor;
 }
 
-void RayTracer::render(const Scene& scene)
-{
-    const float grid = scene.grid;
-    const float gridSize = 1.0f/grid;
-    const size_t nrays_persubpixel = ceilf(scene.spp/(grid*grid));
-    const size_t nrays_perpixel = nrays_persubpixel * grid * grid;
 
-    int count = 0;
-
-    buffer.resize(camera.getWidth(), camera.getHeight());
-
-    std::cout << std::endl;
-    std::cout << "\r -> 0.00% completed" << std::flush;
-    #pragma omp parallel for schedule(dynamic, 1) shared(count)
-    for (size_t i = 0; i < camera.getHeight(); ++i)
-    {
-        std::ostringstream ss;
-        for (size_t j = 0; j < camera.getWidth(); ++j)
-        {
-            buffer.at(i, j) = 0;
-            for (size_t ii=0; ii < grid; ++ii)
-            {
-                unsigned short Xi[3]={0,0,(short unsigned int)(ii*ii*ii)};
-                for (size_t jj=0; jj < grid; ++jj)
-                {
-                    for (size_t n = 0; n < nrays_persubpixel; ++n)
-                    {
-                        float r1 = erand48(Xi) * gridSize;
-                        float r2 = erand48(Xi) * gridSize;
-                        Ray ray(camera.getPosition(), rayDirection(i + gridSize*ii + r1, j + gridSize*jj + r2));
-                        buffer.at(i, j) += castRay(ray, scene, 1);
-                    }
-                }
-            }
-            buffer.at(i, j) /= nrays_perpixel;
-        }
-        ++count;
-        ss << "\r -> " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) << count/float(camera.getHeight()) * 100.0f << "% completed";
-        std::cout << ss.str() << std::flush;
-    }
-}
 
 inline
 Vector3 RayTracer::rayDirection(float i, float j) const
@@ -380,4 +385,41 @@ Vector3 RayTracer::globalIllumination(const Ray &ray, const Scene &scene, const 
     indirectLigthing = E * material->Le + material->kd * textureColor * castRay(R, scene, depth+1, scene.shader == Shader::GI_DIRECT ? 0.0f : 1.0f);
 
     return directLigthing + indirectLigthing;
+}
+
+void RayTracer::setTracer(Shader type){
+    switch (type) {
+    case Shader::GI:
+        tracer = std::bind(&RayTracer::pathTracer, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        break;
+    default:
+        tracer = std::bind(&RayTracer::pathTracer, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        break;
+    }
+}
+
+
+inline
+Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t depth)
+{    
+    if(depth > scene.maxDepth) return Color::BLACK;
+
+    IntersectionData isec;
+
+    if (!closestIntersection(ray, scene.objects, isec))
+        return scene.bgColor;
+
+    const Material *material = &isec.object->getMaterial();
+
+    // Texture
+    const std::pair<float, float> uv = isec.object->uv(isec.phit, isec.idx);
+    Vector3 textureColor = isec.object->getTexture()->get(uv.first, uv.second);
+
+    Ray R;
+    R.origin = isec.phit + bias * isec.normal;
+    R.direction = randomUnitVectorInHemisphereOf(isec.normal);
+
+    float cosTheta = isec.normal ^ R.direction;
+
+    return material->Le + (material->kd * textureColor * pathTracer(R, scene, depth+1) * cosTheta * 2);
 }

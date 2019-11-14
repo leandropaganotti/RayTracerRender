@@ -8,8 +8,18 @@
 #include <cmath>
 #include <sstream>
 #include <vector>
+#include <random>
+
 
 # define PI           3.14159265358979323846  /* pi */
+
+namespace {
+std::random_device rd;  //Will be used to obtain a seed for the random number engine
+std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+std::uniform_real_distribution<float> dis(0, 1);
+}
+
+#define UNUSED(expr) (void)(expr)
 
 typedef struct timeval timestamp;
 
@@ -143,6 +153,21 @@ Vector3 uniformSampleHemisphere(const float &r1, const float &r2)
     float phi = 2 * M_PI * r2;    
     return Vector3(sinTheta * cosf(phi), sinTheta * sinf(phi), r1);
 }
+
+inline
+Vector3 randomUnitVectorInHemisphereOf(const Vector3& normalAtpoint)
+{
+    Vector3 u,v, w=normalAtpoint, n(1,0,0),m(0,1,0);
+    u = w%n; if(u.length()<0.01f)u = w%m;
+    v=w%u;
+
+    float r1 = dis(gen); // this is cosi
+    float r2 = dis(gen);
+
+    Vector3 sample = uniformSampleHemisphere(r1, r2);
+    return sample.x*u + sample.y*v + sample.z*w;
+}
+
 inline
 void createCoordinateSystem(const Vector3 &N, Vector3 &Nt, Vector3 &Nb)
 {
