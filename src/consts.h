@@ -2,11 +2,11 @@
 #define CONSTS_H
 #include "vector.h"
 
-enum class Shader
+enum class RayTracerType
 {
-    PHONG,
-    GI,         // Global Ilumination: Indirect Light
-    GI_DIRECT   // Global Ilumination: Direct + Indirect Light
+    Phong,
+    PathTracer,         // Global Ilumination: Indirect Light
+    PathTracerWithDirectLightSampling   // Global Ilumination: Direct + Indirect Light
 };
 
 namespace Color {    

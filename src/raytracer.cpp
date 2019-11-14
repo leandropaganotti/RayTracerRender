@@ -13,7 +13,7 @@ const float bias = 0.001;
 
 RayTracer::RayTracer()
 {
-    setTracer(Shader::GI);
+    setTracer(RayTracerType::Phong);
 }
 
 void RayTracer::render(const Scene& scene)
@@ -26,7 +26,7 @@ void RayTracer::render(const Scene& scene)
     int count = 0;
 
     buffer.resize(camera.getWidth(), camera.getHeight());
-    setTracer(scene.shader);
+    setTracer(scene.raytracer);
 
     std::cout << std::endl;
     std::cout << "\r -> 0.00% completed" << std::flush;
@@ -69,7 +69,7 @@ Vector3 RayTracer::rayDirection(float i, float j) const
 }
 
 inline
-bool RayTracer::closestIntersection(const Ray &ray, const ObjectVector &objects, IntersectionData &isec)
+bool RayTracer::castRay(const Ray &ray, const ObjectVector &objects, IntersectionData &isec)
 {
     IntersectionData isec_tmp;
     isec.object = nullptr;
@@ -117,16 +117,19 @@ float RayTracer::castShadowRay(const Ray &ray, const ObjectVector &objects, floa
     return vis;
 }
 
-void RayTracer::setTracer(Shader type){
+void RayTracer::setTracer(RayTracerType type){
     switch (type) {
-    case Shader::GI:
+    case RayTracerType::Phong:
+        tracer = std::bind(&RayTracer::rayTracer, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        break;
+    case RayTracerType::PathTracer:
         tracer = std::bind(&RayTracer::pathTracer, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
         break;
-    case Shader::PHONG:
-        tracer = std::bind(&RayTracer::phong, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    case RayTracerType::PathTracerWithDirectLightSampling:
+        tracer = std::bind(&RayTracer::pathTracer2, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
         break;
     default:
-        tracer = std::bind(&RayTracer::phong, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        tracer = std::bind(&RayTracer::rayTracer, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
         break;
     }
 }
@@ -176,7 +179,7 @@ Vector3 RayTracer::specularReflection(const Ray &ray, const Scene &scene, const 
     Ray R;
     R.origin = isec.phit + bias * isec.normal;
     R.direction = reflect(ray.direction, isec.normal).normalize();
-    return castRay(R, scene, depth + 1, E) * isec.object->getMaterial().ks;
+    return oldTracer(R, scene, depth + 1, E) * isec.object->getMaterial().ks;
 }
 
 inline
@@ -243,7 +246,7 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const
         T.origin = phit - bias * normal;
         T.direction = n * ray.direction + (n * cosi - cost) * normal;
         T.direction.normalize();
-        phitColor += castRay(T, scene, depth + 1, E) * kt;
+        phitColor += oldTracer(T, scene, depth + 1, E) * kt;
     }
 
 
@@ -253,26 +256,26 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const
         Ray R;
         R.origin = phit + bias * normal;
         R.direction = reflect(ray.direction, normal).normalize();
-        phitColor += castRay(R, scene, depth + 1, E) * kr;
+        phitColor += oldTracer(R, scene, depth + 1, E) * kr;
     }
     return phitColor;
 }
 
 inline
-Vector3 RayTracer::castRay(const Ray &ray, const Scene &scene, const uint8_t depth, float E)
+Vector3 RayTracer::oldTracer(const Ray &ray, const Scene &scene, const uint8_t depth, float E)
 {
     if(depth > scene.maxDepth) return Color::BLACK;
 
     IntersectionData isec;
 
-    if (!closestIntersection(ray, scene.objects, isec))
+    if (!castRay(ray, scene.objects, isec))
         return scene.bgColor;
 
-    if (scene.shader == Shader::PHONG)
+    if (scene.raytracer == RayTracerType::Phong)
     {
         return phongIllumination(ray, scene, depth, isec, E);
     }
-    else if (scene.shader == Shader::GI || scene.shader == Shader::GI_DIRECT)
+    else if (scene.raytracer == RayTracerType::PathTracer || scene.raytracer == RayTracerType::PathTracerWithDirectLightSampling)
     {
         return globalIllumination(ray, scene, depth, isec, E);
     }
@@ -342,7 +345,7 @@ Vector3 RayTracer::globalIllumination(const Ray &ray, const Scene &scene, const 
     //direct light
     Vector3 directLigthing(0.0f),indirectLigthing(0.0f);
 
-    if( scene.shader == Shader::GI_DIRECT)
+    if( scene.raytracer == RayTracerType::PathTracerWithDirectLightSampling)
     for(auto &obj : scene.objects)
     {
         if (obj->getMaterial().Le == Vector::ZERO) continue; // skip non light
@@ -394,9 +397,21 @@ Vector3 RayTracer::globalIllumination(const Ray &ray, const Scene &scene, const 
     Ray R;
     R.origin = isec.phit + bias * isec.normal;
     R.direction = sampleWorld;
-    indirectLigthing = E * material->Le + material->kd * textureColor * castRay(R, scene, depth+1, scene.shader == Shader::GI_DIRECT ? 0.0f : 1.0f);
+    indirectLigthing = E * material->Le + material->kd * textureColor * oldTracer(R, scene, depth+1, scene.raytracer == RayTracerType::PathTracerWithDirectLightSampling ? 0.0f : 1.0f);
 
     return directLigthing + indirectLigthing;
+}
+
+Vector3 RayTracer::rayTracer(const Ray &ray, const Scene &scene, const uint8_t depth)
+{
+    if(depth > scene.maxDepth) return Color::BLACK;
+
+    IntersectionData isec;
+
+    if (!castRay(ray, scene.objects, isec))
+        return scene.bgColor;
+
+    return phongShading(ray, scene, isec);
 }
 
 inline
@@ -406,7 +421,7 @@ Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t 
 
     IntersectionData isec;
 
-    if (!closestIntersection(ray, scene.objects, isec))
+    if (!castRay(ray, scene.objects, isec))
         return scene.bgColor;
 
     const Material *material = &isec.object->getMaterial();
@@ -424,15 +439,14 @@ Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t 
     return material->Le + (material->kd * textureColor * pathTracer(R, scene, depth+1) * cosTheta * 2);
 }
 
-Vector3 RayTracer::phong(const Ray &ray, const Scene &scene, const uint8_t depth)
+Vector3 RayTracer::pathTracer2(const Ray &ray, const Scene &scene, const uint8_t depth)
 {
-    if(depth > scene.maxDepth) return Color::BLACK;
+    return 0;
+}
 
-    IntersectionData isec;
 
-    if (!closestIntersection(ray, scene.objects, isec))
-        return scene.bgColor;
-
+Vector3 RayTracer::phongShading(const Ray &ray, const Scene &scene, const IntersectionData &isec)
+{
     const Material &material = isec.object->getMaterial();
 
     // Texture

@@ -27,7 +27,7 @@ public:
     size_t          grid;
     size_t          maxDepth;
     Vector3         bgColor;
-    Shader          shader;
+    RayTracerType   raytracer;
 
     CameraOptions   cameraOptions;
     ObjectVector    objects;
