@@ -60,6 +60,15 @@ void RayTracer::render(const Scene& scene)
 }
 
 inline
+Vector3 RayTracer::rayDirection(float i, float j) const
+{
+    float Px = (2.0f * ((j) / camera.getWidth()) - 1.0f) * tan(camera.getFov() / 2.0f ) * camera.getRatio();
+    float Py = (1.0f - 2.0f * ((i) / camera.getHeight())) * tan(camera.getFov() / 2.0f);
+    Vector3 dir = (camera.getCameraToWorld() * Vector3(Px, Py, -1.0f)) - camera.getPosition();
+    return dir.normalize();
+}
+
+inline
 bool RayTracer::closestIntersection(const Ray &ray, const ObjectVector &objects, IntersectionData &isec)
 {
     IntersectionData isec_tmp;
@@ -106,6 +115,20 @@ float RayTracer::castShadowRay(const Ray &ray, const ObjectVector &objects, floa
         }
     }
     return vis;
+}
+
+void RayTracer::setTracer(Shader type){
+    switch (type) {
+    case Shader::GI:
+        tracer = std::bind(&RayTracer::pathTracer, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        break;
+    case Shader::PHONG:
+        tracer = std::bind(&RayTracer::phong, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        break;
+    default:
+        tracer = std::bind(&RayTracer::phong, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        break;
+    }
 }
 
 inline
@@ -233,17 +256,6 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const
         phitColor += castRay(R, scene, depth + 1, E) * kr;
     }
     return phitColor;
-}
-
-
-
-inline
-Vector3 RayTracer::rayDirection(float i, float j) const
-{
-    float Px = (2.0f * ((j) / camera.getWidth()) - 1.0f) * tan(camera.getFov() / 2.0f ) * camera.getRatio();
-    float Py = (1.0f - 2.0f * ((i) / camera.getHeight())) * tan(camera.getFov() / 2.0f);
-    Vector3 dir = (camera.getCameraToWorld() * Vector3(Px, Py, -1.0f)) - camera.getPosition();
-    return dir.normalize();
 }
 
 inline
@@ -387,18 +399,6 @@ Vector3 RayTracer::globalIllumination(const Ray &ray, const Scene &scene, const 
     return directLigthing + indirectLigthing;
 }
 
-void RayTracer::setTracer(Shader type){
-    switch (type) {
-    case Shader::GI:
-        tracer = std::bind(&RayTracer::pathTracer, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-        break;
-    default:
-        tracer = std::bind(&RayTracer::pathTracer, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-        break;
-    }
-}
-
-
 inline
 Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t depth)
 {    
@@ -422,4 +422,47 @@ Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t 
     float cosTheta = isec.normal ^ R.direction;
 
     return material->Le + (material->kd * textureColor * pathTracer(R, scene, depth+1) * cosTheta * 2);
+}
+
+Vector3 RayTracer::phong(const Ray &ray, const Scene &scene, const uint8_t depth)
+{
+    if(depth > scene.maxDepth) return Color::BLACK;
+
+    IntersectionData isec;
+
+    if (!closestIntersection(ray, scene.objects, isec))
+        return scene.bgColor;
+
+    const Material &material = isec.object->getMaterial();
+
+    // Texture
+    const std::pair<float, float> uv = isec.object->uv(isec.phit, isec.idx);
+    Vector3 textureColor = isec.object->getTexture()->get(uv.first, uv.second);
+
+    //ambient
+    Vector3 phitColor = material.kd * textureColor * scene.ka;
+
+    for(auto& light: scene.lights)
+    {
+        Vector3 toLight = light->direction(isec.phit);
+
+        float incidence = isec.normal ^ toLight; //NdotL
+        if( incidence > 0.0f )
+        {
+            float vis = castShadowRay(Ray(isec.phit + bias * isec.normal, toLight), scene.objects, light->distance(isec.phit));
+            if (vis)
+            {
+                //diffuse
+                Vector3 diffuse = material.kd * textureColor * incidence;
+
+                //specular
+                Vector3 toCamera = -ray.direction;
+                Vector3 reflected = reflect(-toLight, isec.normal);
+                Vector3 specular = material.highlight * pow(std::max(0.0f, toCamera ^ reflected), material.shininess);
+
+                phitColor +=  light->intensity(isec.phit) * (diffuse + specular) * vis;
+            }
+        }
+    }
+    return phitColor;
 }
