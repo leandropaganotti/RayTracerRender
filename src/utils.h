@@ -72,6 +72,21 @@ void fresnel(const Vector3 &I, const Vector3 &N, const float &ior, float &kr)
 }
 
 inline
+float schlick(const Vector3 &I, const Vector3 &N, const float &R0)
+{
+    float c = 1.0f - (N ^ I);
+    return R0 + (1.0f - R0) * (c*c*c*c*c);
+}
+
+inline
+float schlick(const Vector3 &I, const Vector3 &N, const float &n1, const float &n2)
+{
+    float R0 = (n1-n2) / (n1 + n2);
+    R0 = R0 * R0;
+    return schlick(I, N, R0);
+}
+
+inline
 float modulo(const float x)
 {
     return x - std::floor(x);

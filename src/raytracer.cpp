@@ -411,7 +411,30 @@ Vector3 RayTracer::rayTracer(const Ray &ray, const Scene &scene, const uint8_t d
     if (!castRay(ray, scene.objects, isec))
         return scene.bgColor;
 
-    return phongShading(ray, scene, isec);
+    Material::Type type = isec.object->getMaterial().type;
+
+    if (type == Material::Type::DIFFUSE)
+    {
+        return phongShading(ray, scene, isec);
+    }
+    else if (type == Material::Type::SPECULAR)
+    {
+        float R = schlick(-ray.direction, isec.normal, isec.object->getMaterial().reflectivity);
+        float T = 1.0f - R;        
+        Vector3 diffused(0), reflected(0);
+        if (T > 0.0001)
+            diffused = phongShading(ray, scene, isec);
+        if (R > 0.0001)
+            reflected = specularReflection(ray, scene, depth, isec);
+
+        return T*diffused + R*reflected;
+    }
+    else if (type == Material::Type::TRANSPARENT)
+    {
+        return transparentMaterial(ray, scene, depth, isec);
+    }
+
+    return Color::BLACK;
 }
 
 inline
