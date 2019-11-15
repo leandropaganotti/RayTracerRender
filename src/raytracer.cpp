@@ -339,13 +339,28 @@ Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t 
 
     if (type == Material::Type::DIFFUSE)
     {
+        /*
+         * A Lambertian surface by definition reflects radiance equally into all directions. Its BRDF is simply
+
+            $BRDF = ~= rho / pi,
+
+            where $ \rho$ is called the reflectivity of the surface (from 0 to 1).
+
+            Lo = E + (BRDF * Li * cos) / pdf; where pdf = 1/Area = 1/2pi (hemisphere)
+
+            Lo = E + material->color/pi * pathTrace() * cos * 1/pdf
+            Lo = E + material->color/pi * pathTrace() * cos * 2pi
+            Lo = E + material->color * pathTrace() * cos * 2
+            I am not recurring in case of hit a light so:
+            if hit light return E otherwise material->color * pathTrace() * cos * 2
+        */
         Ray R;
         R.origin = isec.phit + bias * isec.normal;
         R.direction = randomUnitVectorInHemisphereOf(isec.normal);
 
         float cosTheta = isec.normal ^ R.direction;
 
-        return material->emission + (isec.object->color(isec) * pathTracer(R, scene, depth+1) * cosTheta * 2);
+        return material->emission != Vector::ZERO ? material->emission : isec.object->color(isec) * pathTracer(R, scene, depth+1) * cosTheta * 2;
     }
     else if (type == Material::Type::SPECULAR)
     {
