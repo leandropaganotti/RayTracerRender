@@ -26,11 +26,11 @@ private:
     Vector3 phongShading(const Ray &ray, const Scene &scene, const IntersectionData &isec);
     Vector3 specularReflection(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec);
     Vector3 transparentMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec);
-    //Vector3 globalIllumination(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float E=1.0f);
+    Vector3 globalIllumination(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, float E=1.0f);
 
     Vector3 rayTracer(const Ray &ray, const Scene &scene, const uint8_t depth);
-    Vector3 pathTracer(const Ray &ray, const Scene &scene, const uint8_t depth);
-    Vector3 pathTracer2(const Ray &ray, const Scene &scene, const uint8_t depth);
+    Vector3 pathTracer(const Ray &ray, const Scene &scene, const uint8_t depth);    
+    Vector3 pathTracer2(const Ray &ray, const Scene &scene, const uint8_t depth, float E);
 
 private:
     Camera camera;

@@ -126,7 +126,7 @@ void RayTracer::setTracer(RayTracerType type){
         tracer = std::bind(&RayTracer::pathTracer, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
         break;
     case RayTracerType::PathTracerWithDirectLightSampling:
-        tracer = std::bind(&RayTracer::pathTracer2, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        tracer = std::bind(&RayTracer::pathTracer2, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, 1.0f);
         break;
     default:
         tracer = std::bind(&RayTracer::rayTracer, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
@@ -358,7 +358,7 @@ Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t 
         R.origin = isec.phit + bias * isec.normal;
         R.direction = randomUnitVectorInHemisphereOf(isec.normal);
 
-        float cosTheta = isec.normal ^ R.direction;
+        float cosTheta = isec.normal ^ R.direction;        
 
         return material->emission != Vector::ZERO ? material->emission : isec.object->color(isec) * pathTracer(R, scene, depth+1) * cosTheta * 2;
     }
@@ -390,8 +390,73 @@ Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t 
     return Color::BLACK;
 }
 
-Vector3 RayTracer::pathTracer2(const Ray &, const Scene &, const uint8_t)
+Vector3 RayTracer::pathTracer2(const Ray& ray, const Scene& scene, const uint8_t depth, float E)
 {
+    if(depth > scene.maxDepth) return Color::BLACK;
+
+    IntersectionData isec;
+
+    if (!castRay(ray, scene.objects, isec))
+        return scene.bgColor;
+
+    const Material *material = &isec.object->getMaterial();
+
+    Material::Type type = isec.object->getMaterial().type;
+
+    if (type == Material::Type::DIFFUSE)
+    {
+        Vector3 brdf = isec.object->color(isec) / M_PI;
+        //direct light
+        Vector3 direct(0);
+
+        for(auto &obj : scene.objects)
+        {
+            if (obj->getMaterial().emission  == Vector::ZERO) continue; // skip non light
+
+            Sphere *sphere = dynamic_cast<Sphere*>(obj.get());
+
+            if (!sphere) continue; // only supported sphere for direct light
+
+            Vector3 u,v, w=(sphere->getCenter() - isec.phit).normalize(), n(1,0,0),m(0,1,0);
+            u = w%n; if(u.length()<0.01f)u = w%m;
+            v=w%u;
+
+            float r1 = dis(gen);
+            float r2 = dis(gen);
+            float dist2 = (isec.phit - sphere->getCenter()).length(); dist2*=dist2;
+            float cos_a_max = sqrt(1 - (sphere->getRadius()*sphere->getRadius())/dist2);
+            float cos_a = 1 - r2*(1-cos_a_max);
+            float sin_a = sqrtf(1-cos_a*cos_a);
+            float phi = 2 * M_PI * r1;
+            float pdf = 1/(2*M_PI*(1-cos_a_max));
+
+            Vector3 sample(cos(phi)*sin_a, sin(phi)*sin_a, cos_a);
+
+            Vector3 sampleWorld = sample.x*u + sample.y*v + sample.z*w;
+
+            float cosTheta = isec.normal ^ sampleWorld;
+            if( cosTheta > 0.0f )
+            {
+                float dist = (isec.phit - sphere->getCenter()).length() - sphere->getRadius() - bias;
+                float vis = castShadowRay(Ray(isec.phit + bias * isec.normal, sampleWorld), scene.objects, dist);
+                if (vis)
+                {
+                    direct += vis * brdf * sphere->getMaterial().emission * cosTheta / pdf;
+                }
+            }
+        }
+
+        //indirect light
+        float pdf2 = 1/(2*M_PI);
+        Ray R;
+        R.origin = isec.phit + bias * isec.normal;
+        R.direction = randomUnitVectorInHemisphereOf(isec.normal);
+
+        float cosTheta = isec.normal ^ R.direction;
+
+        Vector3 indirect =  (E*material->emission) + (brdf * pathTracer2(R, scene, depth+1, 0) * cosTheta) / pdf2;
+        return direct + indirect;
+    }
     return Color::BLACK;
 }
 
