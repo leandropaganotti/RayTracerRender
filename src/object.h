@@ -25,9 +25,8 @@ struct Material
 {
     enum class Type { DIFFUSE, SPECULAR, TRANSPARENT };
     Type type;
-    Vector3 kd;
-    Vector3 ks;
-    Vector3 Le;    
+    Vector3 kdiffuse;
+    Vector3 emission;
     float highlight;
     float shininess;
     float reflectivity;
@@ -35,10 +34,9 @@ struct Material
 
     Material()
     {
-        kd = Color::WHITE;
-        ks = 1.0f;
-        Le = 0.0f;
-        highlight = 0.0f;
+        kdiffuse = Color::WHITE;
+        emission = 0.0f;
+        highlight = 1.0f;
         shininess = 30.0f;
         reflectivity = 1.0f;
         refractiveIndex = 1.55f;
@@ -61,6 +59,12 @@ public:
     void setTexture(const std::shared_ptr<Texture> &tex) { if (tex != nullptr) this->tex = tex; }
     const Material & getMaterial() const { return material; }
     void setMaterial(const Material &material) { this->material = material; }
+
+    const Vector3 color(const IntersectionData& isec) const
+    {
+        const std::pair<float, float> _uv = uv(isec.phit, isec.idx);
+        return tex->get(_uv.first, _uv.second) * material.kdiffuse;
+    }
 
 private:
     std::shared_ptr<Texture> tex;

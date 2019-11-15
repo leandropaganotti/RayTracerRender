@@ -282,11 +282,9 @@ void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, Material & material)
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "kdiffuse"))
-    		material.kd = toVector(attr->children->content);
-		else if (equals(attr->name, "kspecular"))
-			material.ks = toVector(attr->children->content);
+            material.kdiffuse = toVector(attr->children->content);
         else if (equals(attr->name, "emission"))
-            material.Le = toVector(attr->children->content);
+            material.emission = toVector(attr->children->content);
         else if (equals(attr->name, "highlight"))
             material.highlight = toFloat(attr->children->content);
 		else if (equals(attr->name, "shininess"))

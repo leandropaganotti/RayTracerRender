@@ -140,7 +140,7 @@ Vector3 RayTracer::specularReflection(const Ray &ray, const Scene &scene, const 
     Ray R;
     R.origin = isec.phit + bias * isec.normal;
     R.direction = reflect(ray.direction, isec.normal).normalize();
-    return tracer(R, scene, depth + 1) * isec.object->getMaterial().ks;
+    return tracer(R, scene, depth + 1) * isec.object->color(isec);
 }
 
 inline
@@ -151,25 +151,6 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const
     const Material &material = isec.object->getMaterial();
 
     Vector3 phitColor(0.0f);
-
-    // specular
-    for(auto& light: scene.lights)
-    {
-        Vector3 toLight = light->direction(phit);
-
-        float incidence = normal ^ toLight; //NdotL
-        if( incidence > 0.0f )
-        {
-            if (!castShadowRay(Ray(phit + bias * normal, toLight), scene.objects, light->distance(phit)))
-            {
-                //specular
-                Vector3 toCamera = -ray.direction;
-                Vector3 reflected = reflect(-toLight, normal);
-                Vector3 specular = material.highlight * pow(std::max(0.0f, toCamera ^ reflected), material.shininess);
-                phitColor +=  light->intensity(phit) * specular;
-            }
-        }
-    }
 
     // transmited
     float n, n1, n2, kr, kt;
@@ -207,7 +188,7 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const
         T.origin = phit - bias * normal;
         T.direction = n * ray.direction + (n * cosi - cost) * normal;
         T.direction.normalize();
-        phitColor += tracer(T, scene, depth + 1) * kt;
+        phitColor += tracer(T, scene, depth + 1) * kt * isec.object->color(isec);
     }
 
 
@@ -217,7 +198,7 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const
         Ray R;
         R.origin = phit + bias * normal;
         R.direction = reflect(ray.direction, normal).normalize();
-        phitColor += tracer(R, scene, depth + 1) * kr;
+        phitColor += tracer(R, scene, depth + 1) * kr * isec.object->color(isec);
     }
     return phitColor;
 }
@@ -354,22 +335,49 @@ Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t 
 
     const Material *material = &isec.object->getMaterial();
 
-    // Texture
-    const std::pair<float, float> uv = isec.object->uv(isec.phit, isec.idx);
-    Vector3 textureColor = isec.object->getTexture()->get(uv.first, uv.second);
+    Material::Type type = isec.object->getMaterial().type;
 
-    Ray R;
-    R.origin = isec.phit + bias * isec.normal;
-    R.direction = randomUnitVectorInHemisphereOf(isec.normal);
+    if (type == Material::Type::DIFFUSE)
+    {
+        Ray R;
+        R.origin = isec.phit + bias * isec.normal;
+        R.direction = randomUnitVectorInHemisphereOf(isec.normal);
 
-    float cosTheta = isec.normal ^ R.direction;
+        float cosTheta = isec.normal ^ R.direction;
 
-    return material->Le + (material->kd * textureColor * pathTracer(R, scene, depth+1) * cosTheta * 2);
+        return material->emission + (isec.object->color(isec) * pathTracer(R, scene, depth+1) * cosTheta * 2);
+    }
+    else if (type == Material::Type::SPECULAR)
+    {
+        float R = schlick(-ray.direction, isec.normal, isec.object->getMaterial().reflectivity);
+        float T = 1.0f - R;
+        Vector3 diffused(0), reflected(0);
+        if (T > 0.0001)
+        {
+            Ray R;
+            R.origin = isec.phit + bias * isec.normal;
+            R.direction = randomUnitVectorInHemisphereOf(isec.normal);
+
+            float cosTheta = isec.normal ^ R.direction;
+
+            diffused = isec.object->color(isec) * pathTracer(R, scene, depth+1) * cosTheta * 2;
+
+        }
+        if (R > 0.0001)
+            reflected = specularReflection(ray, scene, depth, isec);
+
+        return T*diffused + R*reflected;
+    }
+    else if (type == Material::Type::TRANSPARENT)
+    {
+        return transparentMaterial(ray, scene, depth, isec);
+    }
+    return Color::BLACK;
 }
 
-Vector3 RayTracer::pathTracer2(const Ray &ray, const Scene &scene, const uint8_t depth)
+Vector3 RayTracer::pathTracer2(const Ray &, const Scene &, const uint8_t)
 {
-    return 0;
+    return Color::BLACK;
 }
 
 
@@ -377,12 +385,11 @@ Vector3 RayTracer::phongShading(const Ray &ray, const Scene &scene, const Inters
 {
     const Material &material = isec.object->getMaterial();
 
-    // Texture
-    const std::pair<float, float> uv = isec.object->uv(isec.phit, isec.idx);
-    Vector3 textureColor = isec.object->getTexture()->get(uv.first, uv.second);
+    // Texture & color
+    const Vector3 color = isec.object->color(isec);
 
     //ambient
-    Vector3 phitColor = material.kd * textureColor * scene.ka;
+    Vector3 phitColor = color * scene.ka;
 
     for(auto& light: scene.lights)
     {
@@ -395,7 +402,7 @@ Vector3 RayTracer::phongShading(const Ray &ray, const Scene &scene, const Inters
             if (vis)
             {
                 //diffuse
-                Vector3 diffuse = material.kd * textureColor * incidence;
+                Vector3 diffuse = color * incidence;
 
                 //specular
                 Vector3 toCamera = -ray.direction;
