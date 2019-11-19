@@ -47,7 +47,7 @@ void RayTracer::render(const Scene& scene)
                         float r1 = erand48(Xi) * gridSize;
                         float r2 = erand48(Xi) * gridSize;
                         Ray ray(camera.getPosition(), rayDirection(i + gridSize*ii + r1, j + gridSize*jj + r2));
-                        buffer.at(i, j) += tracer(ray, scene, 1);
+                        buffer.at(i, j) += tracer(ray, scene, 1, 1.0f);
                     }
                 }
             }
@@ -120,16 +120,16 @@ float RayTracer::castShadowRay(const Ray &ray, const ObjectVector &objects, floa
 void RayTracer::setTracer(RayTracerType type){
     switch (type) {
     case RayTracerType::Phong:
-        tracer = std::bind(&RayTracer::rayTracer, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        tracer = std::bind(&RayTracer::rayTracer, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
         break;
     case RayTracerType::PathTracer:
-        tracer = std::bind(&RayTracer::pathTracer, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        tracer = std::bind(&RayTracer::pathTracer, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
         break;
     case RayTracerType::PathTracerWithDirectLightSampling:
-        tracer = std::bind(&RayTracer::pathTracer2, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, 1.0f);
+        tracer = std::bind(&RayTracer::pathTracer2, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
         break;
     default:
-        tracer = std::bind(&RayTracer::rayTracer, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        tracer = std::bind(&RayTracer::rayTracer, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
         break;
     }
 }
@@ -140,17 +140,17 @@ Vector3 RayTracer::specularReflection(const Ray &ray, const Scene &scene, const 
     Ray R;
     R.origin = isec.phit + bias * isec.normal;
     R.direction = reflect(ray.direction, isec.normal).normalize();
-    return tracer(R, scene, depth + 1) * isec.object->color(isec);
+    return tracer(R, scene, depth + 1, 1.0f);
 }
 
 inline
-Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec)
+Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const uint8_t depth, const IntersectionData &isec, const float E)
 {
     const Vector3 &phit = isec.phit;
     Vector3 normal = isec.normal;
     const Material &material = isec.object->getMaterial();
 
-    Vector3 phitColor(0.0f);
+    Vector3 transmited(0.0f), reflected(0.0f);
 
     // transmited
     float n, n1, n2, kr, kt;
@@ -188,9 +188,8 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const
         T.origin = phit - bias * normal;
         T.direction = n * ray.direction + (n * cosi - cost) * normal;
         T.direction.normalize();
-        phitColor += tracer(T, scene, depth + 1) * kt * isec.object->color(isec);
+        transmited = tracer(T, scene, depth + 1, E) * kt;
     }
-
 
     // reflection
     if(kr)
@@ -198,9 +197,9 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const
         Ray R;
         R.origin = phit + bias * normal;
         R.direction = reflect(ray.direction, normal).normalize();
-        phitColor += tracer(R, scene, depth + 1) * kr * isec.object->color(isec);
+        reflected = tracer(R, scene, depth + 1, E) * kr;
     }
-    return phitColor;
+    return transmited + reflected;
 }
 
 //inline
@@ -288,7 +287,7 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const
 //    return directLigthing + indirectLigthing;
 //}
 
-Vector3 RayTracer::rayTracer(const Ray &ray, const Scene &scene, const uint8_t depth)
+Vector3 RayTracer::rayTracer(const Ray &ray, const Scene &scene, const uint8_t depth, const float)
 {
     if(depth > scene.maxDepth) return Color::BLACK;
 
@@ -311,20 +310,23 @@ Vector3 RayTracer::rayTracer(const Ray &ray, const Scene &scene, const uint8_t d
         if (T > 0.0001)
             diffused = phongShading(ray, scene, isec);
         if (R > 0.0001)
-            reflected = specularReflection(ray, scene, depth, isec);
-
+        {
+            Ray R;
+            R.origin = isec.phit + bias * isec.normal;
+            R.direction = reflect(ray.direction, isec.normal).normalize();
+            reflected = isec.object->color(isec) * rayTracer(R, scene, depth + 1);
+        }
         return T*diffused + R*reflected;
     }
     else if (type == Material::Type::TRANSPARENT)
     {
-        return transparentMaterial(ray, scene, depth, isec);
+        return isec.object->color(isec) * transparentMaterial(ray, scene, depth, isec);
     }
-
     return Color::BLACK;
 }
 
 inline
-Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t depth)
+Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t depth, const float)
 {    
     if(depth > scene.maxDepth) return Color::BLACK;
 
@@ -357,10 +359,8 @@ Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t 
         Ray R;
         R.origin = isec.phit + bias * isec.normal;
         R.direction = randomUnitVectorInHemisphereOf(isec.normal);
-
         float cosTheta = isec.normal ^ R.direction;        
-
-        return material->emission != Vector::ZERO ? material->emission : isec.object->color(isec) * pathTracer(R, scene, depth+1) * cosTheta * 2;
+        return material->emission != Vector::ZERO ? material->emission : isec.object->color(isec) * pathTracer(R, scene, depth+1) * cosTheta * 2 ;
     }
     else if (type == Material::Type::SPECULAR)
     {
@@ -371,26 +371,27 @@ Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t 
         {
             Ray R;
             R.origin = isec.phit + bias * isec.normal;
-            R.direction = randomUnitVectorInHemisphereOf(isec.normal);
-
-            float cosTheta = isec.normal ^ R.direction;
-
-            diffused = isec.object->color(isec) * pathTracer(R, scene, depth+1) * cosTheta * 2;
-
+            R.direction = randomUnitVectorInHemisphereOf(isec.normal);            
+            diffused = isec.object->color(isec) * pathTracer(R, scene, depth+1);
         }
         if (R > 0.0001)
-            reflected = specularReflection(ray, scene, depth, isec);
+        {
+            Ray R;
+            R.origin = isec.phit + bias * isec.normal;
+            R.direction = reflect(ray.direction, isec.normal).normalize();
+            reflected = isec.object->color(isec) * pathTracer(R, scene, depth+1);
+        }
 
         return T*diffused + R*reflected;
     }
     else if (type == Material::Type::TRANSPARENT)
     {
-        return transparentMaterial(ray, scene, depth, isec);
+        return isec.object->color(isec) * transparentMaterial(ray, scene, depth, isec);
     }
     return Color::BLACK;
 }
 
-Vector3 RayTracer::pathTracer2(const Ray& ray, const Scene& scene, const uint8_t depth, float E)
+Vector3 RayTracer::pathTracer2(const Ray& ray, const Scene& scene, const uint8_t depth, const float E)
 {
     if(depth > scene.maxDepth) return Color::BLACK;
 
@@ -451,11 +452,81 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const Scene& scene, const uint8_t
         Ray R;
         R.origin = isec.phit + bias * isec.normal;
         R.direction = randomUnitVectorInHemisphereOf(isec.normal);
-
         float cosTheta = isec.normal ^ R.direction;
-
-        Vector3 indirect =  (E*material->emission) + (brdf * pathTracer2(R, scene, depth+1, 0) * cosTheta) / pdf2;
+        Vector3 indirect =  (E*material->emission) + (brdf * pathTracer2(R, scene, depth+1, 0.0f) * cosTheta) / pdf2;
         return direct + indirect;
+    }
+    else if (type == Material::Type::SPECULAR)
+    {
+        float R = schlick(-ray.direction, isec.normal, isec.object->getMaterial().reflectivity);
+        float T = 1.0f - R;
+        Vector3 diffused(0), reflected(0);
+        if (T > 0.0001)
+        {
+            Vector3 brdf = isec.object->color(isec) / M_PI;
+            //direct light
+            Vector3 direct(0);
+
+            for(auto &obj : scene.objects)
+            {
+                if (obj->getMaterial().emission  == Vector::ZERO) continue; // skip non light
+
+                Sphere *sphere = dynamic_cast<Sphere*>(obj.get());
+
+                if (!sphere) continue; // only supported sphere for direct light
+
+                Vector3 u,v, w=(sphere->getCenter() - isec.phit).normalize(), n(1,0,0),m(0,1,0);
+                u = w%n; if(u.length()<0.01f)u = w%m;
+                v=w%u;
+
+                float r1 = dis(gen);
+                float r2 = dis(gen);
+                float dist2 = (isec.phit - sphere->getCenter()).length(); dist2*=dist2;
+                float cos_a_max = sqrt(1 - (sphere->getRadius()*sphere->getRadius())/dist2);
+                float cos_a = 1 - r2*(1-cos_a_max);
+                float sin_a = sqrtf(1-cos_a*cos_a);
+                float phi = 2 * M_PI * r1;
+                float pdf = 1/(2*M_PI*(1-cos_a_max));
+
+                Vector3 sample(cos(phi)*sin_a, sin(phi)*sin_a, cos_a);
+
+                Vector3 sampleWorld = sample.x*u + sample.y*v + sample.z*w;
+
+                float cosTheta = isec.normal ^ sampleWorld;
+                if( cosTheta > 0.0f )
+                {
+                    float dist = (isec.phit - sphere->getCenter()).length() - sphere->getRadius() - bias;
+                    float vis = castShadowRay(Ray(isec.phit + bias * isec.normal, sampleWorld), scene.objects, dist);
+                    if (vis)
+                    {
+                        direct += vis * brdf * sphere->getMaterial().emission * cosTheta / pdf;
+                    }
+                }
+            }
+
+            //indirect light
+            float pdf2 = 1/(2*M_PI);
+            Ray r;
+            r.origin = isec.phit + bias * isec.normal;
+            r.direction = randomUnitVectorInHemisphereOf(isec.normal);
+            float cosTheta = isec.normal ^ r.direction;
+            Vector3 indirect =  (E*material->emission) + (brdf * pathTracer2(r, scene, depth+1, 0.0f) * cosTheta) / pdf2;
+
+            diffused = (direct + indirect) * T;
+
+        }
+        if (R > 0.0001)
+        {
+            Ray r;
+            r.origin = isec.phit + bias * isec.normal;
+            r.direction = reflect(ray.direction, isec.normal).normalize();
+            reflected = isec.object->color(isec) * pathTracer2(r, scene, depth+1, E) * R;
+        }
+        return diffused + reflected;
+    }
+    else if (type == Material::Type::TRANSPARENT)
+    {
+        return isec.object->color(isec) * transparentMaterial(ray, scene, depth, isec, E);
     }
     return Color::BLACK;
 }
