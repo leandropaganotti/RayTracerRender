@@ -448,12 +448,14 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const Scene& scene, const uint8_t
         }
 
         //indirect light
-        float pdf2 = 1/(2*M_PI);
+        const float pdf2 = 1/(2*M_PI);
         Ray R;
         R.origin = isec.phit + bias * isec.normal;
         R.direction = randomUnitVectorInHemisphereOf(isec.normal);
         float cosTheta = isec.normal ^ R.direction;
+        //Vector3 indirect =  (E*material->emission) + (isec.object->color(isec) * pathTracer2(R, scene, depth+1, 0.0f) );
         Vector3 indirect =  (E*material->emission) + (brdf * pathTracer2(R, scene, depth+1, 0.0f) * cosTheta) / pdf2;
+
         return direct + indirect;
     }
     else if (type == Material::Type::SPECULAR)
