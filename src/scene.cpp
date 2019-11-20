@@ -3,9 +3,9 @@
 #include <string.h>
 #include <xmlparser.h>
 
-Scene::Scene(): name("unamed"), ambientIndex(1.0f), ka(0.1), spp(1), grid(1), maxDepth(3), bgColor(0), shader(Shader::PHONG){}
+Scene::Scene(): name("unamed"), ambientIndex(1.0f), ka(0.1), spp(1), grid(1), maxDepth(3), bgColor(0), raytracer(RayTracerType::Phong){}
 
-Scene::Scene(const std::string &fileName): name("unamed"), ambientIndex(1.0f), ka(0.1), spp(1), grid(1), maxDepth(3), bgColor(0), shader(Shader::PHONG)
+Scene::Scene(const std::string &fileName): name("unamed"), ambientIndex(1.0f), ka(0.1), spp(1), grid(1), maxDepth(3), bgColor(0), raytracer(RayTracerType::Phong)
 {
     load(fileName);
 }

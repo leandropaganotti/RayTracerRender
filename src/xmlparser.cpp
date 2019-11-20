@@ -118,14 +118,14 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
              scene.bgColor = toVector(attr->children->content);
         else if (equals(attr->name, "ka"))
              scene.ka = toFloat(attr->children->content);
-        else if (equals(attr->name, "shader"))
+        else if (equals(attr->name, "raytracer"))
         {
-            if (equals(attr->children->content, "gi"))
-                scene.shader = Shader::GI;
-            else if (equals(attr->children->content, "gi_direct"))
-                scene.shader = Shader::GI_DIRECT;
+            if (equals(attr->children->content, "path"))
+                scene.raytracer = RayTracerType::PathTracer;
+            else if (equals(attr->children->content, "path2"))
+                scene.raytracer = RayTracerType::PathTracerWithDirectLightSampling;
             else
-                scene.shader = Shader::PHONG;
+                scene.raytracer = RayTracerType::Phong;
         }
         else
             cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlSceneNode->name << "\':" << name << "\x1b[0m" << endl;
@@ -282,11 +282,9 @@ void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, Material & material)
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "kdiffuse"))
-    		material.kd = toVector(attr->children->content);
-		else if (equals(attr->name, "kspecular"))
-			material.ks = toVector(attr->children->content);
+            material.kdiffuse = toVector(attr->children->content);
         else if (equals(attr->name, "emission"))
-            material.Le = toVector(attr->children->content);
+            material.emission = toVector(attr->children->content);
         else if (equals(attr->name, "highlight"))
             material.highlight = toFloat(attr->children->content);
 		else if (equals(attr->name, "shininess"))
