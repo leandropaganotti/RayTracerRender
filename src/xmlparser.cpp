@@ -281,18 +281,18 @@ void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, Material & material)
 	{
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
-        else if (equals(attr->name, "kdiffuse"))
-            material.kdiffuse = toVector(attr->children->content);
-        else if (equals(attr->name, "emission"))
-            material.emission = toVector(attr->children->content);
-        else if (equals(attr->name, "highlight"))
-            material.highlight = toFloat(attr->children->content);
-		else if (equals(attr->name, "shininess"))
-			material.shininess = toFloat(attr->children->content);
-		else if (equals(attr->name, "reflectivity"))
-			material.reflectivity = toFloat(attr->children->content);
-		else if (equals(attr->name, "refractiveIndex"))
-			material.refractiveIndex = toFloat(attr->children->content);
+        else if (equals(attr->name, "kd"))
+            material.kd = toVector(attr->children->content);
+        else if (equals(attr->name, "E"))
+            material.E = toVector(attr->children->content);
+        else if (equals(attr->name, "ks"))
+            material.ks = toFloat(attr->children->content);
+        else if (equals(attr->name, "m"))
+            material.m = toFloat(attr->children->content);
+        else if (equals(attr->name, "R0"))
+			material.R0 = toFloat(attr->children->content);
+        else if (equals(attr->name, "index"))
+			material.index = toFloat(attr->children->content);
 		else if (equals(attr->name, "type"))
 		{
 			if (equals(attr->children->content, "DIFFUSE"))

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scene name="4balls" grid="2" spp="16" index="1.0" maxdepth="5" bgcolor="0" ka="0.1" shader="phong">
+<scene name="4balls" grid="2" spp="16" index="1.0" maxdepth="5" bgcolor="0" ka="0.1" raytracer="phong">
     <CameraOptions position="0,0,10" lookingat="0" fov="35" width="640" height="480"></CameraOptions>
     <PointLight position="0,0,5" color="1" strength="1.0" k="0.0"></PointLight>
     <Sphere name="left" position="-2.0,0,0" radius="1">
-        <material type="specular" kdiffuse="1,0,0" kspecular="1" shininess="150" reflectivity="0.5"></material>
+        <material type="specular" kd="1,0,0" ks="1" m="150" R0="0.5"></material>
     </Sphere>
     <Sphere name="top" position="0,2,0" radius="1">
-        <material type="specular" kdiffuse="0,1,0" kspecular="1" shininess="150" reflectivity="0.5"></material>
+        <material type="specular" kd="0,1,0" ks="1" m="150" R0="0.5"></material>
     </Sphere>
     <Sphere name="right" position="2,0,0" radius="1">
-        <material type="specular" kdiffuse="0,0,1" kspecular="1" shininess="150" reflectivity="0.5"></material>
+        <material type="specular" kd="0,0,1" ks="1" m="150" R0="0.5"></material>
     </Sphere>
     <Sphere name="bottom" position="0,-2,0" radius="1">
-        <material type="specular" kdiffuse="1,0,1" kspecular="1" shininess="150" reflectivity="0.5"></material>
+        <material type="specular" kd="1,0,1" ks="1" m="150" R0="0.5"></material>
     </Sphere>
 </scene>

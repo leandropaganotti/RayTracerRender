@@ -3,15 +3,15 @@
     <CameraOptions position="0,2,13" lookingat="0" fov="35" width="1280" height="720"></CameraOptions>
     <PointLight position="0,3,6.5" color="1" strength="1.5" k="0.05"></PointLight>
     <Sphere name="left" position="-2.5,1,2.5" radius="1">
-        <material type="specular" kdiffuse="1,0,0" kspecular="1" shininess="250" reflectivity="0.03" specularHighlight="1"></material>
+        <material type="specular" kd="1,0,0" ks="1" m="250" R0="0.03" ></material>
     </Sphere>
     <Sphere name="middle" position="0,1.5,0" radius="1.5">
-        <material type="specular" kdiffuse="0,1,0" kspecular="1" shininess="250" reflectivity="0.3" specularHighlight="1"></material>
+        <material type="specular" kd="0,1,0" ks="1" m="250" R0="0.3" ></material>
     </Sphere>
     <Sphere name="right" position="2.5, 1, 2.5" radius="1">
-        <material type="specular" kdiffuse="0,0,1" kspecular="1" shininess="250" reflectivity="0.03" specularHighlight="1"></material>
+        <material type="specular" kd="0,0,1" ks="1" m="250" R0="0.03" ></material>
     </Sphere>
     <Plane name="floor" point="0" normal="0,1,0" >
-        <material type="specular" kdiffuse="1" kspecular="1" shininess="150" reflectivity="0.3"></material>
+        <material type="specular" kd="1" ks="1" m="150" R0="0.3"></material>
     </Plane>
 </scene>

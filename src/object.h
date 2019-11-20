@@ -25,21 +25,21 @@ struct Material
 {
     enum class Type { DIFFUSE, SPECULAR, TRANSPARENT };
     Type type;
-    Vector3 kdiffuse;
-    Vector3 emission;
-    float highlight;
-    float shininess;
-    float reflectivity;
-    float refractiveIndex;
+    Vector3 kd;
+    Vector3 E;
+    float ks;
+    float m;
+    float R0;
+    float index;
 
     Material()
     {
-        kdiffuse = Color::WHITE;
-        emission = 0.0f;
-        highlight = 1.0f;
-        shininess = 30.0f;
-        reflectivity = 1.0f;
-        refractiveIndex = 1.55f;
+        kd = 1.0f;
+        E = 0.0f;
+        ks = 1.0f;
+        m = 30.0f;
+        R0 = 8.0f;
+        index = 1.55f; // refractive index for glass
         type = Type::DIFFUSE;
     }
 };
@@ -63,7 +63,7 @@ public:
     const Vector3 color(const IntersectionData& isec) const
     {
         const std::pair<float, float> _uv = uv(isec.phit, isec.idx);
-        return tex->get(_uv.first, _uv.second) * material.kdiffuse;
+        return tex->get(_uv.first, _uv.second) * material.kd;
     }
 
 private:
