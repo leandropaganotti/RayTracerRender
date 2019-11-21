@@ -2,7 +2,7 @@
 <scene name="ModifiedCornellBox" grid="2" spp="32" index="1.0" maxdepth="5" raytracer="path2">
     <CameraOptions position="0,1.7,5" lookingat="0,1.7,0" fov="50" width="640" height="480"></CameraOptions>
     <Sphere name="mirrorBall" position="-2,0.8,-1.5" radius="0.8">
-        <material type="specular" kd="0.9" R0="1"></material>
+        <material type="specular" kd="1" R0="1"></material>
     </Sphere>
     <Sphere name="glassBall" position="1.8,1.5,0.2" radius="0.5">
         <material type="transparent" index="1.5" m="150"></material>

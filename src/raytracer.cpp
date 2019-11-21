@@ -431,43 +431,30 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const Scene& scene, const uint8_t
 
             if (!sphere) continue; // only supported sphere for direct light
 
-            Vector3 u,v, w=(sphere->getCenter() - isec.phit).normalize(), n(1,0,0),m(0,1,0);
-            u = w%n; if(u.length()<0.01f)u = w%m;
-            v=w%u;
+            Vector3 sampleToLight;
+            float _1_pdf;
+            sphere->sampleSolidAngleSphere(isec.phit, sampleToLight, _1_pdf);
 
-            float r1 = dis(gen);
-            float r2 = dis(gen);
-            float dist2 = (isec.phit - sphere->getCenter()).length(); dist2*=dist2;
-            float cos_a_max = sqrt(1 - (sphere->getRadius()*sphere->getRadius())/dist2);
-            float cos_a = 1 - r2*(1-cos_a_max);
-            float sin_a = sqrtf(1-cos_a*cos_a);
-            float phi = 2 * M_PI * r1;
-            float pdf = (2*M_PI*(1-cos_a_max));//1/(2*M_PI*(1-cos_a_max));
-
-            Vector3 sample(cos(phi)*sin_a, sin(phi)*sin_a, cos_a);
-
-            Vector3 sampleWorld = sample.x*u + sample.y*v + sample.z*w;
-
-            float cosTheta = isec.normal ^ sampleWorld;
+            float cosTheta = isec.normal ^ sampleToLight;
             if( cosTheta > 0.0f )
             {
                 float dist = (isec.phit - sphere->getCenter()).length() - sphere->getRadius() - bias;
-                float vis = castShadowRay(Ray(isec.phit + bias * isec.normal, sampleWorld), scene.objects, dist);
+                float vis = castShadowRay(Ray(isec.phit + bias * isec.normal, sampleToLight), scene.objects, dist);
                 if (vis)
                 {
-                    direct += vis * brdf * sphere->getMaterial().E * cosTheta * pdf;
+                    direct += vis * brdf * sphere->getMaterial().E * cosTheta * _1_pdf;
                 }
             }
         }
 
         //indirect light
-        //const float pdf2 = (2.0f*M_PI);//1/(2*M_PI)
+        //const float _1_pdf = (2.0f*M_PI);//1/(2*M_PI)
         Ray r;
         r.origin = isec.phit + bias * isec.normal;
         r.direction = randomUnitVectorInHemisphereOf(isec.normal);
         //float cosTheta = isec.normal ^ r.direction;
         Vector3 indirect =  (E*material->E) + isec.object->color(isec) * pathTracer2(r, scene, depth+1, 0.0f);
-        //Vector3 indirect =  (E*material->E) + brdf * pathTracer2(r, scene, depth+1, 0.0f) * cosTheta * pdf2;
+        //Vector3 indirect =  (E*material->E) + brdf * pathTracer2(r, scene, depth+1, 0.0f) * cosTheta * _1_pdf;
 
         diffused = direct + indirect;
 
