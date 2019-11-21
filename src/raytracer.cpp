@@ -395,14 +395,14 @@ Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t 
 
 Vector3 RayTracer::pathTracer2(const Ray& ray, const Scene& scene, const uint8_t depth, const float E)
 {
-    if(depth > scene.maxDepth) return Color::BLACK;
+    if(depth > scene.maxDepth) return Color::BLACK;       
 
     IntersectionData isec;
 
     if (!castRay(ray, scene.objects, isec))
         return scene.bgColor;
 
-    const Material *material = &isec.object->getMaterial();
+    const Material *material = &isec.object->getMaterial();        
 
     Material::Type type = isec.object->getMaterial().type;
 
@@ -416,7 +416,15 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const Scene& scene, const uint8_t
         kr = schlick(-ray.direction, isec.normal, isec.object->getMaterial().R0);
         kt = 1.0f - kr;
     }
+    if(isec.object->getMaterial().E != Vector::ZERO && depth == 1){
+        float n=5, m=15;
+        float nk = isec.normal ^ -ray.direction;
+        float ek = (n+1)/(2*M_PI)*pow(nk, m);
 
+        Vector3 Lo = isec.object->getMaterial().E * ek / nk;
+
+        return Lo;
+    }
     Vector3 diffused, reflected;
     Vector3 brdf = isec.object->color(isec) * M_1_PI;
     if (kt > 0.0001f)

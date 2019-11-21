@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scene name="basic" grid="4" spp="16" index="1.0" maxdepth="3" bgcolor="0" ka="0.1" raytracer="path2">
+<scene name="basic" grid="4" spp="100" index="1.0" maxdepth="5" bgcolor="0" ka="0.1" raytracer="path2">
     <CameraOptions position="0,1.5,15" lookingat="0, 0, 0" fov="45" width="640" height="480"></CameraOptions>
     <PointLight position="-1,5.5,6.5" color="1" strength="1" k="0.05"></PointLight>
-    <Sphere name="light" position="2,10,6.5" radius="0.2">
-        <material type="diffuse" kd="1" E="1500"></material>
+    <Sphere name="light" position="3,3.5,6.5" radius="0.5">
+        <material type="diffuse" kd="1" E="35"></material>
     </Sphere>
     <Sphere name="red" position="0.5,1,4" radius="1">
         <material type="diffuse" kd="1,0,0" R0="0.7"></material>
