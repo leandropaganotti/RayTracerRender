@@ -1,72 +1,37 @@
 #ifndef OBJECT_H
 #define OBJECT_H
+
 #include <memory>
-#include <vector>
-#include "vector.h"
-#include "ray.h"
+#include "material.h"
 #include "texture.h"
-#include "matrix.h"
-#include "transformation.h"
-#include <utility>
-#include "consts.h"
+#include "intersection.h"
+#include "shape.h"
+#include "vector"
 
-class Object;
-
-struct IntersectionData
-{
-    float tnear;
-    size_t idx;
-    const Object * object;
-    Vector3 phit;
-    Vector3 normal;
-};
-
-struct Material
-{
-    enum class Type { DIFFUSE, SPECULAR, TRANSPARENT };
-    Type type;
-    Vector3 kd;
-    Vector3 E;
-    float ks;
-    float m;
-    float R0;
-    float index;
-
-    Material()
-    {
-        kd = 1.0f;
-        E = 0.0f;
-        ks = 1.0f;
-        m = 30.0f;
-        R0 = 8.0f;
-        index = 1.55f; // refractive index for glass
-        type = Type::DIFFUSE;
-    }
-};
-
-class Object
+class Object: public virtual Shape
 {           
 public:
-    Object(){ tex = std::shared_ptr<Texture>(new SolidWhite); }
-    virtual ~Object() = default;
 
-    virtual bool intersection(const Ray& ray, IntersectionData &isec) const = 0;
-    virtual bool intersection(const Ray& ray, float &tnear) const = 0;
-    virtual const Vector3 normal(const Vector3 &phit, size_t idx) const = 0;
-    virtual const std::pair<float, float> uv(const Vector3 &, size_t) const { return std::make_pair(0.0f,0.0f); }
+    Object(): tex(std::shared_ptr<Texture>(new SolidWhite)){}
+
+    virtual ~Object() = default;
 
     const std::shared_ptr<Texture> & getTexture() const { return tex; }
     void setTexture(const std::shared_ptr<Texture> &tex) { if (tex != nullptr) this->tex = tex; }
     const Material & getMaterial() const { return material; }
     void setMaterial(const Material &material) { this->material = material; }
 
-    const Vector3 color(const IntersectionData& isec) const
+    virtual const Vector3 color(const IntersectionData&) const
     {
-        const std::pair<float, float> _uv = uv(isec.phit, isec.idx);
-        return tex->get(_uv.first, _uv.second) * material.kd;
+//        const std::pair<float, float> _uv = uv(isec.phit, isec.idx);
+//        return tex->get(_uv.first, _uv.second) * material.kd;
+        return material.kd;
     }
-
-private:
+    virtual const std::pair<float, float> uv(const Vector3 &, size_t) const
+    {
+        return std::pair<float, float>(0.0f,0.0f);
+    }
+protected:
     std::shared_ptr<Texture> tex;
     Material material;
 };

@@ -2,11 +2,6 @@
 #include <float.h>
 #include <objparser.h>
 
-Mesh::Mesh()
-{
-
-}
-
 void Mesh::addVertex(const Vector3 &v)
 {
     vertices.push_back(v);
@@ -70,7 +65,7 @@ bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
     }
     if (isec.tnear < FLT_MAX)
     {        
-        isec.object = this;        
+        isec.object = this;
         Vector3 phit = r.origin + isec.tnear * r.direction;
         phit = getModel() * phit;
         isec.tnear = (phit - ray.origin).length();

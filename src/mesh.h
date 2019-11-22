@@ -1,13 +1,12 @@
 #ifndef MESH_H
 #define MESH_H
 #include <vector>
-#include "plane.h"
 #include "aabb.h"
 
 class Mesh: public Object, public Transformation
 {    
 public:    
-    Mesh();
+    Mesh() = default;
 
     struct Triangle
     {
@@ -30,13 +29,13 @@ public:
     // Object interface
     bool  intersection(const Ray& ray, IntersectionData& isec) const;
     bool  intersection(const Ray& ray, float& tnear) const;
-    const Vector3 normal(const Vector3 &phit, size_t idx) const;
+    const Vector3 normal(const Vector3 &phit, size_t idx) const;    
 
 protected:
     AABB aabb;
     std::vector<Vector3>   vertices;
     std::vector<Vector3>   normals;
-    std::vector<Triangle>  faces;
+    std::vector<Triangle>  faces;        
 };
 
 

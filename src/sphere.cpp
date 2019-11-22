@@ -1,39 +1,38 @@
 #include "sphere.h"
 
-Sphere::Sphere(const Vector3 &center, const float &radius) :
+GEOMSphere::GEOMSphere(const Vector3 &center, const float &radius) :
     center(center), radius(radius), radius2(radius * radius)
 {
 
 }
 
-Vector3 Sphere::getCenter() const
+Vector3 GEOMSphere::getCenter() const
 {
     return center;
 }
 
-void Sphere::setCenter(const Vector3 &value)
+void GEOMSphere::setCenter(const Vector3 &value)
 {
     center = value;
 }
 
-float Sphere::getRadius() const
+float GEOMSphere::getRadius() const
 {
     return radius;
 }
 
-void Sphere::setRadius(float value)
+void GEOMSphere::setRadius(float value)
 {
     radius = value;
     radius2 = radius * radius;
 }
 
-bool Sphere::intersection(const Ray &ray, IntersectionData &isec) const
-{
-    isec.object = this;
+bool GEOMSphere::intersection(const Ray &ray, IntersectionData &isec) const
+{    
     return intersection(ray, isec.tnear);;
 }
 
-bool Sphere::intersection(const Ray &ray, float &tnear) const
+bool GEOMSphere::intersection(const Ray &ray, float &tnear) const
 {
     float t0, t1;
 
@@ -54,7 +53,7 @@ bool Sphere::intersection(const Ray &ray, float &tnear) const
     return true;
 }
 
-const Vector3 Sphere::normal(const Vector3 &phit, size_t) const
+const Vector3 GEOMSphere::normal(const Vector3 &phit, size_t) const
 {
     return (phit-center).normalize();
 }

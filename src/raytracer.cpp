@@ -82,6 +82,7 @@ bool RayTracer::castRay(const Ray &ray, const ObjectVector &objects, Intersectio
             if ( isec_tmp.tnear < isec.tnear )
             {
                 isec = isec_tmp; // copy
+                isec.object = object.get();
             }
         }
     }
@@ -402,7 +403,7 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const Scene& scene, const uint8_t
     if (!castRay(ray, scene.objects, isec))
         return scene.bgColor;
 
-    const Material *material = &isec.object->getMaterial();        
+    const Material *material = &isec.object->getMaterial();
 
     Material::Type type = isec.object->getMaterial().type;
 

@@ -2,7 +2,7 @@
 #define PLANE_H
 
 #include "object.h"
-#include "texture.h"
+#include "ray.h"
 
 class Plane: public Object
 {

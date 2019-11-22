@@ -5,14 +5,10 @@
 #include "utils.h"
 #include <utility>
 
-Vector3 Box::min = Vector3(-0.5f, -0.5f, 0.5f);
-Vector3 Box::max = Vector3(0.5f,0.5f,-0.5f);
+Vector3 GEOMBox::min = Vector3(-0.5f, -0.5f, 0.5f);
+Vector3 GEOMBox::max = Vector3(0.5f,0.5f,-0.5f);
 
-Box::Box()
-{    
-}
-
-bool Box::intersection(const Ray &ray, IntersectionData &isec) const
+bool GEOMBox::intersection(const Ray &ray, IntersectionData &isec) const
 {
     Ray r = getInverse() * ray;
 
@@ -51,12 +47,11 @@ bool Box::intersection(const Ray &ray, IntersectionData &isec) const
 
     Vector3 phit = r.origin + isec.tnear * r.direction;
     phit = getModel() * phit;
-    isec.tnear = (phit - ray.origin).length();
-    isec.object = this;
+    isec.tnear = (phit - ray.origin).length();    
     return true;
 }
 
-bool Box::intersection(const Ray &ray, float &tnear) const
+bool GEOMBox::intersection(const Ray &ray, float &tnear) const
 {
     Ray r = getInverse() * ray;
 
@@ -83,7 +78,7 @@ bool Box::intersection(const Ray &ray, float &tnear) const
     return true;
 }
 
-const Vector3 Box::normal(const Vector3 &, size_t idx) const
+const Vector3 GEOMBox::normal(const Vector3 &, size_t idx) const
 {
     if (idx == 1)      return (getInverseTranspose() * Vector3(-1,0,0)).normalize();
     else if (idx == 2) return (getInverseTranspose() * Vector3(1,0,0)).normalize();
@@ -93,21 +88,7 @@ const Vector3 Box::normal(const Vector3 &, size_t idx) const
     else               return (getInverseTranspose() * Vector3(0,0,-1)).normalize();
 }
 
-const std::pair<float, float> Box::uv(const Vector3 &phit, size_t idx) const
-{
-    float u=0, v=0;
-    Vector3 p = getInverse() * phit;
 
-    if (idx == 1 || idx == 2)
-    {
-        u = p.z; v = p.y;
-    } else if (idx == 3 || idx == 4)
-    {
-        u = p.x; v = p.z;
-    } else
-    {
-        u = p.x; v = p.y;
-    }
 
-    return std::make_pair(u, v);
-}
+
+
