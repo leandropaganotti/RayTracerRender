@@ -24,7 +24,7 @@
     </Box>
     <Box>
         <transformation translate="-0.8,0,-2.8" rotate="0,0,30" scale="0.5,5,0.5"></transformation>
-        <material type="diffuse" kd="0,1,0"></material>
+        <material name="teste" type="diffuse" kd="0,1,0"></material>
         <texture name="tiles" rows="15" cols="15" color1="1" color2="0.1, 0.1, 0" angle="0"></texture>
     </Box>
     <Box>

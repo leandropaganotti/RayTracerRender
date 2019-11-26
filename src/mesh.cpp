@@ -2,11 +2,6 @@
 #include <float.h>
 #include <objparser.h>
 
-Mesh::Mesh()
-{
-
-}
-
 void Mesh::addVertex(const Vector3 &v)
 {
     vertices.push_back(v);

@@ -7,10 +7,6 @@
 #include <algorithm>
 #include "objparser.h"
 
-Model::Model()
-{
-}
-
 void Model::loadFromFile(std::string path)
 {
     OBJParser::Parse(path, *this);

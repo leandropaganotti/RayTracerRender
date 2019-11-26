@@ -240,6 +240,10 @@ void XMLParser::parseSphere(xmlNode *xmlSphereNode, Sphere & sphere)
 			sphere.setCenter( toVector(attr->children->content) );
 		else if (equals(attr->name, "radius"))
 		    sphere.setRadius( toFloat(attr->children->content) );
+        else if (equals(attr->name, "material"))
+            sphere.setMaterial((const char*)attr->children->content);
+        else if (equals(attr->name, "texture"))
+            sphere.setTexture((const char*)attr->children->content);
 		else
             cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlSphereNode->name << "\':" << name << "\x1b[0m" << endl;
 	}
@@ -250,13 +254,13 @@ void XMLParser::parseSphere(xmlNode *xmlSphereNode, Sphere & sphere)
         if (node->type == XML_ELEMENT_NODE)
         {
         	if (equals(node->name, "material"))
-            {
-                Material material;
+            {                
+                std::shared_ptr<Material> material;
                 parseMaterial(node, material);
                 sphere.setMaterial(material);
             }
             else if (equals(node->name, "texture"))
-            {
+            {                
                 std::shared_ptr<Texture> tex;
                 parseTexture(node, tex);
                 sphere.setTexture(tex);
@@ -267,7 +271,7 @@ void XMLParser::parseSphere(xmlNode *xmlSphereNode, Sphere & sphere)
     }
 }
 
-void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, Material & material)
+void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, std::shared_ptr<Material> &material)
 {    
     if(xmlMaterialNode == NULL)
     {
@@ -275,39 +279,40 @@ void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, Material & material)
          return;
     }
 
+    xmlChar *name = xmlGetProp(xmlMaterialNode,(const xmlChar*)"name");
+    material = Material::Create(name ? (const char*)name : "");
+    xmlFree(name);
+
     const xmlAttr *attr = NULL;
-    string name("");
     for (attr = xmlMaterialNode->properties; attr; attr = attr->next)
 	{
-        if (equals(attr->name, "name"))
-            name = (const char*)attr->children->content;
+        if (equals(attr->name, "name")) {}
         else if (equals(attr->name, "kd"))
-            material.kd = toVector(attr->children->content);
+            material->kd = toVector(attr->children->content);
         else if (equals(attr->name, "E"))
-            material.E = toVector(attr->children->content);
+            material->E = toVector(attr->children->content);
         else if (equals(attr->name, "ks"))
-            material.ks = toFloat(attr->children->content);
+            material->ks = toFloat(attr->children->content);
         else if (equals(attr->name, "m"))
-            material.m = toFloat(attr->children->content);
+            material->m = toFloat(attr->children->content);
         else if (equals(attr->name, "R0"))
-			material.R0 = toFloat(attr->children->content);
+            material->R0 = toFloat(attr->children->content);
         else if (equals(attr->name, "index"))
-			material.index = toFloat(attr->children->content);
+            material->index = toFloat(attr->children->content);
 		else if (equals(attr->name, "type"))
 		{
 			if (equals(attr->children->content, "DIFFUSE"))
-				material.type = Material::Type::DIFFUSE;
+                material->type = Material::Type::DIFFUSE;
 			else if (equals(attr->children->content, "SPECULAR"))
-				material.type = Material::Type::SPECULAR;			
+                material->type = Material::Type::SPECULAR;
 			else if (equals(attr->children->content, "TRANSPARENT"))
-				material.type = Material::Type::TRANSPARENT;            
+                material->type = Material::Type::TRANSPARENT;
 			else
                 cerr << "\x1b[33;1m" << "unrecognized material type \'" << attr->children->content << "\'" << "\x1b[0m" << endl;
 		}
 		else
-            cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlMaterialNode->name << "\':" << name << "\x1b[0m" << endl;
-	}
-
+            cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlMaterialNode->name << "\':" << name << "    \x1b[0m" << endl;
+	}    
     xmlNode *node = NULL;
     for (node = xmlMaterialNode->children; node; node = node->next)
     {
@@ -406,7 +411,11 @@ void XMLParser::parsePlane(xmlNode *xmlPlaneNode, Plane & plane)
 			plane.O = toVector(attr->children->content);
 		else if (equals(attr->name, "normal"))
 			plane.N = toVector(attr->children->content);
-		else
+        else if (equals(attr->name, "material"))
+            plane.setMaterial((const char*)attr->children->content);
+        else if (equals(attr->name, "texture"))
+            plane.setTexture((const char*)attr->children->content);
+        else
             cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlPlaneNode->name << "\':" << name << "\x1b[0m" << endl;
 	}
 
@@ -417,7 +426,7 @@ void XMLParser::parsePlane(xmlNode *xmlPlaneNode, Plane & plane)
         {
         	if (equals(node->name, "material"))
             {
-                Material material;
+                std::shared_ptr<Material> material;
                 parseMaterial(node, material);
                 plane.setMaterial(material);
             }
@@ -442,13 +451,16 @@ void XMLParser::parseTexture(xmlNode *xmlTextureNode, std::shared_ptr<Texture> &
     }
 
     const xmlAttr *attr = NULL;
-    xmlChar *name=NULL;
+    string name("");
+    string type("");
     float rows=1.0f, cols=1.0f, uedge=0.1f, vedge=0.1f, angle=0.0f;
     Vector3 color1=0, color2=1;
     for (attr = xmlTextureNode->properties; attr; attr = attr->next)
     {
         if (equals(attr->name, "name"))
-            name = attr->children->content;
+            name = (const char*)attr->children->content;
+        else if (equals(attr->name, "type"))
+            type = (const char*)attr->children->content;
         else if (equals(attr->name, "rows"))
             rows = toFloat(attr->children->content);
         else if (equals(attr->name, "cols"))
@@ -466,12 +478,14 @@ void XMLParser::parseTexture(xmlNode *xmlTextureNode, std::shared_ptr<Texture> &
         else
             cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlTextureNode->name << "\'" << "\x1b[0m" << endl;
     }
-    if(name)
+    if(type!="")
     {
-        if (equals(name, "tiles"))
-            tex.reset(new Tiles(color1, color2, rows, cols, angle, uedge, vedge));
-        else if (equals(name, "chessBoard"))
-            tex.reset(new ChessBoard(color1, color2, rows, cols, angle));
+        if (type == "Tiles")
+            tex = Tiles::Create(name, color1, color2, rows, cols, angle, uedge, vedge);
+        else if (type == "ChessBoard")
+            tex = ChessBoard::Create(name, color1, color2, rows, cols, angle);
+        else
+            tex = nullptr;
     }
     else
         cerr << "\x1b[33;1m" << "Error parsing Texture type attribute not found in " << xmlTextureNode->name << "\x1b[0m" << endl;
@@ -485,6 +499,21 @@ void XMLParser::parseBox(xmlNode *xmlBoxNode, Box &box)
          cerr << "\x1b[33;1m" << "error: could not parse Box, xmlNode pointer is NULL" << "\x1b[0m" << endl;
          return;
     }
+
+    const xmlAttr *attr = NULL;
+    string name("");
+    for (attr = xmlBoxNode->properties; attr; attr = attr->next)
+    {
+        if (equals(attr->name, "name"))
+            name = (const char*)attr->children->content;
+        else if (equals(attr->name, "material"))
+            box.setMaterial((const char*)attr->children->content);
+        else if (equals(attr->name, "texture"))
+            box.setTexture((const char*)attr->children->content);
+        else
+            cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlBoxNode->name << "\':" << name << "\x1b[0m" << endl;
+    }
+
     xmlNode *node = NULL;
     for (node = xmlBoxNode->children; node; node = node->next)
     {
@@ -492,7 +521,7 @@ void XMLParser::parseBox(xmlNode *xmlBoxNode, Box &box)
         {
             if (equals(node->name, "material"))
             {
-                Material material;
+                std::shared_ptr<Material> material;
                 parseMaterial(node, material);
                 box.setMaterial(material);
             }
@@ -564,6 +593,8 @@ void XMLParser::parseModel(xmlNode *xmlModelNode, Model &model)
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "path"))
             model.loadFromFile((const char*)attr->children->content);
+        else if (equals(attr->name, "material"))
+            model.setMaterial((const char*)attr->children->content);
         else
             cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlModelNode->name << "\'" << "\x1b[0m" << endl;
     }
@@ -575,7 +606,7 @@ void XMLParser::parseModel(xmlNode *xmlModelNode, Model &model)
         {
             if (equals(node->name, "material"))
             {
-                Material material;
+                std::shared_ptr<Material> material;
                 parseMaterial(node, material);
                 model.setMaterial(material);
             }

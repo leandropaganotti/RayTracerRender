@@ -7,7 +7,7 @@
 class Mesh: public Object, public Transformation
 {    
 public:    
-    Mesh();
+    Mesh() = default;
 
     struct Triangle
     {
@@ -31,13 +31,20 @@ public:
     bool  intersection(const Ray& ray, IntersectionData& isec) const;
     bool  intersection(const Ray& ray, float& tnear) const;
     const Vector3 normal(const Vector3 &phit, size_t idx) const;
+    const std::pair<float, float> uv(const Vector3 &, size_t) const;
 
 protected:
     AABB aabb;
     std::vector<Vector3>   vertices;
     std::vector<Vector3>   normals;
-    std::vector<Triangle>  faces;
+    std::vector<Triangle>  faces;    
 };
+
+inline
+const std::pair<float, float> Mesh::uv(const Vector3 &, size_t) const
+{
+    return std::pair<float, float>(0.0f, 0.0f);
+}
 
 
 

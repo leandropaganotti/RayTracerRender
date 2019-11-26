@@ -105,7 +105,7 @@ float RayTracer::castShadowRay(const Ray &ray, const ObjectVector &objects, floa
         {
             if ( tnear < tMax )
             {
-                if (object->getMaterial().type != Material::Type::TRANSPARENT)
+                if (object->getMaterial()->type != Material::Type::TRANSPARENT)
                     return 0.0f;
                 else
                 {
@@ -148,7 +148,7 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const
 {
     const Vector3 &phit = isec.phit;
     Vector3 normal = isec.normal;
-    const Material &material = isec.object->getMaterial();
+    const Material &material = *isec.object->getMaterial();
 
     Vector3 transmited(0.0f), reflected(0.0f);
 
@@ -233,7 +233,7 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const
 //    if( scene.raytracer == RayTracerType::PathTracerWithDirectLightSampling)
 //    for(auto &obj : scene.objects)
 //    {
-//        if (obj->getMaterial().Le == Vector::ZERO) continue; // skip non light
+//        if (obj->getMaterial()->Le == Vector::ZERO) continue; // skip non light
 
 //        Sphere *sphere = dynamic_cast<Sphere*>(obj.get());
 
@@ -263,7 +263,7 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const
 //            float vis = castShadowRay(Ray(isec.phit + bias * isec.normal, sampleWorld), scene.objects, dist);
 //            if (vis)
 //            {
-//                directLigthing += vis * brdf * sphere->getMaterial().Le * cosTheta / pdf;
+//                directLigthing += vis * brdf * sphere->getMaterial()->Le * cosTheta / pdf;
 //            }
 //        }
 //    }
@@ -296,7 +296,7 @@ Vector3 RayTracer::rayTracer(const Ray &ray, const Scene &scene, const uint8_t d
     if (!castRay(ray, scene.objects, isec))
         return scene.bgColor;
 
-    Material::Type type = isec.object->getMaterial().type;
+    Material::Type type = isec.object->getMaterial()->type;
 
     if (type == Material::Type::DIFFUSE)
     {
@@ -304,7 +304,7 @@ Vector3 RayTracer::rayTracer(const Ray &ray, const Scene &scene, const uint8_t d
     }
     else if (type == Material::Type::SPECULAR)
     {
-        float kr = schlick(-ray.direction, isec.normal, isec.object->getMaterial().R0);
+        float kr = schlick(-ray.direction, isec.normal, isec.object->getMaterial()->R0);
         float kt = 1.0f - kr;
         Vector3 diffused(0), reflected(0);        
         if (kr > 0.0001)
@@ -336,9 +336,9 @@ Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t 
     if (!castRay(ray, scene.objects, isec))
         return scene.bgColor;
 
-    const Material *material = &isec.object->getMaterial();
+    const Material *material = isec.object->getMaterial();
 
-    Material::Type type = isec.object->getMaterial().type;
+    Material::Type type = isec.object->getMaterial()->type;
 
     if (type == Material::Type::DIFFUSE)
     {
@@ -360,12 +360,12 @@ Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t 
         Ray r;
         r.origin = isec.phit + bias * isec.normal;
         r.direction = randomUnitVectorInHemisphereOf(isec.normal);
-        float cosTheta = isec.normal ^ r.direction;
+        float cosTheta = isec.normal ^ r.direction;        
         return material->E + isec.object->color(isec) * pathTracer(r, scene, depth+1) * cosTheta * 2.0f;
     }
     else if (type == Material::Type::SPECULAR)
     {
-        float kr = schlick(-ray.direction, isec.normal, isec.object->getMaterial().R0);
+        float kr = schlick(-ray.direction, isec.normal, isec.object->getMaterial()->R0);
         float kt = 1.0f - kr;
         Vector3 diffused(0), reflected(0);
         if (kr > 0.0001)
@@ -402,9 +402,9 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const Scene& scene, const uint8_t
     if (!castRay(ray, scene.objects, isec))
         return scene.bgColor;
 
-    const Material *material = &isec.object->getMaterial();        
+    const Material *material = isec.object->getMaterial();
 
-    Material::Type type = isec.object->getMaterial().type;
+    Material::Type type = isec.object->getMaterial()->type;
 
     float kt=1.0f, kr=0.0f; // default diffuse material values
     if(type == Material::Type::TRANSPARENT)
@@ -413,15 +413,15 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const Scene& scene, const uint8_t
     }
     else if (type == Material::Type::SPECULAR)
     {
-        kr = schlick(-ray.direction, isec.normal, isec.object->getMaterial().R0);
+        kr = schlick(-ray.direction, isec.normal, isec.object->getMaterial()->R0);
         kt = 1.0f - kr;
     }
-    if(isec.object->getMaterial().E != Vector::ZERO && depth == 1){
+    if(isec.object->getMaterial()->E != Vector::ZERO && depth == 1){
         float n=5, m=15;
         float nk = isec.normal ^ -ray.direction;
         float ek = (n+1)/(2*M_PI)*pow(nk, m);
 
-        Vector3 Lo = isec.object->getMaterial().E * ek / nk;
+        Vector3 Lo = isec.object->getMaterial()->E * ek / nk;
 
         return Lo;
     }
@@ -433,7 +433,7 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const Scene& scene, const uint8_t
         Vector3 direct(0);
         for(auto &obj : scene.objects)
         {
-            if (obj->getMaterial().E  == Vector::ZERO) continue; // skip non light
+            if (obj->getMaterial()->E  == Vector::ZERO) continue; // skip non light
 
             Sphere *sphere = dynamic_cast<Sphere*>(obj.get());
 
@@ -450,7 +450,7 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const Scene& scene, const uint8_t
                 float vis = castShadowRay(Ray(isec.phit + bias * isec.normal, sampleToLight), scene.objects, dist);
                 if (vis)
                 {
-                    direct += vis * brdf * sphere->getMaterial().E * cosTheta * _1_pdf;
+                    direct += vis * brdf * sphere->getMaterial()->E * cosTheta * _1_pdf;
                 }
             }
         }
@@ -482,7 +482,7 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const Scene& scene, const uint8_t
 
 Vector3 RayTracer::phongShading(const Ray &ray, const Scene &scene, const IntersectionData &isec)
 {
-    const Material &material = isec.object->getMaterial();
+    const Material &material = *isec.object->getMaterial();
 
     // Texture & color
     const Vector3 color = isec.object->color(isec);

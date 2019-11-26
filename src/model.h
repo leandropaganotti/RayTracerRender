@@ -14,7 +14,7 @@ current implementation loads a mesh from .obj file
 class Model: public Mesh
 {
 public:
-    Model();
+    Model() = default;
     void loadFromFile(std::string path);
 };
 

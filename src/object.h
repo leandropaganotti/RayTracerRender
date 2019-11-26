@@ -9,66 +9,59 @@
 #include "transformation.h"
 #include <utility>
 #include "consts.h"
+#include "intersection.h"
+#include "material.h"
 
-class Object;
-
-struct IntersectionData
-{
-    float tnear;
-    size_t idx;
-    const Object * object;
-    Vector3 phit;
-    Vector3 normal;
-};
-
-struct Material
-{
-    enum class Type { DIFFUSE, SPECULAR, TRANSPARENT };
-    Type type;
-    Vector3 kd;
-    Vector3 E;
-    float ks;
-    float m;
-    float R0;
-    float index;
-
-    Material()
-    {
-        kd = 1.0f;
-        E = 0.0f;
-        ks = 1.0f;
-        m = 30.0f;
-        R0 = 8.0f;
-        index = 1.55f; // refractive index for glass
-        type = Type::DIFFUSE;
-    }
-};
 
 class Object
 {           
 public:
-    Object(){ tex = std::shared_ptr<Texture>(new SolidWhite); }
+    Object()
+    {
+        material = Material::DiffuseWhite;
+        texture = Texture::SolidWhite;
+    }
     virtual ~Object() = default;
 
     virtual bool intersection(const Ray& ray, IntersectionData &isec) const = 0;
     virtual bool intersection(const Ray& ray, float &tnear) const = 0;
     virtual const Vector3 normal(const Vector3 &phit, size_t idx) const = 0;
-    virtual const std::pair<float, float> uv(const Vector3 &, size_t) const { return std::make_pair(0.0f,0.0f); }
 
-    const std::shared_ptr<Texture> & getTexture() const { return tex; }
-    void setTexture(const std::shared_ptr<Texture> &tex) { if (tex != nullptr) this->tex = tex; }
-    const Material & getMaterial() const { return material; }
-    void setMaterial(const Material &material) { this->material = material; }
+    virtual const std::pair<float, float> uv(const Vector3 &, size_t) const = 0;
 
     const Vector3 color(const IntersectionData& isec) const
     {
         const std::pair<float, float> _uv = uv(isec.phit, isec.idx);
-        return tex->get(_uv.first, _uv.second) * material.kd;
+        return texture->get(_uv.first, _uv.second) * material->kd;
+        return material->kd;
+    }        
+    const Material * getMaterial() const { return material.get(); }
+    void setMaterial(const std::string &name)
+    {
+        if(!(material = Material::GetByName(name)))
+            material = Material::DiffuseWhite;
+    }
+    void setMaterial(std::shared_ptr<const Material>m)
+    {
+        material = m ? m : Material::DiffuseWhite;
     }
 
-private:
-    std::shared_ptr<Texture> tex;
-    Material material;
+    const Texture * getTexture() const { return texture.get(); }
+    void setTexture(const std::string &name)
+    {
+        if(!(texture = Texture::GetByName(name)))
+            texture = Texture::SolidWhite;
+    }
+    void setTexture(std::shared_ptr<const Texture> tex)
+    {
+        texture = tex ? tex : Texture::SolidWhite;
+    }
+
+protected:
+    std::shared_ptr<const Texture> texture;
+
+    std::shared_ptr<const Material> material;
+
 };
 
 typedef std::vector<std::unique_ptr<Object>> ObjectVector;
