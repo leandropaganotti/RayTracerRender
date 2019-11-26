@@ -109,7 +109,7 @@ float RayTracer::castShadowRay(const Ray &ray, const ObjectVector &objects, floa
                     return 0.0f;
                 else
                 {
-                    vis -= 0.3f;
+                    vis *= 0.8f;
                 }
             }
         }

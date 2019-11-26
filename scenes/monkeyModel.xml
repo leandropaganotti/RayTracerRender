@@ -4,6 +4,6 @@
     <PointLight position="0,3,6.5" color="1" strength="1.5" k="0.01"></PointLight>
     <Model name="monkey"  path="../obj/monkey.obj">
         <transformation translate="0" rotate="0" scale="1"></transformation>
-        <material type="diffuse" kdiffuse="0, 1, 0" kspecular="1" shininess="50" highlight="0"></material>
+        <material type="diffuse" kd="0, 1, 0" ks="1" m="50"></material>
     </Model>        
 </scene>

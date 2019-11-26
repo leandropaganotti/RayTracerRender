@@ -279,14 +279,15 @@ void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, std::shared_ptr<Material
          return;
     }
 
-    xmlChar *name = xmlGetProp(xmlMaterialNode,(const xmlChar*)"name");
-    material = Material::Create(name ? (const char*)name : "");
-    xmlFree(name);
-
+    xmlChar *attName = xmlGetProp(xmlMaterialNode,(const xmlChar*)"name");
+    material = Material::Create(attName? (const char*)attName : "");
+    xmlFree(attName);
     const xmlAttr *attr = NULL;
+    string name = "";
     for (attr = xmlMaterialNode->properties; attr; attr = attr->next)
 	{
-        if (equals(attr->name, "name")) {}
+        if (equals(attr->name, "name"))
+            name = (const char*)attr->children->content;
         else if (equals(attr->name, "kd"))
             material->kd = toVector(attr->children->content);
         else if (equals(attr->name, "E"))
