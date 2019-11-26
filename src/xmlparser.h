@@ -26,7 +26,7 @@ public:
 
     void parseSphere(xmlNode * xmlSphereNode, Sphere & sphere);
 
-    void parseMaterial(xmlNode * xmlMaterialNode, Material & material);
+    void parseMaterial(xmlNode * xmlMaterialNode, std::shared_ptr<Material> &material);
 
     void parsePointLight(xmlNode * xmlPointLightNode, PointLight & light);
 

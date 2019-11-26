@@ -31,7 +31,7 @@ std::ostream &operator <<(std::ostream &os, const Scene &scene)
     os << "Scene: " << scene.name << " : " << scene.fileName << std::endl
     << "\t" << scene.cameraOptions << std::endl <<
     "\tambientIndex: " << scene.ambientIndex << ", ka: " << scene.ka << ", spp: " <<
-    scene.spp << ", grid: " << scene.grid << ", bgColor: " << scene.bgColor;
+    scene.spp << ", grid: " << scene.grid << ", bgColor: " << scene.bgColor << std::endl;
     return os;
 }
 
