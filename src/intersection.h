@@ -14,4 +14,12 @@ struct IntersectionData
     Vector3 normal;
 };
 
+class IntersectionIF
+{
+public:
+    virtual ~IntersectionIF() = default;
+    virtual bool intersection(const Ray& ray, IntersectionData &isec) const = 0;
+    virtual bool intersection(const Ray& ray, float &tnear) const = 0;
+};
+
 #endif // INTERSECTION_H
