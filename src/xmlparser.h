@@ -10,7 +10,7 @@
 #include "plane.h"
 #include "box.h"
 #include "transformation.h"
-#include "model.h"
+#include "objmodel.h"
 using namespace std;
 
 class XMLParser
@@ -40,7 +40,7 @@ public:
 
     void parseTransformation(xmlNode * xmlTrnasformationNode, Transformation & transformation);
 
-    void parseModel(xmlNode * xmlModelNode, Model & model);
+    void parseModel(xmlNode * xmlModelNode, OBJModel & model);
 
 private:
     bool     equals(const xmlChar *lhs, const char *rhs);

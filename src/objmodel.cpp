@@ -1,4 +1,4 @@
-#include "model.h"
+#include "objmodel.h"
 #include <fstream>
 #include <string>
 #include <sstream>
@@ -7,7 +7,7 @@
 #include <algorithm>
 #include "objparser.h"
 
-void Model::loadFromFile(std::string path)
+void OBJModel::loadFromFile(std::string path)
 {
     OBJParser::Parse(path, *this);
     aabb.create(vertices); // create AABB

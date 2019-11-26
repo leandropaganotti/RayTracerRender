@@ -1,5 +1,5 @@
-#ifndef MODEL_H
-#define MODEL_H
+#ifndef OBJMODEL_H
+#define OBJMODEL_H
 #include <string>
 #include "mesh.h"
 
@@ -11,11 +11,11 @@ current implementation loads a mesh from .obj file
 
 **************************************************************/
 
-class Model: public Mesh
+class OBJModel: public Mesh
 {
 public:
-    Model() = default;
+    OBJModel() = default;
     void loadFromFile(std::string path);
 };
 
-#endif // MODEL_H
+#endif // OBJMODEL_H

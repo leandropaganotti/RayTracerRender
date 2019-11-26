@@ -177,7 +177,7 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
             }
             else if(equals(node->name, "model"))
             {
-                Model *model = new Model();
+                OBJModel *model = new OBJModel();
                 parseModel(node, *model);
                 scene.addObject(model);
             }
@@ -577,7 +577,7 @@ void XMLParser::parseTransformation(xmlNode *xmlTrnasformationNode, Transformati
     transformation.setTransformation(translate, rotate, scale);
 }
 
-void XMLParser::parseModel(xmlNode *xmlModelNode, Model &model)
+void XMLParser::parseModel(xmlNode *xmlModelNode, OBJModel &model)
 {
     if(xmlModelNode == NULL)
     {

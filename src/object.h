@@ -40,33 +40,33 @@ protected:
 
 };
 
-#endif // OBJECT_H
-
 inline
 const Vector3 Object::color(const IntersectionData &isec) const
 {
     const std::pair<float, float> _uv = uv(isec.phit, isec.idx);
     return texture->get(_uv.first, _uv.second) * material->kd;    
 }
-
+inline
 void Object::setMaterial(const std::string &name)
 {
     if(!(material = Material::GetByName(name)))
         material = Material::DiffuseWhite;
 }
-
+inline
 void Object::setMaterial(std::shared_ptr<const Material> m)
 {
     material = m ? m : Material::DiffuseWhite;
 }
-
+inline
 void Object::setTexture(const std::string &name)
 {
     if(!(texture = Texture::GetByName(name)))
         texture = Texture::SolidWhite;
 }
-
+inline
 void Object::setTexture(std::shared_ptr<const Texture> tex)
 {
     texture = tex ? tex : Texture::SolidWhite;
 }
+
+#endif // OBJECT_H
