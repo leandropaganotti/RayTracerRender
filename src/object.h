@@ -34,7 +34,7 @@ public:
     const Texture * getTexture() const { return texture.get(); }
     void setTexture(const std::string &name);
     void setTexture(std::shared_ptr<const Texture> tex);
-private:
+protected:
     std::shared_ptr<const Material> material;
     std::shared_ptr<const Texture> texture;
 

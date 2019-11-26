@@ -28,6 +28,8 @@ public:
     static std::shared_ptr<Material> GetByName(const std::string &name);
 
     static const std::shared_ptr<const Material> DiffuseWhite;
+    static const std::shared_ptr<const Material> Glass;
+    static const std::shared_ptr<const Material> Mirror;
 };
 
 #endif // MATERIAL_H

@@ -3,8 +3,8 @@
 std::map<std::string, std::shared_ptr<Material>> Material::MaterialList;
 
 const std::shared_ptr<const Material> Material::DiffuseWhite = Material::Create("DiffuseWhite");
-//const std::shared_ptr<const Material> Material::Glass = Material::Create("Glass");
-//const std::shared_ptr<const Material> Material::Mirror = Material::Create("Mirror");
+const std::shared_ptr<const Material> Material::Glass = Material::Create("Glass");
+const std::shared_ptr<const Material> Material::Mirror = Material::Create("Mirror");
 
 std::shared_ptr<Material> Material::Create(std::string name)
 {
