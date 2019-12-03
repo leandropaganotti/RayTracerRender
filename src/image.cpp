@@ -31,7 +31,7 @@ void Image::save_ppm(const char *filename) const
 void Image::save_ppm_bin(const char *filename) const
 {
     FILE *fp = fopen(filename, "wb"); /* b - binary mode */
-    (void) fprintf(fp, "P6\n%lu %lu\n255\n", _width, _height);
+    (void) fprintf(fp, "P6\n%zu %zu\n255\n", _width, _height);
     for (size_t i = 0; i < _height; ++i)
     {
         for (size_t j = 0; j < _width; ++j)

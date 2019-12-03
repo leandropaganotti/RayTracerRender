@@ -1,7 +1,6 @@
 #include <iostream>
 #include <iomanip>
 #include <thread>
-#include <unistd.h>
 #include <string>
 #include <sstream>
 #include "raytracer.h"
@@ -9,7 +8,7 @@
 
 using namespace std;
 
-const char *xmlscene = NULL;// xml file with scene description
+char	    *xmlscene = NULL;	// xml file with scene description
 unsigned    nimages  = 1;   // generates nimages from difterent angles around y-axis
 bool        detailedName = false;
 
@@ -17,7 +16,7 @@ void parseArguments(int argc, char **argv);
 
 int main(int argc, char **argv)
 {
-    parseArguments(argc, argv);
+	parseArguments(argc, argv);
 
     double time_in_ms_avg=0.0, time_in_ms=0.0;
     float angle = nimages ? 360.0 / nimages : 0.0;
@@ -25,7 +24,7 @@ int main(int argc, char **argv)
     std::string output(xmlscene);
 
     //get the name of the file input (scene in xml file)
-    output = output.substr(output.find_last_of("/")+1);
+    output = output.substr(output.find_last_of("/\\")+1);
     output = output.substr(0, output.find_last_of("."));
 
     Scene scene(xmlscene);
@@ -41,32 +40,32 @@ int main(int argc, char **argv)
 
     for (unsigned i=0; i < nimages; ++i)
     {
-        cout << "\n" << i+1 << "/" << nimages << ": at " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) <<  i*angle << "°" << flush;
+        cout << "\n" << i+1 << "/" << nimages << ": at " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) <<  i*angle << " deg" << flush;
         camera.lookAt( Matrix4::T(to) * Matrix4::Ry(deg2rad( i*angle )) * Matrix4::T(-to) * from, to); // rotate around y-axis
 
-        auto start = chrono::steady_clock::now();
+		auto start = std::chrono::high_resolution_clock::now();
         raytracer.render(scene);
-        auto end = chrono::steady_clock::now();
+		auto end = std::chrono::high_resolution_clock::now();
 
         time_in_ms = chrono::duration_cast<chrono::milliseconds>(end - start).count();
 
-        std::stringstream time_str ;
-        time_str << timestamp2string(time_in_ms / 1000, "%T") << ":" << std::setw(3) << std::setfill('0') << (unsigned long long)time_in_ms % 1000;
-
-        cout << ", Time: " << time_str.str() << flush;
-
         std::stringstream ss;
-        ss << output;
-        ss << "_IMG" << std::setw(4) << std::setfill('0') << i;
-        if (detailedName) ss << "_SPP" << spp << "_T" << time_str.str();
-        ss << ".ppm";
-        raytracer.getBuffer().save_ppm_bin(ss.str().c_str());
+		int s=time_in_ms/1000, m=s/60, h=m/60;
+        ss << std::setw(2) << std::setfill('0') << h << "." << std::setw(2) << std::setfill('0') << m << "." << std::setw(2) << std::setfill('0') << s << "." << std::setw(3) << std::setfill('0') << (unsigned long long)time_in_ms % 1000;
+		std::string time_str = ss.str();
+        cout << ", Time: " << time_str << endl << flush;
+		
+		std::stringstream ss2;
+		ss2 << output << "_" << std::setw(4) << std::setfill('0') << i;
+		if (detailedName) { ss2 << "_SPP" << spp << "_T" << time_str; }
+        ss2 << ".ppm";
+        raytracer.getBuffer().save_ppm_bin(ss2.str().c_str());
 
         time_in_ms_avg += time_in_ms;
     }
 
     time_in_ms_avg = time_in_ms_avg / (nimages);
-    cout << ", Average in ms: " << time_in_ms_avg << endl;
+    cout << endl << "Total Average in ms: " << time_in_ms_avg << endl;
 
     return 0;
 }
@@ -82,24 +81,40 @@ void usage (char **argv)
 
 void parseArguments(int argc, char **argv)
 {
-    int opt;
-    while ((opt = getopt(argc, argv, "dp:")) != -1) {
-        switch (opt) {
-        case 'd':
-            detailedName = true;
-            break;
-        case 'p':
-            nimages = atoi(optarg);
-            break;
-        default: /* '?' */
-            usage(argv);
-            exit(EXIT_FAILURE);
-        }
+	if (argc < 2)
+	{
+		usage(argv);
+		exit(0);
+	}
+	
+    int opt = 1;
+    while (opt < argc) {
+		if (!strcmp(argv[opt], "-d")) 
+		{
+			detailedName = true;
+		}
+		else if (!strcmp(argv[opt], "-p"))
+		{
+			++opt;
+			if (opt < argc)
+			{
+				nimages = atoi(argv[opt]);
+			}
+			else
+			{
+				usage(argv);
+				exit(0);
+			}
+		}
+		else
+		{
+			xmlscene = argv[opt];
+		}
+		++opt;
     }
-
-   if (optind >= argc) {
-        usage(argv);
-        exit(EXIT_FAILURE);
-    }
-   xmlscene = argv[optind];
+	if (!xmlscene)
+	{
+		usage(argv);
+		exit(0);
+	}
 }

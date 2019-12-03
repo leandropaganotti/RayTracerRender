@@ -65,8 +65,8 @@ inline
 Matrix4 Matrix4::operator *(const Matrix4 &M) const
 {
     Matrix4 R;
-    for (size_t i=0; i < 4; ++i)
-        for (size_t j=0; j < 4; ++j)
+    for (uint8_t i=0; i < 4; ++i)
+        for (uint8_t j=0; j < 4; ++j)
         {
             R[i][j]  = mat[i][0] * M[0][j];
             R[i][j] += mat[i][1] * M[1][j];

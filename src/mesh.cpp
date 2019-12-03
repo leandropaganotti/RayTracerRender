@@ -1,6 +1,6 @@
 #include "mesh.h"
 #include <float.h>
-#include <objparser.h>
+#include "objparser.h"
 
 void Mesh::addVertex(const Vector3 &v)
 {

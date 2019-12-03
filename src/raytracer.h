@@ -4,6 +4,7 @@
 #include "image.h"
 #include "camera.h"
 #include "scene.h"
+#include <functional>
 
 class RayTracer
 {

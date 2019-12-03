@@ -20,8 +20,8 @@ void RayTracer::render(const Scene& scene)
 {
     const float grid = scene.grid;
     const float gridSize = 1.0f/grid;
-    const size_t nrays_persubpixel = ceilf(scene.spp/(grid*grid));
-    const size_t nrays_perpixel = nrays_persubpixel * grid * grid;
+    const size_t nrays_persubM_PIxel = ceilf(scene.spp/(grid*grid));
+    const size_t nrays_perM_PIxel = nrays_persubM_PIxel * grid * grid;
 
     int count = 0;
 
@@ -31,27 +31,26 @@ void RayTracer::render(const Scene& scene)
     std::cout << std::endl;
     std::cout << "\r -> 0.00% completed" << std::flush;
     #pragma omp parallel for schedule(dynamic, 1) shared(count)
-    for (size_t i = 0; i < camera.getHeight(); ++i)
+    for (int i = 0; i < camera.getHeight(); ++i)
     {
         std::ostringstream ss;
-        for (size_t j = 0; j < camera.getWidth(); ++j)
+        for (int j = 0; j < camera.getWidth(); ++j)
         {
             buffer.at(i, j) = 0;
-            for (size_t ii=0; ii < grid; ++ii)
+            for (int ii=0; ii < grid; ++ii)
             {
-                unsigned short Xi[3]={0,0,(short unsigned int)(ii*ii*ii)};
-                for (size_t jj=0; jj < grid; ++jj)
+                for (int jj=0; jj < grid; ++jj)
                 {
-                    for (size_t n = 0; n < nrays_persubpixel; ++n)
+                    for (int n = 0; n < nrays_persubM_PIxel; ++n)
                     {
-                        float r1 = erand48(Xi) * gridSize;
-                        float r2 = erand48(Xi) * gridSize;
+                        float r1 = dis(gen) * gridSize;
+                        float r2 = dis(gen) * gridSize;
                         Ray ray(camera.getPosition(), rayDirection(i + gridSize*ii + r1, j + gridSize*jj + r2));
                         buffer.at(i, j) += tracer(ray, scene, 1, 1.0f);
                     }
                 }
             }
-            buffer.at(i, j) /= nrays_perpixel;
+            buffer.at(i, j) /= nrays_perM_PIxel;
         }
         ++count;
         ss << "\r -> " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) << count/float(camera.getHeight()) * 100.0f << "% completed";
@@ -345,14 +344,14 @@ Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t 
         /*
          * A Lambertian surface by definition reflects radiance equally into all directions. Its BRDF is simply
 
-            $BRDF = ~= rho / pi,
+            $BRDF = ~= rho / M_PI,
 
             where $ \rho$ is called the reflectivity of the surface (from 0 to 1).
 
-            Lo = E + (BRDF * Li * cos) / pdf; where pdf = 1/Area = 1/2pi (hemisphere)
+            Lo = E + (BRDF * Li * cos) / pdf; where pdf = 1/Area = 1/2M_PI (hemisphere)
 
-            Lo = E + material->color/pi * pathTrace() * cos * 1/pdf
-            Lo = E + material->color/pi * pathTrace() * cos * 2pi
+            Lo = E + material->color/M_PI * pathTrace() * cos * 1/pdf
+            Lo = E + material->color/M_PI * pathTrace() * cos * 2M_PI
             Lo = E + material->color * pathTrace() * cos * 2
             I am not recurring in case of hit a light so:
             if hit light return E otherwise material->color * pathTrace() * cos * 2

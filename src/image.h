@@ -1,7 +1,7 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#include <vector.h>
+#include "vector.h"
 #include "utils.h"
 
 class Image

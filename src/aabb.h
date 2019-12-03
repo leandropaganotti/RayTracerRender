@@ -2,6 +2,7 @@
 #define AABB_H
 
 #include "box.h"
+#include <algorithm>
 
 class AABB
 {

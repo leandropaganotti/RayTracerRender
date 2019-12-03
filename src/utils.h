@@ -3,15 +3,13 @@
 
 #include <ctime>
 #include "matrix.h"
-#include <math.h>
-#include <sys/time.h>
 #include <cmath>
 #include <sstream>
 #include <vector>
 #include <random>
 
-
-# define PI           3.14159265358979323846  /* pi */
+#define M_PI	3.14159265358979323846
+#define M_1_PI	0.318309886183790671538
 
 namespace {
 std::random_device rd;  //Will be used to obtain a seed for the random number engine
@@ -97,25 +95,25 @@ float clamp(float x)
 {
     return x < 0.0f ? 0.0f : x > 1.0 ? 1.0f : x;
 }
-
+/*
 inline
 double ms_time()
 {
     struct timeval currentTime;
     gettimeofday(&currentTime, NULL);
     return (double) currentTime.tv_sec * 1000.0 + (double)currentTime.tv_usec/1000.0;
-}
+}*/
 
 inline
 float deg2rad(float deg)
 {
-    return deg * PI / 180.0;
+    return deg * M_PI / 180.0;
 }
 
 inline
 float rad2deg(float rad)
 {
-    return rad * 180.0 / PI;
+    return rad * 180.0 / M_PI;
 }
 
 
@@ -193,7 +191,7 @@ void createCoordinateSystem(const Vector3 &N, Vector3 &Nt, Vector3 &Nb)
     Nb = N.cross(Nt);
 }
 
-inline
+/*inline
 std::string timestamp2string(std::time_t timestamp, const char* format="%FT%T")
 {
     struct tm t;
@@ -205,7 +203,7 @@ std::string timestamp2string(std::time_t timestamp, const char* format="%FT%T")
     char buffer[64] = { };
     strftime( buffer, 64, format, &t );
     return buffer;
-}
+}*/
 
 inline
 std::vector<std::string> split(const std::string &s, char delim) {
