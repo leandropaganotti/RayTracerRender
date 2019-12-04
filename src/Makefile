@@ -1,9 +1,11 @@
 PROGRAM = render
 CXXFLAGS =  -O3 -std=c++0x -Wall -W -fopenmp
 CXX = g++
-INCPATH = -I. -I/usr/include/libxml2
-LIBDIRS = -L/usr/local/lib
-LIBS = -lpthread -lxml2 
+#INCPATH = -I. -I/usr/include/libxml2
+#LIBDIRS = -L/usr/local/lib
+INCPATH = -I. -IC:\Users\lpaganotti\RayTracerRender\libxml\include\libxml2
+LIBDIRS = -LC:\Users\lpaganotti\RayTracerRender\libxml\lib
+LIBS = -lpthread -lxml2
 LDFLAGS = $(LIBDIRS) $(LIBS)
 LFLAGS  = -fopenmp
 

@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <thread>
 #include <string>
+#include <cstring>
 #include <sstream>
 #include "raytracer.h"
 #include "transformation.h"

@@ -17,6 +17,7 @@ struct IntersectionData
 class IntersectionIF
 {
 public:
+	IntersectionIF() = default;
     virtual ~IntersectionIF() = default;
     virtual bool intersection(const Ray& ray, IntersectionData &isec) const = 0;
     virtual bool intersection(const Ray& ray, float &tnear) const = 0;

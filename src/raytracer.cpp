@@ -9,7 +9,7 @@
 #include <iostream>
 #include "consts.h"
 
-const float bias = 0.001;
+const float bias = 0.001f;
 
 RayTracer::RayTracer()
 {
@@ -31,17 +31,17 @@ void RayTracer::render(const Scene& scene)
     std::cout << std::endl;
     std::cout << "\r -> 0.00% completed" << std::flush;
     #pragma omp parallel for schedule(dynamic, 1) shared(count)
-    for (int i = 0; i < camera.getHeight(); ++i)
+    for (size_t i = 0; i < camera.getHeight(); ++i)
     {
         std::ostringstream ss;
-        for (int j = 0; j < camera.getWidth(); ++j)
+        for (size_t j = 0; j < camera.getWidth(); ++j)
         {
             buffer.at(i, j) = 0;
-            for (int ii=0; ii < grid; ++ii)
+            for (size_t ii=0; ii < grid; ++ii)
             {
-                for (int jj=0; jj < grid; ++jj)
+                for (size_t jj=0; jj < grid; ++jj)
                 {
-                    for (int n = 0; n < nrays_persubpixel; ++n)
+                    for (size_t n = 0; n < nrays_persubpixel; ++n)
                     {
                         float r1 = dis(gen) * gridSize;
                         float r2 = dis(gen) * gridSize;
