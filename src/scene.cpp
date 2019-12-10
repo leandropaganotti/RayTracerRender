@@ -7,7 +7,7 @@ Scene::Scene(): name("unamed"), ambientIndex(1.0f), ka(0.1), spp(1), grid(1), ma
 
 Scene::Scene(const std::string &fileName): name("unamed"), ambientIndex(1.0f), ka(0.1), spp(1), grid(1), maxDepth(3), bgColor(0), raytracer(RayTracerType::Phong)
 {
-    load(fileName);
+    //load(fileName);
 }
 
 void Scene::addObject(Object *obj)
@@ -20,11 +20,11 @@ void Scene::addLight(Light *light)
     lights.emplace_back(light);
 }
 
-void Scene::load(const std::string &fileName)
-{
-    this->fileName = fileName;
-    XMLParser().parseFile(fileName.c_str(), *this);
-}
+//void Scene::load(const std::string &fileName)
+//{
+//    this->fileName = fileName;
+//    XMLParser().parseFile(fileName.c_str(), *this);
+//}
 
 std::ostream &operator <<(std::ostream &os, const Scene &scene)
 {

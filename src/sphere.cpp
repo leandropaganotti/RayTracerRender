@@ -27,10 +27,14 @@ void Sphere::setRadius(float value)
     radius2 = radius * radius;
 }
 
-bool Sphere::intersection(const Ray &ray, IntersectionData &isec) const
+std::shared_ptr<Sphere> Sphere::Create(const Vector3 &center, const float &radius)
 {
-    isec.object = this;
-    return intersection(ray, isec.tnear);;
+    return std::shared_ptr<Sphere>(new Sphere(center, radius));
+}
+
+bool Sphere::intersection(const Ray &ray, IntersectionData &isec) const
+{    
+    return intersection(ray, isec.tnear);
 }
 
 bool Sphere::intersection(const Ray &ray, float &tnear) const
@@ -71,5 +75,10 @@ const Vector3 Sphere::normal(const Vector3 &phit, size_t) const
 //       tnear = t0;
 //       return true;
 
-
-
+const std::pair<float, float> Sphere::uv(const Vector3 &phit, size_t) const
+{
+    Vector3 d = (phit-center).normalize();
+    float u = 0.5 + atan2f(d.z, d.x) / (2.0f * M_PI);
+    float v = 0.5 - asinf(d.y) / M_PI;
+    return std::make_pair(u, v);
+}

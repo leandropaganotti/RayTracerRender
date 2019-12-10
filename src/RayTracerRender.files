@@ -13,6 +13,7 @@ image.h
 intersection.h
 light.cpp
 light.h
+list.h
 main.cpp
 material.cpp
 material.h

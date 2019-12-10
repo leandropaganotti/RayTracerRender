@@ -38,7 +38,7 @@ public:
 
     void parseBox(xmlNode * xmlBoxNode, Box & box);
 
-    void parseTransformation(xmlNode * xmlTrnasformationNode, Transformation & transformation);
+    void parseTransformation(xmlNode * xmlTrnasformationNode, TransformationIF & transformation);
 
     void parseModel(xmlNode * xmlModelNode, OBJModel & model);
 

@@ -4,7 +4,7 @@
 #include "plane.h"
 #include "aabb.h"
 
-class Mesh: public Object, public Transformation
+class Mesh: public Object, public TransformationIF
 {    
 public:    
     Mesh() = default;

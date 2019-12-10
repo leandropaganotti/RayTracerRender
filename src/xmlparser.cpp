@@ -540,7 +540,7 @@ void XMLParser::parseBox(xmlNode *xmlBoxNode, Box &box)
     }
 }
 
-void XMLParser::parseTransformation(xmlNode *xmlTrnasformationNode, Transformation &transformation)
+void XMLParser::parseTransformation(xmlNode *xmlTrnasformationNode, TransformationIF &transformation)
 {
     if(xmlTrnasformationNode == NULL)
     {

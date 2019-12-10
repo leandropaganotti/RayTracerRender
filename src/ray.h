@@ -16,6 +16,16 @@ public:
 
     Vector3 origin;
     Vector3 direction;
+
+    struct ISec {
+        Vector3 wPhit;
+        Vector3 lPhit;
+        float wTnear;
+        float lTnear;
+        size_t idx;
+    };
+
+    ISec isec{{0}, {0}, 0, 0, 0};
 };
 
 #endif // RAY_H

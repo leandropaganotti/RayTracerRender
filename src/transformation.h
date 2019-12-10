@@ -4,11 +4,11 @@
 #include "vector.h"
 #include "matrix.h"
 
-class Transformation
+class TransformationIF
 {    
 public:
-    Transformation() = default;
-    virtual ~Transformation() = default;
+    TransformationIF() = default;
+    virtual ~TransformationIF() = default;
 
     virtual void setTransformation(const Vector3 &translate, const Vector3 &rotate, const Vector3 &scale);
     virtual void setTransformation(const Matrix4 &transformation);
@@ -28,24 +28,24 @@ public:
     virtual void rotateY(float y);
     virtual void rotateZ(float z);*/
 
-private:
+protected:
     Matrix4 model;              // object-to-world
     Matrix4 inverse;            // world-to-object
     Matrix4 inverseTranspose;   // matrix for normals transformation
 };
 
 inline
-const Matrix4 &Transformation::getModel() const
+const Matrix4 &TransformationIF::getModel() const
 {
     return model;
 }
 inline
-const Matrix4 &Transformation::getInverse() const
+const Matrix4 &TransformationIF::getInverse() const
 {
     return inverse;
 }
 inline
-const Matrix4 &Transformation::getInverseTranspose() const
+const Matrix4 &TransformationIF::getInverseTranspose() const
 {
     return inverseTranspose;
 }

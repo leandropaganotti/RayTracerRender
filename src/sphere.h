@@ -1,21 +1,20 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
-#include "object.h"
+#include "shape.h"
 #include "texture.h"
 #include <math.h>
 #include "utils.h"
 
-class Sphere: public Object
+class Sphere: public Shape
 {
-    Vector3 center;                         // position of the sphere
-    float radius, radius2;                  // sphere radius and radius^2    
 public:    
-    Sphere(const Vector3 &center={0.0f}, const float &radius=1.0f);
+    static std::shared_ptr<Sphere> Create(const Vector3 &center={0.0f}, const float &radius=1.0f);
 
     bool  intersection(const Ray &ray, IntersectionData &isec) const;
     bool  intersection(const Ray& ray, float& tnear) const;
     const Vector3 normal(const Vector3 &phit, size_t) const;
+    const std::pair<float, float> uv(const Vector3 &phit, size_t) const;
 
     Vector3  getCenter() const;
     void     setCenter(const Vector3 &value);
@@ -24,18 +23,12 @@ public:
 
     void sampleSolidAngleSphere(const Vector3& point, Vector3& sample,  float &_1_pdf);
 
-private:
-    const std::pair<float, float> uv(const Vector3 &phit, size_t) const;
-};
+protected:
+    Sphere(const Vector3 &center={0.0f}, const float &radius=1.0f);
 
-inline
-const std::pair<float, float> Sphere::uv(const Vector3 &phit, size_t) const
-{
-    Vector3 d = (phit-center).normalize();
-    float u = 0.5 + atan2f(d.z, d.x) / (2.0f * M_PI);
-    float v = 0.5 - asinf(d.y) / M_PI;
-    return std::make_pair(u, v);
-}
+    Vector3 center;                         // position of the sphere
+    float radius, radius2;                  // sphere radius and radius^2
+};
 
 inline
 void Sphere::sampleSolidAngleSphere(const Vector3& point, Vector3& sample,  float &_1_pdf){

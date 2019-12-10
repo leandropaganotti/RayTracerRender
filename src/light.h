@@ -9,7 +9,7 @@ class Light
 {
 public:     
     virtual Vector3 position  () const = 0;
-    virtual float    distance  (const Vector3 &point) const = 0;
+    virtual float   distance  (const Vector3 &point) const = 0;
     virtual Vector3 direction (const Vector3 &point) const = 0;
     virtual Vector3 intensity (const Vector3 &point) const = 0;
     virtual ~Light() = default;
@@ -49,9 +49,9 @@ public:
         return 1.0f / ( 1.0f + k * d * d);
     }
 
-    Vector3 getPos() const;
+    Vector3  getPos() const;
     void     setPos(const Vector3 &value);
-    Vector3 getColor() const;
+    Vector3  getColor() const;
     void     setColor(const Vector3 &value);
     float    getStrength() const;
     void     setStrength(float value);

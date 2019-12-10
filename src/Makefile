@@ -9,7 +9,19 @@ LIBS = -lpthread -lxml2
 LDFLAGS = $(LIBDIRS) $(LIBS)
 LFLAGS  = -fopenmp
 
-OBJECTS = camera.o image.o light.o main.o mesh.o plane.o raytracer.o scene.o sphere.o texture.o transformation.o box.o objmodel.o xmlparser.o objparser.o aabb.o cameraoptions.o material.o
+OBJECTS = main.o \
+camera.o \
+image.o \
+light.o \
+plane.o \
+raytracer.o \
+scene.o \
+sphere.o \
+texture.o \
+transformation.o \
+cameraoptions.o \
+material.o \
+shape.o \
 
 all: $(PROGRAM)
 
