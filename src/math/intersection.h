@@ -1,5 +1,4 @@
-#ifndef INTERSECTION_H
-#define INTERSECTION_H
+#pragma once
 
 #include "vector.h"
 
@@ -23,5 +22,3 @@ public:
     virtual bool intersection(const Ray& ray, IntersectionData &isec) const = 0;
     virtual bool intersection(const Ray& ray, float &tnear) const = 0;    
 };
-
-#endif // INTERSECTION_H

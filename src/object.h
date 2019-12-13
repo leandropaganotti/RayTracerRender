@@ -5,6 +5,7 @@
 #include "shape.h"
 #include "material.h"
 #include "texture.h"
+#include "shapefactory.h"
 
 class Object;
 
@@ -79,7 +80,7 @@ const Vector3 Object::color(const IntersectionData &isec) const
 inline
 void Object::setShape(std::shared_ptr<const Shape> shape)
 {
-    this->shape = shape ? shape : Shape::Invisible;
+    this->shape = shape ? shape : Shapes::Invisible;
 }
 inline
 void Object::setMaterial(const std::string &name)

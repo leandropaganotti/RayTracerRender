@@ -1,5 +1,4 @@
-#ifndef UTILS
-#define UTILS
+#pragma once
 
 #include <ctime>
 #include "matrix.h"
@@ -8,8 +7,8 @@
 #include <vector>
 #include <random>
 
-#define M_PI	3.14159265358979323846
-#define M_1_PI	0.318309886183790671538
+//#define M_PI	3.14159265358979323846
+//#define M_1_PI	0.31830988618379067153
 
 namespace {
 std::random_device rd;  //Will be used to obtain a seed for the random number engine
@@ -216,4 +215,3 @@ std::vector<std::string> split(const std::string &s, char delim) {
   }
   return std::move(elems);
 }
-#endif // UTILS

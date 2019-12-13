@@ -1,16 +1,11 @@
-#ifndef SPHERE_H
-#define SPHERE_H
+#pragma once
 
 #include "shape.h"
-#include "texture.h"
-#include <math.h>
 #include "utils.h"
 
 class Sphere: public Shape
-{
-public:    
-    static std::shared_ptr<Sphere> Create(const Vector3 &center={0.0f}, const float &radius=1.0f);
-
+{    
+public:        
     bool  intersection(const Ray &ray, IntersectionData &isec) const;
     bool  intersection(const Ray& ray, float& tnear) const;
     const Vector3 normal(const Vector3 &phit, size_t) const;
@@ -28,6 +23,8 @@ protected:
 
     Vector3 center;                         // position of the sphere
     float radius, radius2;                  // sphere radius and radius^2
+
+    friend class Shapes;
 };
 
 inline
@@ -47,4 +44,4 @@ void Sphere::sampleSolidAngleSphere(const Vector3& point, Vector3& sample,  floa
 
     _1_pdf = (2.0f*M_PI*(1.0f-cos_a_max));//1/(2*M_PI*(1-cos_a_max));
 }
-#endif  // SPHERE_H
+

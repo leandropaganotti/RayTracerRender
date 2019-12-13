@@ -1,11 +1,7 @@
-#ifndef VECTOR_H
-#define VECTOR_H
+#pragma once
 
-#include <cstddef>
 #include <iostream>
-#include <math.h>
-
-
+#include <cmath>
 
 struct Vector3
 {
@@ -137,5 +133,3 @@ struct Vector3
         return os << std::fixed << "[ " << v.x << " " << v.y << " " << v.z <<  " ]";
     }
 };
-
-#endif // VECTOR_H

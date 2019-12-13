@@ -5,22 +5,7 @@ Vector3 AABB::getCenter()
 {
     return (min + max ) * 0.5f;
 }
-const Vector3 &AABB::getMin() const
-{
-    return min;
-}
-const Vector3 &AABB::getMax() const
-{
-    return max;
-}
-void AABB::setMin(const Vector3 &value)
-{
-    min = value;
-}
-void AABB::setMax(const Vector3 &value)
-{
-    max = value;
-}
+
 
 void AABB::create(const std::vector<Vector3> &vertices)
 {
@@ -44,4 +29,10 @@ void AABB::create(const std::vector<Vector3> &vertices)
         if (vertices[i].z > max.z)
             max.z = vertices[i].z;
     }    
+}
+
+AABB::AABB(const Vector3 &min, const Vector3 &max):
+    AABox(min, max)
+{
+
 }

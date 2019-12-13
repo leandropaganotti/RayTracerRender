@@ -1,5 +1,4 @@
-#ifndef TRANSFORMATION_H
-#define TRANSFORMATION_H
+#pragma once
 
 #include "vector.h"
 #include "matrix.h"
@@ -49,5 +48,3 @@ const Matrix4 &TransformationIF::getInverseTranspose() const
 {
     return inverseTranspose;
 }
-
-#endif // TRANSFORMATION_H

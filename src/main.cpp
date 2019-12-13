@@ -5,10 +5,8 @@
 #include <cstring>
 #include <sstream>
 #include "raytracer.h"
-#include "transformation.h"
-#include "plane.h"
-#include "sphere.h"
-#include "shape.h"
+
+#include "shapefactory.h"
 
 using namespace std;
 
@@ -31,28 +29,31 @@ int main(int argc, char **argv)
     output = output.substr(output.find_last_of("/\\")+1);
     output = output.substr(0, output.find_last_of("."));
 
-    Scene scene(xmlscene);
+    Scene scene;
     scene.grid = 4;
     scene.spp = 4;
     scene.raytracer = RayTracerType::Phong;
-    scene.addLight( new PointLight({0,1,2}, 1));
-    scene.cameraOptions.setFrom({0,1,10});
+    scene.addLight( new PointLight({0,2,2}, 1));
+    scene.cameraOptions.setFrom({0,5,10});
 
-    scene.addObject(new Object(Plane::Create()));
-
+    scene.addObject(new Object(Shapes::CreatePlane()));
 
     auto m = Material::Create();
     m->kd = {1, 0, 0};
     m->ks = 1;
-    auto inst = Instance::Create(Sphere::Create());
-    inst->setTransformation({0,1,0}, {0,0,0}, {0.5, 1,0.5});
+    auto inst = Shapes::CreateInstance(Shapes::UnitSphere);
+    inst->setTransformation({2,1,0}, {0,0,0}, {0.5, 1,0.5});
     scene.addObject(new Object(inst, m));
 
 
     auto m2 = Material::Create();
     m2->E = 10;
-    Object *light = new Object(Sphere::Create({0,4,0}, 1), m2);
+    Object *light = new Object(Shapes::CreateSphere({0,4,0}, 1), m2);
     scene.addObject(light);
+
+    auto box = Shapes::CreateInstance(Shapes::CreateAABox());
+    box->setTransformation({-1,0,0}, {0,45,0}, {1.5, 1.5,1.5});
+    scene.addObject(new Object(box));
 
     cout << scene << endl;
 

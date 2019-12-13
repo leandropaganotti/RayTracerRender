@@ -450,7 +450,7 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const Scene& scene, const uint8_t
                 float vis = castShadowRay(Ray(isec.phit + bias * isec.normal, sampleToLight), scene.objects, dist);
                 if (vis)
                 {
-                    //direct += vis * brdf * sphere->getMaterial()->E * cosTheta * _1_pdf;
+                    direct += vis * brdf * obj->getMaterial()->E * cosTheta * _1_pdf;
                 }
             }
         }

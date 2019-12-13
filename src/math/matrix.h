@@ -1,7 +1,6 @@
-#ifndef MATRIX_H
-#define MATRIX_H
-#include <iostream>
+#pragma once
 
+#include <iostream>
 #include "vector.h"
 #include "ray.h"
 
@@ -266,5 +265,3 @@ float Matrix4::det3(float a, float b, float c, float d, float e, float f, float 
 {
     return a*e*i + d*h*c + g*b*f - g*e*c - d*b*i -a*h*f;
 }
-
-#endif // MATRIX_H

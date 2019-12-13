@@ -1,10 +1,5 @@
 #include "plane.h"
 
-std::shared_ptr<Plane> Plane::Create(const Vector3 &O, const Vector3 &N)
-{
-    return std::shared_ptr<Plane>(new Plane(O, N));
-}
-
 Plane::Plane(const Vector3 &O, const Vector3 &N):
     O(O), N(N)
 {

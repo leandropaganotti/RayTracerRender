@@ -27,11 +27,6 @@ void Sphere::setRadius(float value)
     radius2 = radius * radius;
 }
 
-std::shared_ptr<Sphere> Sphere::Create(const Vector3 &center, const float &radius)
-{
-    return std::shared_ptr<Sphere>(new Sphere(center, radius));
-}
-
 bool Sphere::intersection(const Ray &ray, IntersectionData &isec) const
 {    
     return intersection(ray, isec.tnear);
