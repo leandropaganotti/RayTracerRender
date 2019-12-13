@@ -1,21 +1,10 @@
-#ifndef OBJMODEL_H
-#define OBJMODEL_H
-#include <string>
-#include "mesh.h"
+#pragma once
 
-/**************************************************************
-TODO: A model is going to be a collections of Mesh blocks,
-which one with their material, transformation, and texture
+#include "object.h"
 
-current implementation loads a mesh from .obj file
-
-**************************************************************/
-
-class OBJModel: public Mesh
-{
+class OBJModel: public Object
+{    
 public:
     OBJModel() = default;
-    void loadFromFile(std::string path);
+    void loadFromFile(const std::string &path);    
 };
-
-#endif // OBJMODEL_H

@@ -1,14 +1,12 @@
-#ifndef MESH_H
-#define MESH_H
+#pragma once
+
 #include <vector>
-#include "plane.h"
+#include "shape.h"
 #include "aabb.h"
 
-class Mesh: public Object, public TransformationIF
+class Mesh: public Shape
 {    
-public:    
-    Mesh() = default;
-
+public:
     struct Triangle
     {
         size_t v0, v1, v2;      // 3 vertex indexes
@@ -23,29 +21,23 @@ public:
     void addFace(size_t v0, size_t v1, size_t v2, size_t nv0, size_t nv1, size_t nv2);
 
     void clear();
+    void updateAABB();
 
     friend std::ostream& operator << (std::ostream& os, const Mesh &m);
     friend std::ostream& operator << (std::ostream &os, const Triangle &f);
 
-    // Object interface
+    // Shape interface
     bool  intersection(const Ray& ray, IntersectionData& isec) const;
     bool  intersection(const Ray& ray, float& tnear) const;
-    const Vector3 normal(const Vector3 &phit, size_t idx) const;
-    const std::pair<float, float> uv(const Vector3 &, size_t) const;
+    Vector3 normal(const Vector3 &phit, size_t idx) const;
+    std::pair<float, float> uv(const Vector3 &, size_t) const;
 
 protected:
+    Mesh() = default;
     AABB aabb;
     std::vector<Vector3>   vertices;
     std::vector<Vector3>   normals;
     std::vector<Triangle>  faces;    
+
+    friend class Shapes;
 };
-
-inline
-const std::pair<float, float> Mesh::uv(const Vector3 &, size_t) const
-{
-    return std::pair<float, float>(0.0f, 0.0f);
-}
-
-
-
-#endif // MESH_H

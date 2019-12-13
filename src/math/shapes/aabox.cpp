@@ -1,4 +1,4 @@
-#include "box.h"
+#include "aabox.h"
 #include "shapefactory.h"
 
 AABox::AABox(const Vector3 &min, const Vector3 &max): min(min), max(max)
@@ -73,7 +73,7 @@ bool AABox::intersection(const Ray &ray, float &tnear) const
     return true;
 }
 
-const Vector3 AABox::normal(const Vector3 &, size_t idx) const
+Vector3 AABox::normal(const Vector3 &, size_t idx) const
 {
     if (idx == 1)      return Vector3(-1,0,0);
     else if (idx == 2) return Vector3(1,0,0);
@@ -83,7 +83,7 @@ const Vector3 AABox::normal(const Vector3 &, size_t idx) const
     else               return Vector3(0,0,-1);
 }
 
-const std::pair<float, float> AABox::uv(const Vector3 &phit, size_t idx) const
+std::pair<float, float> AABox::uv(const Vector3 &phit, size_t idx) const
 {
     float u=0, v=0;
     if (idx == 1 || idx == 2)
@@ -107,9 +107,4 @@ Vector3 AABox::getMin() const
 void AABox::setMin(const Vector3 &value)
 {
     min = value;
-}
-
-Box::Box(): InstancedShape(Shapes::UnitBox)
-{
-
 }

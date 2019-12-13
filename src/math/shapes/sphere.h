@@ -8,8 +8,8 @@ class Sphere: public Shape
 public:        
     bool  intersection(const Ray &ray, IntersectionData &isec) const;
     bool  intersection(const Ray& ray, float& tnear) const;
-    const Vector3 normal(const Vector3 &phit, size_t) const;
-    const std::pair<float, float> uv(const Vector3 &phit, size_t) const;
+    Vector3 normal(const Vector3 &phit, size_t) const;
+    std::pair<float, float> uv(const Vector3 &phit, size_t) const;
 
     Vector3  getCenter() const;
     void     setCenter(const Vector3 &value);

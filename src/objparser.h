@@ -1,15 +1,10 @@
-#ifndef OBJPARSER_H
-#define OBJPARSER_H
+#pragma once
 
-#include "mesh.h"
 #include <string>
+#include "objmodel.h"
 
 class OBJParser
 {
 public:
-    OBJParser() = default;
-    static Mesh* Parse(std::string path);
-    static void Parse(std::string path, Mesh &mesh);
+    static void Parse(const std::string &path, OBJModel &model);
 };
-
-#endif // OBJPARSER_H

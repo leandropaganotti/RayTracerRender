@@ -42,19 +42,22 @@ void Mesh::clear()
     faces.clear();
 }
 
-bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
-{    
-    Ray r = getInverse() * ray;
+void Mesh::updateAABB()
+{
+    aabb.create(vertices);
+}
 
+bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
+{        
     float t;
 
-    if (!aabb.intersection(r, t))
+    if (!aabb.intersection(ray, t))
         return false;
 
     isec.tnear = FLT_MAX;
     for (size_t i=0 ; i < faces.size(); ++i)
     {
-        if (faces[i].intersection(vertices, r, t))
+        if (faces[i].intersection(vertices, ray, t))
         {
             if (t < isec.tnear)
             {
@@ -63,55 +66,38 @@ bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
             }
         }
     }
-    if (isec.tnear < FLT_MAX)
-    {        
-        isec.object = this;        
-        Vector3 phit = r.origin + isec.tnear * r.direction;
-        phit = getModel() * phit;
-        isec.tnear = (phit - ray.origin).length();
-        return true;
-    }
-    return false;
+    return isec.tnear < FLT_MAX ? true : false;
 }
 
 bool Mesh::intersection(const Ray& ray, float &tnear) const
-{
-    Ray r = getInverse() * ray;
-
+{    
     float t;
-    if (!aabb.intersection(r, t))
+    if (!aabb.intersection(ray, t))
         return false;
 
     tnear = FLT_MAX;
     for (size_t i=0 ; i < faces.size(); ++i)
     {
-        if (faces[i].intersection(vertices, r, t))
+        if (faces[i].intersection(vertices, ray, t))
         {
             if (t < tnear) tnear = t;
         }
     }
-    if (tnear < FLT_MAX)
-    {
-        Vector3 phit = r.origin + tnear * r.direction;
-        phit = getModel() * phit;
-        tnear = (phit - ray.origin).length();
-        return true;
-    }
-    return false;
+    return tnear < FLT_MAX ? true : false;
+
 }
 
-const Vector3 Mesh::normal(const Vector3 &phit, size_t idx) const
-{        
-    Vector3 _phit = getInverse() * phit;
-    float u = (((vertices[faces[idx].v2] - vertices[faces[idx].v1]) % (_phit - vertices[faces[idx].v1])).length() / 2) / faces[idx].area;
-    float v = (((vertices[faces[idx].v0] - vertices[faces[idx].v2]) % (_phit - vertices[faces[idx].v2])).length() / 2) / faces[idx].area;
+Vector3 Mesh::normal(const Vector3 &phit, size_t idx) const
+{            
+    float u = (((vertices[faces[idx].v2] - vertices[faces[idx].v1]) % (phit - vertices[faces[idx].v1])).length() / 2) / faces[idx].area;
+    float v = (((vertices[faces[idx].v0] - vertices[faces[idx].v2]) % (phit - vertices[faces[idx].v2])).length() / 2) / faces[idx].area;
     float w = 1 - u - v;
 
     Vector3 N =  u*normals[faces[idx].nv0] + v*normals[faces[idx].nv1] +w*normals[faces[idx].nv2];
 
     //N = (normals[faces[idx].nv0] + normals[faces[idx].nv1] + normals[faces[idx].nv2]).normalize();
 
-    return (getInverseTranspose() * N).normalize();
+    return N;
 }
 
 std::ostream &operator <<(std::ostream &os, const Mesh &m)
@@ -178,4 +164,9 @@ bool Mesh::Triangle::intersection(const std::vector<Vector3> &vertices, const Ra
     tnear = -(F*AKJB + E*JCAL + D*BLKC  ) / denon;
 
     return tnear > 0.0f ? true : false;
+}
+
+std::pair<float, float> Mesh::uv(const Vector3 &, size_t) const
+{
+    return std::pair<float, float>(0.0f, 0.0f);
 }

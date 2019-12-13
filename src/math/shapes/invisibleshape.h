@@ -14,8 +14,8 @@ public:
 
     // Shape interface
 public:
-    const Vector3 normal(const Vector3 &, size_t) const override;
-    const std::pair<float, float> uv(const Vector3 &, size_t) const override;
+    Vector3 normal(const Vector3 &, size_t) const override;
+    std::pair<float, float> uv(const Vector3 &, size_t) const override;
 private:
     InvisibleShape() = default;
     InvisibleShape(const InvisibleShape&) = delete;

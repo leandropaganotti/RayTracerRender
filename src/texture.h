@@ -19,7 +19,7 @@ public:
 
     static std::shared_ptr<Texture> GetByName(const std::string &name);
 
-    static const std::shared_ptr<const Texture> SolidWhite;
+    static const std::shared_ptr<Texture> SolidWhite;
 };
 
 class Solid: public Texture

@@ -1,7 +1,7 @@
 #include "shape.h"
 #include "invisibleshape.h"
 
-bool InstancedShape::intersection(const Ray &ray, IntersectionData &isec) const
+bool Instance::intersection(const Ray &ray, IntersectionData &isec) const
 {
     Ray r = inverse * ray;
     if (shape->intersection(r, isec))
@@ -15,7 +15,7 @@ bool InstancedShape::intersection(const Ray &ray, IntersectionData &isec) const
         return false;
 }
 
-bool InstancedShape::intersection(const Ray &ray, float &tnear) const
+bool Instance::intersection(const Ray &ray, float &tnear) const
 {
     Ray r = inverse * ray;
     if (shape->intersection(r, tnear))
@@ -29,17 +29,17 @@ bool InstancedShape::intersection(const Ray &ray, float &tnear) const
         return false;
 }
 
-const Vector3 InstancedShape::normal(const Vector3 &phit, size_t idx) const
+Vector3 Instance::normal(const Vector3 &phit, size_t idx) const
 {
     return (inverseTranspose * shape->normal(inverse * phit, idx)).normalize();
 }
 
-const std::pair<float, float> InstancedShape::uv(const Vector3 &phit, size_t idx) const
+std::pair<float, float> Instance::uv(const Vector3 &phit, size_t idx) const
 {
     return shape->uv(inverse * phit, idx);
 }
 
-InstancedShape::InstancedShape(std::shared_ptr<Shape> shape)
+Instance::Instance(std::shared_ptr<Shape> shape)
 {
     this->shape = shape ? shape : InvisibleShape::GetInstance();
 }
@@ -47,10 +47,4 @@ InstancedShape::InstancedShape(std::shared_ptr<Shape> shape)
 void Instance::setShape(std::shared_ptr<Shape> shape)
 {
     if(shape) this->shape = shape;
-}
-
-Instance::Instance(std::shared_ptr<Shape> shape):
-    InstancedShape(shape)
-{
-
 }

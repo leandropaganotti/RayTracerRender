@@ -3,7 +3,7 @@
 
 std::map<std::string, std::shared_ptr<Texture>> Texture::TextureList;
 
-const std::shared_ptr<const Texture> Texture::SolidWhite = Solid::Create("SolidWhite");
+const std::shared_ptr<Texture> Texture::SolidWhite = Solid::Create("SolidWhite");
 
 Texture::Texture(const std::string &name)
 {

@@ -53,7 +53,7 @@ bool Sphere::intersection(const Ray &ray, float &tnear) const
     return true;
 }
 
-const Vector3 Sphere::normal(const Vector3 &phit, size_t) const
+Vector3 Sphere::normal(const Vector3 &phit, size_t) const
 {
     return (phit-center).normalize();
 }
@@ -70,7 +70,7 @@ const Vector3 Sphere::normal(const Vector3 &phit, size_t) const
 //       tnear = t0;
 //       return true;
 
-const std::pair<float, float> Sphere::uv(const Vector3 &phit, size_t) const
+std::pair<float, float> Sphere::uv(const Vector3 &phit, size_t) const
 {
     Vector3 d = (phit-center).normalize();
     float u = 0.5 + atan2f(d.z, d.x) / (2.0f * M_PI);

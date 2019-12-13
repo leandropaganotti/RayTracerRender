@@ -27,8 +27,11 @@ material.o \
 shape.o \
 shapefactory.o \
 invisibleshape.o \
-box.o \
-aabb.o
+aabox.o \
+aabb.o \
+mesh.o \
+objmodel.o \
+objparser.o
 
 
 CObjects=$(addprefix $(OBJDIR)/,$(OBJECTS))

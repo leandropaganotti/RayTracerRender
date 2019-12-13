@@ -3,21 +3,15 @@
 #include <vector>
 #include "utils.h"
 #include <sstream>
+#include "mesh.h"
+#include "shapefactory.h"
 
-Mesh* OBJParser::Parse(std::string path)
+void OBJParser::Parse(const std::string &path, OBJModel &model)
 {
-    Mesh * mesh = new Mesh;
-
-    Parse(path, *mesh);
-
-    return mesh;
-}
-
-void OBJParser::Parse(std::string path, Mesh &mesh)
-{
-    mesh.clear();
-    mesh.addVertex({});
-    mesh.addNormal({});
+    auto mesh = Shapes::CreateMesh();
+    mesh->clear();
+    mesh->addVertex({});
+    mesh->addNormal({});
 
     std::ifstream ifs (path, std::ifstream::in);
 
@@ -31,11 +25,11 @@ void OBJParser::Parse(std::string path, Mesh &mesh)
             //v 1.250047 0.000000 0.000000
             if (list.size() == 4 && list[0] == "v")
             {
-                mesh.addVertex({stof(list[1]), stof(list[2]), stof(list[3])});
+                mesh->addVertex({stof(list[1]), stof(list[2]), stof(list[3])});
             }
             else if (list.size() == 4 && list[0] == "vn")
             {
-                mesh.addNormal({stof(list[1]), stof(list[2]), stof(list[3])});
+                mesh->addNormal({stof(list[1]), stof(list[2]), stof(list[3])});
             }
             else if (list.size() == 4 && list[0] == "f")
             {
@@ -52,7 +46,7 @@ void OBJParser::Parse(std::string path, Mesh &mesh)
                 size_t v3 = stoi(list1[0]);
                 size_t nv3 = stoi(list1[2]);
 
-                mesh.addFace(v1, v2, v3, nv1, nv2, nv3);
+                mesh->addFace(v1, v2, v3, nv1, nv2, nv3);
             }
         }
     }
@@ -62,4 +56,6 @@ void OBJParser::Parse(std::string path, Mesh &mesh)
     }
     //std::cout << mesh << std::endl;
     ifs.close();
+    mesh->updateAABB();
+    model.setShape(Shapes::CreateInstance(mesh));
 }

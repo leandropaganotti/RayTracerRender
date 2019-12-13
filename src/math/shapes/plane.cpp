@@ -28,12 +28,12 @@ bool Plane::intersection(const Ray &ray, float& tnear) const
     return false;
 }
 
-const Vector3 Plane::normal(const Vector3 &, size_t) const
+Vector3 Plane::normal(const Vector3 &, size_t) const
 {
     return N;
 }
 
-const std::pair<float, float> Plane::uv(const Vector3 &phit, size_t) const
+std::pair<float, float> Plane::uv(const Vector3 &phit, size_t) const
 {
 
     Vector3 v = phit - O;

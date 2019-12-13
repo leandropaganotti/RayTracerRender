@@ -14,8 +14,8 @@ public:
 
     // Shape interface
 public:
-    const Vector3 normal(const Vector3 &phit, size_t idx) const;
-    const std::pair<float, float> uv(const Vector3 &phit, size_t idx) const;
+    Vector3 normal(const Vector3 &phit, size_t idx) const;
+    std::pair<float, float> uv(const Vector3 &phit, size_t idx) const;
 
 public:
     Vector3 getMin() const;
@@ -29,13 +29,6 @@ protected:
     Vector3 min;
     Vector3 max;
 
-    friend class Shapes;
-};
-
-class Box : public InstancedShape
-{
-private:
-    Box();
     friend class Shapes;
 };
 

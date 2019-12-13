@@ -7,6 +7,7 @@
 #include "raytracer.h"
 
 #include "shapefactory.h"
+#include "objmodel.h"
 
 using namespace std;
 
@@ -31,29 +32,36 @@ int main(int argc, char **argv)
 
     Scene scene;
     scene.grid = 4;
-    scene.spp = 4;
+    scene.spp = 1;
     scene.raytracer = RayTracerType::Phong;
-    scene.addLight( new PointLight({0,2,2}, 1));
-    scene.cameraOptions.setFrom({0,5,10});
+    scene.addLight( new PointLight({0,5,3}, 1));
+    scene.cameraOptions.setFrom({0,4,8});
+    scene.cameraOptions.setTo({0,1.5,0});
 
-    scene.addObject(new Object(Shapes::CreatePlane()));
+    //scene.addObject(new Object(Shapes::CreatePlane()));
 
     auto m = Material::Create();
     m->kd = {1, 0, 0};
-    m->ks = 1;
+    m->ks = 1;    
     auto inst = Shapes::CreateInstance(Shapes::UnitSphere);
     inst->setTransformation({2,1,0}, {0,0,0}, {0.5, 1,0.5});
-    scene.addObject(new Object(inst, m));
+    //scene.addObject(new Object(inst, m));
 
 
     auto m2 = Material::Create();
     m2->E = 10;
     Object *light = new Object(Shapes::CreateSphere({0,4,0}, 1), m2);
-    scene.addObject(light);
+    //scene.addObject(light);
 
-    auto box = Shapes::CreateInstance(Shapes::CreateAABox());
-    box->setTransformation({-1,0,0}, {0,45,0}, {1.5, 1.5,1.5});
+    auto box = Shapes::CreateInstanceBox();
+    box->setTransformation({0,0,0}, {0,0,0}, {5, 0.1, 5});
     scene.addObject(new Object(box));
+
+    OBJModel *model = new OBJModel();
+    model->loadFromFile("obj/glass.obj");
+    model->setMaterial(m);
+    model->setTransformation({0,0,0}, {0,0,0}, {1});
+    scene.addObject(model);
 
     cout << scene << endl;
 

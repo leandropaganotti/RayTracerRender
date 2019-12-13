@@ -27,9 +27,9 @@ public:
     static std::shared_ptr<Material> Create(std::string name="");
     static std::shared_ptr<Material> GetByName(const std::string &name);
 
-    static const std::shared_ptr<const Material> DiffuseWhite;
-    static const std::shared_ptr<const Material> Glass;
-    static const std::shared_ptr<const Material> Mirror;
+    static const std::shared_ptr<Material> DiffuseWhite;
+    static const std::shared_ptr<Material> Glass;
+    static const std::shared_ptr<Material> Mirror;
 };
 
 #endif // MATERIAL_H
