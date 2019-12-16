@@ -2,10 +2,19 @@
 
 #include <ctime>
 #include "matrix.h"
-#include <cmath>
 #include <sstream>
 #include <vector>
 #include <random>
+#include <cmath>
+#include <iostream>
+
+#ifndef M_PI
+#define M_PI           3.14159265358979323846
+#endif
+
+#ifndef M_1_PI
+#define M_1_PI           0.31830988618379067153
+#endif
 
 //#define M_PI	3.14159265358979323846
 //#define M_1_PI	0.31830988618379067153

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include "aabox.h"
+#include <vector>
 
 class AABB: public AABox
 {

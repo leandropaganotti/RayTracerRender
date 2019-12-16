@@ -3,10 +3,10 @@ OBJDIR = build
 
 CXXFLAGS =  -O3 -std=c++0x -Wall -W -fopenmp
 CXX = g++
-INCPATH = -I./src -I./src/math -I./src/math/shapes -I/usr/include/libxml2
-LIBDIRS = -L/usr/local/lib
-#INCPATH = -I. -IC:\Users\lpaganotti\RayTracerRender\libxml\include\libxml2
-#LIBDIRS = -LC:\Users\lpaganotti\RayTracerRender\libxml\lib
+#INCPATH = -I./src -I./src/math -I./src/math/shapes -I/usr/include/libxml2
+#LIBDIRS = -L/usr/local/lib
+INCPATH = -I./src -I./src/math -I./src/math/shapes -IC:\Users\lpaganotti\RayTracerRender\libxml\include\libxml2
+LIBDIRS = -LC:\Users\lpaganotti\RayTracerRender\libxml\lib
 LIBS = -lpthread -lxml2
 LDFLAGS = $(LIBDIRS) $(LIBS)
 LFLAGS  = -fopenmp
