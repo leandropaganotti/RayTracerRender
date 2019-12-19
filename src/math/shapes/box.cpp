@@ -1,4 +1,4 @@
-#include "aabox.h"
+#include "box.h"
 #include "shapefactory.h"
 
 AABox::AABox(const Vector3 &min, const Vector3 &max): min(min), max(max)
@@ -107,4 +107,9 @@ Vector3 AABox::getMin() const
 void AABox::setMin(const Vector3 &value)
 {
     min = value;
+}
+
+Box::Box()
+{
+    shape = Shapes::UnitBox;
 }

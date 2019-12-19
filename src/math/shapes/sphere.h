@@ -16,7 +16,7 @@ public:
     float    getRadius() const;
     void     setRadius(float value);    
 
-    void sampleSolidAngleSphere(const Vector3& point, Vector3& sample,  float &_1_pdf);
+    void sampleSolidAngleSphere(const Vector3& point, Vector3& sample,  float &_1_pdf) const;
 
 protected:
     Sphere(const Vector3 &center={0.0f}, const float &radius=1.0f);
@@ -27,8 +27,17 @@ protected:
     friend class Shapes;
 };
 
+class Ellipsoid: public LocalInstance
+{
+protected:
+    Ellipsoid();
+
+    friend class Shapes;
+};
+
+
 inline
-void Sphere::sampleSolidAngleSphere(const Vector3& point, Vector3& sample,  float &_1_pdf){
+void Sphere::sampleSolidAngleSphere(const Vector3& point, Vector3& sample,  float &_1_pdf) const{
     float dist2 = (center - point).length(); dist2*=dist2; // distance from point hit to center of light power 2
     float cos_a_max = sqrt(1.0f - radius2/dist2);
     float r1 = dis(gen);

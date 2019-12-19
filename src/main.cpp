@@ -8,6 +8,7 @@
 
 #include "shapefactory.h"
 #include "objmodel.h"
+#include "objparser.h"
 
 using namespace std;
 
@@ -31,37 +32,49 @@ int main(int argc, char **argv)
     output = output.substr(0, output.find_last_of("."));
 
     Scene scene;
-    scene.grid = 4;
-    scene.spp = 1;
-    scene.raytracer = RayTracerType::Phong;
-    scene.addLight( new PointLight({0,5,3}, 1));
-    scene.cameraOptions.setFrom({0,4,8});
+    scene.grid = 8;
+    scene.spp = 16;
+    scene.maxDepth = 3;
+    scene.raytracer = RayTracerType::PathTracerWithDirectLightSampling;
+    scene.addLight( new PointLight({0,4,6}, 1));
+    scene.cameraOptions.setFrom({0,4,10});
     scene.cameraOptions.setTo({0,1.5,0});
 
-    //scene.addObject(new Object(Shapes::CreatePlane()));
+    scene.addObject(new Object(Shapes::CreatePlane({0,-0.2,0})));
 
     auto m = Material::Create();
-    m->kd = {1, 0, 0};
-    m->ks = 1;    
-    auto inst = Shapes::CreateInstance(Shapes::UnitSphere);
-    inst->setTransformation({2,1,0}, {0,0,0}, {0.5, 1,0.5});
-    //scene.addObject(new Object(inst, m));
+    m->kd = Color::GREEN;
+    m->ks = 0.3;
+    auto inst = Shapes::CreateEllipsoid();
+    auto obj = new Object(inst, m);    
+    inst->setTransformation({1,0,0.2}, {0,0,0}, {0.2, 1,0.2});
+    scene.addObject(obj);
 
 
     auto m2 = Material::Create();
-    m2->E = 10;
-    Object *light = new Object(Shapes::CreateSphere({0,4,0}, 1), m2);
-    //scene.addObject(light);
+    m2->E = 100;
+    //m2->kd = {1};
+    Object *light = new Object(Shapes::CreateSphere({2,5,0}, 0.5), m2);
+    scene.addObject(light);
 
-    auto box = Shapes::CreateInstanceBox();
+    auto box = Shapes::CreateBox();
     box->setTransformation({0,0,0}, {0,0,0}, {5, 0.1, 5});
     scene.addObject(new Object(box));
 
-    OBJModel *model = new OBJModel();
-    model->loadFromFile("obj/glass.obj");
-    model->setMaterial(m);
-    model->setTransformation({0,0,0}, {0,0,0}, {1});
+
+
+
+    auto mesh = Shapes::CreateMesh("glass");
+    OBJParser::ParseMesh("./obj/glass.obj", mesh);
+    Object *model = new Object(Shapes::CreateInstanceMesh(mesh), m);
+    model->setTransformation({0,0,0}, {0,0,0}, {0.5});
     scene.addObject(model);
+
+    auto mesh2 = dynamic_pointer_cast<Mesh>(Shapes::Get("glass"));
+    Object *model2 = new Object(Shapes::CreateInstanceMesh(mesh2), m);
+    model2->setTransformation({-1,0,0}, {0,0,0}, {0.5,0.6, 0.5});
+    scene.addObject(model2);
+
 
     cout << scene << endl;
 

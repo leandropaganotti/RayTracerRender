@@ -9,42 +9,25 @@ public:
     TransformationIF() = default;
     virtual ~TransformationIF() = default;
 
-    virtual void setTransformation(const Vector3 &translate, const Vector3 &rotate, const Vector3 &scale);
-    virtual void setTransformation(const Matrix4 &transformation);
-
-    const Matrix4& getModel()               const;
-    const Matrix4& getInverse()             const;
-    const Matrix4& getInverseTranspose()    const;
-
-
-    /**************************************************
-      TODO
-    **************************************************/
-    /*virtual void transform(const Matrix4 &M);
-    virtual void translate(const Vector3 &T);
-    virtual void scale(const Vector3 &S);
-    virtual void rotateX(float x);
-    virtual void rotateY(float y);
-    virtual void rotateZ(float z);*/
-
-protected:
-    Matrix4 model;              // object-to-world
-    Matrix4 inverse;            // world-to-object
-    Matrix4 inverseTranspose;   // matrix for normals transformation
+    virtual void setTransformation(const Vector3 &, const Vector3 &, const Vector3 &)
+    {
+        std::cout << "Not Implemented yet";
+    }
 };
 
-inline
-const Matrix4 &TransformationIF::getModel() const
-{
-    return model;
-}
-inline
-const Matrix4 &TransformationIF::getInverse() const
-{
-    return inverse;
-}
-inline
-const Matrix4 &TransformationIF::getInverseTranspose() const
-{
-    return inverseTranspose;
-}
+
+class Transformation: public Matrix4 {
+
+public:
+
+    static Transformation T(const Vector3 &v);
+    static Transformation S(const Vector3 &v);
+    static Transformation R(const Vector3 &v);
+    static Transformation Rx(float a);
+    static Transformation Ry(float a);
+    static Transformation Rz(float a);
+
+    Transformation & applyT(const Vector3 &v);
+    Transformation & applyS(const Vector3 &v);
+    Transformation & applyR(const Vector3 &v);
+};

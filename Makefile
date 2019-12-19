@@ -27,10 +27,9 @@ material.o \
 shape.o \
 shapefactory.o \
 invisibleshape.o \
-aabox.o \
+box.o \
 aabb.o \
 mesh.o \
-objmodel.o \
 objparser.o
 
 

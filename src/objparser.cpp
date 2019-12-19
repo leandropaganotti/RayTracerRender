@@ -6,9 +6,8 @@
 #include "mesh.h"
 #include "shapefactory.h"
 
-void OBJParser::Parse(const std::string &path, OBJModel &model)
-{
-    auto mesh = Shapes::CreateMesh();
+void OBJParser::ParseMesh(const std::string &path, std::shared_ptr<Mesh> &mesh)
+{    
     mesh->clear();
     mesh->addVertex({});
     mesh->addNormal({});
@@ -56,6 +55,5 @@ void OBJParser::Parse(const std::string &path, OBJModel &model)
     }
     //std::cout << mesh << std::endl;
     ifs.close();
-    mesh->updateAABB();
-    model.setShape(Shapes::CreateInstance(mesh));
+    mesh->updateAABB();    
 }

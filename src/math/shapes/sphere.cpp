@@ -1,4 +1,5 @@
 #include "sphere.h"
+#include "shapefactory.h"
 
 Sphere::Sphere(const Vector3 &center, const float &radius) :
     center(center), radius(radius), radius2(radius * radius)
@@ -76,4 +77,9 @@ std::pair<float, float> Sphere::uv(const Vector3 &phit, size_t) const
     float u = 0.5 + atan2f(d.z, d.x) / (2.0f * M_PI);
     float v = 0.5 - asinf(d.y) / M_PI;
     return std::make_pair(u, v);
+}
+
+Ellipsoid::Ellipsoid()
+{
+    shape = Shapes::UnitSphere;
 }

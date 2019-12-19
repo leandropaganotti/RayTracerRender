@@ -6,6 +6,11 @@ const std::shared_ptr<Shape> Shapes::Invisible  = Shapes::GetInvisible();
 const std::shared_ptr<Shape> Shapes::UnitSphere = Shapes::CreateSphere();
 const std::shared_ptr<Shape> Shapes::UnitBox    = Shapes::CreateAABox();
 
+std::shared_ptr<Shape> Shapes::Get(const std::string &name)
+{
+    return Shapes::ListOfNamedShapes.get(name);
+}
+
 std::shared_ptr<Shape> Shapes::GetInvisible()
 {
     return InvisibleShape::GetInstance();
@@ -35,7 +40,7 @@ std::shared_ptr<AABox> Shapes::CreateAABox(const Vector3 &min, const Vector3 &ma
     return aabox;
 }
 
-std::shared_ptr<Mesh> Shapes::CreateMesh(const std::__cxx11::string &name)
+std::shared_ptr<Mesh> Shapes::CreateMesh(const std::string &name)
 {
     std::shared_ptr<Mesh> mesh = std::shared_ptr<Mesh>(new Mesh());
     if (name != "")
@@ -43,27 +48,26 @@ std::shared_ptr<Mesh> Shapes::CreateMesh(const std::__cxx11::string &name)
     return mesh;
 }
 
-std::shared_ptr<Instance> Shapes::CreateInstance(std::shared_ptr<Shape> shape)
+std::shared_ptr<Ellipsoid> Shapes::CreateEllipsoid(const std::string &name)
 {
-    return std::shared_ptr<Instance>(new Instance(shape));
+    std::shared_ptr<Ellipsoid> ellipsoid = std::shared_ptr<Ellipsoid>(new Ellipsoid());
+    if (name != "")
+        ListOfNamedShapes.add(ellipsoid, name);
+    return ellipsoid;
 }
 
-std::shared_ptr<Instance> Shapes::CreateInstance(const std::string &name)
+std::shared_ptr<Box> Shapes::CreateBox(const std::string &name)
 {
-    return std::shared_ptr<Instance>(new Instance(ListOfNamedShapes.get(name)));
+    std::shared_ptr<Box> box = std::shared_ptr<Box>(new Box());
+    if (name != "")
+        ListOfNamedShapes.add(box, name);
+    return box;
 }
 
-std::shared_ptr<Instance> Shapes::CreateInstanceBox()
+std::shared_ptr<InstanceMesh> Shapes::CreateInstanceMesh(std::shared_ptr<Mesh> mesh, const std::__cxx11::string &name)
 {
-    return std::shared_ptr<Instance>(new Instance(Shapes::UnitBox));
-}
-
-std::shared_ptr<Instance> Shapes::CreateInstanceSphere()
-{
-    return std::shared_ptr<Instance>(new Instance(Shapes::UnitSphere));
-}
-
-std::shared_ptr<Instance> Shapes::CreateInstanceMesh(std::shared_ptr<Mesh> mesh)
-{
-    return std::shared_ptr<Instance>(new Instance(mesh));
+    std::shared_ptr<InstanceMesh> imesh = std::shared_ptr<InstanceMesh>(new InstanceMesh(mesh));
+    if (name != "")
+        ListOfNamedShapes.add(imesh, name);
+    return imesh;
 }

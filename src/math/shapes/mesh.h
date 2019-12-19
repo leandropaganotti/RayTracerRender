@@ -41,3 +41,17 @@ protected:
 
     friend class Shapes;
 };
+
+class InstanceMesh: public LocalInstance
+{
+    InstanceMesh(std::shared_ptr<Mesh> mesh=nullptr)
+    {
+        if(mesh) shape = mesh;
+    }
+public:
+    void setMesh(std::shared_ptr<Mesh> mesh)
+    {
+        if(mesh) shape = mesh;
+    }
+    friend class Shapes;
+};

@@ -2,9 +2,10 @@
 
 #include <string>
 #include "objmodel.h"
+#include "mesh.h"
 
 class OBJParser
 {
 public:
-    static void Parse(const std::string &path, OBJModel &model);
+    static void ParseMesh(const std::string &path, std::shared_ptr<Mesh> &mesh);
 };

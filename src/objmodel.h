@@ -6,5 +6,5 @@ class OBJModel: public Object
 {        
 public:
     OBJModel() = default;
-    void loadFromFile(const std::string &path);    
+    void loadFromFile(const std::string &path);
 };

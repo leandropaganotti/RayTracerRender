@@ -395,12 +395,12 @@ Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t 
 
 Vector3 RayTracer::pathTracer2(const Ray& ray, const Scene& scene, const uint8_t depth, const float E)
 {
-    if(depth > scene.maxDepth) return Color::BLACK;       
+    if(depth > scene.maxDepth) return Color::BLACK;
 
     IntersectionData isec;
 
     if (!castRay(ray, scene.objects, isec))
-        return scene.bgColor;
+        return Color::BLACK;
 
     const Material *material = isec.object->getMaterial();
 
@@ -435,7 +435,8 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const Scene& scene, const uint8_t
         {
             if (obj->getMaterial()->E  == Vector::ZERO) continue; // skip non light
 
-            Sphere *sphere = dynamic_cast<Sphere*>(obj.get());
+
+            const Sphere * const sphere = dynamic_cast<const Sphere*const>(obj->getShape());
 
             if (!sphere) continue; // only supported sphere for direct light
 
@@ -456,14 +457,13 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const Scene& scene, const uint8_t
         }
 
         //indirect light
-        //const float _1_pdf = (2.0f*M_PI);//1/(2*M_PI)
+        const float _1_pdf = (2.0f*M_PI);//1/(2*M_PI)
         Ray r;
         r.origin = isec.phit + bias * isec.normal;
         r.direction = randomUnitVectorInHemisphereOf(isec.normal);
-        //float cosTheta = isec.normal ^ r.direction;
-        Vector3 indirect =  (E*material->E) + isec.object->color(isec) * pathTracer2(r, scene, depth+1, 0.0f);
-        //Vector3 indirect =  (E*material->E) + brdf * pathTracer2(r, scene, depth+1, 0.0f) * cosTheta * _1_pdf;
-
+        float cosTheta = isec.normal ^ r.direction;
+        //Vector3 indirect =  (E*material->E) + isec.object->color(isec) * pathTracer2(r, scene, depth+1, 0.0f);
+        Vector3 indirect =  (E*material->E) + brdf * pathTracer2(r, scene, depth+1, 0.0f) * cosTheta * _1_pdf;
         diffused = direct + indirect;
 
     }

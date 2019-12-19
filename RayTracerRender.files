@@ -99,5 +99,5 @@ src/xmlparser.cpp
 src/xmlparser.h
 src/math/shapes/mesh.h
 src/math/shapes/mesh.cpp
-src/math/shapes/aabox.h
-src/math/shapes/aabox.cpp
+src/math/shapes/box.h
+src/math/shapes/box.cpp

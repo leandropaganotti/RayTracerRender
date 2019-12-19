@@ -1,8 +1,39 @@
 #include "shape.h"
+#include "shapefactory.h"
 #include "invisibleshape.h"
 
-bool Instance::intersection(const Ray &ray, IntersectionData &isec) const
+void Instance::setTransformation(const Vector3 &translate, const Vector3 &rotate, const Vector3 &scale)
 {
+    shape->setTransformation(translate, rotate, scale);
+}
+
+bool Instance::intersection(const Ray &ray, IntersectionData &isec) const
+{    
+    return shape->intersection(ray, isec);
+}
+
+bool Instance::intersection(const Ray &ray, float &tnear) const
+{
+    return shape->intersection(ray, tnear);
+}
+
+Vector3 Instance::normal(const Vector3 &phit, size_t idx) const
+{
+    return shape->normal(phit, idx);
+}
+
+std::pair<float, float> Instance::uv(const Vector3 &phit, size_t idx) const
+{
+    return shape->uv(phit, idx);
+}
+
+Instance::Instance(std::shared_ptr<Shape> shape)
+{
+    this->shape = shape ? shape : Shapes::Invisible;
+}
+
+bool LocalInstance::intersection(const Ray &ray, IntersectionData &isec) const
+{    
     Ray r = inverse * ray;
     if (shape->intersection(r, isec))
     {
@@ -15,7 +46,7 @@ bool Instance::intersection(const Ray &ray, IntersectionData &isec) const
         return false;
 }
 
-bool Instance::intersection(const Ray &ray, float &tnear) const
+bool LocalInstance::intersection(const Ray &ray, float &tnear) const
 {
     Ray r = inverse * ray;
     if (shape->intersection(r, tnear))
@@ -29,22 +60,24 @@ bool Instance::intersection(const Ray &ray, float &tnear) const
         return false;
 }
 
-Vector3 Instance::normal(const Vector3 &phit, size_t idx) const
+Vector3 LocalInstance::normal(const Vector3 &phit, size_t idx) const
 {
     return (inverseTranspose * shape->normal(inverse * phit, idx)).normalize();
 }
 
-std::pair<float, float> Instance::uv(const Vector3 &phit, size_t idx) const
+std::pair<float, float> LocalInstance::uv(const Vector3 &phit, size_t idx) const
 {
     return shape->uv(inverse * phit, idx);
 }
 
-Instance::Instance(std::shared_ptr<Shape> shape)
+LocalInstance::LocalInstance(std::shared_ptr<Shape> shape): Instance(shape)
 {
-    this->shape = shape ? shape : InvisibleShape::GetInstance();
+
 }
 
-void Instance::setShape(std::shared_ptr<Shape> shape)
-{
-    if(shape) this->shape = shape;
+void LocalInstance::setTransformation(const Vector3 &translate, const Vector3 &rotate, const Vector3 &scale)
+{        
+    model = Matrix4::T(translate) * Matrix4::Rz(rotate.z) * Matrix4::Ry(rotate.y) * Matrix4::Rx(rotate.x) * Matrix4::S(scale);
+    inverse = model.getInverse();
+    inverseTranspose = inverse.getTranspose();
 }

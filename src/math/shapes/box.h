@@ -32,3 +32,9 @@ protected:
     friend class Shapes;
 };
 
+class Box: public LocalInstance
+{
+protected:
+    Box();
+    friend class Shapes;
+};

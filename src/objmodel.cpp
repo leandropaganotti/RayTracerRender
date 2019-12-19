@@ -3,5 +3,5 @@
 
 void OBJModel::loadFromFile(const std::string &path)
 {
-    OBJParser::Parse(path, *this);
+    shape = OBJParser::ParseMesh(path);
 }

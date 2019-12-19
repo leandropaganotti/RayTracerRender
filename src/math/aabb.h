@@ -1,7 +1,7 @@
 #pragma once
 
 #include <algorithm>
-#include "aabox.h"
+#include "box.h"
 #include <vector>
 
 class AABB: public AABox
