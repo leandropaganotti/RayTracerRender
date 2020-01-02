@@ -1,13 +1,13 @@
 #include "cylinder.h"
-#include "utils.h"
 #include "consts.h"
+#include "utils.h"
 
-UnitCylinder::UnitCylinder()
+UnitYCylinder::UnitYCylinder()
 {
 
 }
 
-bool UnitCylinder::intersection(const Ray &ray, IntersectionData &isec) const
+bool UnitYCylinder::intersection(const Ray &ray, IntersectionData &isec) const
 {
     float a = ray.direction.x*ray.direction.x + ray.direction.z*ray.direction.z;
     float b = 2.0f*ray.direction.x*ray.origin.x + 2.0f*ray.direction.z*ray.origin.z;
@@ -58,7 +58,7 @@ bool UnitCylinder::intersection(const Ray &ray, IntersectionData &isec) const
     return false;
 }
 
-bool UnitCylinder::intersection(const Ray &ray, float &tnear) const
+bool UnitYCylinder::intersection(const Ray &ray, float &tnear) const
 {
     /*
      * x2 + y2 = 1
@@ -115,7 +115,7 @@ bool UnitCylinder::intersection(const Ray &ray, float &tnear) const
     return false;
 }
 
-Vector3 UnitCylinder::normal(const Vector3 &phit, size_t idx) const
+Vector3 UnitYCylinder::normal(const Vector3 &phit, size_t idx) const
 {    
     if(idx==0)
     {
@@ -131,12 +131,7 @@ Vector3 UnitCylinder::normal(const Vector3 &phit, size_t idx) const
     }
 }
 
-std::pair<float, float> UnitCylinder::uv(const Vector3 &, size_t) const
+std::pair<float, float> UnitYCylinder::uv(const Vector3 &, size_t) const
 {
     return std::pair<float, float>(0.0f, 0.0f);
-}
-
-Cylinder::Cylinder()
-{
-    shape = std::shared_ptr<Shape>(new UnitCylinder());
 }

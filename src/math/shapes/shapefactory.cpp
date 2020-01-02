@@ -2,18 +2,14 @@
 
 List<Shape> Shapes::ListOfNamedShapes;
 
-const std::shared_ptr<Shape> Shapes::Invisible  = Shapes::GetInvisible();
-const std::shared_ptr<Shape> Shapes::UnitSphere = Shapes::CreateSphere();
-const std::shared_ptr<Shape> Shapes::UnitBox    = Shapes::CreateAABox();
+const std::shared_ptr<Shape> Shapes::Invisible  = std::shared_ptr<Shape> (new InvisibleShape);
+const std::shared_ptr<Shape> Shapes::UnitSphere = std::shared_ptr<Shape> (new Sphere);
+const std::shared_ptr<Shape> Shapes::UnitBox    = std::shared_ptr<Shape> (new AABox);
+const std::shared_ptr<Shape> Shapes::UnitCylinder    = std::shared_ptr<Shape> (new UnitYCylinder);
 
 std::shared_ptr<Shape> Shapes::Get(const std::string &name)
 {
     return Shapes::ListOfNamedShapes.get(name);
-}
-
-std::shared_ptr<Shape> Shapes::GetInvisible()
-{
-    return InvisibleShape::GetInstance();
 }
 
 std::shared_ptr<Sphere> Shapes::CreateSphere(const Vector3 &center, const float &radius, const std::string &name)
@@ -48,34 +44,27 @@ std::shared_ptr<Mesh> Shapes::CreateMesh(const std::string &name)
     return mesh;
 }
 
-std::shared_ptr<Ellipsoid> Shapes::CreateEllipsoid(const std::string &name)
+std::shared_ptr<Shape> Shapes::CreateEllipsoid()
 {
-    std::shared_ptr<Ellipsoid> ellipsoid = std::shared_ptr<Ellipsoid>(new Ellipsoid());
-    if (name != "")
-        ListOfNamedShapes.add(ellipsoid, name);
-    return ellipsoid;
+    return CreateInstance(UnitSphere);
 }
 
-std::shared_ptr<Box> Shapes::CreateBox(const std::string &name)
+std::shared_ptr<Shape> Shapes::CreateBox()
 {
-    std::shared_ptr<Box> box = std::shared_ptr<Box>(new Box());
-    if (name != "")
-        ListOfNamedShapes.add(box, name);
-    return box;
+    return CreateInstance(UnitBox);
 }
 
-std::shared_ptr<Cylinder> Shapes::CreateCylinder(const std::string &name)
+std::shared_ptr<Shape> Shapes::CreateCylinder()
 {
-    std::shared_ptr<Cylinder> cylinder = std::shared_ptr<Cylinder>(new Cylinder());
-    if (name != "")
-        ListOfNamedShapes.add(cylinder, name);
-    return cylinder;
+    return CreateInstance(UnitCylinder);
 }
 
-std::shared_ptr<InstanceMesh> Shapes::CreateInstanceMesh(std::shared_ptr<Mesh> mesh, const std::__cxx11::string &name)
+std::shared_ptr<Shape> Shapes::CreateInstance(const std::shared_ptr<Shape> shape)
 {
-    std::shared_ptr<InstanceMesh> imesh = std::shared_ptr<InstanceMesh>(new InstanceMesh(mesh));
-    if (name != "")
-        ListOfNamedShapes.add(imesh, name);
-    return imesh;
+    return std::shared_ptr<Shape>(new LocalInstance(shape));
+}
+
+std::shared_ptr<Shape> Shapes::CreateInstance(const std::string &name)
+{
+    return std::shared_ptr<Shape>(new LocalInstance(Get(name)));
 }

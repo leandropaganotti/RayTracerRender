@@ -1,6 +1,5 @@
 #include "shape.h"
 #include "shapefactory.h"
-#include "invisibleshape.h"
 
 void Instance::setTransformation(const Vector3 &translate, const Vector3 &rotate, const Vector3 &scale)
 {

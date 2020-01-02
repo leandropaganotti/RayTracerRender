@@ -4,9 +4,6 @@
 
 class InvisibleShape: public Shape
 {
-public:
-    static std::shared_ptr<InvisibleShape> GetInstance();
-
     // IntersectionIF interface
 public:
     bool intersection(const Ray &, IntersectionData &) const override;
@@ -16,11 +13,11 @@ public:
 public:
     Vector3 normal(const Vector3 &, size_t) const override;
     std::pair<float, float> uv(const Vector3 &, size_t) const override;
-private:
+protected:
     InvisibleShape() = default;
     InvisibleShape(const InvisibleShape&) = delete;
     InvisibleShape& operator=(const InvisibleShape&) = delete;
 
-    static std::shared_ptr<InvisibleShape> instance;
+    friend class Shapes;
 };
 

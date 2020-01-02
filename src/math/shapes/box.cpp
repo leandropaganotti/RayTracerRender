@@ -108,8 +108,3 @@ void AABox::setMin(const Vector3 &value)
 {
     min = value;
 }
-
-Box::Box()
-{
-    shape = Shapes::UnitBox;
-}

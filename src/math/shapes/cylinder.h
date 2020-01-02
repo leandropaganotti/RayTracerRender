@@ -2,7 +2,7 @@
 
 #include "shape.h"
 
-class UnitCylinder: public Shape
+class UnitYCylinder: public Shape
 {    
     // IntersectionIF interface
 public:
@@ -15,15 +15,7 @@ public:
     virtual std::pair<float, float> uv(const Vector3 &phit, size_t idx) const override;
 
 protected:
-    UnitCylinder();    
-
-    friend class Cylinder;
-};
-
-class Cylinder: public LocalInstance
-{
-protected:
-    Cylinder();
+    UnitYCylinder();
 
     friend class Shapes;
 };

@@ -27,15 +27,6 @@ protected:
     friend class Shapes;
 };
 
-class Ellipsoid: public LocalInstance
-{
-protected:
-    Ellipsoid();
-
-    friend class Shapes;
-};
-
-
 inline
 void Sphere::sampleSolidAngleSphere(const Vector3& point, Vector3& sample,  float &_1_pdf) const{
     float dist2 = (center - point).length(); dist2*=dist2; // distance from point hit to center of light power 2

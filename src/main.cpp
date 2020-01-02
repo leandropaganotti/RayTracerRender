@@ -47,16 +47,16 @@ int main(int argc, char **argv)
     m->ks = 0.3;
     auto inst = Shapes::CreateEllipsoid();
     auto obj = new Object(inst, m);    
-    inst->setTransformation({3,0,0.2}, {0,0,0}, {0.2, 1,0.2});
+    inst->setTransformation({1,1.7,0.2}, {0,0,0}, {0.3, 1,0.3});
     scene.addObject(obj);
 
     auto mx = Material::Create();
-    mx->type = Material::Type::SPECULAR;
+    mx->type = Material::Type::DIFFUSE;
     mx->kd = {0,0,1};
-    mx->R0 = 0.01;
-    auto cy = new Object(Shapes::CreateCylinder(), mx);
-    cy->setTransformation({1,0,-2}, {0}, {1, 3, 1});
-    scene.addObject(cy);
+    mx->R0 = 0.9;
+    auto cy = new Object(Shapes::CreateCylinder(), m);
+    cy->setTransformation({1.0,0,0.2}, {0}, {0.3, 1.7, 0.3});
+    //scene.addObject(cy);
 
 
     auto m2 = Material::Create();
@@ -75,12 +75,12 @@ int main(int argc, char **argv)
     m3->type = Material::Type::TRANSPARENT;
     auto mesh = Shapes::CreateMesh("glass");
     OBJParser::ParseMesh("./obj/glass.obj", mesh);
-    Object *model = new Object(Shapes::CreateInstanceMesh(mesh), m3);
+    Object *model = new Object(Shapes::CreateInstance(mesh), m3);
     model->setTransformation({0,0,0}, {0,0,0}, {0.5});
     scene.addObject(model);
 
     auto mesh2 = dynamic_pointer_cast<Mesh>(Shapes::Get("glass"));
-    Object *model2 = new Object(Shapes::CreateInstanceMesh(mesh2), m3);
+    Object *model2 = new Object(Shapes::CreateInstance(mesh2), m3);
     model2->setTransformation({-1,0,0}, {0,0,0}, {0.5,0.6, 0.5});
     scene.addObject(model2);
 

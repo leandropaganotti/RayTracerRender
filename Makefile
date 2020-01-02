@@ -25,14 +25,13 @@ transformation.o \
 cameraoptions.o \
 material.o \
 shape.o \
-shapefactory.o \
+cylinder.o \
 invisibleshape.o \
 box.o \
 aabb.o \
 mesh.o \
 objparser.o \
-cylinder.o
-
+shapefactory.o \
 
 CObjects=$(addprefix $(OBJDIR)/,$(OBJECTS))
 
