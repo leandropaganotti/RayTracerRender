@@ -27,7 +27,7 @@ Material::Material(std::string name)
     E = 0.0f;
     ks = 0.0f;
     m = 30.0f;
-    R0 = 8.0f;
+    R0 = 0.9f;
     index = 1.55f; // refractive index for glass
     type = Type::DIFFUSE;
 }

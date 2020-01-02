@@ -64,6 +64,14 @@ std::shared_ptr<Box> Shapes::CreateBox(const std::string &name)
     return box;
 }
 
+std::shared_ptr<Cylinder> Shapes::CreateCylinder(const std::string &name)
+{
+    std::shared_ptr<Cylinder> cylinder = std::shared_ptr<Cylinder>(new Cylinder());
+    if (name != "")
+        ListOfNamedShapes.add(cylinder, name);
+    return cylinder;
+}
+
 std::shared_ptr<InstanceMesh> Shapes::CreateInstanceMesh(std::shared_ptr<Mesh> mesh, const std::__cxx11::string &name)
 {
     std::shared_ptr<InstanceMesh> imesh = std::shared_ptr<InstanceMesh>(new InstanceMesh(mesh));

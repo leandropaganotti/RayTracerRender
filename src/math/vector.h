@@ -96,7 +96,7 @@ struct Vector3
     }
 
     // distance
-    float distance(const Vector3& rhs)
+    float distance(const Vector3& rhs) const
     {
         return (*this - rhs).length();
     }

@@ -8,6 +8,7 @@
 #include "box.h"
 #include "invisibleshape.h"
 #include "mesh.h"
+#include "cylinder.h"
 
 class Shapes
 {
@@ -20,13 +21,15 @@ public:
     static std::shared_ptr<Plane>       CreatePlane             (const Vector3 &O={0.0f}, const Vector3 &N={0.0f, 1.0f, 0.0f}, const std::string &name="");
     static std::shared_ptr<AABox>       CreateAABox             (const Vector3 &min={-0.5f, -0.5f, 0.5f}, const Vector3 &max={0.5f,0.5f,-0.5f}, const std::string &name="");
     static std::shared_ptr<Mesh>        CreateMesh              (const std::string &name="");
+
     static std::shared_ptr<Ellipsoid>   CreateEllipsoid         (const std::string &name="");
-    static std::shared_ptr<Box>         CreateBox               (const std::string &name="");
+    static std::shared_ptr<Box>         CreateBox               (const std::string &name="");    
+    static std::shared_ptr<Cylinder>    CreateCylinder          (const std::string &name="");
 
     static std::shared_ptr<InstanceMesh>CreateInstanceMesh      (std::shared_ptr<Mesh> mesh=nullptr, const std::string &name="");
 
     // pre defined shapes
     const static std::shared_ptr<Shape> Invisible;
     const static std::shared_ptr<Shape> UnitSphere;
-    const static std::shared_ptr<Shape> UnitBox;
+    const static std::shared_ptr<Shape> UnitBox;        
 };

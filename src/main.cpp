@@ -32,10 +32,10 @@ int main(int argc, char **argv)
     output = output.substr(0, output.find_last_of("."));
 
     Scene scene;
-    scene.grid = 8;
-    scene.spp = 16;
-    scene.maxDepth = 3;
-    scene.raytracer = RayTracerType::PathTracerWithDirectLightSampling;
+    scene.grid = 4;
+    scene.spp = 8;
+    scene.maxDepth = 6;
+    scene.raytracer = RayTracerType::Phong;
     scene.addLight( new PointLight({0,4,6}, 1));
     scene.cameraOptions.setFrom({0,4,10});
     scene.cameraOptions.setTo({0,1.5,0});
@@ -47,8 +47,16 @@ int main(int argc, char **argv)
     m->ks = 0.3;
     auto inst = Shapes::CreateEllipsoid();
     auto obj = new Object(inst, m);    
-    inst->setTransformation({1,0,0.2}, {0,0,0}, {0.2, 1,0.2});
+    inst->setTransformation({3,0,0.2}, {0,0,0}, {0.2, 1,0.2});
     scene.addObject(obj);
+
+    auto mx = Material::Create();
+    mx->type = Material::Type::SPECULAR;
+    mx->kd = {0,0,1};
+    mx->R0 = 0.01;
+    auto cy = new Object(Shapes::CreateCylinder(), mx);
+    cy->setTransformation({1,0,-2}, {0}, {1, 3, 1});
+    scene.addObject(cy);
 
 
     auto m2 = Material::Create();
@@ -63,15 +71,16 @@ int main(int argc, char **argv)
 
 
 
-
+    auto m3 = Material::Create();
+    m3->type = Material::Type::TRANSPARENT;
     auto mesh = Shapes::CreateMesh("glass");
     OBJParser::ParseMesh("./obj/glass.obj", mesh);
-    Object *model = new Object(Shapes::CreateInstanceMesh(mesh), m);
+    Object *model = new Object(Shapes::CreateInstanceMesh(mesh), m3);
     model->setTransformation({0,0,0}, {0,0,0}, {0.5});
     scene.addObject(model);
 
     auto mesh2 = dynamic_pointer_cast<Mesh>(Shapes::Get("glass"));
-    Object *model2 = new Object(Shapes::CreateInstanceMesh(mesh2), m);
+    Object *model2 = new Object(Shapes::CreateInstanceMesh(mesh2), m3);
     model2->setTransformation({-1,0,0}, {0,0,0}, {0.5,0.6, 0.5});
     scene.addObject(model2);
 

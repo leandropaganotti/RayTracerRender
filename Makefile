@@ -30,7 +30,8 @@ invisibleshape.o \
 box.o \
 aabb.o \
 mesh.o \
-objparser.o
+objparser.o \
+cylinder.o
 
 
 CObjects=$(addprefix $(OBJDIR)/,$(OBJECTS))
