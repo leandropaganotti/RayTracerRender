@@ -19,6 +19,11 @@ void Scene::addLight(Light *light)
     lights.emplace_back(light);
 }
 
+void Scene::addObject(std::unique_ptr<Object> obj)
+{
+    objects.push_back(std::move(obj));
+}
+
 void Scene::load(const std::string &fileName)
 {
     this->fileName = fileName;

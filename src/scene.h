@@ -17,6 +17,8 @@ public:
     void addObject(Object * obj);
     void addLight(Light * light);
 
+    void addObject(std::unique_ptr<Object> obj);
+
     void load(const std::string &fileName);
 
     std::string     fileName;

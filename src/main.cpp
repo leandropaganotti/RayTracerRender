@@ -98,7 +98,7 @@ int main(int argc, char **argv)
     for (unsigned i=0; i < nimages; ++i)
     {
         cout << "\n" << i+1 << "/" << nimages << ": at " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) <<  i*angle << " deg" << flush;
-        camera.lookAt( Matrix4::T(to) * Matrix4::Ry(deg2rad( i*angle )) * Matrix4::T(-to) * from, to); // rotate around y-axis
+        camera.lookAt( Transformation::T(to) * Transformation::Ry(deg2rad( i*angle )) * Transformation::T(-to) * from, to); // rotate around y-axis
 
 		auto start = std::chrono::high_resolution_clock::now();
         raytracer.render(scene);

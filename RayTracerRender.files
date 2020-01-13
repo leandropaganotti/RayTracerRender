@@ -13,7 +13,6 @@ src/math/aabb.cpp
 src/math/aabb.h
 src/math/intersection.h
 src/math/matrix.h
-src/math/transformation.cpp
 src/math/transformation.h
 src/math/utils.h
 src/math/vector.h
@@ -103,3 +102,15 @@ src/math/shapes/box.h
 src/math/shapes/box.cpp
 src/math/shapes/cylinder.h
 src/math/shapes/cylinder.cpp
+scenes/3ballsOnTheFloor.xml
+scenes/4balls.xml
+scenes/ballsOnTheMirror.xml
+scenes/basic.xml
+scenes/glassOfwine.xml
+scenes/ModifiedCornellBox.xml
+scenes/ModifiedCornellBox2.xml
+scenes/ModifiedCornellBox3.xml
+scenes/monkeyModel.xml
+scenes/ptexture.xml
+scenes/refraction.xml
+scenes/test.xml

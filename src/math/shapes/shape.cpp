@@ -76,7 +76,7 @@ LocalInstance::LocalInstance(std::shared_ptr<Shape> shape): Instance(shape)
 
 void LocalInstance::setTransformation(const Vector3 &translate, const Vector3 &rotate, const Vector3 &scale)
 {        
-    model = Matrix4::T(translate) * Matrix4::Rz(rotate.z) * Matrix4::Ry(rotate.y) * Matrix4::Rx(rotate.x) * Matrix4::S(scale);
+    model = Transformation::TSR(translate, rotate, scale);
     inverse = model.getInverse();
     inverseTranspose = inverse.getTranspose();
 }

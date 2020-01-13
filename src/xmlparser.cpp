@@ -141,14 +141,7 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
         {
             if (equals(node->name, "CameraOptions"))
                 parseCameraOptions(node, scene.cameraOptions);
-            else if (equals(node->name, "Sphere"))
-            {
-                Sphere *sphere = new Sphere();
-                parseSphere(node, *sphere);
-                scene.addObject(sphere);
-            }
-            else if(equals(node->name, "ambientIndex"))
-               scene.ambientIndex = toFloat(node->children->content);
+
             else if(equals(node->name, "PointLight"))
             {
                 PointLight *light = new PointLight();
@@ -160,29 +153,19 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
                 DistantLight *light = new DistantLight();
                 parseDistantLight(node, *light);
                 scene.addLight(light);
-            }
-            else if(equals(node->name, "kAmbient"))
-                scene.ka = toFloat(node->children->content);
-            else if(equals(node->name, "plane"))
+            }            
+//            else if(equals(node->name, "objmodel"))
+//            {
+//                OBJModel *model = new OBJModel();
+//                parseModel(node, *model);
+//                scene.addObject(model);
+//            }
+            else // simple object
             {
-                Plane *plane = new Plane();
-                parsePlane(node, *plane);
-                scene.addObject(plane);
+                scene.addObject(std::move(parseObject(node)));
             }
-            else if(equals(node->name, "box"))
-            {
-                Box *box = new Box();
-                parseBox(node, *box);
-                scene.addObject(box);
-            }
-            else if(equals(node->name, "model"))
-            {
-                OBJModel *model = new OBJModel();
-                parseModel(node, *model);
-                scene.addObject(model);
-            }
-            else
-                cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlSceneNode->name << "\'" << "\x1b[0m" << endl;
+//            else
+//                cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlSceneNode->name << "\'" << "\x1b[0m" << endl;
         }
     }    
 }
@@ -392,6 +375,60 @@ void XMLParser::parseDistantLight(xmlNode *xmlDistantLightNode, DistantLight &li
             cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlDistantLightNode->name << "\'" << "\x1b[0m" << endl;
         }
     }
+}
+
+std::unique_ptr<Object> XMLParser::parseObject(xmlNode *xmlObjectNode)
+{
+    if(xmlObjectNode == NULL)
+    {
+         cerr << "\x1b[33;1m" << "error: could not parse Object, xmlNode pointer is NULL" << "\x1b[0m" << endl;
+         return nullptr;
+    }
+
+    auto object = std::make_unique<Object>();
+
+    const xmlAttr *attr = NULL;
+    string name("");
+    for (attr = xmlObjectNode->properties; attr; attr = attr->next)
+    {
+        if (equals(attr->name, "name"))
+            name = (const char*)attr->children->content;
+        else if (equals(attr->name, "shape"))
+        {
+            object->setShape(Shapes::Get((const char*)attr->children->content));
+        }
+
+        else if (equals(attr->name, "material"))
+            plane.setMaterial((const char*)attr->children->content);
+        else if (equals(attr->name, "texture"))
+            plane.setTexture((const char*)attr->children->content);
+        else
+            cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlObjectNode->name << "\':" << name << "\x1b[0m" << endl;
+    }
+
+    xmlNode *node = NULL;
+    for (node = xmlObjectNode->children; node; node = node->next)
+    {
+        if (node->type == XML_ELEMENT_NODE)
+        {
+            if (equals(node->name, "material"))
+            {
+                std::shared_ptr<Material> material;
+                parseMaterial(node, material);
+                plane.setMaterial(material);
+            }
+            else if (equals(node->name, "texture"))
+            {
+                std::shared_ptr<Texture> tex;
+                parseTexture(node, tex);
+                plane.setTexture(tex);
+            }
+            else
+                cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlObjectNode->name << "\'" << "\x1b[0m" << endl;
+        }
+    }
+
+    return object;
 }
 
 void XMLParser::parsePlane(xmlNode *xmlPlaneNode, Plane & plane)

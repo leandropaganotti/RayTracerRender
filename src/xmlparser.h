@@ -11,6 +11,9 @@
 #include "box.h"
 #include "transformation.h"
 #include "objmodel.h"
+#include "object.h"
+#include <memory>
+
 using namespace std;
 
 class XMLParser
@@ -24,23 +27,20 @@ public:
 
     void parseCameraOptions(xmlNode * xmlCameraOptionsNode, CameraOptions & options);
 
-    void parseSphere(xmlNode * xmlSphereNode, Sphere & sphere);
-
-    void parseMaterial(xmlNode * xmlMaterialNode, std::shared_ptr<Material> &material);
-
     void parsePointLight(xmlNode * xmlPointLightNode, PointLight & light);
 
     void parseDistantLight(xmlNode * xmlDistantLightNode, DistantLight & light);
 
-    void parsePlane(xmlNode * xmlPlaneNode, Plane & plane);
+    std::unique_ptr<Object> parseObject(xmlNode *xmlObjectNode);
 
-    void parseTexture(xmlNode * xmlTextureNode, std::shared_ptr<Texture> &tex);
-
-    void parseBox(xmlNode * xmlBoxNode, Box & box);
+    //void parseSphere(xmlNode * xmlSphereNode, Sphere & sphere);
+    //void parsePlane(xmlNode * xmlPlaneNode, Plane & plane);
+    //void parseBox(xmlNode * xmlBoxNode, Box & box);
+    //void parseModel(xmlNode * xmlModelNode, OBJModel & model);
 
     void parseTransformation(xmlNode * xmlTrnasformationNode, TransformationIF & transformation);
-
-    void parseModel(xmlNode * xmlModelNode, OBJModel & model);
+    void parseMaterial(xmlNode * xmlMaterialNode, std::shared_ptr<Material> &material);
+    void parseTexture(xmlNode * xmlTextureNode, std::shared_ptr<Texture> &tex);
 
 private:
     bool     equals(const xmlChar *lhs, const char *rhs);
