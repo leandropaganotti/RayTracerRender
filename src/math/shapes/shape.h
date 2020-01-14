@@ -18,7 +18,7 @@ protected:
 class Instance: public Shape {    
     // TransformationIF interface
 public:
-    virtual void setTransformation(const Vector3 &translate, const Vector3 &rotate, const Vector3 &scale) override;
+    virtual void setTransformation(const Matrix4 &transformation) override;
 
     // IntersectionIF interface
 public:
@@ -54,7 +54,7 @@ public:
 
     // TransformationIF interface
 public:
-    virtual void setTransformation(const Vector3 &translate, const Vector3 &rotate, const Vector3 &scale) override;
+    virtual void setTransformation(const Matrix4 &transformation) override;
 
 protected:
     LocalInstance(std::shared_ptr<Shape> shape=nullptr);

@@ -47,7 +47,7 @@ int main(int argc, char **argv)
     m->ks = 0.3;
     auto inst = Shapes::CreateEllipsoid();
     auto obj = new Object(inst, m);    
-    inst->setTransformation({1,1.7,0.2}, {0,0,0}, {0.3, 1,0.3});
+    inst->setTransformation(Transformation::TSR({1,1.7,0.2}, {0,0,0}, {0.3, 1,0.3}));
     scene.addObject(obj);
 
     auto mx = Material::Create();
@@ -55,7 +55,7 @@ int main(int argc, char **argv)
     mx->kd = {0,0,1};
     mx->R0 = 0.9;
     auto cy = new Object(Shapes::CreateCylinder(), m);
-    cy->setTransformation({1.0,0,0.2}, {0}, {0.3, 1.7, 0.3});
+    cy->setTransformation(Transformation::TSR({1.0,0,0.2}, {0}, {0.3, 1.7, 0.3}));
     //scene.addObject(cy);
 
 
@@ -66,7 +66,7 @@ int main(int argc, char **argv)
     scene.addObject(light);
 
     auto box = Shapes::CreateBox();
-    box->setTransformation({0,0,0}, {0,0,0}, {5, 0.1, 5});
+    box->setTransformation(Transformation::TSR({0,0,0}, {0,0,0}, {5, 0.1, 5}));
     scene.addObject(new Object(box));
 
 
@@ -76,12 +76,12 @@ int main(int argc, char **argv)
     auto mesh = Shapes::CreateMesh("glass");
     OBJParser::ParseMesh("./obj/glass.obj", mesh);
     Object *model = new Object(Shapes::CreateInstance(mesh), m3);
-    model->setTransformation({0,0,0}, {0,0,0}, {0.5});
+    model->setTransformation(Transformation::TSR({0,0,0}, {0,0,0}, {0.5}));
     scene.addObject(model);
 
     auto mesh2 = dynamic_pointer_cast<Mesh>(Shapes::Get("glass"));
     Object *model2 = new Object(Shapes::CreateInstance(mesh2), m3);
-    model2->setTransformation({-1,0,0}, {0,0,0}, {0.5,0.6, 0.5});
+    model2->setTransformation(Transformation::TSR({-1,0,0}, {0,0,0}, {0.5,0.6, 0.5}));
     scene.addObject(model2);
 
 

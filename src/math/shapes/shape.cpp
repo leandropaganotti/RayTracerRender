@@ -1,9 +1,9 @@
 #include "shape.h"
 #include "shapefactory.h"
 
-void Instance::setTransformation(const Vector3 &translate, const Vector3 &rotate, const Vector3 &scale)
+void Instance::setTransformation(const Matrix4 &transformation)
 {
-    shape->setTransformation(translate, rotate, scale);
+    shape->setTransformation(transformation);
 }
 
 bool Instance::intersection(const Ray &ray, IntersectionData &isec) const
@@ -74,9 +74,9 @@ LocalInstance::LocalInstance(std::shared_ptr<Shape> shape): Instance(shape)
 
 }
 
-void LocalInstance::setTransformation(const Vector3 &translate, const Vector3 &rotate, const Vector3 &scale)
+void LocalInstance::setTransformation(const Matrix4 &transformation)
 {        
-    model = Transformation::TSR(translate, rotate, scale);
+    model = transformation;
     inverse = model.getInverse();
     inverseTranspose = inverse.getTranspose();
 }
