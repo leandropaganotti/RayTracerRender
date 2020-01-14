@@ -166,7 +166,7 @@ bool Mesh::Triangle::intersection(const std::vector<Vector3> &vertices, const Ra
     return tnear > 0.0f ? true : false;
 }
 
-std::pair<float, float> Mesh::uv(const Vector3 &, size_t) const
+Vector2 Mesh::uv(const Vector3 &, size_t) const
 {
-    return std::pair<float, float>(0.0f, 0.0f);
+    return Vector2(0.0f, 0.0f);
 }

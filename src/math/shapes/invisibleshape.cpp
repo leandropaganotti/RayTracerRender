@@ -12,8 +12,8 @@ Vector3 InvisibleShape::normal(const Vector3 &, size_t) const
 {
     return {0,0,0};
 }
-std::pair<float, float> InvisibleShape::uv(const Vector3 &, size_t) const
+Vector2 InvisibleShape::uv(const Vector3 &, size_t) const
 {
-    return std::pair<float, float> (0,0);
+    return Vector2 (0,0);
 }
 

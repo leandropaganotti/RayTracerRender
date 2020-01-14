@@ -21,7 +21,7 @@ Vector3 Instance::normal(const Vector3 &phit, size_t idx) const
     return shape->normal(phit, idx);
 }
 
-std::pair<float, float> Instance::uv(const Vector3 &phit, size_t idx) const
+Vector2 Instance::uv(const Vector3 &phit, size_t idx) const
 {
     return shape->uv(phit, idx);
 }
@@ -64,7 +64,7 @@ Vector3 LocalInstance::normal(const Vector3 &phit, size_t idx) const
     return (inverseTranspose * shape->normal(inverse * phit, idx)).normalize();
 }
 
-std::pair<float, float> LocalInstance::uv(const Vector3 &phit, size_t idx) const
+Vector2 LocalInstance::uv(const Vector3 &phit, size_t idx) const
 {
     return shape->uv(inverse * phit, idx);
 }

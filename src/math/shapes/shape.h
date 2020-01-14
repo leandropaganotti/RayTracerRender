@@ -8,7 +8,7 @@ class Shape: public IntersectionIF, public TransformationIF
 {
 public:
     virtual Vector3 normal(const Vector3 &phit, size_t idx) const = 0;
-    virtual std::pair<float, float> uv(const Vector3 &phit, size_t idx) const = 0;
+    virtual Vector2 uv(const Vector3 &phit, size_t idx) const = 0;
 
 protected:
 	Shape() = default;
@@ -28,7 +28,7 @@ public:
     // Shape interface
 public:
     virtual Vector3 normal(const Vector3 &phit, size_t idx) const override;
-    virtual std::pair<float, float> uv(const Vector3 &phit, size_t idx) const override;
+    virtual Vector2 uv(const Vector3 &phit, size_t idx) const override;
 
 protected:
     Instance(std::shared_ptr<Shape> shape=nullptr);
@@ -50,7 +50,7 @@ public:
     // Shape interface
 public:
     virtual Vector3 normal(const Vector3 &phit, size_t idx) const override;
-    virtual std::pair<float, float> uv(const Vector3 &phit, size_t idx) const override;
+    virtual Vector2 uv(const Vector3 &phit, size_t idx) const override;
 
     // TransformationIF interface
 public:

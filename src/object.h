@@ -41,8 +41,8 @@ protected:
 inline
 const Vector3 Object::color(const IntersectionData &isec) const
 {
-    const std::pair<float, float> _uv = shape->uv(isec.phit, isec.idx);
-    return texture->get(_uv.first, _uv.second) * material->kd;
+    const Vector2 _uv = shape->uv(isec.phit, isec.idx);
+    return texture->get(_uv.u, _uv.v) * material->kd;
 }
 inline
 void Object::setMaterial(const std::string &name)

@@ -133,3 +133,27 @@ struct Vector3
         return os << std::fixed << "[ " << v.x << " " << v.y << " " << v.z <<  " ]";
     }
 };
+
+struct Vector2
+{
+    union
+    {
+        float vec[2];
+        struct {float x, y;};
+        struct {float i, j;};
+        struct {float u, v;};
+    };
+
+    Vector2(): vec{0.0f, 0.0f}{}
+    Vector2(float x): x(x), y(x){}
+    Vector2(float x, float y): x(x), y(y){}
+
+    float& operator[](size_t i) { return vec[i]; }
+    const float& operator[](size_t i) const { return vec[i]; }
+
+    /** Print function */
+    friend std::ostream& operator<< (std::ostream& os, const Vector2& v)
+    {
+        return os << std::fixed << "[ " << v.x << " " << v.y <<  " ]";
+    }
+};

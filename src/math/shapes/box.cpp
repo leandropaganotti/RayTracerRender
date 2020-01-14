@@ -83,7 +83,7 @@ Vector3 AABox::normal(const Vector3 &, size_t idx) const
     else               return Vector3(0,0,-1);
 }
 
-std::pair<float, float> AABox::uv(const Vector3 &phit, size_t idx) const
+Vector2 AABox::uv(const Vector3 &phit, size_t idx) const
 {
     float u=0, v=0;
     if (idx == 1 || idx == 2)
@@ -96,7 +96,7 @@ std::pair<float, float> AABox::uv(const Vector3 &phit, size_t idx) const
     {
         u = phit.x; v = phit.y;
     }
-    return std::make_pair(u, v);
+    return {u, v};
 }
 
 Vector3 AABox::getMin() const

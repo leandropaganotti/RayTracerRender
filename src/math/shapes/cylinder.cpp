@@ -131,7 +131,7 @@ Vector3 UnitYCylinder::normal(const Vector3 &phit, size_t idx) const
     }
 }
 
-std::pair<float, float> UnitYCylinder::uv(const Vector3 &, size_t) const
+Vector2 UnitYCylinder::uv(const Vector3 &, size_t) const
 {
-    return std::pair<float, float>(0.0f, 0.0f);
+    return Vector2(0.0f, 0.0f);
 }

@@ -30,7 +30,7 @@ public:
     bool  intersection(const Ray& ray, IntersectionData& isec) const;
     bool  intersection(const Ray& ray, float& tnear) const;
     Vector3 normal(const Vector3 &phit, size_t idx) const;
-    std::pair<float, float> uv(const Vector3 &, size_t) const;
+    Vector2 uv(const Vector3 &, size_t) const;
 
 protected:
     Mesh() = default;

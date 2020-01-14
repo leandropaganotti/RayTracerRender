@@ -15,7 +15,7 @@ public:
     // Shape interface
 public:
     Vector3 normal(const Vector3 &phit, size_t idx) const;
-    std::pair<float, float> uv(const Vector3 &phit, size_t idx) const;
+    Vector2 uv(const Vector3 &phit, size_t idx) const;
 
 public:
     Vector3 getMin() const;

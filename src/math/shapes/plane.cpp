@@ -33,21 +33,21 @@ Vector3 Plane::normal(const Vector3 &, size_t) const
     return N;
 }
 
-std::pair<float, float> Plane::uv(const Vector3 &phit, size_t) const
+Vector2 Plane::uv(const Vector3 &phit, size_t) const
 {
 
     Vector3 v = phit - O;
 
     if(N.x == 1.0f || N.x == -1.0f)
     {
-        return std::make_pair(v.y, v.z);
+        return {v.y, v.z};
     }
     else if(N.y == 1.0f || N.y == -1.0f)
     {
-        return std::make_pair(v.x, v.z);
+        return {v.x, v.z};
     }
     else
     {
-        return std::make_pair(v.x, v.y);
+        return {v.x, v.y};
     }
 }

@@ -70,10 +70,10 @@ Vector3 Sphere::normal(const Vector3 &phit, size_t) const
 //       tnear = t0;
 //       return true;
 
-std::pair<float, float> Sphere::uv(const Vector3 &phit, size_t) const
+Vector2 Sphere::uv(const Vector3 &phit, size_t) const
 {
     Vector3 d = (phit-center).normalize();
     float u = 0.5 + atan2f(d.z, d.x) / (2.0f * M_PI);
     float v = 0.5 - asinf(d.y) / M_PI;
-    return std::make_pair(u, v);
+    return {u, v};
 }
