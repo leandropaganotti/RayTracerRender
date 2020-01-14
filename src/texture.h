@@ -15,7 +15,7 @@ protected:
 public:    
 	virtual ~Texture() = default;
     const std::string& getName(){ return name; }
-    virtual const Vector3& get(float u, float v) const = 0;
+    virtual const Vector3& get(const Vector2 &uv) const = 0;
 
     static std::shared_ptr<Texture> GetByName(const std::string &name);
 
@@ -26,7 +26,7 @@ class Solid: public Texture
 {
 public:
     static std::shared_ptr<Texture> Create(const std::string &name="")  { return std::shared_ptr<Texture>(new Solid(name));}
-    const Vector3& get(float, float) const { return Color::WHITE; }
+    const Vector3& get(const Vector2 &) const { return Color::WHITE; }
 protected:
     Solid(const std::string &name):Texture(name){}
 };
@@ -35,7 +35,7 @@ class ChessBoard: public Texture
 {
 public:    
     static std::shared_ptr<ChessBoard> Create(const std::string &name="", const Vector3 &color1={0.0f}, const Vector3 &color2={1.0f}, float rows=1.0f, float cols=1.0f, float angle=0.0f);
-    const Vector3& get(float u, float v) const;
+    const Vector3& get(const Vector2 &uv) const;
 protected:
     ChessBoard(const std::string &name=""):Texture(name){}
     Vector3 color1;
@@ -49,7 +49,7 @@ class Tiles: public Texture
 {
 public:
     static std::shared_ptr<Tiles> Create(const std::string &name="", const Vector3 &colorTile={1.0f}, const Vector3 &colorEdge={0.0f}, float rows=1.0f, float cols=1.0f, float angle=0.0f, float uedge=0.01f, float vedge=0.0f);
-    const Vector3& get(float u, float v) const;
+    const Vector3& get(const Vector2 &uv) const;
 protected:
     Tiles(const std::string &name=""):Texture(name){}
     Vector3 colorTile;

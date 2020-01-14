@@ -30,4 +30,21 @@ Material::Material(std::string name)
     R0 = 0.9f;
     index = 1.55f; // refractive index for glass
     type = Type::DIFFUSE;
+    texture = Texture::SolidWhite;
+}
+
+const Texture * Material::getTexture() const
+{
+    return texture.get();
+}
+
+void Material::setTexture(const std::shared_ptr<Texture> texture)
+{
+    this->texture = texture ? texture : Texture::SolidWhite;
+}
+
+void Material::setTexture(const std::string &name)
+{
+    if(!(this->texture = Texture::GetByName(name)))
+        this->texture = Texture::SolidWhite;
 }

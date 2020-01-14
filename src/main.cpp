@@ -41,15 +41,16 @@ int main(int argc, char **argv)
     scene.cameraOptions.setTo({0,1.5,0});
 
 
-    auto t= ChessBoard::Create("", {1}, {0}, 3, 3 );
-    scene.addObject(new Object(Shapes::CreatePlane({0,-0.2,0}), nullptr, t));
+    auto t= Tiles::Create("", {1}, {0}, 10, 10,45,0.1, 0.1  );
+    scene.addObject(new Object(Shapes::CreatePlane({0,-0.2,0})));
 
     auto m = Material::Create();
     m->kd = Color::GREEN;
     m->ks = 0.3;
+    m->setTexture(t);
     auto inst = Shapes::CreateEllipsoid();
 
-    auto obj = new Object(inst, m, t);
+    auto obj = new Object(inst, m);
     inst->setTransformation(Transformation::TSR({1,1.7,0.2}, {0,0,0}, {0.3, 1,0.3}));
     scene.addObject(obj);
 
@@ -70,7 +71,7 @@ int main(int argc, char **argv)
 
     auto box = Shapes::CreateBox();
     box->setTransformation(Transformation::TSR({0,0,0}, {0,0,0}, {5, 0.1, 5}));
-    scene.addObject(new Object(box));
+    scene.addObject(new Object(box, m));
 
 
 

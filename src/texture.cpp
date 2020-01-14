@@ -28,10 +28,10 @@ std::shared_ptr<ChessBoard> ChessBoard::Create(const std::string &name, const Ve
     return chessboard;
 }
 
-const Vector3& ChessBoard::get(float u, float v) const
+const Vector3& ChessBoard::get(const Vector2 &uv) const
 {
-    float s = u*cos(deg2rad(angle)) - v*sin(deg2rad(angle));
-    float t = v*cos(deg2rad(angle)) + u*sin(deg2rad(angle));
+    float s = uv.u*cos(deg2rad(angle)) - uv.v*sin(deg2rad(angle));
+    float t = uv.v*cos(deg2rad(angle)) + uv.u*sin(deg2rad(angle));
 
     if ((modulo(s*cols) < 0.5f) ^ (modulo(t*rows) < 0.5f))
 		return color1;
@@ -53,10 +53,10 @@ std::shared_ptr<Tiles> Tiles::Create(const std::string &name, const Vector3 &col
     return tiles;
 }
 
-const Vector3& Tiles::get(float u, float v) const
+const Vector3& Tiles::get(const Vector2 &uv) const
 {
-    float s = u*cos(deg2rad(angle)) - v*sin(deg2rad(angle));
-    float t = v*cos(deg2rad(angle)) + u*sin(deg2rad(angle));
+    float s = uv.u*cos(deg2rad(angle)) - uv.v*sin(deg2rad(angle));
+    float t = uv.v*cos(deg2rad(angle)) + uv.u*sin(deg2rad(angle));
     if (modulo(s*cols) > uedge && modulo(t*rows) > vedge)
         return colorTile;
     else
