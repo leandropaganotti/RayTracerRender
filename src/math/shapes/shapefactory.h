@@ -2,14 +2,14 @@
 
 #include <memory>
 #include "list.h"
-#include "shape.h"
+
 #include "sphere.h"
 #include "plane.h"
 #include "box.h"
-#include "invisibleshape.h"
 #include "mesh.h"
 #include "cylinder.h"
-
+#include "shape.h"
+#include "invisibleshape.h"
 
 class Shapes
 {

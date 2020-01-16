@@ -69,9 +69,9 @@ Vector2 LocalInstance::uv(const Vector3 &phit, size_t idx) const
     return shape->uv(inverse * phit, idx);
 }
 
-LocalInstance::LocalInstance(std::shared_ptr<Shape> shape): Instance(shape)
+LocalInstance::LocalInstance(std::shared_ptr<Shape> shape)
 {
-
+    this->shape = shape ? shape : Shapes::Invisible;
 }
 
 void LocalInstance::setTransformation(const Matrix4 &transformation)

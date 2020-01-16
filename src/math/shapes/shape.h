@@ -15,11 +15,7 @@ protected:
 	virtual ~Shape() = default;
 };
 
-class Instance: public Shape {    
-    // TransformationIF interface
-public:
-    virtual void setTransformation(const Matrix4 &transformation) override;
-
+class Instance: public Shape {        
     // IntersectionIF interface
 public:
     virtual bool intersection(const Ray &ray, IntersectionData &isec) const override;
@@ -30,6 +26,10 @@ public:
     virtual Vector3 normal(const Vector3 &phit, size_t idx) const override;
     virtual Vector2 uv(const Vector3 &phit, size_t idx) const override;
 
+    // TransformationIF interface
+public:
+    virtual void setTransformation(const Matrix4 &transformation) override;
+
 protected:
     Instance(std::shared_ptr<Shape> shape=nullptr);
     virtual ~Instance() = default;
@@ -37,7 +37,7 @@ protected:
     std::shared_ptr<Shape> shape;
 };
 
-class LocalInstance: public Instance
+class LocalInstance: public Shape
 {
 public:
     virtual ~LocalInstance() = default;
@@ -59,10 +59,11 @@ public:
 protected:
     LocalInstance(std::shared_ptr<Shape> shape=nullptr);
 
-    friend class Shapes;
+    std::shared_ptr<Shape> shape;
 
-protected:
     Matrix4 model;              // object-to-world
     Matrix4 inverse;            // world-to-object
     Matrix4 inverseTranspose;   // matrix for normals transformation
+
+    friend class Shapes;
 };
