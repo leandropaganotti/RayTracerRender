@@ -1,6 +1,7 @@
 #include "scene.h"
 #include <stdio.h>
 #include <string.h>
+#include "xmlparser.h"
 
 Scene::Scene(): name("unamed"), ambientIndex(1.0f), ka(0.1), spp(1), grid(1), maxDepth(3), bgColor(0), raytracer(RayTracerType::Phong){}
 
@@ -27,7 +28,7 @@ void Scene::addObject(std::unique_ptr<Object> obj)
 void Scene::load(const std::string &fileName)
 {
     this->fileName = fileName;
-    //XMLParser().parseFile(fileName.c_str(), *this);
+    XMLParser().parseFile(fileName.c_str(), *this);
 }
 
 std::ostream &operator <<(std::ostream &os, const Scene &scene)

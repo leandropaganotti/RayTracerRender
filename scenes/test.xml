@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scene name="test" grid="4" spp="128" index="1.0" maxdepth="3" bgcolor="0" ka="0.1" raytracer="path">
     <CameraOptions position="0,0,5" lookingat="0" fov="45" width="250" height="500"></CameraOptions>
-    <Sphere name="light" position="0,1,0" radius="1">
+    <sphere name="light" position="0,1,0" radius="1">
         <material E="1"></material>
-    </Sphere>    
-    <Sphere position="0,-1,0" radius="1"/>
+    </sphere>
+    <sphere position="0,-1,0" radius="1"/>
 </scene>

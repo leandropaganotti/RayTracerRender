@@ -6,6 +6,26 @@ Plane::Plane(const Vector3 &O, const Vector3 &N):
 
 }
 
+Vector3 Plane::getN() const
+{
+    return N;
+}
+
+void Plane::setN(const Vector3 &value)
+{
+    N = value;
+}
+
+Vector3 Plane::getO() const
+{
+    return O;
+}
+
+void Plane::setO(const Vector3 &value)
+{
+    O = value;
+}
+
 bool Plane::intersection(const Ray &ray, IntersectionData& isec) const
 {
     if( intersection(ray, isec.tnear) )

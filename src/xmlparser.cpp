@@ -1,4 +1,5 @@
 #include "xmlparser.h"
+#include "objparser.h"
 
 bool XMLParser::equals(const xmlChar *lhs, const char *rhs)
 {
@@ -154,18 +155,10 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
                 parseDistantLight(node, *light);
                 scene.addLight(light);
             }            
-//            else if(equals(node->name, "objmodel"))
-//            {
-//                OBJModel *model = new OBJModel();
-//                parseModel(node, *model);
-//                scene.addObject(model);
-//            }
-            else // simple object
-            {
+            else // it has to be an object
+            {                
                 scene.addObject(std::move(parseObject(node)));
             }
-//            else
-//                cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlSceneNode->name << "\'" << "\x1b[0m" << endl;
         }
     }    
 }
@@ -205,65 +198,16 @@ void XMLParser::parseCameraOptions(xmlNode *xmlCameraOptionsNode, CameraOptions 
     }
 }
 
-void XMLParser::parseSphere(xmlNode *xmlSphereNode, Sphere & sphere)
-{
-    if(xmlSphereNode == NULL)
-    {
-        cerr << "\x1b[33;1m" << "error: could not parse Sphere, xmlNode pointer is NULL" << "\x1b[0m" << endl;
-	    return;
-    }
-
-    const xmlAttr *attr = NULL;
-    string name("");
-    for (attr = xmlSphereNode->properties; attr; attr = attr->next)
-	{
-    	if (equals(attr->name, "name"))
-    		name = (const char*)attr->children->content;
-    	else if (equals(attr->name, "position"))
-			sphere.setCenter( toVector(attr->children->content) );
-		else if (equals(attr->name, "radius"))
-		    sphere.setRadius( toFloat(attr->children->content) );
-        else if (equals(attr->name, "material"))
-            sphere.setMaterial((const char*)attr->children->content);
-        else if (equals(attr->name, "texture"))
-            sphere.setTexture((const char*)attr->children->content);
-		else
-            cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlSphereNode->name << "\':" << name << "\x1b[0m" << endl;
-	}
-
-    xmlNode *node = NULL;
-    for (node = xmlSphereNode->children; node; node = node->next)
-    {
-        if (node->type == XML_ELEMENT_NODE)
-        {
-        	if (equals(node->name, "material"))
-            {                
-                std::shared_ptr<Material> material;
-                parseMaterial(node, material);
-                sphere.setMaterial(material);
-            }
-            else if (equals(node->name, "texture"))
-            {                
-                std::shared_ptr<Texture> tex;
-                parseTexture(node, tex);
-                sphere.setTexture(tex);
-            }
-            else
-                cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlSphereNode->name << "\'" << "\x1b[0m" << endl;
-        }
-    }
-}
-
-void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, std::shared_ptr<Material> &material)
+std::shared_ptr<Material> XMLParser::parseMaterial(xmlNode *xmlMaterialNode)
 {    
     if(xmlMaterialNode == NULL)
     {
          cerr << "\x1b[33;1m" << "error: could not parse Material, xmlNode pointer is NULL" << "\x1b[0m" << endl;
-         return;
+         return nullptr;
     }
 
     xmlChar *attName = xmlGetProp(xmlMaterialNode,(const xmlChar*)"name");
-    material = Material::Create(attName? (const char*)attName : "");
+    std::shared_ptr<Material> material = Material::Create(attName? (const char*)attName : "");
     xmlFree(attName);
     const xmlAttr *attr = NULL;
     string name = "";
@@ -294,17 +238,24 @@ void XMLParser::parseMaterial(xmlNode *xmlMaterialNode, std::shared_ptr<Material
 			else
                 cerr << "\x1b[33;1m" << "unrecognized material type \'" << attr->children->content << "\'" << "\x1b[0m" << endl;
 		}
+        else if (equals(attr->name, "texture"))
+            material->setTexture((const char*)attr->children->content);
 		else
             cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlMaterialNode->name << "\':" << name << "    \x1b[0m" << endl;
 	}    
+
     xmlNode *node = NULL;
     for (node = xmlMaterialNode->children; node; node = node->next)
-    {
+    {        
         if (node->type == XML_ELEMENT_NODE)
         {
-            cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlMaterialNode->name << "\'" << "\x1b[0m" << endl;
+            if (equals(node->name, "texture"))
+                material->setTexture(parseTexture(node));
+            else
+                cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlMaterialNode->name << "\'" << "\x1b[0m" << endl;
         }
     }
+    return material;
 }
 
 void XMLParser::parsePointLight(xmlNode *xmlPointLightNode, PointLight & light)
@@ -385,26 +336,29 @@ std::unique_ptr<Object> XMLParser::parseObject(xmlNode *xmlObjectNode)
          return nullptr;
     }
 
-    auto object = std::make_unique<Object>();
+    auto object = std::unique_ptr<Object>( new Object );
 
-    const xmlAttr *attr = NULL;
-    string name("");
-    for (attr = xmlObjectNode->properties; attr; attr = attr->next)
-    {
-        if (equals(attr->name, "name"))
-            name = (const char*)attr->children->content;
-        else if (equals(attr->name, "shape"))
-        {
-            object->setShape(Shapes::Get((const char*)attr->children->content));
-        }
+    xmlChar *material = xmlGetProp(xmlObjectNode,(const xmlChar*)"material");
+    object->setMaterial( material ? (const char*)material : "");
+    xmlFree(material);
 
-        else if (equals(attr->name, "material"))
-            plane.setMaterial((const char*)attr->children->content);
-        else if (equals(attr->name, "texture"))
-            plane.setTexture((const char*)attr->children->content);
-        else
-            cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlObjectNode->name << "\':" << name << "\x1b[0m" << endl;
-    }
+    std::shared_ptr<Shape> shape;
+    if (equals(xmlObjectNode->name, "plane"))
+        shape = parsePlane(xmlObjectNode);
+    else if (equals(xmlObjectNode->name, "sphere"))
+        shape = parseSphere(xmlObjectNode);
+    else if (equals(xmlObjectNode->name, "box"))
+        shape = parseBox(xmlObjectNode);
+    else if (equals(xmlObjectNode->name, "cylinder"))
+        shape = parseCylinder(xmlObjectNode);
+    else if (equals(xmlObjectNode->name, "ellipsoid"))
+        shape = parseEllipsoid(xmlObjectNode);
+    else if (equals(xmlObjectNode->name, "mesh"))
+        shape = parseMesh(xmlObjectNode);
+    else
+        cerr << "\x1b[33;1m" << "unrecognized element \'" << xmlObjectNode->name << "\'" << " in the scene \x1b[0m" << endl;
+
+    object->setShape(shape);
 
     xmlNode *node = NULL;
     for (node = xmlObjectNode->children; node; node = node->next)
@@ -412,17 +366,9 @@ std::unique_ptr<Object> XMLParser::parseObject(xmlNode *xmlObjectNode)
         if (node->type == XML_ELEMENT_NODE)
         {
             if (equals(node->name, "material"))
-            {
-                std::shared_ptr<Material> material;
-                parseMaterial(node, material);
-                plane.setMaterial(material);
-            }
-            else if (equals(node->name, "texture"))
-            {
-                std::shared_ptr<Texture> tex;
-                parseTexture(node, tex);
-                plane.setTexture(tex);
-            }
+                object->setMaterial(parseMaterial(node));
+            else if (equals(node->name, "transformation"))
+                object->setTransformation(parseTransformation(node));
             else
                 cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlObjectNode->name << "\'" << "\x1b[0m" << endl;
         }
@@ -431,13 +377,15 @@ std::unique_ptr<Object> XMLParser::parseObject(xmlNode *xmlObjectNode)
     return object;
 }
 
-void XMLParser::parsePlane(xmlNode *xmlPlaneNode, Plane & plane)
+std::shared_ptr<Shape> XMLParser::parsePlane(xmlNode *xmlPlaneNode)
 {
     if(xmlPlaneNode == NULL)
     {
          cerr << "\x1b[33;1m" << "error: could not parse Plane, xmlNode pointer is NULL" << "\x1b[0m" << endl;
-         return;
-    }
+         return nullptr;
+    }    
+
+    auto plane = Shapes::CreatePlane();
 
     const xmlAttr *attr = NULL;
 	string name("");
@@ -446,50 +394,58 @@ void XMLParser::parsePlane(xmlNode *xmlPlaneNode, Plane & plane)
 		if (equals(attr->name, "name"))
 			name = (const char*)attr->children->content;
 		else if (equals(attr->name, "point"))
-			plane.O = toVector(attr->children->content);
+            plane->setO(toVector(attr->children->content));
 		else if (equals(attr->name, "normal"))
-			plane.N = toVector(attr->children->content);
+            plane->setN(toVector(attr->children->content));
         else if (equals(attr->name, "material"))
-            plane.setMaterial((const char*)attr->children->content);
-        else if (equals(attr->name, "texture"))
-            plane.setTexture((const char*)attr->children->content);
+            ;
         else
             cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlPlaneNode->name << "\':" << name << "\x1b[0m" << endl;
 	}
 
-    xmlNode *node = NULL;
-    for (node = xmlPlaneNode->children; node; node = node->next)
-    {
-        if (node->type == XML_ELEMENT_NODE)
-        {
-        	if (equals(node->name, "material"))
-            {
-                std::shared_ptr<Material> material;
-                parseMaterial(node, material);
-                plane.setMaterial(material);
-            }
-            else if (equals(node->name, "texture"))
-            {
-                std::shared_ptr<Texture> tex;
-                parseTexture(node, tex);
-                plane.setTexture(tex);
-            }
-            else
-                cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlPlaneNode->name << "\'" << "\x1b[0m" << endl;
-        }
-    }
+    return plane;
 }
 
-void XMLParser::parseTexture(xmlNode *xmlTextureNode, std::shared_ptr<Texture> &tex)
+std::shared_ptr<Shape>  XMLParser::parseSphere(xmlNode * xmlSphereNode)
+{
+    if(xmlSphereNode == NULL)
+    {
+        cerr << "\x1b[33;1m" << "error: could not parse Sphere, xmlNode pointer is NULL" << "\x1b[0m" << endl;
+        return nullptr;
+    }
+
+    auto sphere = Shapes::CreateSphere();
+
+    const xmlAttr *attr = NULL;
+    string name("");
+    for (attr = xmlSphereNode->properties; attr; attr = attr->next)
+    {
+        if (equals(attr->name, "name"))
+            name = (const char*)attr->children->content;
+        else if (equals(attr->name, "position"))
+            sphere->setCenter( toVector(attr->children->content) );
+        else if (equals(attr->name, "radius"))
+            sphere->setRadius( toFloat(attr->children->content) );
+        else if (equals(attr->name, "material"))
+            ;
+        else
+            cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlSphereNode->name << "\':" << name << "\x1b[0m" << endl;
+    }
+
+    return sphere;
+}
+
+std::shared_ptr<Texture> XMLParser::parseTexture(xmlNode *xmlTextureNode)
 {
     if(xmlTextureNode == NULL)
     {
          cerr << "\x1b[33;1m" << "error: could not parse Texture, xmlNode pointer is NULL" << "\x1b[0m" << endl;
-         return;
+         return nullptr;
     }
 
+    std::shared_ptr<Texture> tex;
     const xmlAttr *attr = NULL;
-    string name("");
+    string name("");    
     string type("");
     float rows=1.0f, cols=1.0f, uedge=0.1f, vedge=0.1f, angle=0.0f;
     Vector3 color1=0, color2=1;
@@ -516,27 +472,27 @@ void XMLParser::parseTexture(xmlNode *xmlTextureNode, std::shared_ptr<Texture> &
         else
             cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlTextureNode->name << "\'" << "\x1b[0m" << endl;
     }
-    if(type!="")
-    {
-        if (type == "Tiles")
-            tex = Tiles::Create(name, color1, color2, rows, cols, angle, uedge, vedge);
-        else if (type == "ChessBoard")
-            tex = ChessBoard::Create(name, color1, color2, rows, cols, angle);
-        else
-            tex = nullptr;
-    }
-    else
-        cerr << "\x1b[33;1m" << "Error parsing Texture type attribute not found in " << xmlTextureNode->name << "\x1b[0m" << endl;
 
+    if (type == "Tiles")
+        tex = Tiles::Create(name, color1, color2, rows, cols, angle, uedge, vedge);
+    else if (type == "ChessBoard")
+        tex = ChessBoard::Create(name, color1, color2, rows, cols, angle);
+    else
+    {
+        cerr << "\x1b[33;1m" << "Error parsing Texture, \'Type\' not found or invalid in " << xmlTextureNode->name << "\x1b[0m" << endl;
+    }
+    return tex;
 }
 
-void XMLParser::parseBox(xmlNode *xmlBoxNode, Box &box)
+std::shared_ptr<Shape> XMLParser::parseBox(xmlNode *xmlBoxNode)
 {
     if(xmlBoxNode == NULL)
     {
          cerr << "\x1b[33;1m" << "error: could not parse Box, xmlNode pointer is NULL" << "\x1b[0m" << endl;
-         return;
+         return nullptr;
     }
+
+    auto box = Shapes::CreateBox();
 
     const xmlAttr *attr = NULL;
     string name("");
@@ -545,44 +501,105 @@ void XMLParser::parseBox(xmlNode *xmlBoxNode, Box &box)
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "material"))
-            box.setMaterial((const char*)attr->children->content);
-        else if (equals(attr->name, "texture"))
-            box.setTexture((const char*)attr->children->content);
+            ;
         else
             cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlBoxNode->name << "\':" << name << "\x1b[0m" << endl;
     }
 
-    xmlNode *node = NULL;
-    for (node = xmlBoxNode->children; node; node = node->next)
-    {
-        if (node->type == XML_ELEMENT_NODE)
-        {
-            if (equals(node->name, "material"))
-            {
-                std::shared_ptr<Material> material;
-                parseMaterial(node, material);
-                box.setMaterial(material);
-            }
-            else if (equals(node->name, "transformation"))
-                parseTransformation(node, box);
-            else if (equals(node->name, "texture"))
-            {
-                std::shared_ptr<Texture> tex;
-                parseTexture(node, tex);
-                box.setTexture(tex);
-            }
-            else
-                cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlBoxNode->name << "\'" << "\x1b[0m" << endl;
-        }
-    }
+    return box;
 }
 
-void XMLParser::parseTransformation(xmlNode *xmlTrnasformationNode, TransformationIF &transformation)
+std::shared_ptr<Shape> XMLParser::parseCylinder(xmlNode *xmlCylinderNode)
+{
+    if(xmlCylinderNode == NULL)
+    {
+         cerr << "\x1b[33;1m" << "error: could not parse Box, xmlNode pointer is NULL" << "\x1b[0m" << endl;
+         return nullptr;
+    }
+
+    auto cylinder = Shapes::CreateCylinder();
+
+    const xmlAttr *attr = NULL;
+    string name("");
+    for (attr = xmlCylinderNode->properties; attr; attr = attr->next)
+    {
+        if (equals(attr->name, "name"))
+            name = (const char*)attr->children->content;
+        else if (equals(attr->name, "material"))
+            ;
+        else
+            cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlCylinderNode->name << "\':" << name << "\x1b[0m" << endl;
+    }
+
+    return cylinder;
+}
+
+std::shared_ptr<Shape> XMLParser::parseEllipsoid(xmlNode *xmlEllipsoidNode)
+{
+    if(xmlEllipsoidNode == NULL)
+    {
+         cerr << "\x1b[33;1m" << "error: could not parse Box, xmlNode pointer is NULL" << "\x1b[0m" << endl;
+         return nullptr;
+    }
+
+    auto ellipsoid = Shapes::CreateEllipsoid();
+
+    const xmlAttr *attr = NULL;
+    string name("");
+    for (attr = xmlEllipsoidNode->properties; attr; attr = attr->next)
+    {
+        if (equals(attr->name, "name"))
+            name = (const char*)attr->children->content;
+        else if (equals(attr->name, "material"))
+            ;
+        else
+            cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlEllipsoidNode->name << "\':" << name << "\x1b[0m" << endl;
+    }
+
+    return ellipsoid;
+}
+
+std::shared_ptr<Shape> XMLParser::parseMesh(xmlNode *xmlMeshNode)
+{
+    if(xmlMeshNode == NULL)
+    {
+         cerr << "\x1b[33;1m" << "error: could not parse Box, xmlNode pointer is NULL" << "\x1b[0m" << endl;
+         return nullptr;
+    }
+
+    std::shared_ptr<Mesh>  mesh;
+
+    const xmlAttr *attr = NULL;
+    string name("");
+
+    for (attr = xmlMeshNode->properties; attr; attr = attr->next)
+    {
+        if (equals(attr->name, "name"))
+            name = (const char*)attr->children->content;
+        else if (equals(attr->name, "path"))
+        {
+            mesh = std::dynamic_pointer_cast<Mesh>( Shapes::Get((const char*)attr->children->content) );
+            if(!mesh)
+            {
+                mesh = Shapes::CreateMesh((const char*)attr->children->content);
+                OBJParser::ParseMesh((const char*)attr->children->content, mesh);
+            }
+        }
+        else if (equals(attr->name, "material"))
+            ;
+        else
+            cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlMeshNode->name << "\':" << name << "\x1b[0m" << endl;
+    }
+
+    return Shapes::CreateInstance(mesh);
+}
+
+Matrix4 XMLParser::parseTransformation(xmlNode *xmlTrnasformationNode)
 {
     if(xmlTrnasformationNode == NULL)
     {
          cerr << "\x1b[33;1m" << "error: could not parse Model, xmlNode pointer is NULL" << "\x1b[0m" << endl;
-         return;
+         return Matrix4();
     }
 
     const xmlAttr *attr = NULL;
@@ -612,50 +629,6 @@ void XMLParser::parseTransformation(xmlNode *xmlTrnasformationNode, Transformati
             cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlTrnasformationNode->name << "\'" << "\x1b[0m" << endl;
         }
     }
-    transformation.setTransformation(translate, rotate, scale);
-}
 
-void XMLParser::parseModel(xmlNode *xmlModelNode, OBJModel &model)
-{
-    if(xmlModelNode == NULL)
-    {
-         cerr << "\x1b[33;1m" << "error: could not parse Model, xmlNode pointer is NULL" << "\x1b[0m" << endl;
-         return;
-    }
-
-    const xmlAttr *attr = NULL;
-    std::string name;
-    for (attr = xmlModelNode->properties; attr; attr = attr->next)
-    {
-        if (equals(attr->name, "name"))
-            name = (const char*)attr->children->content;
-        else if (equals(attr->name, "path"))
-            model.loadFromFile((const char*)attr->children->content);
-        else if (equals(attr->name, "material"))
-            model.setMaterial((const char*)attr->children->content);
-        else
-            cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlModelNode->name << "\'" << "\x1b[0m" << endl;
-    }
-
-    xmlNode *node = NULL;
-    for (node = xmlModelNode->children; node; node = node->next)
-    {
-        if (node->type == XML_ELEMENT_NODE)
-        {
-            if (equals(node->name, "material"))
-            {
-                std::shared_ptr<Material> material;
-                parseMaterial(node, material);
-                model.setMaterial(material);
-            }
-            else if (equals(node->name, "transformation"))
-            {                                
-                parseTransformation(node, model);                
-            }
-            else
-            {
-                cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlModelNode->name << "\'" << "\x1b[0m" << endl;
-            }
-        }
-    }    
+    return Transformation::TSR(translate, rotate, scale);
 }

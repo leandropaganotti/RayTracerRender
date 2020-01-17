@@ -6,10 +6,6 @@
 #include <sstream>
 #include "raytracer.h"
 
-#include "shapefactory.h"
-#include "objmodel.h"
-#include "objparser.h"
-
 using namespace std;
 
 char	    *xmlscene = NULL;	// xml file with scene description
@@ -31,63 +27,7 @@ int main(int argc, char **argv)
     output = output.substr(output.find_last_of("/\\")+1);
     output = output.substr(0, output.find_last_of("."));
 
-    Scene scene;
-    scene.grid = 4;
-    scene.spp = 8;
-    scene.maxDepth = 6;
-    scene.raytracer = RayTracerType::Phong;
-    scene.addLight( new PointLight({0,4,6}, 1));
-    scene.cameraOptions.setFrom({0,4,10});
-    scene.cameraOptions.setTo({0,1.5,0});
-
-
-    auto t= Tiles::Create("", {1}, {0}, 10, 10,45,0.1, 0.1  );
-    scene.addObject(new Object(Shapes::CreatePlane({0,-0.2,0})));
-
-    auto m = Material::Create();
-    m->kd = Color::GREEN;
-    m->ks = 0.3;
-    m->setTexture(t);
-    auto inst = Shapes::CreateEllipsoid();
-
-    auto obj = new Object(inst, m);
-    inst->setTransformation(Transformation::TSR({1,1.7,0.2}, {0,0,0}, {0.3, 1,0.3}));
-    scene.addObject(obj);
-
-    auto mx = Material::Create();
-    mx->type = Material::Type::DIFFUSE;
-    mx->kd = {0,0,1};
-    mx->R0 = 0.9;
-    auto cy = new Object(Shapes::CreateCylinder(), m);
-    cy->setTransformation(Transformation::TSR({1.0,0,0.2}, {0}, {0.3, 1.7, 0.3}));
-    //scene.addObject(cy);
-
-
-    auto m2 = Material::Create();
-    m2->E = 100;
-    //m2->kd = {1};
-    Object *light = new Object(Shapes::CreateSphere({2,5,0}, 0.5), m2);
-    scene.addObject(light);
-
-    auto box = Shapes::CreateBox();
-    box->setTransformation(Transformation::TSR({0,0,0}, {0,0,0}, {5, 0.1, 5}));
-    scene.addObject(new Object(box, m));
-
-
-
-    auto m3 = Material::Create();
-    m3->type = Material::Type::TRANSPARENT;
-    auto mesh = Shapes::CreateMesh("glass");
-    OBJParser::ParseMesh("./obj/glass.obj", mesh);
-    Object *model = new Object(Shapes::CreateInstance(mesh), m3);
-    model->setTransformation(Transformation::TSR({0,0,0}, {0,0,0}, {0.5}));
-    scene.addObject(model);
-
-    auto mesh2 = dynamic_pointer_cast<Mesh>(Shapes::Get("glass"));
-    Object *model2 = new Object(Shapes::CreateInstance(mesh2), m3);
-    model2->setTransformation(Transformation::TSR({-1,0,0}, {0,0,0}, {0.5,0.6, 0.5}));
-    scene.addObject(model2);
-
+    Scene scene(xmlscene);
 
     cout << scene << endl;
 

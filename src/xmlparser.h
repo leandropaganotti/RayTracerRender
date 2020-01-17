@@ -31,16 +31,18 @@ public:
 
     void parseDistantLight(xmlNode * xmlDistantLightNode, DistantLight & light);
 
-    std::unique_ptr<Object> parseObject(xmlNode *xmlObjectNode);
+    std::unique_ptr<Object> parseObject(xmlNode * xmlObjectNode);
+    std::shared_ptr<Shape>  parsePlane(xmlNode * xmlPlaneNode);
+    std::shared_ptr<Shape>  parseSphere(xmlNode * xmlSphereNode);
+    std::shared_ptr<Shape>  parseBox(xmlNode * xmlBoxNode);
+    std::shared_ptr<Shape>  parseCylinder(xmlNode * xmlCylinderNode);
+    std::shared_ptr<Shape>  parseEllipsoid(xmlNode * xmlEllipsoidNode);
+    std::shared_ptr<Shape>  parseMesh(xmlNode * xmlMeshNode);
 
-    //void parseSphere(xmlNode * xmlSphereNode, Sphere & sphere);
-    //void parsePlane(xmlNode * xmlPlaneNode, Plane & plane);
-    //void parseBox(xmlNode * xmlBoxNode, Box & box);
-    //void parseModel(xmlNode * xmlModelNode, OBJModel & model);
 
-    void parseTransformation(xmlNode * xmlTrnasformationNode, TransformationIF & transformation);
-    void parseMaterial(xmlNode * xmlMaterialNode, std::shared_ptr<Material> &material);
-    void parseTexture(xmlNode * xmlTextureNode, std::shared_ptr<Texture> &tex);
+    Matrix4 parseTransformation(xmlNode * xmlTrnasformationNode);
+    std::shared_ptr<Material> parseMaterial(xmlNode * xmlMaterialNode);
+    std::shared_ptr<Texture> parseTexture(xmlNode * xmlTextureNode);
 
 private:
     bool     equals(const xmlChar *lhs, const char *rhs);

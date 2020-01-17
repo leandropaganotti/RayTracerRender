@@ -32,7 +32,7 @@ Instance::Instance(std::shared_ptr<Shape> shape)
 }
 
 bool LocalInstance::intersection(const Ray &ray, IntersectionData &isec) const
-{    
+{
     Ray r = inverse * ray;
     if (shape->intersection(r, isec))
     {

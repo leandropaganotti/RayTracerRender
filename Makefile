@@ -4,7 +4,7 @@ OBJDIR = build
 CXXFLAGS =  -O3 -std=c++14 -Wall -W -fopenmp
 CXX = g++
 INCPATH = -I./src -I./src/math -I./src/math/shapes -I/usr/include/libxml2
-LIBDIRS = -L/usr/local/lib
+LIBDIRS = -L/usr/lib/x86_64-linux-gnu
 #INCPATH = -I./src -I./src/math -I./src/math/shapes -IC:\Users\lpaganotti\RayTracerRender\libxml\include\libxml2
 #LIBDIRS = -LC:\Users\lpaganotti\RayTracerRender\libxml\lib
 LIBS = -lpthread -lxml2
@@ -32,6 +32,7 @@ aabb.o \
 mesh.o \
 objparser.o \
 shapefactory.o \
+xmlparser.o 
 
 
 CObjects=$(addprefix $(OBJDIR)/,$(OBJECTS))
@@ -43,7 +44,7 @@ $(OBJDIR)/%.o : %.cpp
 all: $(PROGRAM)
 
 $(PROGRAM): $(CObjects)
-	$(CXX) $(LFLAGS) $(LDFLAGS) $(CObjects) -o $@
+	$(CXX) $(LFLAGS) $(CObjects) -o $@ $(LDFLAGS)
 
 $(CObjects): | $(OBJDIR)
 

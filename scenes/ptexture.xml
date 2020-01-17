@@ -3,15 +3,17 @@
     <CameraOptions position="0,1.5,6" lookingat="0, 1, 0" fov="35" width="1280" height="720"></CameraOptions>
     <PointLight position="0,2,2" color="1" strength="1.0" k="0.001"></PointLight>    
     <plane name="floor" point="-100, 0, 100" normal="0,1,0">
-        <material type="specular" kd="0.75, 0.25, 0.25" ks="0" R0="0.03"></material>
-        <texture type="ChessBoard" name="chessBoard" rows="1" cols="1" color1="1" color2="0" angle="45"></texture>
+        <material type="specular" kd="0.75, 0.25, 0.25" ks="0" R0="0.03">
+            <texture type="ChessBoard" name="chessBoard" rows="1" cols="1" color1="1" color2="0" angle="45"></texture>
+        </material>
     </plane>
     <Sphere name="left" position="-2,0.5,0" radius="0.5">
         <material type="specular" ks="1" R0="1"></material>
     </Sphere>
     <Sphere name="middle" position="0,0.5,0" radius="0.5">
-        <material type="diffuse" kd="0,1,0"></material>
-        <texture type="Tiles" name="tiles" rows="4" cols="1" angle="30" uedge="0.03" vedge="0.06" color1="0,1,0" color2="0.45,0.45,0"></texture>
+        <material type="diffuse" kd="0,1,0">
+            <texture type="Tiles" name="tiles" rows="4" cols="1" angle="30" uedge="0.03" vedge="0.06" color1="0,1,0" color2="0.45,0.45,0"></texture>
+        </material>
     </Sphere>
     <Sphere name="right" position="2,0.5,0" radius="0.5">
         <material type="transparent" kd="1,0,1" ks="1" m="250" index="1.55"></material>

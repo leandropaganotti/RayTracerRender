@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scene name="refraction" grid="2" spp="50" maxdepth="5" index="1.0" bgcolor="0">
     <CameraOptions position="0,3.5,7.5" lookingat="0, 0.5, 0" fov="45" width="1280" height="720"></CameraOptions>
-    <PointLight position="0,5.5,0" color="1" strength="1.5" k="0.001"></PointLight>
-    <!--<Sphere name="light" position="0,5.5,0" radius="1.5">
-        <material type="diffuse" kd="1" emission="20"></material>
-    </Sphere>-->
+    <PointLight position="0,5.5,0" color="1" strength="1.5" k="0.001"></PointLight>    
     <Sphere name="glass" position="0, 1.2, 0" radius="0.8">
         <material type="transparent" ks="1" index="1.55" m="10"></material>
     </Sphere>
     <Box>
         <transformation translate="0,-3.25,0" rotate="00, 0, 0" scale="6.5"></transformation>
-        <material type="diffuse" kd="0.25,0.25,0.75"></material>
-        <texture name="tiles" rows="20" cols="20" color1="1" color2="0" angle="0"></texture>
+        <material type="diffuse" kd="0.25,0.25,0.75">
+            <texture type="Tiles" name="tiles" rows="20" cols="20" color1="1" color2="0" angle="0"></texture>
+        </material>
     </Box>
     <Box>
         <transformation translate="0,0,0.5" rotate="0" scale="4,0.1,5"></transformation>
@@ -19,23 +17,27 @@
     </Box>
     <Box>
         <transformation translate="0,0,-2.8" rotate="0,0,30" scale="0.5,5,0.5"></transformation>
-        <material type="diffuse" kd="1,0,0"></material>
-        <texture name="tiles" rows="15" cols="15" color1="1" color2="0.1, 0.1, 0" angle="0"></texture>
+        <material type="diffuse" kd="1,0,0">
+            <texture type="Tiles" name="tiles" rows="15" cols="15" color1="1" color2="0.1, 0.1, 0" angle="0"></texture>
+        </material>
     </Box>
     <Box>
         <transformation translate="-0.8,0,-2.8" rotate="0,0,30" scale="0.5,5,0.5"></transformation>
-        <material name="teste" type="diffuse" kd="0,1,0"></material>
-        <texture name="tiles" rows="15" cols="15" color1="1" color2="0.1, 0.1, 0" angle="0"></texture>
+        <material name="teste" type="diffuse" kd="0,1,0">
+            <texture type="Tiles" name="tiles" rows="15" cols="15" color1="1" color2="0.1, 0.1, 0" angle="0"></texture>
+        </material>
     </Box>
     <Box>
         <transformation translate="0,0,-2.81" rotate="0,0,-30" scale="0.5,5,0.5"></transformation>
-        <material type="diffuse" kd="0,0,1"></material>
-        <texture name="tiles" rows="15" cols="15" color1="1" color2="0.1, 0.1, 0" angle="0"></texture>
+        <material type="diffuse" kd="0,0,1">
+            <texture type="Tiles" name="tiles" rows="15" cols="15" color1="1" color2="0.1, 0.1, 0" angle="0"></texture>
+        </material>
     </Box>
     <Box>
         <transformation translate="0.8,0,-2.81" rotate="0,0,-30" scale="0.5,5,0.5"></transformation>
-        <material type="diffuse" kd="1,1,0"></material>
-        <texture name="tiles" rows="15" cols="15" color1="1" color2="0.1, 0.1, 0" angle="0"></texture>
+        <material type="diffuse" kd="1,1,0">
+            <texture type="Tiles" name="tiles" rows="15" cols="15" color1="1" color2="0.1, 0.1, 0" angle="0"></texture>
+        </material>
     </Box>
 </scene>
 
