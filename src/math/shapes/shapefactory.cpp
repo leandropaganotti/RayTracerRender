@@ -1,13 +1,13 @@
 #include "shapefactory.h"
 
-List<Shape> Shapes::ListOfNamedShapes;
+List<ShapeIF> Shapes::ListOfNamedShapes;
 
-const std::shared_ptr<Shape> Shapes::Invisible  = std::shared_ptr<Shape> (new InvisibleShape);
-const std::shared_ptr<Shape> Shapes::UnitSphere = std::shared_ptr<Shape> (new Sphere);
-const std::shared_ptr<Shape> Shapes::UnitBox    = std::shared_ptr<Shape> (new AABox);
-const std::shared_ptr<Shape> Shapes::UnitCylinder    = std::shared_ptr<Shape> (new UnitYCylinder);
+const std::shared_ptr<ShapeIF> Shapes::Invisible  = std::shared_ptr<ShapeIF> (new InvisibleShape);
+const std::shared_ptr<ShapeIF> Shapes::UnitSphere = std::shared_ptr<ShapeIF> (new Sphere);
+const std::shared_ptr<ShapeIF> Shapes::UnitBox    = std::shared_ptr<ShapeIF> (new AABox);
+const std::shared_ptr<ShapeIF> Shapes::UnitCylinder    = std::shared_ptr<ShapeIF> (new UnitYCylinder);
 
-std::shared_ptr<Shape> Shapes::Get(const std::string &name)
+std::shared_ptr<ShapeIF> Shapes::Get(const std::string &name)
 {
     return Shapes::ListOfNamedShapes.get(name);
 }
@@ -44,27 +44,22 @@ std::shared_ptr<Mesh> Shapes::CreateMesh(const std::string &name)
     return mesh;
 }
 
-std::shared_ptr<Shape> Shapes::CreateEllipsoid()
+std::shared_ptr<ShapeIF> Shapes::CreateEllipsoid()
 {
     return CreateInstance(UnitSphere);
 }
 
-std::shared_ptr<Shape> Shapes::CreateBox()
+std::shared_ptr<ShapeIF> Shapes::CreateBox()
 {
     return CreateInstance(UnitBox);
 }
 
-std::shared_ptr<Shape> Shapes::CreateCylinder()
+std::shared_ptr<ShapeIF> Shapes::CreateCylinder()
 {
     return CreateInstance(UnitCylinder);
 }
 
-std::shared_ptr<Shape> Shapes::CreateInstance(const std::shared_ptr<Shape> shape)
+std::shared_ptr<ShapeIF> Shapes::CreateInstance(const std::shared_ptr<ShapeIF> shape)
 {
-    return std::shared_ptr<Shape>(new LocalInstance(shape));
-}
-
-std::shared_ptr<Shape> Shapes::CreateInstance(const std::string &name)
-{
-    return std::shared_ptr<Shape>(new LocalInstance(Get(name)));
+    return std::shared_ptr<ShapeIF>(new LocalInstance(shape));
 }

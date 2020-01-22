@@ -27,7 +27,7 @@ material.o \
 shape.o \
 cylinder.o \
 invisibleshape.o \
-box.o \
+aabox.o \
 aabb.o \
 mesh.o \
 objparser.o \

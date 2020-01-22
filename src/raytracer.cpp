@@ -159,12 +159,12 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const Scene &scene, const
     {
         cosi = -cosi;
         n1 = scene.ambientIndex;
-        n2 = material.index;
+        n2 = material.Ni;
     }
     else              // inside surface
     {
         normal = -normal;
-        n1 = material.index;
+        n1 = material.Ni;
         n2 = scene.ambientIndex;
     }
 
@@ -506,7 +506,7 @@ Vector3 RayTracer::phongShading(const Ray &ray, const Scene &scene, const Inters
                 //specular
                 Vector3 toCamera = -ray.direction;
                 Vector3 reflected = reflect(-toLight, isec.normal);
-                Vector3 specular = material.ks * pow(std::max(0.0f, toCamera ^ reflected), material.m);
+                Vector3 specular = material.Ks * pow(std::max(0.0f, toCamera ^ reflected), material.Ns);
 
                 phitColor +=  (diffuse + specular) * vis;
             }

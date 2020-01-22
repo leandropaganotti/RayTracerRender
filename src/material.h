@@ -11,21 +11,15 @@
 
 class Material
 {
-    Material(std::string name);
-    std::string name;
-    static std::map<std::string, std::shared_ptr<Material>> MaterialList;
-
-    std::shared_ptr<Texture>  texture;
-
 public:
     enum class Type { DIFFUSE, SPECULAR, TRANSPARENT };
     Type type;
-    Vector3 kd;
+    Vector3 Kd;
     Vector3 E;
-    float ks;
-    float m;
+    float Ks;
+    float Ns;
     float R0;
-    float index;    
+    float Ni;
 
     const std::string& getName() const { return name;}
 
@@ -33,12 +27,19 @@ public:
     void setTexture(const std::shared_ptr<Texture> texture);
     void setTexture(const std::string &name);
 
-    static std::shared_ptr<Material> Create(std::string name="");
+    static std::shared_ptr<Material> Create(std::string name="", Type type=Type::DIFFUSE);
     static std::shared_ptr<Material> GetByName(const std::string &name);
 
     static const std::shared_ptr<Material> DiffuseWhite;
     static const std::shared_ptr<Material> Glass;
     static const std::shared_ptr<Material> Mirror;
+
+protected:
+    Material(std::string name, Type type=Type::DIFFUSE);
+    std::string name;
+    std::shared_ptr<Texture>  texture;
+
+    static std::map<std::string, std::shared_ptr<Material>> MaterialList;
 
 };
 

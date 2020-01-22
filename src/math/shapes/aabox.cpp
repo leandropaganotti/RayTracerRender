@@ -1,4 +1,4 @@
-#include "box.h"
+#include "aabox.h"
 #include "shapefactory.h"
 
 AABox::AABox(const Vector3 &min, const Vector3 &max): min(min), max(max)

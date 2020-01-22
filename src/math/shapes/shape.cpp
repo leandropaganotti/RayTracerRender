@@ -1,32 +1,32 @@
 #include "shape.h"
 #include "shapefactory.h"
 
-void Instance::setTransformation(const Matrix4 &transformation)
+void ShapeWraper::setTransformation(const Matrix4 &transformation)
 {
     shape->setTransformation(transformation);
 }
 
-bool Instance::intersection(const Ray &ray, IntersectionData &isec) const
+bool ShapeWraper::intersection(const Ray &ray, IntersectionData &isec) const
 {    
     return shape->intersection(ray, isec);
 }
 
-bool Instance::intersection(const Ray &ray, float &tnear) const
+bool ShapeWraper::intersection(const Ray &ray, float &tnear) const
 {
     return shape->intersection(ray, tnear);
 }
 
-Vector3 Instance::normal(const Vector3 &phit, size_t idx) const
+Vector3 ShapeWraper::normal(const Vector3 &phit, size_t idx) const
 {
     return shape->normal(phit, idx);
 }
 
-Vector2 Instance::uv(const Vector3 &phit, size_t idx) const
+Vector2 ShapeWraper::uv(const Vector3 &phit, size_t idx) const
 {
     return shape->uv(phit, idx);
 }
 
-Instance::Instance(std::shared_ptr<Shape> shape)
+ShapeWraper::ShapeWraper(std::shared_ptr<ShapeIF> shape)
 {
     this->shape = shape ? shape : Shapes::Invisible;
 }
@@ -69,7 +69,7 @@ Vector2 LocalInstance::uv(const Vector3 &phit, size_t idx) const
     return shape->uv(inverse * phit, idx);
 }
 
-LocalInstance::LocalInstance(std::shared_ptr<Shape> shape)
+LocalInstance::LocalInstance(std::shared_ptr<ShapeIF> shape)
 {
     this->shape = shape ? shape : Shapes::Invisible;
 }

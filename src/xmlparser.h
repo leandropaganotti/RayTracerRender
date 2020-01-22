@@ -8,7 +8,7 @@
 #include "scene.h"
 #include "sphere.h"
 #include "plane.h"
-#include "box.h"
+#include "aabox.h"
 #include "transformation.h"
 #include "objmodel.h"
 #include "object.h"
@@ -32,12 +32,12 @@ public:
     void parseDistantLight(xmlNode * xmlDistantLightNode, DistantLight & light);
 
     std::unique_ptr<Object> parseObject(xmlNode * xmlObjectNode);
-    std::shared_ptr<Shape>  parsePlane(xmlNode * xmlPlaneNode);
-    std::shared_ptr<Shape>  parseSphere(xmlNode * xmlSphereNode);
-    std::shared_ptr<Shape>  parseBox(xmlNode * xmlBoxNode);
-    std::shared_ptr<Shape>  parseCylinder(xmlNode * xmlCylinderNode);
-    std::shared_ptr<Shape>  parseEllipsoid(xmlNode * xmlEllipsoidNode);
-    std::shared_ptr<Shape>  parseMesh(xmlNode * xmlMeshNode);
+    std::shared_ptr<ShapeIF>  parsePlane(xmlNode * xmlPlaneNode);
+    std::shared_ptr<ShapeIF>  parseSphere(xmlNode * xmlSphereNode);
+    std::shared_ptr<ShapeIF>  parseBox(xmlNode * xmlBoxNode);
+    std::shared_ptr<ShapeIF>  parseCylinder(xmlNode * xmlCylinderNode);
+    std::shared_ptr<ShapeIF>  parseEllipsoid(xmlNode * xmlEllipsoidNode);
+    std::shared_ptr<ShapeIF>  parseMesh(xmlNode * xmlMeshNode);
 
 
     Matrix4 parseTransformation(xmlNode * xmlTrnasformationNode);

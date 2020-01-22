@@ -4,7 +4,7 @@
 #include "shape.h"
 #include "aabb.h"
 
-class Mesh: public Shape
+class Mesh: public ShapeIF
 {    
 public:
     struct Triangle

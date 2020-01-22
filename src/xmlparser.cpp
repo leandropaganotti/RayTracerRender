@@ -216,17 +216,17 @@ std::shared_ptr<Material> XMLParser::parseMaterial(xmlNode *xmlMaterialNode)
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "kd"))
-            material->kd = toVector(attr->children->content);
+            material->Kd = toVector(attr->children->content);
         else if (equals(attr->name, "E"))
             material->E = toVector(attr->children->content);
         else if (equals(attr->name, "ks"))
-            material->ks = toFloat(attr->children->content);
+            material->Ks = toFloat(attr->children->content);
         else if (equals(attr->name, "m"))
-            material->m = toFloat(attr->children->content);
+            material->Ns = toFloat(attr->children->content);
         else if (equals(attr->name, "R0"))
             material->R0 = toFloat(attr->children->content);
         else if (equals(attr->name, "index"))
-            material->index = toFloat(attr->children->content);
+            material->Ni = toFloat(attr->children->content);
 		else if (equals(attr->name, "type"))
 		{
 			if (equals(attr->children->content, "DIFFUSE"))
@@ -342,7 +342,7 @@ std::unique_ptr<Object> XMLParser::parseObject(xmlNode *xmlObjectNode)
     object->setMaterial( material ? (const char*)material : "");
     xmlFree(material);
 
-    std::shared_ptr<Shape> shape;
+    std::shared_ptr<ShapeIF> shape;
     if (equals(xmlObjectNode->name, "plane"))
         shape = parsePlane(xmlObjectNode);
     else if (equals(xmlObjectNode->name, "sphere"))
@@ -377,7 +377,7 @@ std::unique_ptr<Object> XMLParser::parseObject(xmlNode *xmlObjectNode)
     return object;
 }
 
-std::shared_ptr<Shape> XMLParser::parsePlane(xmlNode *xmlPlaneNode)
+std::shared_ptr<ShapeIF> XMLParser::parsePlane(xmlNode *xmlPlaneNode)
 {
     if(xmlPlaneNode == NULL)
     {
@@ -406,7 +406,7 @@ std::shared_ptr<Shape> XMLParser::parsePlane(xmlNode *xmlPlaneNode)
     return plane;
 }
 
-std::shared_ptr<Shape>  XMLParser::parseSphere(xmlNode * xmlSphereNode)
+std::shared_ptr<ShapeIF>  XMLParser::parseSphere(xmlNode * xmlSphereNode)
 {
     if(xmlSphereNode == NULL)
     {
@@ -484,7 +484,7 @@ std::shared_ptr<Texture> XMLParser::parseTexture(xmlNode *xmlTextureNode)
     return tex;
 }
 
-std::shared_ptr<Shape> XMLParser::parseBox(xmlNode *xmlBoxNode)
+std::shared_ptr<ShapeIF> XMLParser::parseBox(xmlNode *xmlBoxNode)
 {
     if(xmlBoxNode == NULL)
     {
@@ -509,7 +509,7 @@ std::shared_ptr<Shape> XMLParser::parseBox(xmlNode *xmlBoxNode)
     return box;
 }
 
-std::shared_ptr<Shape> XMLParser::parseCylinder(xmlNode *xmlCylinderNode)
+std::shared_ptr<ShapeIF> XMLParser::parseCylinder(xmlNode *xmlCylinderNode)
 {
     if(xmlCylinderNode == NULL)
     {
@@ -534,7 +534,7 @@ std::shared_ptr<Shape> XMLParser::parseCylinder(xmlNode *xmlCylinderNode)
     return cylinder;
 }
 
-std::shared_ptr<Shape> XMLParser::parseEllipsoid(xmlNode *xmlEllipsoidNode)
+std::shared_ptr<ShapeIF> XMLParser::parseEllipsoid(xmlNode *xmlEllipsoidNode)
 {
     if(xmlEllipsoidNode == NULL)
     {
@@ -559,7 +559,7 @@ std::shared_ptr<Shape> XMLParser::parseEllipsoid(xmlNode *xmlEllipsoidNode)
     return ellipsoid;
 }
 
-std::shared_ptr<Shape> XMLParser::parseMesh(xmlNode *xmlMeshNode)
+std::shared_ptr<ShapeIF> XMLParser::parseMesh(xmlNode *xmlMeshNode)
 {
     if(xmlMeshNode == NULL)
     {
