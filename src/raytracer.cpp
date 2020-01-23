@@ -39,13 +39,14 @@ void RayTracer::render(const Scene& scene)
             buffer.at(i, j) = 0;
             for (size_t ii=0; ii < grid; ++ii)
             {
+                unsigned short Xi[3]={0,0,(short unsigned int)(ii)};
                 for (size_t jj=0; jj < grid; ++jj)
                 {
                     for (size_t n = 0; n < nrays_persubpixel; ++n)
-                    {
-                        float r1 = dis(gen) * gridSize;
-                        float r2 = dis(gen) * gridSize;
-                        Ray ray(camera.getPosition(), rayDirection(i + gridSize*ii + r1, j + gridSize*jj + r2));
+                    {                        
+                        const float x = i + gridSize * (ii + erand48(Xi));
+                        const float y = j + gridSize * (jj + erand48(Xi));
+                        Ray ray(camera.getPosition(), rayDirection(x, y));
                         buffer.at(i, j) += tracer(ray, scene, 1, 1.0f);
                     }
                 }
@@ -306,7 +307,7 @@ Vector3 RayTracer::rayTracer(const Ray &ray, const Scene &scene, const uint8_t d
     {
         float kr = schlick(-ray.direction, isec.normal, isec.object->getMaterial()->R0);
         float kt = 1.0f - kr;
-        Vector3 diffused(0), reflected(0);        
+        Vector3 diffused(0), reflected(0);
         if (kr > 0.0001)
         {
             Ray r;
@@ -328,7 +329,7 @@ Vector3 RayTracer::rayTracer(const Ray &ray, const Scene &scene, const uint8_t d
 
 inline
 Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t depth, const float)
-{    
+{
     if(depth > scene.maxDepth) return Color::BLACK;
 
     IntersectionData isec;
@@ -360,7 +361,7 @@ Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t 
         Ray r;
         r.origin = isec.phit + bias * isec.normal;
         r.direction = randomUnitVectorInHemisphereOf(isec.normal);
-        float cosTheta = isec.normal ^ r.direction;        
+        float cosTheta = isec.normal ^ r.direction;
         return material->E + isec.object->color(isec) * pathTracer(r, scene, depth+1) * cosTheta * 2.0f;
     }
     else if (type == Material::Type::SPECULAR)
@@ -382,7 +383,7 @@ Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t 
             r.direction = randomUnitVectorInHemisphereOf(isec.normal);
             float cosTheta = isec.normal ^ r.direction;
             diffused = material->E + isec.object->color(isec) * pathTracer(r, scene, depth+1) * cosTheta * 2.0f;
-        }        
+        }
 
         return kt*diffused + kr*reflected;
     }
