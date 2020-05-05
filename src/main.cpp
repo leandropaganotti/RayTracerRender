@@ -5,7 +5,8 @@
 #include <cstring>
 #include <sstream>
 #include "raytracer.h"
-
+#include "transformation.h"
+#include "shapefactory.h"
 using namespace std;
 
 char	    *xmlscene = NULL;	// xml file with scene description
@@ -29,7 +30,7 @@ int main(int argc, char **argv)
 
     Scene scene(xmlscene);
 
-    cout << scene << endl;
+    cout << (int)scene.objects[0]->getMaterial()->type << endl;
 
     RayTracer raytracer;
     Camera &camera = raytracer.getCamera();

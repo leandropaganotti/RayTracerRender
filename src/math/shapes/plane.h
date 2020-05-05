@@ -2,7 +2,7 @@
 
 #include "shape.h"
 
-class Plane: public ShapeIF
+class Plane: public ShapeWithMaterial
 {
 public:               
     bool intersection(const Ray& ray, IntersectionData& isec) const;

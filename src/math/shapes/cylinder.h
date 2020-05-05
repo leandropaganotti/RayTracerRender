@@ -2,7 +2,7 @@
 
 #include "shape.h"
 
-class UnitYCylinder: public ShapeIF
+class UnitYCylinder: public ShapeWithMaterial
 {    
     // IntersectionIF interface
 public:

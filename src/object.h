@@ -14,15 +14,15 @@ typedef std::vector<std::unique_ptr<Object>> ObjectVector;
 class Object: public ShapeWraper
 {
 public:    
-    Object(std::shared_ptr<ShapeIF> shape=nullptr, std::shared_ptr<Material> material=nullptr)
+    Object(std::shared_ptr<Shape> shape=nullptr, std::shared_ptr<Material> material=nullptr)
     {
         setShape(shape);
         setMaterial(material);        
     }
     Vector3 color(const IntersectionData& isec) const;
 
-    void setShape(std::shared_ptr<ShapeIF> shape) { this->shape = shape? shape : Shapes::Invisible;}
-    const ShapeIF * getShape() const { return shape.get(); }
+    void setShape(std::shared_ptr<Shape> shape) { this->shape = shape? shape : Shapes::Invisible;}
+    const Shape * getShape() const { return shape.get(); }
 
     const Material * getMaterial() const { return material.get(); }
     void setMaterial(const std::string &name);

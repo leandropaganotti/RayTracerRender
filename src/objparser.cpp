@@ -4,7 +4,6 @@
 #include "utils.h"
 #include <sstream>
 #include "mesh.h"
-#include "shapefactory.h"
 
 void OBJParser::ParseMesh(const std::string &path, std::shared_ptr<Mesh> &mesh)
 {    

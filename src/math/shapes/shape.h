@@ -1,65 +1,56 @@
 #pragma once
 
 #include <memory>
+#include "vector.h"
 #include "intersection.h"
-#include "transformation.h"
+#include "matrix.h"
+#include "ray.h"
+#include "material.h"
 
-class ShapeIF: public IntersectionIF, public TransformationIF
+class Shape
 {
 public:
+    virtual bool intersection(const Ray &ray, IntersectionData &isec) const = 0;
+    virtual bool intersection(const Ray &ray, float &tnear) const = 0;
     virtual Vector3 normal(const Vector3 &phit, size_t idx) const = 0;
     virtual Vector2 uv(const Vector3 &phit, size_t idx) const = 0;
+    virtual const Material* material(const Vector3 &phit, size_t idx) const = 0;
 
-protected:
-    ShapeIF() = default;
-    virtual ~ShapeIF() = default;
+    virtual void setTransformation(const Matrix4 &);
+
+    Shape() = default;
+    virtual ~Shape() = default;
 };
 
-class ShapeWraper: public ShapeIF {
-    // IntersectionIF interface
-public:
-    virtual bool intersection(const Ray &ray, IntersectionData &isec) const override;
-    virtual bool intersection(const Ray &ray, float &tnear) const override;
-
-    // Shape interface
-public:
-    virtual Vector3 normal(const Vector3 &phit, size_t idx) const override;
-    virtual Vector2 uv(const Vector3 &phit, size_t idx) const override;
-
-    // TransformationIF interface
-public:
-    virtual void setTransformation(const Matrix4 &transformation) override;
-
-protected:
-    ShapeWraper(std::shared_ptr<ShapeIF> shape=nullptr);
-    virtual ~ShapeWraper() = default;
-
-    std::shared_ptr<ShapeIF> shape;
-};
-
-class LocalInstance: public ShapeIF
+class ShapeWithMaterial: public Shape
 {
 public:
-    virtual ~LocalInstance() = default;
+    const Material* material(const Vector3 &, size_t) const override;
 
-    // IntersectionIF interface
+    void setMaterial(const std::shared_ptr<Material> &value);
+    std::shared_ptr<Material> getMaterial() const;
+protected:
+    ShapeWithMaterial();
+    virtual ~ShapeWithMaterial() override;
+    std::shared_ptr<Material> mat;
+};
+
+class Instance: public ShapeWithMaterial
+{
 public:
+    virtual ~Instance() override = default;
     virtual bool intersection(const Ray &ray, IntersectionData &isec) const override;
     virtual bool intersection(const Ray &ray, float &tnear) const override;
-
-    // Shape interface
-public:
     virtual Vector3 normal(const Vector3 &phit, size_t idx) const override;
     virtual Vector2 uv(const Vector3 &phit, size_t idx) const override;
+    const Material *material(const Vector3 &phit, size_t idx) const override;
 
-    // TransformationIF interface
-public:
     virtual void setTransformation(const Matrix4 &transformation) override;
 
 protected:
-    LocalInstance(std::shared_ptr<ShapeIF> shape=nullptr);
+    Instance(std::shared_ptr<Shape> shape=nullptr);
 
-    std::shared_ptr<ShapeIF> shape;
+    std::shared_ptr<Shape> shape;
 
     Matrix4 model;              // object-to-world
     Matrix4 inverse;            // world-to-object

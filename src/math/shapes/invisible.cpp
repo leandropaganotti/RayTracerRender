@@ -1,4 +1,4 @@
-#include "invisibleshape.h"
+#include "invisible.h"
 
 bool InvisibleShape::intersection(const Ray &, IntersectionData &) const
 {

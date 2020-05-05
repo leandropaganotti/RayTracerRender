@@ -50,7 +50,7 @@ void Mesh::updateAABB()
 bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
 {
     float t;
-    if (!aabb.intersection(ray, t))
+    if (!aabb.intersection(ray))
         return false;
 
     isec.tnear = FLT_MAX;
@@ -71,7 +71,7 @@ bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
 bool Mesh::intersection(const Ray& ray, float &tnear) const
 {
     float t;
-    if (!aabb.intersection(ray, t))
+    if (!aabb.intersection(ray))
         return false;
 
     tnear = FLT_MAX;

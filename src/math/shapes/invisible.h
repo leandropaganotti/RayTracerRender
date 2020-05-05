@@ -2,7 +2,7 @@
 
 #include "shape.h"
 
-class InvisibleShape: public ShapeIF
+class InvisibleShape: public ShapeWithMaterial
 {
     // IntersectionIF interface
 public:

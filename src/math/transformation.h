@@ -3,18 +3,6 @@
 #include "vector.h"
 #include "matrix.h"
 
-class TransformationIF
-{    
-public:
-    TransformationIF() = default;
-    virtual ~TransformationIF() = default;
-
-    virtual void setTransformation(const Matrix4 &)
-    {
-        std::cout << "Not Implemented yet";
-    }
-};
-
 class Transformation {
 
 public:

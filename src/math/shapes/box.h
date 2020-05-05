@@ -5,7 +5,7 @@
 /*
  * Axis-Aligned Box
 */
-class AABox: public ShapeIF
+class AABox: public ShapeWithMaterial
 {
     // IntersectionIF interface
 public:

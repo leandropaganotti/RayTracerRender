@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include "objmodel.h"
 #include "mesh.h"
 
 class OBJParser

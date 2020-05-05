@@ -1,37 +1,30 @@
 #include "shape.h"
-#include "shapefactory.h"
 
-void ShapeWraper::setTransformation(const Matrix4 &transformation)
+void Shape::setTransformation(const Matrix4 &)
 {
-    shape->setTransformation(transformation);
+    std::cout << "setTransformation not implemented" << std::endl;
 }
 
-bool ShapeWraper::intersection(const Ray &ray, IntersectionData &isec) const
-{    
-    return shape->intersection(ray, isec);
-}
+ShapeWithMaterial::ShapeWithMaterial(): mat(Material::DiffuseWhite){}
 
-bool ShapeWraper::intersection(const Ray &ray, float &tnear) const
+ShapeWithMaterial::~ShapeWithMaterial(){}
+
+std::shared_ptr<Material> ShapeWithMaterial::getMaterial() const
 {
-    return shape->intersection(ray, tnear);
+    return mat;
 }
 
-Vector3 ShapeWraper::normal(const Vector3 &phit, size_t idx) const
+void ShapeWithMaterial::setMaterial(const std::shared_ptr<Material> &value)
 {
-    return shape->normal(phit, idx);
+    mat = value ? value : Material::DiffuseWhite;
 }
 
-Vector2 ShapeWraper::uv(const Vector3 &phit, size_t idx) const
+const Material *ShapeWithMaterial::material(const Vector3 &, size_t) const
 {
-    return shape->uv(phit, idx);
+    return mat.get();
 }
 
-ShapeWraper::ShapeWraper(std::shared_ptr<ShapeIF> shape)
-{
-    this->shape = shape ? shape : Shapes::Invisible;
-}
-
-bool LocalInstance::intersection(const Ray &ray, IntersectionData &isec) const
+bool Instance::intersection(const Ray &ray, IntersectionData &isec) const
 {
     Ray r = inverse * ray;
     if (shape->intersection(r, isec))
@@ -45,7 +38,7 @@ bool LocalInstance::intersection(const Ray &ray, IntersectionData &isec) const
         return false;
 }
 
-bool LocalInstance::intersection(const Ray &ray, float &tnear) const
+bool Instance::intersection(const Ray &ray, float &tnear) const
 {
     Ray r = inverse * ray;
     if (shape->intersection(r, tnear))
@@ -59,24 +52,29 @@ bool LocalInstance::intersection(const Ray &ray, float &tnear) const
         return false;
 }
 
-Vector3 LocalInstance::normal(const Vector3 &phit, size_t idx) const
+Vector3 Instance::normal(const Vector3 &phit, size_t idx) const
 {
     return (inverseTranspose * shape->normal(inverse * phit, idx)).normalize();
 }
 
-Vector2 LocalInstance::uv(const Vector3 &phit, size_t idx) const
+Vector2 Instance::uv(const Vector3 &phit, size_t idx) const
 {
     return shape->uv(inverse * phit, idx);
 }
 
-LocalInstance::LocalInstance(std::shared_ptr<ShapeIF> shape)
+Instance::Instance(std::shared_ptr<Shape> shape)
 {
-    this->shape = shape ? shape : Shapes::Invisible;
+    this->shape = shape;
 }
 
-void LocalInstance::setTransformation(const Matrix4 &transformation)
+void Instance::setTransformation(const Matrix4 &transformation)
 {        
     model = transformation;
     inverse = model.getInverse();
     inverseTranspose = inverse.getTranspose();
+}
+
+const Material *Instance::material(const Vector3 &phit, size_t idx) const
+{
+    return shape->material(phit, idx);
 }

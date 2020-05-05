@@ -24,13 +24,13 @@ cameraoptions.o \
 material.o \
 shape.o \
 cylinder.o \
-invisibleshape.o \
-aabox.o \
+invisible.o \
+box.o \
 aabb.o \
 mesh.o \
-objparser.o \
 shapefactory.o \
-xmlparser.o 
+xmlparser.o \
+objparser.o \
 
 
 CObjects=$(addprefix $(OBJDIR)/,$(OBJECTS))

@@ -1,14 +1,17 @@
 #pragma once
-
-#include <algorithm>
-#include "aabox.h"
 #include <vector>
+#include "vector.h"
+#include "ray.h"
 
-class AABB: public AABox
+class AABB
 {
 public:    
     AABB(const Vector3 &min={0.0f}, const Vector3 &max={0.0f});
 
-    Vector3 getCenter();
     void create(const std::vector<Vector3>& vertices);
+    bool intersection(const Ray &ray) const;
+    Vector3 getCenter();
+protected:
+    Vector3 min;
+    Vector3 max;
 };

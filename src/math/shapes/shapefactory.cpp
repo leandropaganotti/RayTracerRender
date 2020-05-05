@@ -1,65 +1,47 @@
 #include "shapefactory.h"
 
-List<ShapeIF> Shapes::ListOfNamedShapes;
+//const std::shared_ptr<ShapeIF> Shapes::Invisible  = std::shared_ptr<ShapeIF> (new InvisibleShape);
+const std::shared_ptr<Shape> Shapes::UnitSphere = std::shared_ptr<Shape> (new Sphere);
+const std::shared_ptr<Shape> Shapes::UnitBox    = std::shared_ptr<Shape> (new AABox);
+const std::shared_ptr<Shape> Shapes::UnitCylinder    = std::shared_ptr<Shape> (new UnitYCylinder);
 
-const std::shared_ptr<ShapeIF> Shapes::Invisible  = std::shared_ptr<ShapeIF> (new InvisibleShape);
-const std::shared_ptr<ShapeIF> Shapes::UnitSphere = std::shared_ptr<ShapeIF> (new Sphere);
-const std::shared_ptr<ShapeIF> Shapes::UnitBox    = std::shared_ptr<ShapeIF> (new AABox);
-const std::shared_ptr<ShapeIF> Shapes::UnitCylinder    = std::shared_ptr<ShapeIF> (new UnitYCylinder);
 
-std::shared_ptr<ShapeIF> Shapes::Get(const std::string &name)
+std::shared_ptr<Sphere> Shapes::CreateSphere(const Vector3 &center, const float &radius)
 {
-    return Shapes::ListOfNamedShapes.get(name);
+    return std::shared_ptr<Sphere>(new Sphere(center, radius));
 }
 
-std::shared_ptr<Sphere> Shapes::CreateSphere(const Vector3 &center, const float &radius, const std::string &name)
+std::shared_ptr<Plane> Shapes::CreatePlane(const Vector3 &O, const Vector3 &N)
 {
-    std::shared_ptr<Sphere> sphere = std::shared_ptr<Sphere>(new Sphere(center, radius));
-    if (name != "")
-        ListOfNamedShapes.add(sphere, name);
-    return sphere;
+    return std::shared_ptr<Plane>(new Plane(O, N));
 }
 
-std::shared_ptr<Plane> Shapes::CreatePlane(const Vector3 &O, const Vector3 &N,const std::string &name)
+std::shared_ptr<AABox> Shapes::CreateAABox(const Vector3 &min, const Vector3 &max)
 {
-    std::shared_ptr<Plane> plane = std::shared_ptr<Plane>(new Plane(O, N));
-    if (name != "")
-        ListOfNamedShapes.add(plane, name);
-    return plane;
+    return std::shared_ptr<AABox>(new AABox(min, max));
 }
 
-std::shared_ptr<AABox> Shapes::CreateAABox(const Vector3 &min, const Vector3 &max, const std::string &name)
+std::shared_ptr<Mesh> Shapes::CreateMesh()
 {
-    std::shared_ptr<AABox> aabox = std::shared_ptr<AABox>(new AABox(min, max));
-    if (name != "")
-        ListOfNamedShapes.add(aabox, name);
-    return aabox;
+    return std::shared_ptr<Mesh>(new Mesh());
 }
 
-std::shared_ptr<Mesh> Shapes::CreateMesh(const std::string &name)
-{
-    std::shared_ptr<Mesh> mesh = std::shared_ptr<Mesh>(new Mesh());
-    if (name != "")
-        ListOfNamedShapes.add(mesh, name);
-    return mesh;
-}
-
-std::shared_ptr<ShapeIF> Shapes::CreateEllipsoid()
+std::shared_ptr<Instance> Shapes::CreateEllipsoid()
 {
     return CreateInstance(UnitSphere);
 }
 
-std::shared_ptr<ShapeIF> Shapes::CreateBox()
+std::shared_ptr<Instance> Shapes::CreateBox()
 {
     return CreateInstance(UnitBox);
 }
 
-std::shared_ptr<ShapeIF> Shapes::CreateCylinder()
+std::shared_ptr<Instance> Shapes::CreateCylinder()
 {
     return CreateInstance(UnitCylinder);
 }
 
-std::shared_ptr<ShapeIF> Shapes::CreateInstance(const std::shared_ptr<ShapeIF> shape)
+std::shared_ptr<Instance> Shapes::CreateInstance(const std::shared_ptr<Shape> shape)
 {
-    return std::shared_ptr<ShapeIF>(new LocalInstance(shape));
+    return std::shared_ptr<Instance>(new Instance(shape));
 }

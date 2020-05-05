@@ -3,7 +3,7 @@
 #include "shape.h"
 #include "utils.h"
 
-class Sphere: public ShapeIF
+class Sphere: public ShapeWithMaterial
 {    
 public:        
     bool  intersection(const Ray &ray, IntersectionData &isec) const;

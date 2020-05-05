@@ -3,10 +3,12 @@
 
 #include <string>
 #include <vector>
-#include "object.h"
 #include "light.h"
 #include "consts.h"
 #include "cameraoptions.h"
+#include "shape.h"
+
+typedef std::vector<std::shared_ptr<ShapeWithMaterial>> ObjectVector;
 
 class Scene
 {
@@ -14,10 +16,9 @@ public:
     Scene();
     Scene(const std::string &fileName);
 
-    void addObject(Object * obj);
     void addLight(Light * light);
 
-    void addObject(std::unique_ptr<Object> obj);
+    void addObject(std::shared_ptr<ShapeWithMaterial> obj);
 
     void load(const std::string &fileName);
 

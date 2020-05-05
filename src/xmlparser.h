@@ -1,20 +1,10 @@
-#ifndef XMLPARSER_H
-#define XMLPARSER_H
+#pragma once
 
-#include <string.h>
-#include <iostream>
+#include <memory>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include "scene.h"
-#include "sphere.h"
-#include "plane.h"
-#include "aabox.h"
-#include "transformation.h"
-#include "objmodel.h"
-#include "object.h"
-#include <memory>
-
-using namespace std;
+#include "math/shapes/shapefactory.h"
 
 class XMLParser
 {
@@ -31,13 +21,13 @@ public:
 
     void parseDistantLight(xmlNode * xmlDistantLightNode, DistantLight & light);
 
-    std::unique_ptr<Object> parseObject(xmlNode * xmlObjectNode);
-    std::shared_ptr<ShapeIF>  parsePlane(xmlNode * xmlPlaneNode);
-    std::shared_ptr<ShapeIF>  parseSphere(xmlNode * xmlSphereNode);
-    std::shared_ptr<ShapeIF>  parseBox(xmlNode * xmlBoxNode);
-    std::shared_ptr<ShapeIF>  parseCylinder(xmlNode * xmlCylinderNode);
-    std::shared_ptr<ShapeIF>  parseEllipsoid(xmlNode * xmlEllipsoidNode);
-    std::shared_ptr<ShapeIF>  parseMesh(xmlNode * xmlMeshNode);
+    std::shared_ptr<ShapeWithMaterial>  parseShape(xmlNode * xmlObjectNode);
+    std::shared_ptr<ShapeWithMaterial>  parsePlane(xmlNode * xmlPlaneNode);
+    std::shared_ptr<ShapeWithMaterial>  parseSphere(xmlNode * xmlSphereNode);
+    std::shared_ptr<ShapeWithMaterial>  parseBox(xmlNode * xmlBoxNode);
+    std::shared_ptr<ShapeWithMaterial>  parseCylinder(xmlNode * xmlCylinderNode);
+    std::shared_ptr<ShapeWithMaterial>  parseEllipsoid(xmlNode * xmlEllipsoidNode);
+    std::shared_ptr<ShapeWithMaterial>  parseMesh(xmlNode * xmlMeshNode);
 
 
     Matrix4 parseTransformation(xmlNode * xmlTrnasformationNode);
@@ -54,4 +44,3 @@ private:
     int      toInt(const xmlChar *str);
 };
 
-#endif // XMLPARSER_H

@@ -2,23 +2,17 @@
 
 #include "vector.h"
 
-class Object;
+class Shape;
 class Ray;
+class Material;
 
 struct IntersectionData
 {
     float tnear;
     size_t idx;
-    const Object * object;
+    const Shape * shape;
     Vector3 phit;
     Vector3 normal;
-};
-
-class IntersectionIF
-{
-public:
-	IntersectionIF() = default;
-    virtual ~IntersectionIF() = default;
-    virtual bool intersection(const Ray& ray, IntersectionData &isec) const = 0;
-    virtual bool intersection(const Ray& ray, float &tnear) const = 0;    
+    const Material *material;
+    Vector2 uv;
 };

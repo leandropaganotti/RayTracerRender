@@ -1,7 +1,8 @@
 Makefile
-src/math/shapes/aabox.h
-src/math/shapes/invisibleshape.cpp
-src/math/shapes/invisibleshape.h
+src/math/shapes/box.cpp
+src/math/shapes/box.h
+src/math/shapes/invisible.cpp
+src/math/shapes/invisible.h
 src/math/shapes/plane.cpp
 src/math/shapes/plane.h
 src/math/shapes/shape.cpp
@@ -47,7 +48,6 @@ src/texture.cpp
 src/texture.h
 src/xmlparser.cpp
 src/xmlparser.h
-src/math/shapes/aabox.cpp
 src/math/shapes/box.h
 src/math/shapes/invisibleshape.cpp
 src/math/shapes/invisibleshape.h
