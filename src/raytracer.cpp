@@ -412,12 +412,9 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const Scene& scene, const uint8_t
         Vector3 direct(0);
         for(auto &obj : scene.objects)
         {
-            if (obj->material({}, 0)->E  == Vector::ZERO) continue; // skip non light
-
-
             const Sphere * const sphere = dynamic_cast<const Sphere*const>(obj.get());
-
             if (!sphere) continue; // only supported sphere for direct light
+            if (sphere->getMaterial()->E  == Vector::ZERO) continue; // skip non light
 
             Vector3 sampleToLight;
             float _1_pdf;
