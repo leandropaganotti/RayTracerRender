@@ -1,10 +1,10 @@
 #include "invisible.h"
 
-bool InvisibleShape::intersection(const Ray &, IntersectionData &) const
+bool InvisibleShape::intersection(const Ray &, float, IntersectionData &) const
 {
     return false;
 }
-bool InvisibleShape::intersection(const Ray &, float &) const
+bool InvisibleShape::intersection(const Ray &, float) const
 {
     return false;
 }
@@ -16,4 +16,6 @@ Vector2 InvisibleShape::uv(const Vector3 &, size_t) const
 {
     return Vector2 (0,0);
 }
-
+void InvisibleShape::fetch(const Ray &, IntersectionData &) const
+{
+}

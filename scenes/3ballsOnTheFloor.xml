@@ -12,7 +12,8 @@
         <material type="specular" kd="0,0,1" ks="0" m="350" R0="0.8" ></material>
     </Sphere>
     <Plane name="floor" point="0" normal="0,1,0" >
-        <material type="specular" kd="1" ks="1" m="250" R0="0.3"></material>
-        <texture name="chessBoard" rows="1" cols="1" color1="1" color2="0" angle="0"></texture>
+        <material type="specular" kd="1" ks="1" m="250" R0="0.3">
+            <texture type="ChessBoard" rows="1" cols="1" color1="1" color2="0" angle="0"></texture>
+        </material>
     </Plane>
 </scene>

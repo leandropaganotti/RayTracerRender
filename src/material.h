@@ -20,14 +20,12 @@ public:
     float Ns;
     float R0;
     float Ni;
+    std::shared_ptr<Texture>  texture;
 
     const std::string& getName() const { return name;}
 
-    const Texture * getTexture() const;
-    void setTexture(const std::shared_ptr<Texture> texture);
-    void setTexture(const std::string &name);
 
-    static std::shared_ptr<Material> Create(std::string name="", Type type=Type::DIFFUSE);
+    static std::shared_ptr<Material> Create(std::string name, Type type);
     static std::shared_ptr<Material> GetByName(const std::string &name);
 
     static const std::shared_ptr<Material> DiffuseWhite;
@@ -35,10 +33,8 @@ public:
     static const std::shared_ptr<Material> Mirror;
 
 protected:
-    Material(std::string name, Type type=Type::DIFFUSE);
+    Material(std::string name, Type type);
     std::string name;
-    std::shared_ptr<Texture>  texture;
-
     static std::map<std::string, std::shared_ptr<Material>> MaterialList;
 
 };

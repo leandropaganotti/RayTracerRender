@@ -1,4 +1,6 @@
 #include "shape.h"
+#include "shapefactory.h"
+#include <float.h>
 
 void Shape::setTransformation(const Matrix4 &)
 {
@@ -23,33 +25,31 @@ const Material *ShapeWithMaterial::material(const Vector3 &, size_t) const
 {
     return mat.get();
 }
-
-bool Instance::intersection(const Ray &ray, IntersectionData &isec) const
+inline
+bool Instance::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
 {
-    Ray r = inverse * ray;
-    if (shape->intersection(r, isec))
+    Ray ray_local = inverse * ray;
+    IntersectionData isec_local;
+    if (shape->intersection(ray_local, FLT_MAX, isec_local))
     {
-        Vector3 phit = r.origin + isec.tnear * r.direction;
-        phit = model * phit;
-        isec.tnear = (phit - ray.origin).length();
-        return true;
+        Vector3 phit_local = ray_local.origin + isec_local.tnear * ray_local.direction;
+        Vector3 phit = model * phit_local;
+        float tnear = (phit - ray.origin).length();
+        if(tnear < tmax)
+        {
+            isec.idx = isec_local.idx;
+            isec.tnear = tnear;
+            isec.phit = phit;
+            return true;
+        }
     }
-    else
-        return false;
+    return false;
 }
 
-bool Instance::intersection(const Ray &ray, float &tnear) const
+bool Instance::intersection(const Ray &ray, float tmax) const
 {
-    Ray r = inverse * ray;
-    if (shape->intersection(r, tnear))
-    {
-        Vector3 phit = r.origin + tnear * r.direction;
-        phit = model * phit;
-        tnear = (phit - ray.origin).length();
-        return true;
-    }
-    else
-        return false;
+    IntersectionData isec;
+    return intersection(ray, tmax, isec);
 }
 
 Vector3 Instance::normal(const Vector3 &phit, size_t idx) const
@@ -64,7 +64,7 @@ Vector2 Instance::uv(const Vector3 &phit, size_t idx) const
 
 Instance::Instance(std::shared_ptr<Shape> shape)
 {
-    this->shape = shape;
+    this->shape = shape ? shape : Shapes::Invisible;
 }
 
 void Instance::setTransformation(const Matrix4 &transformation)
@@ -77,4 +77,21 @@ void Instance::setTransformation(const Matrix4 &transformation)
 const Material *Instance::material(const Vector3 &phit, size_t idx) const
 {
     return shape->material(phit, idx);
+}
+
+void Instance::fetch(const Ray &, IntersectionData &isec) const
+{
+    Vector3 phit = inverse * isec.phit;
+
+    isec.material = mat.get();
+    if(mat->texture)
+    {
+        isec.uv = shape->uv(phit, isec.idx);
+        isec.color = mat->texture->get(isec.uv) * mat->Kd;
+    }
+    else
+        isec.color = mat->Kd;
+
+   isec.normal = (inverseTranspose * shape->normal(phit, isec.idx)).normalize();
+
 }

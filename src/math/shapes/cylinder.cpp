@@ -7,7 +7,7 @@ UnitYCylinder::UnitYCylinder()
 
 }
 
-bool UnitYCylinder::intersection(const Ray &ray, IntersectionData &isec) const
+bool UnitYCylinder::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
 {
     float a = ray.direction.x*ray.direction.x + ray.direction.z*ray.direction.z;
     float b = 2.0f*ray.direction.x*ray.origin.x + 2.0f*ray.direction.z*ray.origin.z;
@@ -27,8 +27,9 @@ bool UnitYCylinder::intersection(const Ray &ray, IntersectionData &isec) const
         else
         {
             // hit the cap
-            isec.tnear = t0 + (t1-t0) * (y0+1) / (y0-y1);
-            if (isec.tnear<=0) return false;
+            const float tval = t0 + (t1-t0) * (y0+1) / (y0-y1);
+            if (tval<=0 || tval > tmax) return false;
+            isec.tnear = tval;
             isec.idx=0;
             return true;
         }
@@ -36,7 +37,7 @@ bool UnitYCylinder::intersection(const Ray &ray, IntersectionData &isec) const
     else if (y0>=0 && y0<=1)
     {
         // hit the cylinder bit
-        if (t0<=0) return false;
+        if (t0<=0 || t0 > tmax) return false;
         isec.tnear=t0;
         isec.idx=1;
         return true;
@@ -48,8 +49,9 @@ bool UnitYCylinder::intersection(const Ray &ray, IntersectionData &isec) const
         else
         {
             // hit the cap
-            isec.tnear = t0 + (t1-t0) * (y0-1) / (y0-y1);
-            if (isec.tnear<=0) return false;
+            const float tval = t0 + (t1-t0) * (y0-1) / (y0-y1);
+            if (tval<=0 || tval > tmax) return false;
+            isec.tnear = tval;
             isec.idx=2;
             return true;
         }
@@ -58,7 +60,7 @@ bool UnitYCylinder::intersection(const Ray &ray, IntersectionData &isec) const
     return false;
 }
 
-bool UnitYCylinder::intersection(const Ray &ray, float &tnear) const
+bool UnitYCylinder::intersection(const Ray &ray, float tmax) const
 {
     /*
      * x2 + y2 = 1
@@ -87,16 +89,15 @@ bool UnitYCylinder::intersection(const Ray &ray, float &tnear) const
         else
         {
             // hit the cap
-            tnear = t0 + (t1-t0) * (y0+1) / (y0-y1);
-            if (tnear<=0) return false;
+            const float tval = t0 + (t1-t0) * (y0+1) / (y0-y1);
+            if (tval<=0 || tval > tmax) return false;
             return true;
         }
     }
     else if (y0>=0 && y0<=1)
     {
         // hit the cylinder bit
-        if (t0<=0) return false;
-        tnear=t0;
+        if (t0<=0 || t0 > tmax) return false;
         return true;
     }
     else if (y0>1)
@@ -106,8 +107,8 @@ bool UnitYCylinder::intersection(const Ray &ray, float &tnear) const
         else
         {
             // hit the cap
-            tnear = t0 + (t1-t0) * (y0-1) / (y0-y1);
-            if (tnear<=0) return false;
+            const float tval = t0 + (t1-t0) * (y0-1) / (y0-y1);
+            if (tval<=0 || tval > tmax) return false;
             return true;
         }
     }
@@ -115,6 +116,7 @@ bool UnitYCylinder::intersection(const Ray &ray, float &tnear) const
     return false;
 }
 
+inline
 Vector3 UnitYCylinder::normal(const Vector3 &phit, size_t idx) const
 {    
     if(idx==0)
@@ -134,4 +136,14 @@ Vector3 UnitYCylinder::normal(const Vector3 &phit, size_t idx) const
 Vector2 UnitYCylinder::uv(const Vector3 &, size_t) const
 {
     return Vector2(0.0f, 0.0f);
+}
+
+
+void UnitYCylinder::fetch(const Ray &ray, IntersectionData &isec) const
+{
+    isec.phit = ray.origin + isec.tnear * ray.direction;
+    isec.normal = normal(isec.phit, isec.idx);
+    isec.material = mat.get();
+    isec.color = mat->Kd;
+    //TODO: texture
 }

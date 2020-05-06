@@ -47,45 +47,42 @@ void Mesh::updateAABB()
     aabb.create(vertices);
 }
 
-bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
+bool Mesh::intersection(const Ray& ray, float tmax, IntersectionData &isec) const
+{
+    if (!aabb.intersection(ray))
+        return false;
+
+    float tval = FLT_MAX;
+    for (size_t i=0 ; i < faces.size(); ++i)
+    {
+        if (faces[i].intersection(vertices, ray, tmax, tval))
+        {
+            tmax = tval;
+            isec.tnear = tval;
+            isec.idx = i;
+        }
+    }
+    return tval < FLT_MAX ? true : false;
+}
+
+bool Mesh::intersection(const Ray& ray, float tmax) const
 {
     float t;
     if (!aabb.intersection(ray))
         return false;
 
-    isec.tnear = FLT_MAX;
     for (size_t i=0 ; i < faces.size(); ++i)
     {
-        if (faces[i].intersection(vertices, ray, t))
+        if (faces[i].intersection(vertices, ray, tmax, t))
         {
-            if (t < isec.tnear)
-            {
-                isec.tnear = t;
-                isec.idx = i;
-            }
+            return true;
         }
     }
-    return isec.tnear < FLT_MAX ? true : false;
-}
-
-bool Mesh::intersection(const Ray& ray, float &tnear) const
-{
-    float t;
-    if (!aabb.intersection(ray))
-        return false;
-
-    tnear = FLT_MAX;
-    for (size_t i=0 ; i < faces.size(); ++i)
-    {
-        if (faces[i].intersection(vertices, ray, t))
-        {
-            if (t < tnear) tnear = t;
-        }
-    }
-    return tnear < FLT_MAX ? true : false;
+    return false;
 
 }
 
+inline
 Vector3 Mesh::normal(const Vector3 &phit, size_t idx) const
 {            
     float u = (((vertices[faces[idx].v2] - vertices[faces[idx].v1]) % (phit - vertices[faces[idx].v1])).length() / 2) / faces[idx].area;
@@ -119,7 +116,7 @@ std::ostream& operator <<(std::ostream &os, const Mesh::Triangle &f)
 }
 
 inline
-bool Mesh::Triangle::intersection(const std::vector<Vector3> &vertices, const Ray &ray, float &tnear) const
+bool Mesh::Triangle::intersection(const std::vector<Vector3> &vertices, const Ray &ray, float tmax, float &tnear) const
 {    
     const Vector3 &p0 = vertices[ v0 ];
     const Vector3 &p1 = vertices[ v1 ];
@@ -160,12 +157,25 @@ bool Mesh::Triangle::intersection(const std::vector<Vector3> &vertices, const Ra
 
     if (gamma <= 0.0f || beta + gamma >= 1.0f) return false;
 
-    tnear = -(F*AKJB + E*JCAL + D*BLKC  ) / denon;
+    float tval = -(F*AKJB + E*JCAL + D*BLKC  ) / denon;
 
-    return tnear > 0.0f ? true : false;
+    if(tval < 0.0f || tval > tmax) return false;
+
+    tnear = tval;
+    return true;
 }
 
 Vector2 Mesh::uv(const Vector3 &, size_t) const
 {
     return Vector2(0.0f, 0.0f);
+}
+
+
+void Mesh::fetch(const Ray &ray, IntersectionData &isec) const
+{
+    isec.phit = ray.origin + isec.tnear * ray.direction;
+    isec.normal = normal(isec.phit, isec.idx);
+    isec.material = mat.get();
+    isec.color = mat->Kd;
+    //TODO: texture
 }

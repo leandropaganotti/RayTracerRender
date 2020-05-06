@@ -13,7 +13,7 @@ public:
         size_t nv0, nv1, nv2;   // 3 normal indexes for vertices
         Vector3 nf;             // face normal
         float area;
-        bool intersection(const std::vector<Vector3>   &vertices, const Ray &ray, float &tnear) const;
+        bool intersection(const std::vector<Vector3>   &vertices, const Ray &ray, float tmax, float &tnear) const;
     };
 
     void addVertex(const Vector3& v);
@@ -27,10 +27,11 @@ public:
     friend std::ostream& operator << (std::ostream &os, const Triangle &f);
 
     // Shape interface
-    bool  intersection(const Ray& ray, IntersectionData& isec) const;
-    bool  intersection(const Ray& ray, float& tnear) const;
+    bool  intersection(const Ray& ray, float tmax, IntersectionData& isec) const;
+    bool  intersection(const Ray& ray, float tmax) const;
     Vector3 normal(const Vector3 &phit, size_t idx) const;
     Vector2 uv(const Vector3 &, size_t) const;
+    void fetch(const Ray &ray, IntersectionData &isec) const override;
 
 protected:
     Mesh() = default;
@@ -40,4 +41,5 @@ protected:
     std::vector<Triangle>  faces;    
 
     friend class Shapes;
+
 };

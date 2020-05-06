@@ -5,10 +5,11 @@
 class Plane: public ShapeWithMaterial
 {
 public:               
-    bool intersection(const Ray& ray, IntersectionData& isec) const;
-    bool intersection(const Ray& ray, float &tnear) const;
+    bool intersection(const Ray& ray, float tmax, IntersectionData& isec) const;
+    bool intersection(const Ray& ray, float tmax) const;
     Vector3 normal(const Vector3 &, size_t) const;
     Vector2 uv(const Vector3& phit, size_t) const;
+    void fetch(const Ray &ray, IntersectionData &isec) const override;
 
     Vector3 getO() const;
     void setO(const Vector3 &value);

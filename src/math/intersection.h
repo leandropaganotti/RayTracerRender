@@ -15,4 +15,5 @@ struct IntersectionData
     Vector3 normal;
     const Material *material;
     Vector2 uv;
+    Vector3 color;
 };

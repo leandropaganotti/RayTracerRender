@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 
     Scene scene(xmlscene);
 
-    cout << (int)scene.objects[0]->getMaterial()->type << endl;
+    std::cout << scene << endl;
 
     RayTracer raytracer;
     Camera &camera = raytracer.getCamera();

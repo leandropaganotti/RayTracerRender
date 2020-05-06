@@ -9,13 +9,12 @@ class AABox: public ShapeWithMaterial
 {
     // IntersectionIF interface
 public:
-    bool intersection(const Ray &ray, IntersectionData &isec) const;
-    bool intersection(const Ray &ray, float &tnear) const;
-
-    // Shape interface
-public:
+    bool intersection(const Ray &ray, float tmax, IntersectionData &isec) const;
+    bool intersection(const Ray &ray, float tmax) const;
     Vector3 normal(const Vector3 &phit, size_t idx) const;
     Vector2 uv(const Vector3 &phit, size_t idx) const;
+    void fetch(const Ray &ray, IntersectionData &isec) const override;
+
 
 public:
     Vector3 getMin() const;
@@ -30,4 +29,5 @@ protected:
     Vector3 max;
 
     friend class Shapes;
+
 };

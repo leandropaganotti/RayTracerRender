@@ -1,6 +1,6 @@
 #include "shapefactory.h"
 
-//const std::shared_ptr<ShapeIF> Shapes::Invisible  = std::shared_ptr<ShapeIF> (new InvisibleShape);
+const std::shared_ptr<Shape> Shapes::Invisible  = std::shared_ptr<Shape> (new InvisibleShape);
 const std::shared_ptr<Shape> Shapes::UnitSphere = std::shared_ptr<Shape> (new Sphere);
 const std::shared_ptr<Shape> Shapes::UnitBox    = std::shared_ptr<Shape> (new AABox);
 const std::shared_ptr<Shape> Shapes::UnitCylinder    = std::shared_ptr<Shape> (new UnitYCylinder);
@@ -33,7 +33,7 @@ std::shared_ptr<Instance> Shapes::CreateEllipsoid()
 
 std::shared_ptr<Instance> Shapes::CreateBox()
 {
-    return CreateInstance(UnitBox);
+    return std::shared_ptr<Instance>(new Instance(UnitBox));
 }
 
 std::shared_ptr<Instance> Shapes::CreateCylinder()

@@ -27,12 +27,30 @@ void Sphere::setRadius(float value)
     radius2 = radius * radius;
 }
 
-bool Sphere::intersection(const Ray &ray, IntersectionData &isec) const
+bool Sphere::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
 {    
-    return intersection(ray, isec.tnear);
+    float t0, t1;
+
+    // analytic solution
+    Vector3 L = ray.origin - center;
+    float a = ray.direction.dot(ray.direction);
+    float b = 2 * ray.direction.dot(L);
+    float c = L.dot(L) - radius2;
+    if (!solveQuadratic(a, b, c, t0, t1)) return false;
+
+    if (t0 > t1) std::swap(t0, t1);
+
+    if (t0 < 0) {
+        t0 = t1;
+        if (t0 < 0) return false;
+    }
+    if(t0 > tmax) return false;
+
+    isec.tnear = t0;
+    return true;
 }
 
-bool Sphere::intersection(const Ray &ray, float &tnear) const
+bool Sphere::intersection(const Ray &ray, float tmax) const
 {
     float t0, t1;
 
@@ -46,11 +64,10 @@ bool Sphere::intersection(const Ray &ray, float &tnear) const
     if (t0 > t1) std::swap(t0, t1);
 
     if (t0 < 0) {
-        t0 = t1; // if t0 is negative, let's use t1 instead
-        if (t0 < 0) return false; // both t0 and t1 are negative
+        t0 = t1;
+        if (t0 < 0) return false;
     }
-    tnear = t0;
-    return true;
+    return t0 < tmax ? true : false;
 }
 
 Vector3 Sphere::normal(const Vector3 &phit, size_t) const
@@ -76,4 +93,20 @@ Vector2 Sphere::uv(const Vector3 &phit, size_t) const
     float u = 0.5 + atan2f(d.z, d.x) / (2.0f * M_PI);
     float v = 0.5 - asinf(d.y) / M_PI;
     return {u, v};
+}
+
+void Sphere::fetch(const Ray &ray, IntersectionData &isec) const
+{
+    isec.phit = ray.origin + isec.tnear * ray.direction;
+    isec.normal = (isec.phit - center).normalize();
+    isec.material = mat.get();
+
+    if(mat->texture)
+    {
+        isec.uv.u = 0.5 + atan2f(isec.normal.z, isec.normal.x) / (2.0f * M_PI);
+        isec.uv.v = 0.5 - asinf(isec.normal.y) / M_PI;
+        isec.color = mat->texture->get(isec.uv) * mat->Kd;
+    }
+    else
+        isec.color = mat->Kd;
 }

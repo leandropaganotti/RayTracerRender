@@ -8,7 +8,7 @@ const std::shared_ptr<Material> Material::Mirror = Material::Create("Mirror", Ma
 
 std::shared_ptr<Material> Material::Create(std::string name, Type type)
 {
-    std::shared_ptr<Material> m (new Material(name=="" ? std::to_string(MaterialList.size()) : name, type));
+    std::shared_ptr<Material> m (new Material(name, type));
     MaterialList[m->getName()] = m;
     return m;
 }
@@ -30,21 +30,5 @@ Material::Material(std::string name, Type type)
     R0 = 0.9f;
     Ni = 1.55f; // refractive index for glass
     this->type = type;
-    texture = Texture::SolidWhite;
-}
-
-const Texture * Material::getTexture() const
-{
-    return texture.get();
-}
-
-void Material::setTexture(const std::shared_ptr<Texture> texture)
-{
-    this->texture = texture ? texture : Texture::SolidWhite;
-}
-
-void Material::setTexture(const std::string &name)
-{
-    if(!(this->texture = Texture::GetByName(name)))
-        this->texture = Texture::SolidWhite;
+    texture = nullptr;
 }

@@ -212,7 +212,7 @@ std::shared_ptr<Material> XMLParser::parseMaterial(xmlNode *xmlMaterialNode)
     }
 
     xmlChar *attName = xmlGetProp(xmlMaterialNode,(const xmlChar*)"name");
-    std::shared_ptr<Material> material = Material::Create(attName? (const char*)attName : "");
+    std::shared_ptr<Material> material = Material::Create(attName? (const char*)attName : "", Material::Type::DIFFUSE);
     xmlFree(attName);
     const xmlAttr *attr = NULL;
     std::string name = "";
@@ -244,7 +244,7 @@ std::shared_ptr<Material> XMLParser::parseMaterial(xmlNode *xmlMaterialNode)
                 std::cerr << "\x1b[33;1m" << "unrecognized material type \'" << attr->children->content << "\'" << "\x1b[0m" << std::endl;
         }
         else if (equals(attr->name, "texture"))
-            material->setTexture((const char*)attr->children->content);
+            material->texture = Texture::GetByName((const char*)attr->children->content);
         else
             std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlMaterialNode->name << "\':" << name << "    \x1b[0m" << std::endl;
     }
@@ -255,7 +255,7 @@ std::shared_ptr<Material> XMLParser::parseMaterial(xmlNode *xmlMaterialNode)
         if (node->type == XML_ELEMENT_NODE)
         {
             if (equals(node->name, "texture"))
-                material->setTexture(parseTexture(node));
+                material->texture = parseTexture(node);
             else
                 std::cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlMaterialNode->name << "\'" << "\x1b[0m" << std::endl;
         }
