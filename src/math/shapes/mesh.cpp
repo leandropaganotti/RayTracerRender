@@ -54,14 +54,16 @@ bool Mesh::intersection(const Ray& ray, float tmax, IntersectionData &isec) cons
         return false;
 
     float tval = FLT_MAX;
-    for (size_t i=0 ; i < faces.size(); ++i)
+    size_t idx = 0;
+    for (auto &face: faces)
     {
-        if (faces[i].intersection(vertices, ray, tmax, tval))
+        if (face.intersection(vertices, ray, tmax, tval))
         {
             tmax = tval;
             isec.tnear = tval;
-            isec.idx = i;
+            isec.idx = idx;
         }
+        ++idx;
     }
     return tval < FLT_MAX ? true : false;
 }
@@ -72,9 +74,9 @@ bool Mesh::intersection(const Ray& ray, float tmax) const
     if (!aabb.intersection(ray))
         return false;
 
-    for (size_t i=0 ; i < faces.size(); ++i)
+    for (auto &face: faces)
     {
-        if (faces[i].intersection(vertices, ray, tmax, t))
+        if (face.intersection(vertices, ray, tmax, t))
         {
             return true;
         }
@@ -85,7 +87,7 @@ bool Mesh::intersection(const Ray& ray, float tmax) const
 
 inline
 Vector3 Mesh::normal(const Vector3 &phit, size_t idx) const
-{            
+{
     float u = (((vertices[faces[idx].v2] - vertices[faces[idx].v1]) % (phit - vertices[faces[idx].v1])).length() / 2) / faces[idx].area;
     float v = (((vertices[faces[idx].v0] - vertices[faces[idx].v2]) % (phit - vertices[faces[idx].v2])).length() / 2) / faces[idx].area;
     float w = 1 - u - v;
@@ -118,7 +120,7 @@ std::ostream& operator <<(std::ostream &os, const Mesh::Triangle &f)
 
 inline
 bool Mesh::Triangle::intersection(const std::vector<Vector3> &vertices, const Ray &ray, float tmax, float &tnear) const
-{    
+{
     const Vector3 &p0 = vertices[ v0 ];
     const Vector3 &p1 = vertices[ v1 ];
     const Vector3 &p2 = vertices[ v2 ];
