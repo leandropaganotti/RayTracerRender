@@ -1,5 +1,7 @@
 #include "box.h"
-#include "shapefactory.h"
+#include "material.h"
+
+static std::shared_ptr<AABox> unitBox = std::shared_ptr<AABox>(new AABox);
 
 AABox::AABox(const Vector3 &min, const Vector3 &max): min(min), max(max)
 {
@@ -18,7 +20,7 @@ void AABox::setMax(const Vector3 &value)
 
 bool AABox::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
 {
-    Vector3 invdir = 1.0f / ray.direction ;
+    Vector3 invdir = 1.0f / ray.direction;
 
     float t1 = (min.x - ray.origin.x)*invdir.x;
     float t2 = (max.x - ray.origin.x)*invdir.x;
@@ -119,18 +121,35 @@ void AABox::setMin(const Vector3 &value)
     min = value;
 }
 
-
 void AABox::fetch(const Ray &ray, IntersectionData &isec) const
 {
     isec.phit = ray.origin + isec.tnear * ray.direction;
     isec.normal = normal(isec.phit, isec.idx);
-    isec.material = mat.get();
+}
 
-    if(mat->texture)
+GBox::GBox(): Instance(unitBox)
+{
+
+}
+
+void GBox::fetch(const Ray &ray, IntersectionData &isec) const
+{
+    Instance::fetch(ray, isec);
+    isec.material = material.get();
+    isec.color = material->Kd;
+    if(material->texture)
     {
-        isec.uv = uv(isec.phit, isec.idx);
-        isec.color = mat->texture->get(isec.uv) * mat->Kd;
+        isec.uv = static_cast<AABox*>(shape.get())->uv(isec.phit_local, isec.idx);
+        isec.color = isec.color * material->texture->get(isec.uv);
     }
-    else
-        isec.color = mat->Kd;
+}
+
+std::shared_ptr<Material> GBox::getMaterial() const
+{
+    return material;
+}
+
+void GBox::setMaterial(const std::shared_ptr<Material> &value)
+{
+    material = value ? value : Material::DiffuseWhite;
 }

@@ -22,13 +22,11 @@ texture.o \
 transformation.o \
 cameraoptions.o \
 material.o \
-shape.o \
 cylinder.o \
 invisible.o \
 box.o \
 aabb.o \
 mesh.o \
-shapefactory.o \
 xmlparser.o \
 objparser.o \
 

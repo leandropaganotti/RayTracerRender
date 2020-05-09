@@ -12,8 +12,9 @@ struct IntersectionData
     size_t idx;
     const Shape * shape;
     Vector3 phit;
+    Vector3 phit_local;
     Vector3 normal;
-    const Material *material;
+    const Material * material;
     Vector2 uv;
     Vector3 color;
 };

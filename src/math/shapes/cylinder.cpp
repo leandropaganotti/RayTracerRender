@@ -1,6 +1,9 @@
 #include "cylinder.h"
 #include "consts.h"
 #include "utils.h"
+#include "material.h"
+
+static std::shared_ptr<UnitYCylinder> unitCylinder = std::shared_ptr<UnitYCylinder>(new UnitYCylinder);
 
 UnitYCylinder::UnitYCylinder()
 {
@@ -133,17 +136,41 @@ Vector3 UnitYCylinder::normal(const Vector3 &phit, size_t idx) const
     }
 }
 
+inline
 Vector2 UnitYCylinder::uv(const Vector3 &, size_t) const
 {
     return Vector2(0.0f, 0.0f);
 }
-
-
+inline
 void UnitYCylinder::fetch(const Ray &ray, IntersectionData &isec) const
 {
     isec.phit = ray.origin + isec.tnear * ray.direction;
     isec.normal = normal(isec.phit, isec.idx);
-    isec.material = mat.get();
-    isec.color = mat->Kd;
-    //TODO: texture
+}
+
+GCylinder::GCylinder(): Instance(unitCylinder)
+{
+
+}
+
+std::shared_ptr<Material> GCylinder::getMaterial() const
+{
+    return material;
+}
+
+void GCylinder::setMaterial(const std::shared_ptr<Material> &value)
+{
+    material = value ? value : Material::DiffuseWhite;
+}
+
+void GCylinder::fetch(const Ray &ray, IntersectionData &isec) const
+{
+    Instance::fetch(ray, isec);
+    isec.material = material.get();
+    isec.color = material->Kd;
+    if(material->texture)
+    {
+        isec.uv = static_cast<UnitYCylinder*>(shape.get())->uv(isec.phit_local, 0);
+        isec.color = isec.color * material->texture->get(isec.uv);
+    }
 }

@@ -1,15 +1,16 @@
 #include "mesh.h"
 #include <float.h>
 #include "objparser.h"
+#include "material.h"
 
 void Mesh::addVertex(const Vector3 &v)
 {
     vertices.push_back(v);
 }
 
-void Mesh::addNormal(const Vector3 &v)
+void Mesh::addNormal(const Vector3 &n)
 {
-    normals.push_back(v);
+    normals.push_back(n);
 }
 
 void Mesh::addFace(size_t v0, size_t v1, size_t v2, size_t nv0, size_t nv1, size_t nv2)
@@ -165,17 +166,37 @@ bool Mesh::Triangle::intersection(const std::vector<Vector3> &vertices, const Ra
     return true;
 }
 
+inline
 Vector2 Mesh::uv(const Vector3 &, size_t) const
 {
     return Vector2(0.0f, 0.0f);
 }
 
-
+inline
 void Mesh::fetch(const Ray &ray, IntersectionData &isec) const
 {
     isec.phit = ray.origin + isec.tnear * ray.direction;
     isec.normal = normal(isec.phit, isec.idx);
-    isec.material = mat.get();
-    isec.color = mat->Kd;
-    //TODO: texture
+}
+
+GMesh::GMesh(std::shared_ptr<Mesh> mesh): Instance(mesh)
+{
+
+}
+
+void GMesh::fetch(const Ray &ray, IntersectionData &isec) const
+{
+    Instance::fetch(ray, isec);
+    isec.material = material.get();
+    isec.color = material->Kd;
+}
+
+std::shared_ptr<Material> GMesh::getMaterial() const
+{
+    return material;
+}
+
+void GMesh::setMaterial(const std::shared_ptr<Material> &value)
+{
+    material = value ? value : Material::DiffuseWhite;
 }

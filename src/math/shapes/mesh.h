@@ -4,9 +4,11 @@
 #include "shape.h"
 #include "aabb.h"
 
-class Mesh: public ShapeWithMaterial
+class Mesh: public Shape
 {    
 public:
+    Mesh() = default;
+
     struct Triangle
     {
         size_t v0, v1, v2;      // 3 vertex indexes
@@ -17,7 +19,7 @@ public:
     };
 
     void addVertex(const Vector3& v);
-    void addNormal(const Vector3& v);
+    void addNormal(const Vector3& n);
     void addFace(size_t v0, size_t v1, size_t v2, size_t nv0, size_t nv1, size_t nv2);
 
     void clear();
@@ -31,15 +33,25 @@ public:
     bool  intersection(const Ray& ray, float tmax) const;
     Vector3 normal(const Vector3 &phit, size_t idx) const;
     Vector2 uv(const Vector3 &, size_t) const;
-    void fetch(const Ray &ray, IntersectionData &isec) const override;
+    virtual void fetch(const Ray &ray, IntersectionData &isec) const override;
 
 protected:
-    Mesh() = default;
     AABB aabb;
     std::vector<Vector3>   vertices;
     std::vector<Vector3>   normals;
     std::vector<Triangle>  faces;    
+};
 
-    friend class Shapes;
+class GMesh: public Instance
+{
+public:
+    GMesh(std::shared_ptr<Mesh> mesh);
 
+    void fetch(const Ray &ray, IntersectionData &isec) const override;
+
+    std::shared_ptr<Material> getMaterial() const;
+    void setMaterial(const std::shared_ptr<Material> &value);
+
+protected:
+    std::shared_ptr<Material> material;
 };

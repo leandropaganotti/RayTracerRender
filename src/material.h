@@ -39,4 +39,14 @@ protected:
 
 };
 
+class MaterialPossessor
+{
+protected:
+    std::shared_ptr<Material> mat1 = Material::DiffuseWhite;
+
+public:
+    std::shared_ptr<Material> getMat1() const;
+    void setMat1(const std::shared_ptr<Material> &value);
+};
+
 #endif // MATERIAL_H

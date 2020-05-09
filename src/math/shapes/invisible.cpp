@@ -1,5 +1,10 @@
 #include "invisible.h"
 
+InvisibleShape::InvisibleShape()
+{
+
+}
+
 bool InvisibleShape::intersection(const Ray &, float, IntersectionData &) const
 {
     return false;

@@ -6,7 +6,7 @@
 #include <sstream>
 #include "raytracer.h"
 #include "transformation.h"
-#include "shapefactory.h"
+
 using namespace std;
 
 char	    *xmlscene = NULL;	// xml file with scene description

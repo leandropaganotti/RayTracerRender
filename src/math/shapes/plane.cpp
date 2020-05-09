@@ -1,10 +1,13 @@
 #include "plane.h"
+#include "material.h"
 
 Plane::Plane(const Vector3 &O, const Vector3 &N):
     O(O), N(N)
 {
 
 }
+
+Plane::~Plane(){}
 
 Vector3 Plane::getN() const
 {
@@ -42,52 +45,59 @@ bool Plane::intersection(const Ray &ray, float tmax) const
     return ( t > 0.0f && t < tmax) ? true : false;
 }
 
+inline
 Vector3 Plane::normal(const Vector3 &, size_t) const
 {
     return N;
 }
 
+inline
 Vector2 Plane::uv(const Vector3 &phit, size_t) const
 {
+    const float e=0.001f;
+    const Vector3 v = phit - O;
 
-    Vector3 v = phit - O;
+    if(N.x > e || N.x < -e) return {v.y, v.z};
 
-    if(N.x == 1.0f || N.x == -1.0f)
-    {
-        return {v.y, v.z};
-    }
-    else if(N.y == 1.0f || N.y == -1.0f)
-    {
-        return {v.x, v.z};
-    }
-    else
-    {
-        return {v.x, v.y};
-    }
+    if(N.y > e || N.y < -e) return {v.x, v.z};
+
+    return {v.x, v.y};
 }
 
+inline
 void Plane::fetch(const Ray &ray, IntersectionData &isec) const
 {
     isec.phit = ray.origin + isec.tnear * ray.direction;
     isec.normal = N;
-    isec.material = mat.get();
+}
 
-    if(mat->texture)
+GPlane::GPlane(const Vector3 &o, const Vector3 &n): Plane(o, n)
+{
+
+}
+
+GPlane::~GPlane() {}
+
+void GPlane::fetch(const Ray &ray, IntersectionData &isec) const
+{
+    isec.phit = ray.origin + isec.tnear * ray.direction;
+    isec.normal = N;
+    isec.material = material.get();
+    isec.color = material->Kd;
+
+    if(material->texture)
     {
-        Vector3 v = isec.phit - O;
-        if(N.x == 1.0f || N.x == -1.0f)
-        {
-            isec.uv = {v.y, v.z};
-        }
-        else if(N.y == 1.0f || N.y == -1.0f)
-        {
-            isec.uv = {v.x, v.z};
-        }
-        else
-        {
-            isec.uv = {v.x, v.y};
-        }
-        isec.color = mat->texture->get(isec.uv) * mat->Kd;
-    } else
-        isec.color = mat->Kd;
+        isec.uv = Plane::uv(isec.phit, 0);
+        isec.color = material->texture->get(isec.uv) * material->Kd;
+    }
+}
+
+std::shared_ptr<Material> GPlane::getMaterial() const
+{
+    return material;
+}
+
+void GPlane::setMaterial(const std::shared_ptr<Material> &value)
+{
+    material = value ? value : Material::DiffuseWhite;
 }

@@ -1,19 +1,13 @@
 #include "shapefactory.h"
 
-const std::shared_ptr<Shape> Shapes::Invisible  = std::shared_ptr<Shape> (new InvisibleShape);
-const std::shared_ptr<Shape> Shapes::UnitSphere = std::shared_ptr<Shape> (new Sphere);
-const std::shared_ptr<Shape> Shapes::UnitBox    = std::shared_ptr<Shape> (new AABox);
-const std::shared_ptr<Shape> Shapes::UnitCylinder    = std::shared_ptr<Shape> (new UnitYCylinder);
-
-
-std::shared_ptr<Sphere> Shapes::CreateSphere(const Vector3 &center, const float &radius)
+std::shared_ptr<GSphere> Shapes::CreateSphere(const Vector3 &center, const float &radius)
 {
-    return std::shared_ptr<Sphere>(new Sphere(center, radius));
+    return std::shared_ptr<GSphere>(new GSphere(center, radius));
 }
 
-std::shared_ptr<Plane> Shapes::CreatePlane(const Vector3 &O, const Vector3 &N)
+std::shared_ptr<GPlane> Shapes::CreatePlane(const Vector3 &O, const Vector3 &N)
 {
-    return std::shared_ptr<Plane>(new Plane(O, N));
+    return std::shared_ptr<GPlane>(new GPlane(O, N));
 }
 
 std::shared_ptr<AABox> Shapes::CreateAABox(const Vector3 &min, const Vector3 &max)

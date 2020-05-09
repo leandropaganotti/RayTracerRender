@@ -5,9 +5,10 @@
 #include <atomic>
 #include <iomanip>
 #include <sstream>
-#include "sphere.h"
 #include <iostream>
 #include "consts.h"
+#include "material.h"
+#include "sphere.h"
 
 const float bias = 0.001f;
 
@@ -412,7 +413,7 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const Scene& scene, const uint8_t
         Vector3 direct(0);
         for(auto &obj : scene.objects)
         {
-            const Sphere * const sphere = dynamic_cast<const Sphere*const>(obj.get());
+            const GSphere * const sphere = dynamic_cast<const GSphere*const>(obj.get());
             if (!sphere) continue; // only supported sphere for direct light
             if (sphere->getMaterial()->E  == Vector::ZERO) continue; // skip non light
 
@@ -427,7 +428,7 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const Scene& scene, const uint8_t
                 float vis = castShadowRay(Ray(isec.phit + bias * isec.normal, sampleToLight), scene.objects, dist);
                 if (vis > 0.0f)
                 {
-                    direct += vis * brdf * obj->material({}, 0)->E * cosTheta * _1_pdf;
+                    direct += vis * brdf * sphere->getMaterial()->E * cosTheta * _1_pdf;
                 }
             }
         }
