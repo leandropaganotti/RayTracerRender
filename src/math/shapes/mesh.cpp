@@ -45,44 +45,17 @@ void Mesh::clear()
 
 void Mesh::updateAABB()
 {
-    aabb.create(vertices);
+    aabb.reset(new BVH(vertices, faces));
 }
 
 bool Mesh::intersection(const Ray& ray, float tmax, IntersectionData &isec) const
 {
-    if (!aabb.intersection(ray))
-        return false;
-
-    float tval = FLT_MAX;
-    size_t idx = 0;
-    for (auto &face: faces)
-    {
-        if (face.intersection(vertices, ray, tmax, tval))
-        {
-            tmax = tval;
-            isec.tnear = tval;
-            isec.idx = idx;
-        }
-        ++idx;
-    }
-    return tval < FLT_MAX ? true : false;
+    return aabb->intersection(ray, tmax, isec);
 }
 
 bool Mesh::intersection(const Ray& ray, float tmax) const
 {
-    float t;
-    if (!aabb.intersection(ray))
-        return false;
-
-    for (auto &face: faces)
-    {
-        if (face.intersection(vertices, ray, tmax, t))
-        {
-            return true;
-        }
-    }
-    return false;
-
+    return aabb->intersection(ray, tmax);
 }
 
 inline
@@ -201,4 +174,101 @@ std::shared_ptr<Material> GMesh::getMaterial() const
 void GMesh::setMaterial(const std::shared_ptr<Material> &value)
 {
     material = value ? value : Material::DiffuseWhite;
+}
+
+BVH::BVH(std::vector<Vector3> &v, std::vector<Mesh::Triangle> &t): v(v), t(t)
+{
+    root = build(1, t.size()-1, 0);
+}
+
+BVH::~BVH(){ delete root; }
+
+BVH::Node* BVH::build(size_t l, size_t r, size_t axis)
+{
+    Node *bvh = new Node;
+
+    for (size_t i = l; i <= r; ++i)
+    {
+        bvh->extend(v[t[i].v0]);
+        bvh->extend(v[t[i].v1]);
+        bvh->extend(v[t[i].v2]);
+    }
+
+    if (l==r)
+    {
+        m[bvh] = l;
+        return bvh;
+    }
+    if(l == (r-1))
+    {
+        bvh->left = new Node;
+        bvh->right = new Node;
+        m[bvh->left] = l;
+        m[bvh->right] = r;
+        return bvh;
+    }
+
+    size_t pivot = qsplit(l, r, bvh->getCenter()[axis], axis);
+    bvh->left = build(l, pivot-1, (axis+1)%3);
+    bvh->right = build(pivot, r, (axis+1)%3);
+
+    return bvh;
+}
+
+bool BVH::intersection(Node *root, const Ray &ray, float tmax, IntersectionData &isec)
+{
+    if (root == nullptr) return false;
+
+    if(!root->left && !root->right)
+    {
+        if(t[ m[root] ].intersection(v, ray, tmax, isec.tnear))
+        {
+            isec.idx = m[root];
+            return true;
+        }
+        return false;
+    }
+
+    if(!root->intersection(ray)) return false;
+
+    bool hit_left = intersection(root->left, ray, tmax, isec);
+    if ( hit_left )
+    {
+        tmax = isec.tnear;
+    }
+
+    bool hit_right = intersection(root->right, ray, tmax, isec);
+    return hit_left || hit_right;
+}
+
+bool BVH::intersection(Node *root, const Ray &ray, float tmax)
+{
+    if (root == nullptr) return false;
+
+    if(!root->intersection(ray)) return false;
+
+    float tnear;
+    if(!root->left && !root->right)
+        return t[ m[root] ].intersection(v, ray, tmax, tnear);
+
+    if ( intersection(root->left, ray, tmax) ) return true;
+    return intersection(root->right, ray, tmax);
+}
+
+size_t BVH::qsplit(size_t l, size_t r, float pivot, size_t axis)
+{
+    size_t j = l-1;
+    for(size_t i=l; i <= r; ++i)
+    {
+        float center = (v[t[i].v0][axis] + v[t[i].v1][axis] + v[t[i].v2][axis]) / 3;
+        if (center < pivot)
+        {
+            ++j;
+            Mesh::Triangle tmp = t[i];
+            t[i] = t[j];
+            t[j] = tmp;
+        }
+    }
+    if(j==(l-1) || j==r) return (l+r)/2;
+    return j+1;
 }

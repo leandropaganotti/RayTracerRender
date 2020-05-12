@@ -28,7 +28,24 @@ void AABB::create(const std::vector<Vector3> &vertices)
             max.y = vertices[i].y;
         if (vertices[i].z > max.z)
             max.z = vertices[i].z;
-    }    
+    }
+}
+
+void AABB::extend(const Vector3 &v)
+{
+    if (v.x < min.x)
+        min.x = v.x;
+    if (v.y < min.y)
+        min.y = v.y;
+    if (v.z < min.z)
+        min.z = v.z;
+
+    if (v.x > max.x)
+        max.x = v.x;
+    if (v.y > max.y)
+        max.y = v.y;
+    if (v.z > max.z)
+        max.z = v.z;
 }
 
 bool AABB::intersection(const Ray &ray) const

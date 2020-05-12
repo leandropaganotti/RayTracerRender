@@ -3,6 +3,9 @@
 #include <vector>
 #include "shape.h"
 #include "aabb.h"
+#include <map>
+
+struct BVH;
 
 class Mesh: public Shape
 {    
@@ -36,7 +39,7 @@ public:
     virtual void fetch(const Ray &ray, IntersectionData &isec) const override;
 
 protected:
-    AABB aabb;
+    std::unique_ptr<BVH>   aabb;
     std::vector<Vector3>   vertices;
     std::vector<Vector3>   normals;
     std::vector<Triangle>  faces;    
@@ -54,4 +57,41 @@ public:
 
 protected:
     std::shared_ptr<Material> material;
+};
+
+class BVH
+{
+    struct Node: public AABB
+    {
+        Node *left=nullptr;
+        Node *right=nullptr;
+        ~Node()
+        {
+            if(left) delete left;
+            if(right) delete right;
+        }
+    };
+
+    std::vector<Vector3> &v;
+    std::vector<Mesh::Triangle> &t;
+    Node *root;
+    std::map<Node*,     size_t> m;
+
+    Node* build(size_t l, size_t r, size_t axis);
+    bool intersection(Node* root, const Ray &ray, float tmax, IntersectionData &isec);
+    bool intersection(Node* root, const Ray &ray, float tmax);
+    size_t qsplit(size_t l, size_t r, float pivot, size_t axis);
+
+public:
+    BVH(std::vector<Vector3> &v, std::vector<Mesh::Triangle> &t);
+    ~BVH();
+
+    bool intersection(const Ray &ray, float tmax)
+    {
+        return intersection(root, ray, tmax);
+    }
+    bool intersection(const Ray &ray, float tmax, IntersectionData &isec)
+    {
+        return intersection(root, ray, tmax, isec);
+    }
 };

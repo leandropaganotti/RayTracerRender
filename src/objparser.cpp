@@ -10,6 +10,7 @@ void OBJParser::ParseMesh(const std::string &path, std::shared_ptr<Mesh> &mesh)
     mesh->clear();
     mesh->addVertex({});
     mesh->addNormal({});
+    mesh->addFace(0,0,0,0,0,0);
 
     std::ifstream ifs (path, std::ifstream::in);
 
