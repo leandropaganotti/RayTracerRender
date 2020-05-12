@@ -150,7 +150,7 @@ void UnitYCylinder::fetch(const Ray &ray, IntersectionData &isec) const
 
 GCylinder::GCylinder(): Instance(unitCylinder)
 {
-
+    material = Material::DiffuseWhite;
 }
 
 std::shared_ptr<Material> GCylinder::getMaterial() const

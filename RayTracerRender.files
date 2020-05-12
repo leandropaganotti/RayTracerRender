@@ -7,8 +7,6 @@ src/math/shapes/plane.cpp
 src/math/shapes/plane.h
 src/math/shapes/shape.cpp
 src/math/shapes/shape.h
-src/math/shapes/shapefactory.cpp
-src/math/shapes/shapefactory.h
 src/math/shapes/sphere.cpp
 src/math/shapes/sphere.h
 src/math/aabb.cpp

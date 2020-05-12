@@ -111,6 +111,7 @@ void Sphere::fetch(const Ray &ray, IntersectionData &isec) const
 
 GSphere::GSphere(const Vector3 &c, const float &r): Sphere(c, r)
 {
+    material = Material::DiffuseWhite;
 }
 
 void GSphere::fetch(const Ray &ray, IntersectionData &isec) const

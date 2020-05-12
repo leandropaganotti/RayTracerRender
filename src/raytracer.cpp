@@ -14,7 +14,7 @@ const float bias = 0.001f;
 
 RayTracer::RayTracer()
 {
-    setTracer(RayTracerType::Phong);
+    setTracer(RayTracerType::RayTracerPhong);
 }
 
 void RayTracer::render(const Scene& scene)
@@ -103,13 +103,13 @@ float RayTracer::castShadowRay(const Ray &ray, const ObjectVector &objects, floa
 
 void RayTracer::setTracer(RayTracerType type){
     switch (type) {
-    case RayTracerType::Phong:
+    case RayTracerType::RayTracerPhong:
         tracer = std::bind(&RayTracer::rayTracer, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
         break;
     case RayTracerType::PathTracer:
         tracer = std::bind(&RayTracer::pathTracer, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
         break;
-    case RayTracerType::PathTracerWithDirectLightSampling:
+    case RayTracerType::PathTracerWithDirectLight:
         tracer = std::bind(&RayTracer::pathTracer2, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
         break;
     default:
@@ -350,14 +350,14 @@ Vector3 RayTracer::pathTracer(const Ray &ray, const Scene &scene, const uint8_t 
         float kr = schlick(-ray.direction, isec.normal, isec.material->R0);
         float kt = 1.0f - kr;
         Vector3 diffused(0), reflected(0);
-        if (kr > 0.0001)
+        if (kr > 0.0001f)
         {
             Ray r;
             r.origin = isec.phit + bias * isec.normal;
             r.direction = reflect(ray.direction, isec.normal).normalize();
             reflected = pathTracer(r, scene, depth+1);
         }
-        if (kt > 0.0001)
+        if (kt > 0.0001f)
         {
             Ray r;
             r.origin = isec.phit + bias * isec.normal;

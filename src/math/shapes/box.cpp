@@ -129,7 +129,7 @@ void AABox::fetch(const Ray &ray, IntersectionData &isec) const
 
 GBox::GBox(): Instance(unitBox)
 {
-
+    material = Material::DiffuseWhite;
 }
 
 void GBox::fetch(const Ray &ray, IntersectionData &isec) const

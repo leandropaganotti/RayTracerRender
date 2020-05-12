@@ -33,12 +33,3 @@ Material::Material(std::string name, Type type)
     texture = nullptr;
 }
 
-std::shared_ptr<Material> MaterialPossessor::getMat1() const
-{
-    return mat1;
-}
-
-void MaterialPossessor::setMat1(const std::shared_ptr<Material> &value)
-{
-    mat1 = value ? value : Material::DiffuseWhite;
-}

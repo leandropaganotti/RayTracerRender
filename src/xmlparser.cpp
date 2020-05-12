@@ -127,9 +127,9 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
             if (equals(attr->children->content, "path"))
                 scene.raytracer = RayTracerType::PathTracer;
             else if (equals(attr->children->content, "path2"))
-                scene.raytracer = RayTracerType::PathTracerWithDirectLightSampling;
+                scene.raytracer = RayTracerType::PathTracerWithDirectLight;
             else if (equals(attr->children->content, "phong"))
-                scene.raytracer = RayTracerType::Phong;
+                scene.raytracer = RayTracerType::RayTracerPhong;
             else
                 std::cerr << "\x1b[33;1m" << "unrecognized attribute raytrace value \'" << attr->children->content << "\' " << "\x1b[0m" << std::endl;
         }

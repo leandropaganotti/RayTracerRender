@@ -46,8 +46,19 @@ public:
     }
     bool intersection(const Ray &ray, float tmax) const override
     {
-        IntersectionData isec;
-        return intersection(ray, tmax, isec);
+        Ray ray_local = inverse * ray;
+        IntersectionData isec_local;
+        if (shape->intersection(ray_local, FLT_MAX, isec_local))
+        {
+            Vector3 phit_local = ray_local.origin + isec_local.tnear * ray_local.direction;
+            Vector3 phit = model * phit_local;
+            float tnear = (phit - ray.origin).length();
+            if(tnear < tmax)
+            {
+                return true;
+            }
+        }
+        return false;
     }
     Vector3 normal(const Vector3 &phit, size_t idx) const override
     {

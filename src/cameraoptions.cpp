@@ -3,7 +3,7 @@
 #include "consts.h"
 
 CameraOptions::CameraOptions():
-        from(Vector::ORIGIN), to(Vector::FRONTWARD), fov(FOV), width(WIDTH), height(HEIGHT), aspectRatio(float(WIDTH)/HEIGHT)
+        from(Vector::ORIGIN), to(Vector::FRONT), fov(FOV), width(WIDTH), height(HEIGHT), aspectRatio(float(WIDTH)/HEIGHT)
 {}
 
 void CameraOptions::setTo(const Vector3 &value)

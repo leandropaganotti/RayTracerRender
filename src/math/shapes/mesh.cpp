@@ -156,7 +156,7 @@ void Mesh::fetch(const Ray &ray, IntersectionData &isec) const
 
 GMesh::GMesh(std::shared_ptr<Mesh> mesh): Instance(mesh)
 {
-
+    material = Material::DiffuseWhite;
 }
 
 void GMesh::fetch(const Ray &ray, IntersectionData &isec) const

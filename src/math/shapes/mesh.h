@@ -5,7 +5,7 @@
 #include "aabb.h"
 #include <map>
 
-struct BVH;
+class BVH;
 
 class Mesh: public Shape
 {    

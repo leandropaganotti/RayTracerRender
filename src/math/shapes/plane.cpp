@@ -73,7 +73,7 @@ void Plane::fetch(const Ray &ray, IntersectionData &isec) const
 
 GPlane::GPlane(const Vector3 &o, const Vector3 &n): Plane(o, n)
 {
-
+    material = Material::DiffuseWhite;
 }
 
 GPlane::~GPlane() {}
