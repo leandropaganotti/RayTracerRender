@@ -3,6 +3,10 @@
 #include "objparser.h"
 #include "material.h"
 
+/************************************************************************
+ * Mesh class
+ ************************************************************************/
+
 void Mesh::addVertex(const Vector3 &v)
 {
     vertices.push_back(v);
@@ -13,27 +17,9 @@ void Mesh::addNormal(const Vector3 &n)
     normals.push_back(n);
 }
 
-void Mesh::addFace(size_t v0, size_t v1, size_t v2, size_t nv0, size_t nv1, size_t nv2)
+void Mesh::addFace(const TriangleMesh &f)
 {
-    Triangle tri;
-
-    size_t vbs = vertices.size();
-    if(v0 >= vbs || v1 >= vbs || v2 >= vbs)
-        throw std::out_of_range("Vertex index is out of Range");
-
-    size_t nbs = normals.size();
-    if(nv0 >= nbs || nv1 >= nbs || nv2 >= nbs)
-        throw std::out_of_range("Normal index is out of Range");
-
-    tri.v0 = v0;
-    tri.v1 = v1;
-    tri.v2 = v2;
-    tri.nv0 = nv0;
-    tri.nv1 = nv1;
-    tri.nv2 = nv2;
-    tri.nf = (normals[nv0] + normals[nv1] + normals[nv2]).normalize();
-    tri.area = ((vertices[v1] - vertices[v0]) % (vertices[v2] - vertices[v0])).length() / 2;
-    faces.push_back(tri);
+    faces.push_back(f);
 }
 
 void Mesh::clear()
@@ -45,31 +31,17 @@ void Mesh::clear()
 
 void Mesh::updateAABB()
 {
-    aabb.reset(new BVH(vertices, faces));
+    bvh.reset(new BVH(vertices, faces));
 }
 
 bool Mesh::intersection(const Ray& ray, float tmax, IntersectionData &isec) const
 {
-    return aabb->intersection(ray, tmax, isec);
+    return bvh->intersection(ray, tmax, isec);
 }
 
 bool Mesh::intersection(const Ray& ray, float tmax) const
 {
-    return aabb->intersection(ray, tmax);
-}
-
-inline
-Vector3 Mesh::normal(const Vector3 &phit, size_t idx) const
-{
-    float u = (((vertices[faces[idx].v2] - vertices[faces[idx].v1]) % (phit - vertices[faces[idx].v1])).length() / 2) / faces[idx].area;
-    float v = (((vertices[faces[idx].v0] - vertices[faces[idx].v2]) % (phit - vertices[faces[idx].v2])).length() / 2) / faces[idx].area;
-    float w = 1 - u - v;
-
-    Vector3 N =  u*normals[faces[idx].nv0] + v*normals[faces[idx].nv1] +w*normals[faces[idx].nv2];
-
-    //N = (normals[faces[idx].nv0] + normals[faces[idx].nv1] + normals[faces[idx].nv2]).normalize();
-
-    return N;
+    return bvh->intersection(ray, tmax);
 }
 
 std::ostream &operator <<(std::ostream &os, const Mesh &m)
@@ -86,73 +58,36 @@ std::ostream &operator <<(std::ostream &os, const Mesh &m)
     return os ;
 }
 
-std::ostream& operator <<(std::ostream &os, const Mesh::Triangle &f)
+
+Vector3 Mesh::normal(const Vector3 &phit, size_t idx) const
 {
-    return os << f.v0 << " " << f.v1 << " " << f.v2 << " - " << "  " << f.nf ;
+    float u = (((vertices[faces[idx].v[2]] - vertices[faces[idx].v[1]]) % (phit - vertices[faces[idx].v[1]])).length() / 2) / faces[idx].area;
+    float v = (((vertices[faces[idx].v[0]] - vertices[faces[idx].v[2]]) % (phit - vertices[faces[idx].v[2]])).length() / 2) / faces[idx].area;
+    float w = 1 - u - v;
+
+    Vector3 N =  u*normals[faces[idx].nv[0]] + v*normals[faces[idx].nv[1]] +w*normals[faces[idx].nv[2]];
+
+    //N = (normals[faces[idx].nv0] + normals[faces[idx].nv1] + normals[faces[idx].nv2]).normalize();
+
+    return N;
 }
 
-inline
-bool Mesh::Triangle::intersection(const std::vector<Vector3> &vertices, const Ray &ray, float tmax, float &tnear) const
-{
-    const Vector3 &p0 = vertices[ v0 ];
-    const Vector3 &p1 = vertices[ v1 ];
-    const Vector3 &p2 = vertices[ v2 ];
 
-    float A = p0.x - p1.x;
-    float B = p0.y - p1.y;
-    float C = p0.z - p1.z;
-
-    float D = p0.x - p2.x;
-    float E = p0.y - p2.y;
-    float F = p0.z - p2.z;
-
-    float G = ray.direction.x;
-    float H = ray.direction.y;
-    float I = ray.direction.z;
-
-    float J = p0.x - ray.origin.x;
-    float K = p0.y - ray.origin.y;
-    float L = p0.z - ray.origin.z;
-
-
-    float EIHF = E*I-H*F;
-    float GFDI = G*F-D*I;
-    float DHEG = D*H-E*G;
-
-    float denon = A*EIHF + B*GFDI + C*DHEG;
-
-    float beta = (J*EIHF + K*GFDI + L*DHEG) / denon;
-
-    if (beta <= 0.0f || beta >= 1.0f) return false;
-
-    float AKJB = A*K-J*B;
-    float JCAL = J*C-A*L;
-    float BLKC = B*L-K*C;
-
-    float gamma = (I*AKJB + H*JCAL + G*BLKC ) / denon;
-
-    if (gamma <= 0.0f || beta + gamma >= 1.0f) return false;
-
-    float tval = -(F*AKJB + E*JCAL + D*BLKC  ) / denon;
-
-    if(tval < 0.0f || tval > tmax) return false;
-
-    tnear = tval;
-    return true;
-}
-
-inline
 Vector2 Mesh::uv(const Vector3 &, size_t) const
 {
     return Vector2(0.0f, 0.0f);
 }
 
-inline
+
 void Mesh::fetch(const Ray &ray, IntersectionData &isec) const
 {
     isec.phit = ray.origin + isec.tnear * ray.direction;
     isec.normal = normal(isec.phit, isec.idx);
 }
+
+/************************************************************************
+ * GMesh class
+ ************************************************************************/
 
 GMesh::GMesh(std::shared_ptr<Mesh> mesh): Instance(mesh)
 {
@@ -176,12 +111,18 @@ void GMesh::setMaterial(const std::shared_ptr<Material> &value)
     material = value ? value : Material::DiffuseWhite;
 }
 
-BVH::BVH(std::vector<Vector3> &v, std::vector<Mesh::Triangle> &t): v(v), t(t)
+/************************************************************************
+ * BVH class
+ ************************************************************************/
+
+BVH::BVH(std::vector<Vector3> &v, std::vector<TriangleMesh> &t): v(v), t(t)
 {
     root = build(1, t.size()-1, 0);
 }
 
+
 BVH::~BVH(){ delete root; }
+
 
 BVH::Node* BVH::build(size_t l, size_t r, size_t axis)
 {
@@ -189,9 +130,9 @@ BVH::Node* BVH::build(size_t l, size_t r, size_t axis)
 
     for (size_t i = l; i <= r; ++i)
     {
-        bvh->extend(v[t[i].v0]);
-        bvh->extend(v[t[i].v1]);
-        bvh->extend(v[t[i].v2]);
+        bvh->extend(v[t[i].v[0]]);
+        bvh->extend(v[t[i].v[1]]);
+        bvh->extend(v[t[i].v[2]]);
     }
 
     if (l==r)
@@ -217,11 +158,9 @@ BVH::Node* BVH::build(size_t l, size_t r, size_t axis)
 
 bool BVH::intersection(Node *root, const Ray &ray, float tmax, IntersectionData &isec)
 {
-    if (root == nullptr) return false;
-
-    if(!root->left && !root->right)
+    if(!root->left)
     {
-        if(t[ m[root] ].intersection(v, ray, tmax, isec.tnear))
+        if(t[ m[root] ].intersection(ray, tmax, isec))
         {
             isec.idx = m[root];
             return true;
@@ -229,7 +168,7 @@ bool BVH::intersection(Node *root, const Ray &ray, float tmax, IntersectionData 
         return false;
     }
 
-    if(!root->intersection(ray)) return false;
+    if(!root->intersection(ray, tmax)) return false;
 
     bool hit_left = intersection(root->left, ray, tmax, isec);
     if ( hit_left )
@@ -243,13 +182,10 @@ bool BVH::intersection(Node *root, const Ray &ray, float tmax, IntersectionData 
 
 bool BVH::intersection(Node *root, const Ray &ray, float tmax)
 {
-    if (root == nullptr) return false;
+    if(!root->left)
+        return t[ m[root] ].intersection(ray, tmax);
 
-    if(!root->intersection(ray)) return false;
-
-    float tnear;
-    if(!root->left && !root->right)
-        return t[ m[root] ].intersection(v, ray, tmax, tnear);
+    if(!root->intersection(ray, tmax)) return false;
 
     if ( intersection(root->left, ray, tmax) ) return true;
     return intersection(root->right, ray, tmax);
@@ -260,11 +196,11 @@ size_t BVH::qsplit(size_t l, size_t r, float pivot, size_t axis)
     size_t j = l-1;
     for(size_t i=l; i <= r; ++i)
     {
-        float center = (v[t[i].v0][axis] + v[t[i].v1][axis] + v[t[i].v2][axis]) / 3;
+        float center = (v[t[i].v[0]][axis] + v[t[i].v[1]][axis] + v[t[i].v[2]][axis]) / 3;
         if (center < pivot)
         {
             ++j;
-            Mesh::Triangle tmp = t[i];
+            TriangleMesh tmp = t[i];
             t[i] = t[j];
             t[j] = tmp;
         }
@@ -272,3 +208,115 @@ size_t BVH::qsplit(size_t l, size_t r, float pivot, size_t axis)
     if(j==(l-1) || j==r) return (l+r)/2;
     return j+1;
 }
+
+/************************************************************************
+ * QuadMesh class
+ ************************************************************************/
+
+bool QuadMesh::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
+{
+    float t = ((verts[v[0]]-ray.origin) ^ nf) / (ray.direction ^ nf);
+
+    if( t < 0.0f || t > tmax) return false;
+
+    isec.tnear = t;
+    isec.phit = ray.origin + t * ray.direction;
+
+    return true;
+}
+
+bool QuadMesh::intersection(const Ray &ray, float tmax) const
+{
+    float t = ((verts[v[0]]-ray.origin) ^ nf) / (ray.direction ^ nf);
+
+    if( t < 0.0f || t > tmax) return false;
+
+    return true;
+}
+
+Vector3 QuadMesh::normal(const Vector3 &, size_t) const { return Vector3(0);}
+
+Vector2 QuadMesh::uv(const Vector3 &, size_t) const { return Vector2(0);}
+
+void QuadMesh::fetch(const Ray &, IntersectionData &) const {}
+
+/************************************************************************
+ * TriangleMesh class
+ ************************************************************************/
+
+TriangleMesh::TriangleMesh(const Mesh *m, size_t v0, size_t v1, size_t v2, size_t nv0, size_t nv1, size_t nv2)
+{
+    mesh = m;
+    v[0] = v0;
+    v[1] = v1;
+    v[2] = v2;
+    nv[0] = nv0;
+    nv[1] = nv1;
+    nv[2] = nv2;
+    nf = (mesh->normals[nv0] + mesh->normals[nv1] + mesh->normals[nv2]).normalize();
+    area = ((mesh->vertices[v1] - mesh->vertices[v0]) % (mesh->vertices[v2] - mesh->vertices[v0])).length() / 2;
+}
+
+bool TriangleMesh::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
+{
+    float A = mesh->vertices[v[0]].x - mesh->vertices[v[1]].x;
+    float B = mesh->vertices[v[0]].y - mesh->vertices[v[1]].y;
+    float C = mesh->vertices[v[0]].z - mesh->vertices[v[1]].z;
+
+    float D = mesh->vertices[v[0]].x - mesh->vertices[v[2]].x;
+    float E = mesh->vertices[v[0]].y - mesh->vertices[v[2]].y;
+    float F = mesh->vertices[v[0]].z - mesh->vertices[v[2]].z;
+
+    float G = ray.direction.x;
+    float H = ray.direction.y;
+    float I = ray.direction.z;
+
+    float J = mesh->vertices[v[0]].x - ray.origin.x;
+    float K = mesh->vertices[v[0]].y - ray.origin.y;
+    float L = mesh->vertices[v[0]].z - ray.origin.z;
+
+
+    float EIHF = E*I-H*F;
+    float GFDI = G*F-D*I;
+    float DHEG = D*H-E*G;
+
+    float denon = A*EIHF + B*GFDI + C*DHEG;
+
+    float beta = (J*EIHF + K*GFDI + L*DHEG) / denon;
+
+    if (beta <= 0.0f || beta >= 1.0f) return false;
+
+    float AKJB = A*K-J*B;
+    float JCAL = J*C-A*L;
+    float BLKC = B*L-K*C;
+
+    float gamma = (I*AKJB + H*JCAL + G*BLKC ) / denon;
+
+    if (gamma <= 0.0f || beta + gamma >= 1.0f) return false;
+
+    float tval = -(F*AKJB + E*JCAL + D*BLKC  ) / denon;
+
+    if(tval < 0.0f || tval > tmax) return false;
+
+    isec.tnear = tval;
+    return true;
+}
+
+bool TriangleMesh::intersection(const Ray &ray, float tmax) const
+{
+    IntersectionData isec;
+    return intersection(ray, tmax, isec);
+}
+
+Vector3 TriangleMesh::normal(const Vector3 &, size_t) const { return Vector3(0);}
+
+Vector2 TriangleMesh::uv(const Vector3 &, size_t) const { return Vector2(0);}
+
+void TriangleMesh::fetch(const Ray &, IntersectionData &) const {}
+
+std::ostream& operator <<(std::ostream &os, const TriangleMesh &t)
+{
+    return os << t.v[0] << " " << t.v[1] << " " << t.v[2] << " - " << "  " << t.nf ;
+}
+
+

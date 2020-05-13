@@ -10,7 +10,7 @@ class RayTracer
 {
 public:    
     RayTracer();
-
+    ~RayTracer();
     void render(const Scene& scene);
 
     Camera&       getCamera() { return camera; }

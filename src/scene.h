@@ -15,6 +15,7 @@ class Scene
 public:
     Scene();
     Scene(const std::string &fileName);
+    ~Scene();
 
     void addLight(Light * light);
 

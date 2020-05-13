@@ -17,6 +17,8 @@ RayTracer::RayTracer()
     setTracer(RayTracerType::RayTracerPhong);
 }
 
+RayTracer::~RayTracer(){}
+
 void RayTracer::render(const Scene& scene)
 {
     const float grid = scene.grid;

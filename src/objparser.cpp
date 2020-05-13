@@ -10,7 +10,7 @@ void OBJParser::ParseMesh(const std::string &path, std::shared_ptr<Mesh> &mesh)
     mesh->clear();
     mesh->addVertex({});
     mesh->addNormal({});
-    mesh->addFace(0,0,0,0,0,0);
+    mesh->addFace({});
 
     std::ifstream ifs (path, std::ifstream::in);
 
@@ -45,7 +45,7 @@ void OBJParser::ParseMesh(const std::string &path, std::shared_ptr<Mesh> &mesh)
                 size_t v3 = stoi(list1[0]);
                 size_t nv3 = stoi(list1[2]);
 
-                mesh->addFace(v1, v2, v3, nv1, nv2, nv3);
+                mesh->addFace(TriangleMesh(mesh.get(), v1, v2, v3, nv1, nv2, nv3));
             }
         }
     }

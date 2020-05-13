@@ -5,31 +5,67 @@
 #include "aabb.h"
 #include <map>
 
-class BVH;
+ class BVH;
+ class Mesh;
+
+class QuadMesh: public Shape
+{   
+    size_t v[4];
+    size_t nv[4];
+    Vector3 nf;
+    const Vector3 *verts;
+
+    // Shape interface
+    bool  intersection(const Ray& ray, float tmax, IntersectionData& isec) const;
+    bool  intersection(const Ray& ray, float tmax) const;
+
+    //ignore those
+    Vector3 normal(const Vector3 &, size_t ) const;
+    Vector2 uv(const Vector3 &, size_t) const;
+    void fetch(const Ray &, IntersectionData &) const;
+};
+
+class TriangleMesh: public Shape
+{
+public:
+    TriangleMesh() = default;
+    TriangleMesh(const Mesh *m, size_t v0, size_t v1, size_t v2, size_t nv0, size_t nv1, size_t nv2 );
+
+    // Shape interface
+    bool  intersection(const Ray& ray, float tmax, IntersectionData& isec) const;
+    bool  intersection(const Ray& ray, float tmax) const;
+
+    size_t v[3];    // vertices index
+    size_t nv[3];   // normals index
+
+    Vector3 nf;
+
+    float area;
+
+    friend std::ostream& operator << (std::ostream &os, const TriangleMesh &t);
+
+private:
+    //pointer to the mesh
+    const Mesh *mesh;
+
+    //ignore those
+    Vector3 normal(const Vector3 &, size_t ) const;
+    Vector2 uv(const Vector3 &, size_t) const;
+    void fetch(const Ray &, IntersectionData &) const;
+};
+
 
 class Mesh: public Shape
 {    
 public:
-    Mesh() = default;
-
-    struct Triangle
-    {
-        size_t v0, v1, v2;      // 3 vertex indexes
-        size_t nv0, nv1, nv2;   // 3 normal indexes for vertices
-        Vector3 nf;             // face normal
-        float area;
-        bool intersection(const std::vector<Vector3>   &vertices, const Ray &ray, float tmax, float &tnear) const;
-    };
-
     void addVertex(const Vector3& v);
     void addNormal(const Vector3& n);
-    void addFace(size_t v0, size_t v1, size_t v2, size_t nv0, size_t nv1, size_t nv2);
+    void addFace(const TriangleMesh& f);
 
     void clear();
     void updateAABB();
 
     friend std::ostream& operator << (std::ostream& os, const Mesh &m);
-    friend std::ostream& operator << (std::ostream &os, const Triangle &f);
 
     // Shape interface
     bool  intersection(const Ray& ray, float tmax, IntersectionData& isec) const;
@@ -39,10 +75,12 @@ public:
     virtual void fetch(const Ray &ray, IntersectionData &isec) const override;
 
 protected:
-    std::unique_ptr<BVH>   aabb;
+    std::unique_ptr<BVH>   bvh;
     std::vector<Vector3>   vertices;
     std::vector<Vector3>   normals;
-    std::vector<Triangle>  faces;    
+    std::vector<TriangleMesh>  faces;
+
+    friend class TriangleMesh;
 };
 
 class GMesh: public Instance
@@ -59,6 +97,7 @@ protected:
     std::shared_ptr<Material> material;
 };
 
+
 class BVH
 {
     struct Node: public AABB
@@ -73,7 +112,7 @@ class BVH
     };
 
     std::vector<Vector3> &v;
-    std::vector<Mesh::Triangle> &t;
+    std::vector<TriangleMesh> &t;
     Node *root;
     std::map<Node*,     size_t> m;
 
@@ -83,7 +122,7 @@ class BVH
     size_t qsplit(size_t l, size_t r, float pivot, size_t axis);
 
 public:
-    BVH(std::vector<Vector3> &v, std::vector<Mesh::Triangle> &t);
+    BVH(std::vector<Vector3> &v, std::vector<TriangleMesh> &t);
     ~BVH();
 
     bool intersection(const Ray &ray, float tmax)

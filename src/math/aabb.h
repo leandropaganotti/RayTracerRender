@@ -10,7 +10,7 @@ public:
 
     void create(const std::vector<Vector3>& vertices);
     void extend(const Vector3 &v);
-    bool intersection(const Ray &ray) const;
+    bool intersection(const Ray &ray, float tmax) const;
     Vector3 getCenter();
 protected:
     Vector3 min;

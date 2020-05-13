@@ -10,6 +10,8 @@ Scene::Scene(const std::string &fileName): name("unamed"), ambientIndex(1.0f), k
     load(fileName);
 }
 
+Scene::~Scene(){}
+
 void Scene::addLight(Light *light)
 {
     lights.emplace_back(light);
