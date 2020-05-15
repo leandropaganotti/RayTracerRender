@@ -2,7 +2,7 @@
 #include <float.h>
 #include "objparser.h"
 #include "material.h"
-
+#include "invisible.h"
 /************************************************************************
  * Mesh class
  ************************************************************************/
@@ -49,7 +49,11 @@ std::ostream &operator <<(std::ostream &os, const Mesh &m)
     os << "Mesh:" << std::endl;
     os << "|Vertices: " << std::endl;
     for(size_t i= 0 ; i < m.vertices.size(); ++i)
-        std::cout << "||" << i << ":" << m.vertices[i] << " ---> " << m.vertices[i] << std::endl;
+        std::cout << "||" << i << ":" << m.vertices[i] << std::endl;
+
+    os << "|Normals: " << std::endl;
+    for(size_t i= 0 ; i < m.normals.size(); ++i)
+        std::cout << "||" << i << ":" << m.normals[i] << std::endl;
 
     os << "|Faces: " << std::endl;
     for(size_t i= 0 ; i < m.faces.size(); ++i)
@@ -117,43 +121,41 @@ void GMesh::setMaterial(const std::shared_ptr<Material> &value)
 
 BVH::BVH(std::vector<Vector3> &v, std::vector<TriangleMesh> &t): v(v), t(t)
 {
-    root = build(1, t.size()-1, 0);
+   root = build(1, t.size()-1, 0);
 }
 
 
-BVH::~BVH(){ delete root; }
+BVH::~BVH(){ if(root) delete root; }
 
 
 BVH::Node* BVH::build(size_t l, size_t r, size_t axis)
 {
-    Node *bvh = new Node;
+    Node *node = new Node;
 
     for (size_t i = l; i <= r; ++i)
     {
-        bvh->extend(v[t[i].v[0]]);
-        bvh->extend(v[t[i].v[1]]);
-        bvh->extend(v[t[i].v[2]]);
+        node->extend(t[i].getAABB());
     }
 
     if (l==r)
     {
-        m[bvh] = l;
-        return bvh;
+        m[node] = l;
+        return node;
     }
     if(l == (r-1))
     {
-        bvh->left = new Node;
-        bvh->right = new Node;
-        m[bvh->left] = l;
-        m[bvh->right] = r;
-        return bvh;
+        node->left = new Node;
+        node->right = new Node;
+        m[node->left] = l;
+        m[node->right] = r;
+        return node;
     }
 
-    size_t pivot = qsplit(l, r, bvh->getCenter()[axis], axis);
-    bvh->left = build(l, pivot-1, (axis+1)%3);
-    bvh->right = build(pivot, r, (axis+1)%3);
+    size_t pivot = qsplit(l, r, node->getCenter()[axis], axis);
+    node->left = build(l, pivot-1, (axis+1)%3);
+    node->right = build(pivot, r, (axis+1)%3);
 
-    return bvh;
+    return node;
 }
 
 bool BVH::intersection(Node *root, const Ray &ray, float tmax, IntersectionData &isec)
@@ -196,6 +198,7 @@ size_t BVH::qsplit(size_t l, size_t r, float pivot, size_t axis)
     size_t j = l-1;
     for(size_t i=l; i <= r; ++i)
     {
+        //float center = t[i].getAABB().getCenter()[axis]; // this code is slower
         float center = (v[t[i].v[0]][axis] + v[t[i].v[1]][axis] + v[t[i].v[2]][axis]) / 3;
         if (center < pivot)
         {
@@ -213,25 +216,81 @@ size_t BVH::qsplit(size_t l, size_t r, float pivot, size_t axis)
  * QuadMesh class
  ************************************************************************/
 
+QuadMesh::QuadMesh(const Mesh *m, size_t v0, size_t v1, size_t v2, size_t v3, size_t nv0, size_t nv1, size_t nv2, size_t nv3)
+{
+    mesh = m;
+    v[0] = v0;
+    v[1] = v1;
+    v[2] = v2;
+    v[3] = v3;
+    nv[0] = nv0;
+    nv[1] = nv1;
+    nv[2] = nv2;
+    nv[3] = nv3;
+
+    nf = (mesh->normals[nv0] + mesh->normals[nv1] + mesh->normals[nv2]).normalize();
+    aabb.extend({mesh->vertices[v0], mesh->vertices[v1], mesh->vertices[v2], mesh->vertices[v3]});
+    area = ((mesh->vertices[v1] - mesh->vertices[v0]) % (mesh->vertices[v2] - mesh->vertices[v0])).length() / 2;
+    area += ((mesh->vertices[v2] - mesh->vertices[v0]) % (mesh->vertices[v3] - mesh->vertices[v0])).length() / 2;
+
+}
+
 bool QuadMesh::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
 {
-    float t = ((verts[v[0]]-ray.origin) ^ nf) / (ray.direction ^ nf);
+    float t = ((mesh->vertices[v[0]]-ray.origin) ^ nf) / (ray.direction ^ nf);
 
     if( t < 0.0f || t > tmax) return false;
 
-    isec.tnear = t;
-    isec.phit = ray.origin + t * ray.direction;
+    Vector3 phit = ray.origin + t * ray.direction;
 
+    Vector3 PV0 =  mesh->vertices[v[0]] - phit;
+    Vector3 PV1 =  mesh->vertices[v[1]] - phit;
+    Vector3 PV2 =  mesh->vertices[v[2]] - phit;
+    Vector3 PV3 =  mesh->vertices[v[3]] - phit;
+
+    if ((PV0 ^ PV1) > 0.0f &&
+
+    (PV1 ^ PV2) > 0.0f &&
+
+    (PV2 ^ PV3) > 0.0f &&
+
+    (PV3 ^ PV0) > 0.0f) return false;
+
+    isec.tnear = t;
     return true;
 }
 
 bool QuadMesh::intersection(const Ray &ray, float tmax) const
 {
-    float t = ((verts[v[0]]-ray.origin) ^ nf) / (ray.direction ^ nf);
+    float t = ((mesh->vertices[v[0]]-ray.origin) ^ nf) / (ray.direction ^ nf);
 
     if( t < 0.0f || t > tmax) return false;
 
+    Vector3 phit = ray.origin + t * ray.direction;
+
+    Vector3 PV0 =  mesh->vertices[v[0]] - phit;
+    Vector3 PV1 =  mesh->vertices[v[1]] - phit;
+    Vector3 PV2 =  mesh->vertices[v[2]] - phit;
+    Vector3 PV3 =  mesh->vertices[v[3]] - phit;
+
+    float a  = (PV0 % PV1).length() ;
+    a += (PV1 % PV2).length() ;
+    a += (PV2 % PV3).length() ;
+    a += (PV3 % PV0).length() ;
+    a /= 2;
+    if((a - area) > 0.001f) return false;
+
     return true;
+}
+
+AABB QuadMesh::getAABB() const
+{
+    return aabb;
+}
+
+std::ostream& operator <<(std::ostream &os, const QuadMesh &q)
+{
+    return os << q.v[0] << " " << q.v[1] << " " << q.v[2] << " " << q.v[3] << " - " << "  " << q.nf ;
 }
 
 Vector3 QuadMesh::normal(const Vector3 &, size_t) const { return Vector3(0);}
@@ -253,8 +312,10 @@ TriangleMesh::TriangleMesh(const Mesh *m, size_t v0, size_t v1, size_t v2, size_
     nv[0] = nv0;
     nv[1] = nv1;
     nv[2] = nv2;
+
     nf = (mesh->normals[nv0] + mesh->normals[nv1] + mesh->normals[nv2]).normalize();
     area = ((mesh->vertices[v1] - mesh->vertices[v0]) % (mesh->vertices[v2] - mesh->vertices[v0])).length() / 2;
+    aabb.extend({mesh->vertices[v0], mesh->vertices[v1], mesh->vertices[v2]});
 }
 
 bool TriangleMesh::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
@@ -308,6 +369,11 @@ bool TriangleMesh::intersection(const Ray &ray, float tmax) const
     return intersection(ray, tmax, isec);
 }
 
+AABB TriangleMesh::getAABB() const
+{
+    return aabb;
+}
+
 Vector3 TriangleMesh::normal(const Vector3 &, size_t) const { return Vector3(0);}
 
 Vector2 TriangleMesh::uv(const Vector3 &, size_t) const { return Vector2(0);}
@@ -318,5 +384,3 @@ std::ostream& operator <<(std::ostream &os, const TriangleMesh &t)
 {
     return os << t.v[0] << " " << t.v[1] << " " << t.v[2] << " - " << "  " << t.nf ;
 }
-
-

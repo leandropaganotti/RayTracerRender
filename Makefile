@@ -1,7 +1,7 @@
 PROGRAM = render
 OBJDIR = build
 
-CXXFLAGS =  -O3 -std=c++14 -Wall -W -fopenmp -Winline
+CXXFLAGS =  -O3 -std=c++2a -Wall -W -fopenmp -Winline
 CXX = g++
 INCPATH = -I./src -I./src/math -I./src/math/shapes -I/usr/include/libxml2
 LIBDIRS = -L/usr/lib/x86_64-linux-gnu

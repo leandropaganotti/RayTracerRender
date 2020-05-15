@@ -7,45 +7,55 @@ Vector3 AABB::getCenter()
     return (min + max) * 0.5f;
 }
 
-void AABB::create(const std::vector<Vector3> &vertices)
+Vector3 AABB::getMin() const
 {
-    min.x=FLT_MAX; max.x=FLT_MIN;
-    min.y=FLT_MAX; max.y=FLT_MIN;
-    min.z=FLT_MAX; max.z=FLT_MIN;
+    return min;
+}
 
-    for(size_t i= 0 ; i < vertices.size(); ++i)
+void AABB::setMin(const Vector3 &value)
+{
+    min = value;
+}
+
+Vector3 AABB::getMax() const
+{
+    return max;
+}
+
+void AABB::setMax(const Vector3 &value)
+{
+    max = value;
+}
+
+void AABB::extend(const std::vector<Vector3> &vertices)
+{
+    for(const auto &v: vertices)
     {
-        if (vertices[i].x < min.x)
-            min.x = vertices[i].x;
-        if (vertices[i].y < min.y)
-            min.y = vertices[i].y;
-        if (vertices[i].z < min.z)
-            min.z = vertices[i].z;
-
-        if (vertices[i].x > max.x)
-            max.x = vertices[i].x;
-        if (vertices[i].y > max.y)
-            max.y = vertices[i].y;
-        if (vertices[i].z > max.z)
-            max.z = vertices[i].z;
+        extend(v);
     }
 }
 
-void AABB::extend(const Vector3 &v)
+void AABB::extend(const Vector3 &vertex)
 {
-    if (v.x < min.x)
-        min.x = v.x;
-    if (v.y < min.y)
-        min.y = v.y;
-    if (v.z < min.z)
-        min.z = v.z;
+    if (vertex.x < min.x)
+        min.x = vertex.x;
+    if (vertex.y < min.y)
+        min.y = vertex.y;
+    if (vertex.z < min.z)
+        min.z = vertex.z;
 
-    if (v.x > max.x)
-        max.x = v.x;
-    if (v.y > max.y)
-        max.y = v.y;
-    if (v.z > max.z)
-        max.z = v.z;
+    if (vertex.x > max.x)
+        max.x = vertex.x;
+    if (vertex.y > max.y)
+        max.y = vertex.y;
+    if (vertex.z > max.z)
+        max.z = vertex.z;
+}
+
+void AABB::extend(const AABB &aabb)
+{
+    extend(aabb.getMin());
+    extend(aabb.getMax());
 }
 
 bool AABB::intersection(const Ray &ray, float tmax) const
@@ -72,7 +82,7 @@ bool AABB::intersection(const Ray &ray, float tmax) const
     return true;
 }
 
-AABB::AABB(const Vector3 &min, const Vector3 &max): min(min), max(max)
+AABB::AABB(const Vector3 min, const Vector3 max): min(min), max(max)
 {
 
 }

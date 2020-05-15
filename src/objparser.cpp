@@ -1,9 +1,55 @@
 #include "objparser.h"
 #include <fstream>
 #include <vector>
-#include "utils.h"
 #include <sstream>
-#include "mesh.h"
+
+const std::string WHITESPACE = " \n\r\t\f\v";
+
+std::string ltrim(const std::string& s)
+{
+    size_t start = s.find_first_not_of(WHITESPACE);
+    return (start == std::string::npos) ? "" : s.substr(start);
+}
+
+std::string rtrim(const std::string& s)
+{
+    size_t end = s.find_last_not_of(WHITESPACE);
+    return (end == std::string::npos) ? "" : s.substr(0, end + 1);
+}
+
+std::string trim(const std::string& s)
+{
+    std::string trimed = rtrim(ltrim(s));
+    size_t i=0;
+    int count=0;
+    while(s[i]!='\0')
+    {
+        if(isspace(trimed[i]))
+        {
+            if (count == 1)
+                trimed.erase(i, 1);
+            else
+                ++count;
+        }
+        else
+            count = 0;
+
+
+        ++i;
+    }
+
+    return trimed;
+}
+
+std::vector<std::string> split(const std::string &s, char delim) {
+  std::stringstream ss(s);
+  std::string item;
+  std::vector<std::string> elems;
+  while (std::getline(ss, item, delim)) {
+    elems.push_back(std::move(item));
+  }
+  return elems;
+}
 
 void OBJParser::ParseMesh(const std::string &path, std::shared_ptr<Mesh> &mesh)
 {    
@@ -14,46 +60,61 @@ void OBJParser::ParseMesh(const std::string &path, std::shared_ptr<Mesh> &mesh)
 
     std::ifstream ifs (path, std::ifstream::in);
 
-    if (ifs.is_open())
+    if (!ifs.is_open())
     {
-        std::string line;
-        while (!ifs.eof())
+        std::cerr << "Error opening file: " << path << std::endl << path;
+        return;
+    }
+
+    std::string line;
+    while (!ifs.eof())
+    {
+
+        std::getline(ifs, line);
+        line = trim(line);
+        //std::cout << line << std::endl;
+        std::vector<std::string> list = split(line, ' ');
+
+        if (list.size() == 0) continue;
+
+        if (list.size() == 4 && list[0] == "v")
         {
-            std::getline(ifs, line);
-            std::vector<std::string> list = split(line, ' ');
-            //v 1.250047 0.000000 0.000000
-            if (list.size() == 4 && list[0] == "v")
-            {
-                mesh->addVertex({stof(list[1]), stof(list[2]), stof(list[3])});
-            }
-            else if (list.size() == 4 && list[0] == "vn")
-            {
-                mesh->addNormal({stof(list[1]), stof(list[2]), stof(list[3])});
-            }
-            else if (list.size() == 4 && list[0] == "f")
-            {
-                std::vector<std::string> list1;
-                list1 = split(list[1], '/');
-                size_t v1 = stoi(list1[0]);
-                size_t nv1 = stoi(list1[2]);
+            mesh->addVertex({stof(list[1]), stof(list[2]), stof(list[3])});
+        }
+        else if (list.size() == 4 && list[0] == "vn")
+        {
+            mesh->addNormal({stof(list[1]), stof(list[2]), stof(list[3])});
+        }
+        else if (list.size() >= 4 && list[0] == "f")
+        {
+            std::vector<std::string> list1;
+            list1 = split(list[1], '/');
+            size_t v1 = stoull(list1[0]);
+            size_t nv1 = stoull(list1[2]);
 
-                list1 = split(list[2], '/');
-                size_t v2 = stoi(list1[0]);
-                size_t nv2 = stoi(list1[2]);
+            list1 = split(list[2], '/');
+            size_t v2 = stoull(list1[0]);
+            size_t nv2 = stoull(list1[2]);
 
-                list1 = split(list[3], '/');
-                size_t v3 = stoi(list1[0]);
-                size_t nv3 = stoi(list1[2]);
+            list1 = split(list[3], '/');
+            size_t v3 = stoull(list1[0]);
+            size_t nv3 = stoull(list1[2]);
 
-                mesh->addFace(TriangleMesh(mesh.get(), v1, v2, v3, nv1, nv2, nv3));
+            mesh->addFace(TriangleMesh(mesh.get(), v1, v2, v3, nv1, nv2, nv3));
+
+            if(list.size() == 5)
+            {
+                list1 = split(list[4], '/');
+                size_t v4 = stoull(list1[0]);
+                size_t nv4 = stoull(list1[2]);
+
+                mesh->addFace(TriangleMesh(mesh.get(), v1, v3, v4, nv1, nv3, nv4));
+
             }
         }
     }
-    else
-    {
-        std::cerr << "Error opening file: " << path << std::endl << path;
-    }
-    //std::cout << mesh << std::endl;
+
+    //std::cout << *mesh << std::endl;
     ifs.close();
-    mesh->updateAABB();    
+    mesh->updateAABB();
 }
