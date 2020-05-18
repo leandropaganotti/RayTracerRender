@@ -150,7 +150,6 @@ BVH::Node* BVH::build(size_t l, size_t r, size_t axis)
         m[node->right] = r;
         return node;
     }
-
     size_t pivot = qsplit(l, r, node->getCenter()[axis], axis);
     node->left = build(l, pivot-1, (axis+1)%3);
     node->right = build(pivot, r, (axis+1)%3);
