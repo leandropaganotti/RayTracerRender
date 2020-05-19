@@ -1,8 +1,15 @@
 #include "invisible.h"
 
+std::shared_ptr<Shape> InvisibleShape::instance = std::shared_ptr<InvisibleShape>(new InvisibleShape);
+
 InvisibleShape::InvisibleShape()
 {
 
+}
+
+std::shared_ptr<Shape> InvisibleShape::GetInstance()
+{
+   return instance;
 }
 
 bool InvisibleShape::intersection(const Ray &, float, IntersectionData &) const

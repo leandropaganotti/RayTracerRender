@@ -8,9 +8,9 @@ scenes/ModifiedCornellBox3.xml
 scenes/ballsOnTheMirror.xml
 scenes/basic.xml
 scenes/glassOfwine.xml
-scenes/monkeyModel.xml
 scenes/ptexture.xml
 scenes/refraction.xml
+scenes/suzanne.xml
 scenes/test.xml
 src/camera.cpp
 src/camera.h
@@ -33,6 +33,7 @@ src/math/shapes/box.cpp
 src/math/shapes/box.h
 src/math/shapes/cylinder.cpp
 src/math/shapes/cylinder.h
+src/math/shapes/instance.h
 src/math/shapes/invisible.cpp
 src/math/shapes/invisible.h
 src/math/shapes/mesh.cpp

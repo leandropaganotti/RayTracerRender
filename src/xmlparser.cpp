@@ -667,6 +667,8 @@ std::shared_ptr<GMesh> XMLParser::parseMesh(xmlNode *xmlMeshNode)
             std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlMeshNode->name << "\':" << name << "\x1b[0m" << std::endl;
     }
 
+    if(!mesh) return nullptr;
+
     auto gmesh = std::shared_ptr<GMesh>(new GMesh(mesh));
 
     xmlNode *node = NULL;

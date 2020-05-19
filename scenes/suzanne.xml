@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scene name="monkey" grid="1" spp="1" index="1.0" maxdepth="5" bgcolor="0" ka="0.1">
+    <CameraOptions position="0,2,10" lookingat="0" fov="15" width="320" height="320"></CameraOptions>
+    <PointLight position="0,3,6.5" color="1" strength="1.5" k="0.01"></PointLight>
+    <mesh name="monkey"  path="obj/suzanne.obj">
+        <!--<transformation translate="0" rotate="-90, 0, 0" scale="0.034, 0.034, 0.034"></transformation>-->
+        <material type="diffuse" kd="0.8, 0.8, 0.8, 0.91, 0.84" ks="1"></material>
+    </mesh>
+</scene>

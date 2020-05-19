@@ -3,6 +3,7 @@
 #include <vector>
 #include "shape.h"
 #include "aabb.h"
+#include "instance.h"
 #include <map>
 
  class BVH;

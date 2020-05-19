@@ -1,11 +1,14 @@
 #pragma once
 
 #include "shape.h"
+#include <memory>
 
 class InvisibleShape: public Shape
 {
-public:
     InvisibleShape();
+    static std::shared_ptr<Shape> instance;
+public:
+    static std::shared_ptr<Shape> GetInstance();
 
     bool intersection(const Ray &, float tmax, IntersectionData &) const override;
     bool intersection(const Ray &, float ) const override;

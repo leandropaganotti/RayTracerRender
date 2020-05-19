@@ -19,7 +19,8 @@ void Scene::addLight(Light *light)
 
 void Scene::addObject(std::shared_ptr<Shape> obj)
 {
-    objects.push_back(obj);
+    if(obj)
+        objects.push_back(obj);
 }
 
 void Scene::load(const std::string &fileName)

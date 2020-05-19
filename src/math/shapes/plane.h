@@ -1,6 +1,7 @@
 #pragma once
 
 #include "shape.h"
+#include <memory>
 
 class Plane: public Shape
 {
