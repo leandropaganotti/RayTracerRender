@@ -62,6 +62,8 @@ public:
 
     AABB aabb;
 
+    size_t idx;
+
 private:
     //pointer to the mesh
     const Mesh *mesh;
@@ -93,7 +95,7 @@ public:
     virtual void fetch(const Ray &ray, IntersectionData &isec) const override;
 
 protected:
-    std::unique_ptr<BVH>   bvh;
+    Shape   *bvh;
     std::vector<Vector3>   vertices;
     std::vector<Vector3>   normals;
     std::vector<TriangleMesh>  faces;
@@ -117,39 +119,23 @@ protected:
 };
 
 
-class BVH
+class BVH: public Shape
 {
-    struct Node: public AABB
-    {
-        Node *left=nullptr;
-        Node *right=nullptr;
-        ~Node()
-        {
-            if(left) delete left;
-            if(right) delete right;
-        }
-    };
-
-    std::vector<Vector3> &v;
-    std::vector<TriangleMesh> &t;
-    Node *root;
-    std::map<Node*,     size_t> m;
-
-    Node* build(size_t l, size_t r, size_t axis);
-    bool intersection(Node* root, const Ray &ray, float tmax, IntersectionData &isec);
-    bool intersection(Node* root, const Ray &ray, float tmax);
-    size_t qsplit(size_t l, size_t r, float pivot, size_t axis);
-
 public:
-    BVH(std::vector<Vector3> &v, std::vector<TriangleMesh> &t);
     ~BVH();
 
-    bool intersection(const Ray &ray, float tmax)
-    {
-        return intersection(root, ray, tmax);
-    }
-    bool intersection(const Ray &ray, float tmax, IntersectionData &isec)
-    {
-        return intersection(root, ray, tmax, isec);
-    }
+    static Shape* Create(std::vector<TriangleMesh> &shapes, size_t l, size_t r, size_t axis);
+    bool intersection(const Ray &ray, float tmax, IntersectionData &isec) const override;
+    bool intersection(const Ray &ray, float tmax) const override;
+private:
+    BVH();
+    AABB aabb;
+    Shape *left;
+    Shape *right;
+
+    static size_t qsplit(std::vector<TriangleMesh> &shapes, size_t l, size_t r, float pivot, size_t axis);
+
+    Vector3 normal(const Vector3 &phit, size_t idx) const override;
+    Vector2 uv(const Vector3 &phit, size_t idx) const override;
+    void fetch(const Ray &ray, IntersectionData &isec) const override;
 };

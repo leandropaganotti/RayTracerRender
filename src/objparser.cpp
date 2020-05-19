@@ -51,8 +51,9 @@ std::vector<std::string> split(const std::string &s, char delim) {
   return elems;
 }
 
-void OBJParser::ParseMesh(const std::string &path, std::shared_ptr<Mesh> &mesh)
-{    
+std::shared_ptr<Mesh> OBJParser::ParseMesh(const std::string &path)
+{
+    auto mesh = std::shared_ptr<Mesh>(new Mesh);
     mesh->clear();
     mesh->addVertex({});
     mesh->addNormal({});
@@ -63,7 +64,7 @@ void OBJParser::ParseMesh(const std::string &path, std::shared_ptr<Mesh> &mesh)
     if (!ifs.is_open())
     {
         std::cerr << "Error opening file: " << path << std::endl << path;
-        return;
+        return nullptr;
     }
 
     std::string line;
@@ -100,7 +101,8 @@ void OBJParser::ParseMesh(const std::string &path, std::shared_ptr<Mesh> &mesh)
             size_t v3 = stoull(list1[0]);
             size_t nv3 = stoull(list1[2]);
 
-            mesh->addFace(TriangleMesh(mesh.get(), v1, v2, v3, nv1, nv2, nv3));
+            TriangleMesh t(mesh.get(), v1, v2, v3, nv1, nv2, nv3);
+            mesh->addFace(t);
 
             if(list.size() == 5)
             {
@@ -108,7 +110,8 @@ void OBJParser::ParseMesh(const std::string &path, std::shared_ptr<Mesh> &mesh)
                 size_t v4 = stoull(list1[0]);
                 size_t nv4 = stoull(list1[2]);
 
-                mesh->addFace(TriangleMesh(mesh.get(), v1, v3, v4, nv1, nv3, nv4));
+                TriangleMesh t2(mesh.get(), v1, v3, v4, nv1, nv3, nv4);
+                mesh->addFace(t2);
 
             }
         }
@@ -117,4 +120,5 @@ void OBJParser::ParseMesh(const std::string &path, std::shared_ptr<Mesh> &mesh)
     //std::cout << *mesh << std::endl;
     ifs.close();
     mesh->updateAABB();
+    return mesh;
 }

@@ -20,6 +20,7 @@ void Mesh::addNormal(const Vector3 &n)
 void Mesh::addFace(const TriangleMesh &f)
 {
     faces.push_back(f);
+    faces.back().idx = faces.size()-1;
 }
 
 void Mesh::clear()
@@ -31,7 +32,7 @@ void Mesh::clear()
 
 void Mesh::updateAABB()
 {
-    bvh.reset(new BVH(vertices, faces));
+    bvh = BVH::Create(faces, 1, faces.size()-1, 0);
 }
 
 bool Mesh::intersection(const Ray& ray, float tmax, IntersectionData &isec) const
@@ -119,92 +120,93 @@ void GMesh::setMaterial(const std::shared_ptr<Material> &value)
  * BVH class
  ************************************************************************/
 
-BVH::BVH(std::vector<Vector3> &v, std::vector<TriangleMesh> &t): v(v), t(t)
+BVH::BVH()
 {
-   root = build(1, t.size()-1, 0);
+    left = right = nullptr;
 }
 
+BVH::~BVH(){ }
 
-BVH::~BVH(){ if(root) delete root; }
 
-
-BVH::Node* BVH::build(size_t l, size_t r, size_t axis)
+Shape* BVH::Create(std::vector<TriangleMesh> &shapes, size_t l, size_t r, size_t axis)
 {
-    Node *node = new Node;
-
-    for (size_t i = l; i <= r; ++i)
-    {
-        node->extend(t[i].getAABB());
-    }
-
     if (l==r)
     {
-        m[node] = l;
-        return node;
+        return &shapes[l];
     }
+
+    AABB aabb;
+    for (size_t i = l; i <= r; ++i)
+    {
+        aabb.extend(shapes[i].getAABB());
+    }
+    BVH *bvh = new BVH;
+    bvh->aabb = aabb;
     if(l == (r-1))
     {
-        node->left = new Node;
-        node->right = new Node;
-        m[node->left] = l;
-        m[node->right] = r;
-        return node;
+        bvh->left = &shapes[l];
+        bvh->right = &shapes[r];
+        return bvh;
     }
-    size_t pivot = qsplit(l, r, node->getCenter()[axis], axis);
-    node->left = build(l, pivot-1, (axis+1)%3);
-    node->right = build(pivot, r, (axis+1)%3);
+    size_t pivot = qsplit(shapes, l, r, aabb.getCenter()[axis], axis);
+    bvh->left = Create(shapes, l, pivot-1, (axis+1)%3);
+    bvh->right = Create(shapes, pivot, r, (axis+1)%3);
 
-    return node;
+    return bvh;
 }
 
-bool BVH::intersection(Node *root, const Ray &ray, float tmax, IntersectionData &isec)
+Vector3 BVH::normal(const Vector3 &phit, size_t idx) const
 {
-    if(!root->left)
-    {
-        if(t[ m[root] ].intersection(ray, tmax, isec))
-        {
-            isec.idx = m[root];
-            return true;
-        }
-        return false;
-    }
 
-    if(!root->intersection(ray, tmax)) return false;
+}
 
-    bool hit_left = intersection(root->left, ray, tmax, isec);
+Vector2 BVH::uv(const Vector3 &phit, size_t idx) const
+{
+
+}
+
+void BVH::fetch(const Ray &ray, IntersectionData &isec) const
+{
+
+}
+
+bool BVH::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
+{
+    if(!aabb.intersection(ray, tmax)) return false;
+
+    bool hit_left = left->intersection(ray, tmax, isec);
     if ( hit_left )
     {
         tmax = isec.tnear;
     }
 
-    bool hit_right = intersection(root->right, ray, tmax, isec);
+    bool hit_right = right->intersection(ray, tmax, isec);
     return hit_left || hit_right;
 }
 
-bool BVH::intersection(Node *root, const Ray &ray, float tmax)
+bool BVH::intersection(const Ray &ray, float tmax) const
 {
-    if(!root->left)
-        return t[ m[root] ].intersection(ray, tmax);
+    if(!aabb.intersection(ray, tmax)) return false;
 
-    if(!root->intersection(ray, tmax)) return false;
-
-    if ( intersection(root->left, ray, tmax) ) return true;
-    return intersection(root->right, ray, tmax);
+    if ( left->intersection(ray, tmax) ) return true;
+    return right->intersection(ray, tmax);
 }
 
-size_t BVH::qsplit(size_t l, size_t r, float pivot, size_t axis)
+size_t BVH::qsplit(std::vector<TriangleMesh> &shapes, size_t l, size_t r, float pivot, size_t axis)
 {
     size_t j = l-1;
     for(size_t i=l; i <= r; ++i)
     {
-        //float center = t[i].getAABB().getCenter()[axis]; // this code is slower
-        float center = (v[t[i].v[0]][axis] + v[t[i].v[1]][axis] + v[t[i].v[2]][axis]) / 3;
+        float center = shapes[i].getAABB().getCenter()[axis];
         if (center < pivot)
         {
             ++j;
-            TriangleMesh tmp = t[i];
-            t[i] = t[j];
-            t[j] = tmp;
+            TriangleMesh tmp = shapes[i];
+            shapes[i] = shapes[j];
+            shapes[j] = tmp;
+
+            shapes[i].idx = i;
+            shapes[j].idx = j;
         }
     }
     if(j==(l-1) || j==r) return (l+r)/2;
@@ -359,6 +361,7 @@ bool TriangleMesh::intersection(const Ray &ray, float tmax, IntersectionData &is
     if(tval < 0.0f || tval > tmax) return false;
 
     isec.tnear = tval;
+    isec.idx = idx;
     return true;
 }
 

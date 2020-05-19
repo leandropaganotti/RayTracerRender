@@ -648,7 +648,7 @@ std::shared_ptr<GMesh> XMLParser::parseMesh(xmlNode *xmlMeshNode)
          return nullptr;
     }
 
-    auto  mesh = std::shared_ptr<Mesh>(new Mesh);
+    std::shared_ptr<Mesh> mesh;
 
     const xmlAttr *attr = NULL;
     std::string name("");
@@ -659,7 +659,7 @@ std::shared_ptr<GMesh> XMLParser::parseMesh(xmlNode *xmlMeshNode)
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "path"))
         {
-            OBJParser::ParseMesh((const char*)attr->children->content, mesh);
+            mesh = OBJParser::ParseMesh((const char*)attr->children->content);
         }
         else if (equals(attr->name, "material"))
             ;

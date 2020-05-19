@@ -20,7 +20,9 @@ public:
     void extend(const Vector3 &v);
     void extend(const AABB &aabb);
     bool intersection(const Ray &ray, float tmax) const;
+
     Vector3 getCenter();
+
     Vector3 getMin() const;
     void setMin(const Vector3 &value);
 
