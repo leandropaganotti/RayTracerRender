@@ -109,6 +109,11 @@ void Sphere::fetch(const Ray &ray, IntersectionData &isec) const
     isec.normal = (isec.phit - center).normalize();
 }
 
+AABB Sphere::getAABB() const
+{
+    return AABB(center + Vector3(-radius, -radius, radius), center + Vector3(radius, radius, -radius));
+}
+
 GSphere::GSphere(const Vector3 &c, const float &r): Sphere(c, r)
 {
     material = Material::DiffuseWhite;

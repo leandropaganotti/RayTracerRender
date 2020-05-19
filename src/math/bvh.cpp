@@ -8,25 +8,36 @@ BVH::BVH()
 
 BVH::~BVH(){ }
 
+std::shared_ptr<Shape> BVH::Create(std::vector<std::shared_ptr<Shape>> &shapes)
+{
+    if (shapes.size() == 0) return InvisibleShape::GetInstance();
 
-Shape* BVH::Create(std::vector<TriangleMesh> &shapes, size_t l, size_t r, size_t axis)
+    std::vector<std::shared_ptr<Shape>> shapes_;
+    shapes_.push_back(std::shared_ptr<Shape>());
+    for (auto s: shapes)
+        shapes_.push_back(s);
+
+    return Create(shapes_, 1, shapes_.size()-1, 0);
+}
+
+std::shared_ptr<Shape> BVH::Create(std::vector<std::shared_ptr<Shape> > &shapes, size_t l, size_t r, size_t axis)
 {
     if (l==r)
     {
-        return &shapes[l];
+        return shapes[l];
     }
 
     AABB aabb;
     for (size_t i = l; i <= r; ++i)
     {
-        aabb.extend(shapes[i].getAABB());
+        aabb.extend(shapes[i]->getAABB());
     }
-    BVH *bvh = new BVH;
+    auto bvh = std::shared_ptr<BVH>(new BVH);
     bvh->aabb = aabb;
     if(l == (r-1))
     {
-        bvh->left = &shapes[l];
-        bvh->right = &shapes[r];
+        bvh->left = shapes[l];
+        bvh->right = shapes[r];
         return bvh;
     }
     size_t pivot = qsplit(shapes, l, r, aabb.getCenter()[axis], axis);
@@ -51,6 +62,11 @@ void BVH::fetch(const Ray &ray, IntersectionData &isec) const
 
 }
 
+AABB BVH::getAABB() const
+{
+    return aabb;
+}
+
 bool BVH::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
 {
     if(!aabb.intersection(ray, tmax)) return false;
@@ -73,21 +89,18 @@ bool BVH::intersection(const Ray &ray, float tmax) const
     return right->intersection(ray, tmax);
 }
 
-size_t BVH::qsplit(std::vector<TriangleMesh> &shapes, size_t l, size_t r, float pivot, size_t axis)
+size_t BVH::qsplit(std::vector<std::shared_ptr<Shape> > &shapes, size_t l, size_t r, float pivot, size_t axis)
 {
     size_t j = l-1;
     for(size_t i=l; i <= r; ++i)
     {
-        float center = shapes[i].getAABB().getCenter()[axis];
+        float center = shapes[i]->getAABB().getCenter()[axis];
         if (center < pivot)
         {
             ++j;
-            TriangleMesh tmp = shapes[i];
+            auto tmp = shapes[i];
             shapes[i] = shapes[j];
             shapes[j] = tmp;
-
-            shapes[i].idx = i;
-            shapes[j].idx = j;
         }
     }
     if(j==(l-1) || j==r) return (l+r)/2;

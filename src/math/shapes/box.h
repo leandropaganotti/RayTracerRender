@@ -11,11 +11,12 @@ class AABox: public Shape
 public:
     AABox(const Vector3 &min={-0.5f, -0.5f, 0.5f}, const Vector3 &max={0.5f,0.5f,-0.5f});
 
-    bool intersection(const Ray &ray, float tmax, IntersectionData &isec) const;
-    bool intersection(const Ray &ray, float tmax) const;
-    Vector3 normal(const Vector3 &phit, size_t idx) const;
-    Vector2 uv(const Vector3 &phit, size_t idx) const;
+    bool intersection(const Ray &ray, float tmax, IntersectionData &isec) const override;
+    bool intersection(const Ray &ray, float tmax) const override;
+    Vector3 normal(const Vector3 &phit, size_t idx) const override;
+    Vector2 uv(const Vector3 &phit, size_t idx) const override;
     virtual void fetch(const Ray &ray, IntersectionData &isec) const override;
+    AABB getAABB() const override;
 
 public:
     Vector3 getMin() const;

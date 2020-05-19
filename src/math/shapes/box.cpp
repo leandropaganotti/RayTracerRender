@@ -127,6 +127,11 @@ void AABox::fetch(const Ray &ray, IntersectionData &isec) const
     isec.normal = normal(isec.phit, isec.idx);
 }
 
+AABB AABox::getAABB() const
+{
+    return AABB(min, max);
+}
+
 GBox::GBox(): Instance(unitBox)
 {
     material = Material::DiffuseWhite;

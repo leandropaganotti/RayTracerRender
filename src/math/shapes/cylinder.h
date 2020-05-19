@@ -13,6 +13,7 @@ public:
     Vector3 normal(const Vector3 &phit, size_t idx) const override;
     Vector2 uv(const Vector3 &phit, size_t idx) const override;
     virtual void fetch(const Ray &ray, IntersectionData &isec) const override;
+    AABB getAABB() const override;
 };
 
 class GCylinder: public Instance

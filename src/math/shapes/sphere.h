@@ -13,6 +13,7 @@ public:
     Vector3 normal(const Vector3 &phit, size_t) const override;
     Vector2 uv(const Vector3 &phit, size_t) const override;
     virtual void fetch(const Ray &ray, IntersectionData &isec) const override;
+    AABB getAABB() const override;
 
     Vector3  getCenter() const;
     void     setCenter(const Vector3 &value);

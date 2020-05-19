@@ -148,6 +148,11 @@ void UnitYCylinder::fetch(const Ray &ray, IntersectionData &isec) const
     isec.normal = normal(isec.phit, isec.idx);
 }
 
+AABB UnitYCylinder::getAABB() const
+{
+    return AABB({-1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, -1.0f});
+}
+
 GCylinder::GCylinder(): Instance(unitCylinder)
 {
     material = Material::DiffuseWhite;

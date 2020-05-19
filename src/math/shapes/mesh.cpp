@@ -18,10 +18,13 @@ void Mesh::addNormal(const Vector3 &n)
     normals.push_back(n);
 }
 
-void Mesh::addFace(const TriangleMesh &f)
+void Mesh::addFace(std::shared_ptr<MeshFace> face)
 {
-    faces.push_back(f);
-    faces.back().idx = faces.size()-1;
+    if(face)
+    {
+        face->idx = faces.size();
+        faces.push_back(face);
+    }
 }
 
 void Mesh::clear()
@@ -31,9 +34,9 @@ void Mesh::clear()
     faces.clear();
 }
 
-void Mesh::updateAABB()
+void Mesh::buildBoundingVolume()
 {
-    bvh = BVH::Create(faces, 1, faces.size()-1, 0);
+    bvh = BVH::Create(faces);
 }
 
 bool Mesh::intersection(const Ray& ray, float tmax, IntersectionData &isec) const
@@ -67,15 +70,7 @@ std::ostream &operator <<(std::ostream &os, const Mesh &m)
 
 Vector3 Mesh::normal(const Vector3 &phit, size_t idx) const
 {
-    float u = (((vertices[faces[idx].v[2]] - vertices[faces[idx].v[1]]) % (phit - vertices[faces[idx].v[1]])).length() / 2) / faces[idx].area;
-    float v = (((vertices[faces[idx].v[0]] - vertices[faces[idx].v[2]]) % (phit - vertices[faces[idx].v[2]])).length() / 2) / faces[idx].area;
-    float w = 1 - u - v;
-
-    Vector3 N =  u*normals[faces[idx].nv[0]] + v*normals[faces[idx].nv[1]] +w*normals[faces[idx].nv[2]];
-
-    //N = (normals[faces[idx].nv0] + normals[faces[idx].nv1] + normals[faces[idx].nv2]).normalize();
-
-    return N;
+    return faces[idx]->normal(phit, idx);
 }
 
 
@@ -89,6 +84,11 @@ void Mesh::fetch(const Ray &ray, IntersectionData &isec) const
 {
     isec.phit = ray.origin + isec.tnear * ray.direction;
     isec.normal = normal(isec.phit, isec.idx);
+}
+
+AABB Mesh::getAABB() const
+{
+    return bvh->getAABB();
 }
 
 /************************************************************************
@@ -121,7 +121,7 @@ void GMesh::setMaterial(const std::shared_ptr<Material> &value)
  * QuadMesh class
  ************************************************************************/
 
-QuadMesh::QuadMesh(const Mesh *m, size_t v0, size_t v1, size_t v2, size_t v3, size_t nv0, size_t nv1, size_t nv2, size_t nv3)
+MeshQuad::MeshQuad(const Mesh *m, size_t v0, size_t v1, size_t v2, size_t v3, size_t nv0, size_t nv1, size_t nv2, size_t nv3)
 {
     mesh = m;
     v[0] = v0;
@@ -140,7 +140,7 @@ QuadMesh::QuadMesh(const Mesh *m, size_t v0, size_t v1, size_t v2, size_t v3, si
 
 }
 
-bool QuadMesh::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
+bool MeshQuad::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
 {
     float t = ((mesh->vertices[v[0]]-ray.origin) ^ nf) / (ray.direction ^ nf);
 
@@ -165,7 +165,7 @@ bool QuadMesh::intersection(const Ray &ray, float tmax, IntersectionData &isec) 
     return true;
 }
 
-bool QuadMesh::intersection(const Ray &ray, float tmax) const
+bool MeshQuad::intersection(const Ray &ray, float tmax) const
 {
     float t = ((mesh->vertices[v[0]]-ray.origin) ^ nf) / (ray.direction ^ nf);
 
@@ -188,27 +188,27 @@ bool QuadMesh::intersection(const Ray &ray, float tmax) const
     return true;
 }
 
-AABB QuadMesh::getAABB() const
+AABB MeshQuad::getAABB() const
 {
     return aabb;
 }
 
-std::ostream& operator <<(std::ostream &os, const QuadMesh &q)
+std::ostream& operator <<(std::ostream &os, const MeshQuad &q)
 {
     return os << q.v[0] << " " << q.v[1] << " " << q.v[2] << " " << q.v[3] << " - " << "  " << q.nf ;
 }
 
-Vector3 QuadMesh::normal(const Vector3 &, size_t) const { return Vector3(0);}
+Vector3 MeshQuad::normal(const Vector3 &, size_t) const { return Vector3(0);}
 
-Vector2 QuadMesh::uv(const Vector3 &, size_t) const { return Vector2(0);}
+Vector2 MeshQuad::uv(const Vector3 &, size_t) const { return Vector2(0);}
 
-void QuadMesh::fetch(const Ray &, IntersectionData &) const {}
+void MeshQuad::fetch(const Ray &, IntersectionData &) const {}
 
 /************************************************************************
  * TriangleMesh class
  ************************************************************************/
 
-TriangleMesh::TriangleMesh(const Mesh *m, size_t v0, size_t v1, size_t v2, size_t nv0, size_t nv1, size_t nv2)
+MeshTriangle::MeshTriangle(const Mesh *m, size_t v0, size_t v1, size_t v2, size_t nv0, size_t nv1, size_t nv2)
 {
     mesh = m;
     v[0] = v0;
@@ -223,7 +223,7 @@ TriangleMesh::TriangleMesh(const Mesh *m, size_t v0, size_t v1, size_t v2, size_
     aabb.extend({mesh->vertices[v0], mesh->vertices[v1], mesh->vertices[v2]});
 }
 
-bool TriangleMesh::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
+bool MeshTriangle::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
 {
     float A = mesh->vertices[v[0]].x - mesh->vertices[v[1]].x;
     float B = mesh->vertices[v[0]].y - mesh->vertices[v[1]].y;
@@ -269,24 +269,35 @@ bool TriangleMesh::intersection(const Ray &ray, float tmax, IntersectionData &is
     return true;
 }
 
-bool TriangleMesh::intersection(const Ray &ray, float tmax) const
+bool MeshTriangle::intersection(const Ray &ray, float tmax) const
 {
     IntersectionData isec;
     return intersection(ray, tmax, isec);
 }
 
-AABB TriangleMesh::getAABB() const
+AABB MeshTriangle::getAABB() const
 {
     return aabb;
 }
 
-Vector3 TriangleMesh::normal(const Vector3 &, size_t) const { return Vector3(0);}
+Vector3 MeshTriangle::normal(const Vector3 &phit, size_t) const
+{
+    float _u = (((mesh->vertices[v[2]] - mesh->vertices[v[1]]) % (phit - mesh->vertices[v[1]])).length() / 2) / area;
+    float _v = (((mesh->vertices[v[0]] - mesh->vertices[v[2]]) % (phit - mesh->vertices[v[2]])).length() / 2) / area;
+    float _w = 1 - _u - _v;
 
-Vector2 TriangleMesh::uv(const Vector3 &, size_t) const { return Vector2(0);}
+    Vector3 N =  _u*mesh->normals[nv[0]] + _v*mesh->normals[nv[1]] + _w*mesh->normals[nv[2]];
 
-void TriangleMesh::fetch(const Ray &, IntersectionData &) const {}
+    //N = (normals[faces[idx].nv0] + normals[faces[idx].nv1] + normals[faces[idx].nv2]).normalize();
 
-std::ostream& operator <<(std::ostream &os, const TriangleMesh &t)
+    return N;
+}
+
+Vector2 MeshTriangle::uv(const Vector3 &, size_t) const { return Vector2(0);}
+
+void MeshTriangle::fetch(const Ray &, IntersectionData &) const {}
+
+std::ostream& operator <<(std::ostream &os, const MeshTriangle &t)
 {
     return os << t.v[0] << " " << t.v[1] << " " << t.v[2] << " - " << "  " << t.nf ;
 }

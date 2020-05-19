@@ -1,5 +1,6 @@
 #include "plane.h"
 #include "material.h"
+#include "float.h"
 
 Plane::Plane(const Vector3 &O, const Vector3 &N):
     O(O), N(N)
@@ -69,6 +70,11 @@ void Plane::fetch(const Ray &ray, IntersectionData &isec) const
 {
     isec.phit = ray.origin + isec.tnear * ray.direction;
     isec.normal = N;
+}
+
+AABB Plane::getAABB() const
+{
+    return AABB({FLT_MIN, O.y,FLT_MAX}, {FLT_MAX, O.y,FLT_MIN});
 }
 
 GPlane::GPlane(const Vector3 &o, const Vector3 &n): Plane(o, n)

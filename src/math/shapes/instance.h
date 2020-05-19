@@ -64,6 +64,10 @@ public:
     {
         isec.normal = (inverseTranspose * shape->normal(isec.phit_local, isec.idx)).normalize();
     }
+    AABB getAABB() const override
+    {
+        return AABB(model * shape->getAABB().getMin(), model * shape->getAABB().getMax());
+    }
 
     void setTransformation(const Matrix4 &transformation)
     {

@@ -31,3 +31,8 @@ Vector2 InvisibleShape::uv(const Vector3 &, size_t) const
 void InvisibleShape::fetch(const Ray &, IntersectionData &) const
 {
 }
+
+AABB InvisibleShape::getAABB() const
+{
+    return AABB();
+}
