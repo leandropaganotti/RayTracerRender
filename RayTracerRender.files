@@ -27,6 +27,8 @@ src/material.cpp
 src/material.h
 src/math/aabb.cpp
 src/math/aabb.h
+src/math/bvh.cpp
+src/math/bvh.h
 src/math/intersection.h
 src/math/matrix.h
 src/math/shapes/box.cpp

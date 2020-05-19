@@ -29,6 +29,7 @@ aabb.o \
 mesh.o \
 xmlparser.o \
 objparser.o \
+bvh.o \
 
 
 CObjects=$(addprefix $(OBJDIR)/,$(OBJECTS))
