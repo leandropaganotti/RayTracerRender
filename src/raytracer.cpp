@@ -387,7 +387,7 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const uint8_t depth, const float 
     IntersectionData isec;
 
     if (!castRay(ray, isec))
-        return Color::BLACK;
+        return scene->bgColor;
 
     const Material::Type type = isec.material->type;
 

@@ -290,7 +290,7 @@ Vector3 MeshTriangle::getNormal(const Vector3 &phit, size_t) const
 
     Vector3 N =  _u*mesh->normals[nv[0]] + _v*mesh->normals[nv[1]] + _w*mesh->normals[nv[2]];
 
-    //N = (normals[faces[idx].nv0] + normals[faces[idx].nv1] + normals[faces[idx].nv2]).normalize();
+    //N = (mesh->normals[nv[0]] + mesh->normals[nv[1]] + mesh->normals[nv[2]]).normalize();
 
     return N;
 }
