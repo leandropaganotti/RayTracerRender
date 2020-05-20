@@ -37,6 +37,7 @@ bool Plane::intersection(const Ray &ray, float tmax, IntersectionData& isec) con
     if( t < 0.0f || t > tmax) return false;
 
     isec.tnear = t;
+    isec.shape = this;
     return true;
 }
 
@@ -74,7 +75,25 @@ void Plane::fetchData(const Ray &ray, IntersectionData &isec) const
 
 AABB Plane::getAABB() const
 {
-    return AABB({FLT_MIN, O.y,FLT_MAX}, {FLT_MAX, O.y,FLT_MIN});
+    Vector3 v = Vector3(1,0,0) % N;
+    if(v.length() < 0.1) v = Vector3(0,1,0) % N;
+
+    float t=1000.0;
+    Vector3 P0 = O - t * v.normalize();
+    Vector3 P1 = O + t * v.normalize();
+    AABB aabb;
+
+    aabb.extend(P0+0.1*N);
+    aabb.extend(P1-0.1*N);
+
+    v = v % N;
+    P0 = O - t * v.normalize();
+    P1 = O + t * v.normalize();
+
+    aabb.extend(P0);
+    aabb.extend(P1);
+
+    return aabb;
 }
 
 GPlane::GPlane(const Vector3 &o, const Vector3 &n): Plane(o, n)

@@ -9,8 +9,8 @@ class BVH: public Shape
 {
 public:
     ~BVH();
-    static std::shared_ptr<Shape> Create(std::vector<std::shared_ptr<ShapeNormalUV>> &shapes);
-    static std::shared_ptr<Shape> Create(std::vector<std::shared_ptr<Shape>> &shapes);
+    static std::shared_ptr<Shape> Create(const std::vector<std::shared_ptr<ShapeNormalUV>> &shapes);
+    static std::shared_ptr<Shape> Create(const std::vector<std::shared_ptr<Shape>> &shapes);
     bool intersection(const Ray &ray, float tmax, IntersectionData &isec) const override;
     bool intersection(const Ray &ray, float tmax) const override;
 

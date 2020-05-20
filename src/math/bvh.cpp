@@ -7,7 +7,7 @@ BVH::BVH()
 
 BVH::~BVH(){ }
 
-std::shared_ptr<Shape> BVH::Create(std::vector<std::shared_ptr<ShapeNormalUV> > &shapes)
+std::shared_ptr<Shape> BVH::Create(const std::vector<std::shared_ptr<ShapeNormalUV> > &shapes)
 {
     if (shapes.size() == 0) return InvisibleShape::GetInstance();
 
@@ -19,7 +19,7 @@ std::shared_ptr<Shape> BVH::Create(std::vector<std::shared_ptr<ShapeNormalUV> > 
     return Create(shapes_, 1, shapes_.size()-1, 0);
 }
 
-std::shared_ptr<Shape> BVH::Create(std::vector<std::shared_ptr<Shape> > &shapes)
+std::shared_ptr<Shape> BVH::Create(const std::vector<std::shared_ptr<Shape> > &shapes)
 {
     if (shapes.size() == 0) return InvisibleShape::GetInstance();
 

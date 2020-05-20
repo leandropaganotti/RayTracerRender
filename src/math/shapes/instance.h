@@ -13,6 +13,7 @@ public:
     Instance(std::shared_ptr<ShapeNormalUV> shape)
     {
         this->shape = shape ? shape : InvisibleShape::GetInstance();
+        updateAABB();
     }
     virtual ~Instance() override {}
 
@@ -31,6 +32,7 @@ public:
                 isec.tnear = tnear;
                 isec.phit = phit;
                 isec.phit_local = phit_local;
+                isec.shape = this;
                 return true;
             }
         }
@@ -66,7 +68,7 @@ public:
     }
     AABB getAABB() const override
     {
-        return AABB(model * shape->getAABB().getMin(), model * shape->getAABB().getMax());
+        return aabb;
     }
 
     void setTransformation(const Matrix4 &transformation)
@@ -74,6 +76,7 @@ public:
         model = transformation;
         inverse = model.getInverse();
         inverseTranspose = inverse.getTranspose();
+        updateAABB();
     }
 
 protected:
@@ -82,4 +85,20 @@ protected:
     Matrix4 model;              // object-to-world
     Matrix4 inverse;            // world-to-object
     Matrix4 inverseTranspose;   // matrix for normals transformation
+    AABB aabb;
+
+    void updateAABB()
+    {
+        std::vector<Vector3> corners(8);
+        Vector3 min = shape->getAABB().getMin(), max = shape->getAABB().getMax();
+        corners[0] = model * min;
+        corners[1] = model * Vector3(min.x, min.y, max.z);
+        corners[2] = model * Vector3(min.x, max.y, min.z);
+        corners[3] = model * Vector3(max.x, min.y, min.z);
+        corners[4] = model * Vector3(min.x, max.y, max.z);
+        corners[5] = model * Vector3(max.x, min.y, max.z);
+        corners[6] = model * Vector3(max.x, max.y, min.z);
+        corners[7] = model * max;
+        aabb.extend(corners);
+    }
 };

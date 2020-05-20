@@ -52,6 +52,7 @@ bool Sphere::intersection(const Ray &ray, float tmax, IntersectionData &isec) co
     if(t0 > tmax) return false;
 
     isec.tnear = t0;
+    isec.shape = this;
     return true;
 }
 
