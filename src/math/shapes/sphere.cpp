@@ -77,7 +77,7 @@ bool Sphere::intersection(const Ray &ray, float tmax) const
 }
 
 inline
-Vector3 Sphere::normal(const Vector3 &phit, size_t) const
+Vector3 Sphere::getNormal(const Vector3 &phit, size_t) const
 {
     return (phit-center).normalize();
 }
@@ -94,7 +94,7 @@ Vector3 Sphere::normal(const Vector3 &phit, size_t) const
 //       tnear = t0;
 //       return true;
 inline
-Vector2 Sphere::uv(const Vector3 &phit, size_t) const
+Vector2 Sphere::getUV(const Vector3 &phit, size_t) const
 {
     Vector3 d = (phit-center).normalize();
     float u = 0.5 + atan2f(d.z, d.x) / (2.0f * M_PI);
@@ -103,7 +103,7 @@ Vector2 Sphere::uv(const Vector3 &phit, size_t) const
 }
 
 inline
-void Sphere::fetch(const Ray &ray, IntersectionData &isec) const
+void Sphere::fetchData(const Ray &ray, IntersectionData &isec) const
 {
     isec.phit = ray.origin + isec.tnear * ray.direction;
     isec.normal = (isec.phit - center).normalize();
@@ -119,14 +119,14 @@ GSphere::GSphere(const Vector3 &c, const float &r): Sphere(c, r)
     material = Material::DiffuseWhite;
 }
 
-void GSphere::fetch(const Ray &ray, IntersectionData &isec) const
+void GSphere::fetchData(const Ray &ray, IntersectionData &isec) const
 {
-    Sphere::fetch(ray, isec);
+    Sphere::fetchData(ray, isec);
     isec.material = material.get();
     isec.color = material->Kd;
     if(material->texture)
     {
-        isec.uv = Sphere::uv(isec.phit, 0);
+        isec.uv = Sphere::getUV(isec.phit, 0);
         isec.color = isec.color * material->texture->get(isec.uv);
     }
 }
@@ -153,14 +153,14 @@ void GEllipsoid::setMaterial(const std::shared_ptr<Material> &value)
     material = value ? value : Material::DiffuseWhite;
 }
 
-void GEllipsoid::fetch(const Ray &ray, IntersectionData &isec) const
+void GEllipsoid::fetchData(const Ray &ray, IntersectionData &isec) const
 {
-    Instance::fetch(ray, isec);
+    Instance::fetchData(ray, isec);
     isec.material = material.get();
     isec.color = material->Kd;
     if(material->texture)
     {
-        isec.uv = static_cast<Sphere*>(shape.get())->uv(isec.phit_local, 0);
+        isec.uv = static_cast<Sphere*>(shape.get())->getUV(isec.phit_local, 0);
         isec.color = isec.color * material->texture->get(isec.uv);
     }
 }

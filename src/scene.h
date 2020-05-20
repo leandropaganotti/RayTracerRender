@@ -8,7 +8,7 @@
 #include "cameraoptions.h"
 #include "shape.h"
 
-typedef std::vector<std::shared_ptr<Shape>> ObjectVector;
+typedef std::vector<std::shared_ptr<ShapeNormalUV>> ObjectVector;
 
 class Scene
 {
@@ -19,7 +19,7 @@ public:
 
     void addLight(Light * light);
 
-    void addObject(std::shared_ptr<Shape> obj);
+    void addObject(std::shared_ptr<ShapeNormalUV> obj);
 
     void load(const std::string &fileName);
 

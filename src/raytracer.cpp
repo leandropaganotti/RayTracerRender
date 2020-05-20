@@ -86,7 +86,7 @@ bool RayTracer::castRay(const Ray &ray, const ObjectVector &objects, Intersectio
     }
     if(!isec.shape) return false;
 
-    isec.shape->fetch(ray, isec);
+    isec.shape->fetchData(ray, isec);
     return true;
 }
 

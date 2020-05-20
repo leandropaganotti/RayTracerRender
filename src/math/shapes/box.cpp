@@ -86,7 +86,7 @@ bool AABox::intersection(const Ray &ray, float tmax) const
 }
 
 inline
-Vector3 AABox::normal(const Vector3 &, size_t idx) const
+Vector3 AABox::getNormal(const Vector3 &, size_t idx) const
 {
     if (idx == 1)      return Vector3(-1,0,0);
     else if (idx == 2) return Vector3(1,0,0);
@@ -97,7 +97,7 @@ Vector3 AABox::normal(const Vector3 &, size_t idx) const
 }
 
 inline
-Vector2 AABox::uv(const Vector3 &phit, size_t idx) const
+Vector2 AABox::getUV(const Vector3 &phit, size_t idx) const
 {
     if (idx == 1 || idx == 2)
     {
@@ -121,10 +121,10 @@ void AABox::setMin(const Vector3 &value)
     min = value;
 }
 
-void AABox::fetch(const Ray &ray, IntersectionData &isec) const
+void AABox::fetchData(const Ray &ray, IntersectionData &isec) const
 {
     isec.phit = ray.origin + isec.tnear * ray.direction;
-    isec.normal = normal(isec.phit, isec.idx);
+    isec.normal = getNormal(isec.phit, isec.idx);
 }
 
 AABB AABox::getAABB() const
@@ -137,14 +137,14 @@ GBox::GBox(): Instance(unitBox)
     material = Material::DiffuseWhite;
 }
 
-void GBox::fetch(const Ray &ray, IntersectionData &isec) const
+void GBox::fetchData(const Ray &ray, IntersectionData &isec) const
 {
-    Instance::fetch(ray, isec);
+    Instance::fetchData(ray, isec);
     isec.material = material.get();
     isec.color = material->Kd;
     if(material->texture)
     {
-        isec.uv = static_cast<AABox*>(shape.get())->uv(isec.phit_local, isec.idx);
+        isec.uv = static_cast<AABox*>(shape.get())->getUV(isec.phit_local, isec.idx);
         isec.color = isec.color * material->texture->get(isec.uv);
     }
 }

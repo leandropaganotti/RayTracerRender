@@ -3,18 +3,17 @@
 #include "shape.h"
 #include <memory>
 
-class InvisibleShape: public Shape
+class InvisibleShape: public ShapeNormalUV
 {
     InvisibleShape();
-    static std::shared_ptr<Shape> instance;
+    static std::shared_ptr<InvisibleShape> instance;
 public:
-    static std::shared_ptr<Shape> GetInstance();
-
+    static std::shared_ptr<InvisibleShape> GetInstance();
     bool intersection(const Ray &, float tmax, IntersectionData &) const override;
     bool intersection(const Ray &, float ) const override;
-    Vector3 normal(const Vector3 &, size_t) const override;
-    Vector2 uv(const Vector3 &, size_t) const override;
-    void fetch(const Ray &ray, IntersectionData &isec) const override;
+    void fetchData(const Ray &ray, IntersectionData &isec) const override;
+    Vector3 getNormal(const Vector3 &phit, size_t idx) const override;
+    Vector2 getUV(const Vector3 &phit, size_t idx) const override;
     AABB getAABB() const override;
 };
 

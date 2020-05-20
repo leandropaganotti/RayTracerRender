@@ -8,7 +8,7 @@
  class BVH;
  class MeshFace;
 
-class Mesh: public Shape
+class Mesh: public ShapeNormalUV
 {    
 public:
     void addVertex(const Vector3& v);
@@ -23,16 +23,16 @@ public:
     // Shape interface
     bool  intersection(const Ray& ray, float tmax, IntersectionData& isec) const override;
     bool  intersection(const Ray& ray, float tmax) const override;
-    Vector3 normal(const Vector3 &phit, size_t idx) const override;
-    Vector2 uv(const Vector3 &, size_t) const override;
-    virtual void fetch(const Ray &ray, IntersectionData &isec) const override;
+    Vector3 getNormal(const Vector3 &phit, size_t idx) const override;
+    Vector2 getUV(const Vector3 &, size_t) const override;
+    virtual void fetchData(const Ray &ray, IntersectionData &isec) const override;
     AABB getAABB() const override;
 
 protected:
     std::shared_ptr<Shape> bvh;
     std::vector<Vector3>   vertices;
     std::vector<Vector3>   normals;
-    std::vector<std::shared_ptr<Shape>>    faces;
+    std::vector<std::shared_ptr<ShapeNormalUV>>    faces;
 
     friend class MeshTriangle;
     friend class MeshQuad;
@@ -43,7 +43,7 @@ class GMesh: public Instance
 public:
     GMesh(std::shared_ptr<Mesh> mesh);
 
-    void fetch(const Ray &ray, IntersectionData &isec) const override;
+    void fetchData(const Ray &ray, IntersectionData &isec) const override;
 
     std::shared_ptr<Material> getMaterial() const;
     void setMaterial(const std::shared_ptr<Material> &value);
@@ -52,7 +52,7 @@ protected:
     std::shared_ptr<Material> material;
 };
 
-class MeshFace: public Shape
+class MeshFace: public ShapeNormalUV
 {
 public:
     size_t idx;
@@ -71,7 +71,7 @@ public:
     bool  intersection(const Ray& ray, float tmax) const override;
 
     AABB getAABB() const override;
-    Vector3 normal(const Vector3 &, size_t ) const override;
+    Vector3 getNormal(const Vector3 &, size_t ) const override;
 
     friend std::ostream& operator << (std::ostream &os, const MeshQuad &q);
 
@@ -82,9 +82,10 @@ private:
     Vector3 nf;
     float area;
     AABB aabb;
-    //ignore those
-    Vector2 uv(const Vector3 &, size_t) const override;
-    void fetch(const Ray &, IntersectionData &) const override;
+
+    //ignore those for now
+    Vector2 getUV(const Vector3 &, size_t) const override;
+    void fetchData(const Ray &, IntersectionData &) const override;
 };
 
 class MeshTriangle: public MeshFace
@@ -98,7 +99,7 @@ public:
     bool  intersection(const Ray& ray, float tmax) const override;
 
     AABB getAABB() const override;
-    Vector3 normal(const Vector3 &, size_t ) const override;
+    Vector3 getNormal(const Vector3 &, size_t ) const override;
 
     friend std::ostream& operator << (std::ostream &os, const MeshTriangle &t);
 
@@ -115,9 +116,9 @@ private:
 
     AABB aabb;
 
-    //ignore those
-    Vector2 uv(const Vector3 &, size_t) const override;
-    void fetch(const Ray &, IntersectionData &) const override;
+    //ignore those for now
+    Vector2 getUV(const Vector3 &, size_t) const override;
+    void fetchData(const Ray &, IntersectionData &) const override;
 };
 
 

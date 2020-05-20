@@ -17,7 +17,7 @@ void Scene::addLight(Light *light)
     lights.emplace_back(light);
 }
 
-void Scene::addObject(std::shared_ptr<Shape> obj)
+void Scene::addObject(std::shared_ptr<ShapeNormalUV> obj)
 {
     if(obj)
         objects.push_back(obj);

@@ -7,10 +7,10 @@
 #include "ray.h"
 #include "invisible.h"
 
-class Instance: public Shape
+class Instance: public ShapeNormalUV
 {
 public:
-    Instance(std::shared_ptr<Shape> shape)
+    Instance(std::shared_ptr<ShapeNormalUV> shape)
     {
         this->shape = shape ? shape : InvisibleShape::GetInstance();
     }
@@ -52,17 +52,17 @@ public:
         }
         return false;
     }
-    Vector3 normal(const Vector3 &phit, size_t idx) const override
+    Vector3 getNormal(const Vector3 &phit, size_t idx) const override
     {
-        return (inverseTranspose * shape->normal(inverse * phit, idx)).normalize();
+        return (inverseTranspose * shape->getNormal(inverse * phit, idx)).normalize();
     }
-    Vector2 uv(const Vector3 &phit, size_t idx) const override
+    Vector2 getUV(const Vector3 &phit, size_t idx) const override
     {
-        return shape->uv(inverse * phit, idx);
+        return shape->getUV(inverse * phit, idx);
     }
-    virtual void fetch(const Ray &, IntersectionData &isec) const override
+    virtual void fetchData(const Ray &, IntersectionData &isec) const override
     {
-        isec.normal = (inverseTranspose * shape->normal(isec.phit_local, isec.idx)).normalize();
+        isec.normal = (inverseTranspose * shape->getNormal(isec.phit_local, isec.idx)).normalize();
     }
     AABB getAABB() const override
     {
@@ -77,7 +77,7 @@ public:
     }
 
 protected:
-    std::shared_ptr<Shape> shape;
+    std::shared_ptr<ShapeNormalUV> shape;
 
     Matrix4 model;              // object-to-world
     Matrix4 inverse;            // world-to-object

@@ -120,7 +120,7 @@ bool UnitYCylinder::intersection(const Ray &ray, float tmax) const
 }
 
 inline
-Vector3 UnitYCylinder::normal(const Vector3 &phit, size_t idx) const
+Vector3 UnitYCylinder::getNormal(const Vector3 &phit, size_t idx) const
 {    
     if(idx==0)
     {
@@ -136,16 +136,16 @@ Vector3 UnitYCylinder::normal(const Vector3 &phit, size_t idx) const
     }
 }
 
-inline
-Vector2 UnitYCylinder::uv(const Vector3 &, size_t) const
+Vector2 UnitYCylinder::getUV(const Vector3 &, size_t ) const
 {
-    return Vector2(0.0f, 0.0f);
+    return Vector2(0);
 }
+
 inline
-void UnitYCylinder::fetch(const Ray &ray, IntersectionData &isec) const
+void UnitYCylinder::fetchData(const Ray &ray, IntersectionData &isec) const
 {
     isec.phit = ray.origin + isec.tnear * ray.direction;
-    isec.normal = normal(isec.phit, isec.idx);
+    isec.normal = getNormal(isec.phit, isec.idx);
 }
 
 AABB UnitYCylinder::getAABB() const
@@ -168,14 +168,9 @@ void GCylinder::setMaterial(const std::shared_ptr<Material> &value)
     material = value ? value : Material::DiffuseWhite;
 }
 
-void GCylinder::fetch(const Ray &ray, IntersectionData &isec) const
+void GCylinder::fetchData(const Ray &ray, IntersectionData &isec) const
 {
-    Instance::fetch(ray, isec);
+    shape->fetchData(ray, isec);
     isec.material = material.get();
     isec.color = material->Kd;
-    if(material->texture)
-    {
-        isec.uv = static_cast<UnitYCylinder*>(shape.get())->uv(isec.phit_local, 0);
-        isec.color = isec.color * material->texture->get(isec.uv);
-    }
 }

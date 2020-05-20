@@ -1,6 +1,5 @@
 #include "bvh.h"
 
-
 BVH::BVH()
 {
     left = right = nullptr;
@@ -8,7 +7,19 @@ BVH::BVH()
 
 BVH::~BVH(){ }
 
-std::shared_ptr<Shape> BVH::Create(std::vector<std::shared_ptr<Shape>> &shapes)
+std::shared_ptr<Shape> BVH::Create(std::vector<std::shared_ptr<ShapeNormalUV> > &shapes)
+{
+    if (shapes.size() == 0) return InvisibleShape::GetInstance();
+
+    std::vector<std::shared_ptr<Shape>> shapes_;
+    shapes_.push_back(std::shared_ptr<Shape>());
+    for (auto s: shapes)
+        shapes_.push_back(s);
+
+    return Create(shapes_, 1, shapes_.size()-1, 0);
+}
+
+std::shared_ptr<Shape> BVH::Create(std::vector<std::shared_ptr<Shape> > &shapes)
 {
     if (shapes.size() == 0) return InvisibleShape::GetInstance();
 
@@ -45,21 +56,6 @@ std::shared_ptr<Shape> BVH::Create(std::vector<std::shared_ptr<Shape> > &shapes,
     bvh->right = Create(shapes, pivot, r, (axis+1)%3);
 
     return bvh;
-}
-
-Vector3 BVH::normal(const Vector3 &phit, size_t idx) const
-{
-
-}
-
-Vector2 BVH::uv(const Vector3 &phit, size_t idx) const
-{
-
-}
-
-void BVH::fetch(const Ray &ray, IntersectionData &isec) const
-{
-
 }
 
 AABB BVH::getAABB() const

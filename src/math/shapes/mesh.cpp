@@ -67,23 +67,24 @@ std::ostream &operator <<(std::ostream &os, const Mesh &m)
     return os ;
 }
 
-
-Vector3 Mesh::normal(const Vector3 &phit, size_t idx) const
+inline
+Vector3 Mesh::getNormal(const Vector3 &phit, size_t idx) const
 {
-    return faces[idx]->normal(phit, idx);
+    return faces[idx]->getNormal(phit, idx);
 }
 
-
-Vector2 Mesh::uv(const Vector3 &, size_t) const
+inline
+Vector2 Mesh::getUV(const Vector3 &phit, size_t idx) const
 {
-    return Vector2(0.0f, 0.0f);
+    return faces[idx]->getUV(phit, idx);
 }
 
-
-void Mesh::fetch(const Ray &ray, IntersectionData &isec) const
+inline
+void Mesh::fetchData(const Ray &ray, IntersectionData &isec) const
 {
     isec.phit = ray.origin + isec.tnear * ray.direction;
-    isec.normal = normal(isec.phit, isec.idx);
+    isec.normal = getNormal(isec.phit, isec.idx);
+    isec.uv = getUV(isec.phit, isec.idx);
 }
 
 AABB Mesh::getAABB() const
@@ -100,9 +101,9 @@ GMesh::GMesh(std::shared_ptr<Mesh> mesh): Instance(mesh)
     material = Material::DiffuseWhite;
 }
 
-void GMesh::fetch(const Ray &ray, IntersectionData &isec) const
+void GMesh::fetchData(const Ray &ray, IntersectionData &isec) const
 {
-    Instance::fetch(ray, isec);
+    Instance::fetchData(ray, isec);
     isec.material = material.get();
     isec.color = material->Kd;
 }
@@ -198,11 +199,11 @@ std::ostream& operator <<(std::ostream &os, const MeshQuad &q)
     return os << q.v[0] << " " << q.v[1] << " " << q.v[2] << " " << q.v[3] << " - " << "  " << q.nf ;
 }
 
-Vector3 MeshQuad::normal(const Vector3 &, size_t) const { return Vector3(0);}
+Vector3 MeshQuad::getNormal(const Vector3 &, size_t) const { return Vector3(0);}
 
-Vector2 MeshQuad::uv(const Vector3 &, size_t) const { return Vector2(0);}
+Vector2 MeshQuad::getUV(const Vector3 &, size_t) const { return Vector2(0);}
 
-void MeshQuad::fetch(const Ray &, IntersectionData &) const {}
+void MeshQuad::fetchData(const Ray &, IntersectionData &) const {}
 
 /************************************************************************
  * TriangleMesh class
@@ -280,7 +281,8 @@ AABB MeshTriangle::getAABB() const
     return aabb;
 }
 
-Vector3 MeshTriangle::normal(const Vector3 &phit, size_t) const
+inline
+Vector3 MeshTriangle::getNormal(const Vector3 &phit, size_t) const
 {
     float _u = (((mesh->vertices[v[2]] - mesh->vertices[v[1]]) % (phit - mesh->vertices[v[1]])).length() / 2) / area;
     float _v = (((mesh->vertices[v[0]] - mesh->vertices[v[2]]) % (phit - mesh->vertices[v[2]])).length() / 2) / area;
@@ -293,9 +295,19 @@ Vector3 MeshTriangle::normal(const Vector3 &phit, size_t) const
     return N;
 }
 
-Vector2 MeshTriangle::uv(const Vector3 &, size_t) const { return Vector2(0);}
+inline
+Vector2 MeshTriangle::getUV(const Vector3 &, size_t) const
+{
+    return Vector2(0);
+}
 
-void MeshTriangle::fetch(const Ray &, IntersectionData &) const {}
+inline
+void MeshTriangle::fetchData(const Ray &ray, IntersectionData &isec) const
+{
+    isec.phit = ray.origin + isec.tnear * ray.direction;
+    isec.normal = getNormal(isec.phit, isec.idx);
+    isec.uv = getUV(isec.phit, isec.idx);
+}
 
 std::ostream& operator <<(std::ostream &os, const MeshTriangle &t)
 {

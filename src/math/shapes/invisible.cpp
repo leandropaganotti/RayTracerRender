@@ -1,13 +1,13 @@
 #include "invisible.h"
 
-std::shared_ptr<Shape> InvisibleShape::instance = std::shared_ptr<InvisibleShape>(new InvisibleShape);
+std::shared_ptr<InvisibleShape> InvisibleShape::instance = std::shared_ptr<InvisibleShape>(new InvisibleShape);
 
 InvisibleShape::InvisibleShape()
 {
 
 }
 
-std::shared_ptr<Shape> InvisibleShape::GetInstance()
+std::shared_ptr<InvisibleShape> InvisibleShape::GetInstance()
 {
    return instance;
 }
@@ -20,16 +20,18 @@ bool InvisibleShape::intersection(const Ray &, float) const
 {
     return false;
 }
-Vector3 InvisibleShape::normal(const Vector3 &, size_t) const
+void InvisibleShape::fetchData(const Ray &, IntersectionData &) const
 {
-    return {0,0,0};
 }
-Vector2 InvisibleShape::uv(const Vector3 &, size_t) const
+
+Vector3 InvisibleShape::getNormal(const Vector3 &, size_t ) const
 {
-    return Vector2 (0,0);
+    return Vector3(0);
 }
-void InvisibleShape::fetch(const Ray &, IntersectionData &) const
+
+Vector2 InvisibleShape::getUV(const Vector3 &, size_t ) const
 {
+    return Vector2(0);
 }
 
 AABB InvisibleShape::getAABB() const

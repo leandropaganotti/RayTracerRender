@@ -47,13 +47,13 @@ bool Plane::intersection(const Ray &ray, float tmax) const
 }
 
 inline
-Vector3 Plane::normal(const Vector3 &, size_t) const
+Vector3 Plane::getNormal(const Vector3 &, size_t) const
 {
     return N;
 }
 
 inline
-Vector2 Plane::uv(const Vector3 &phit, size_t) const
+Vector2 Plane::getUV(const Vector3 &phit, size_t) const
 {
     const float e=0.001f;
     const Vector3 v = phit - O;
@@ -66,7 +66,7 @@ Vector2 Plane::uv(const Vector3 &phit, size_t) const
 }
 
 inline
-void Plane::fetch(const Ray &ray, IntersectionData &isec) const
+void Plane::fetchData(const Ray &ray, IntersectionData &isec) const
 {
     isec.phit = ray.origin + isec.tnear * ray.direction;
     isec.normal = N;
@@ -84,7 +84,7 @@ GPlane::GPlane(const Vector3 &o, const Vector3 &n): Plane(o, n)
 
 GPlane::~GPlane() {}
 
-void GPlane::fetch(const Ray &ray, IntersectionData &isec) const
+void GPlane::fetchData(const Ray &ray, IntersectionData &isec) const
 {
     isec.phit = ray.origin + isec.tnear * ray.direction;
     isec.normal = N;
@@ -93,7 +93,7 @@ void GPlane::fetch(const Ray &ray, IntersectionData &isec) const
 
     if(material->texture)
     {
-        isec.uv = Plane::uv(isec.phit, 0);
+        isec.uv = Plane::getUV(isec.phit, 0);
         isec.color = material->texture->get(isec.uv) * material->Kd;
     }
 }

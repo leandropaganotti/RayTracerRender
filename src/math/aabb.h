@@ -3,15 +3,6 @@
 #include "vector.h"
 #include "ray.h"
 
-class AABB;
-
-class AABBIF
-{
-public:
-    virtual AABB getAABB() const = 0;
-    virtual ~AABBIF() = default;
-};
-
 class AABB
 {
 public:    
