@@ -41,12 +41,22 @@ void Mesh::buildBoundingVolume()
 
 bool Mesh::intersection(const Ray& ray, float tmax, IntersectionData &isec) const
 {
-    return bvh->intersection(ray, tmax, isec);
+    Ray r = ray;
+    r.invdir = 1.0f / ray.direction;
+    r.posneg[0] = r.direction[0] > 0 ? 0 : 1;
+    r.posneg[1] = r.direction[1] > 0 ? 0 : 1;
+    r.posneg[2] = r.direction[2] > 0 ? 0 : 1;
+    return bvh->intersection(r, tmax, isec);
 }
 
 bool Mesh::intersection(const Ray& ray, float tmax) const
 {
-    return bvh->intersection(ray, tmax);
+    Ray r = ray;
+    r.invdir = 1.0f / ray.direction;
+    r.posneg[0] = r.direction[0] > 0 ? 0 : 1;
+    r.posneg[1] = r.direction[1] > 0 ? 0 : 1;
+    r.posneg[2] = r.direction[2] > 0 ? 0 : 1;
+    return bvh->intersection(r, tmax);
 }
 
 std::ostream &operator <<(std::ostream &os, const Mesh &m)
@@ -267,6 +277,7 @@ bool MeshTriangle::intersection(const Ray &ray, float tmax, IntersectionData &is
 
     isec.tnear = tval;
     isec.idx = idx;
+    isec.shape = mesh;
     return true;
 }
 

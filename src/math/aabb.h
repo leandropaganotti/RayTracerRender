@@ -6,7 +6,8 @@
 class AABB
 {
 public:    
-    AABB(const Vector3 min={0.0f}, const Vector3 max={0.0f});
+    AABB();
+    AABB(const Vector3 &min, const Vector3 &max);
     void extend(const std::vector<Vector3>& vertices);
     void extend(const Vector3 &v);
     void extend(const AABB &aabb);
@@ -21,6 +22,5 @@ public:
     void setMax(const Vector3 &value);
 
 protected:
-    Vector3 min;
-    Vector3 max;
+    Vector3 data[2]; // 0 -> min,  1 -> max
 };

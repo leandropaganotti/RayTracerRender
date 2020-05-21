@@ -402,7 +402,7 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const uint8_t depth, const float 
         kt = 1.0f - kr;
     }
     if(isec.material->E != Vector::ZERO && depth == 1){
-        float n=5, m=15;
+        float n=5, m=5;
         float nk = isec.normal ^ -ray.direction;
         float ek = (n+1)/(2*M_PI)*powf(nk, m);
 
