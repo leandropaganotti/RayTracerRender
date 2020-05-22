@@ -3,12 +3,12 @@ OBJDIR = build
 
 CXXFLAGS =  -O3 -std=c++0x -Wall -W -fopenmp -Winline
 CXX = g++
-INCPATH = -I./src -I./src/math -I./src/math/shapes -I/usr/include/libxml2 -I./libxml/include/libxml2
+INCPATH = -I./src -I./src/math -I./src/shapes -I/usr/include/libxml2 -I./libxml/include/libxml2
 LIBDIRS = -L/usr/lib/x86_64-linux-gnu -L./libxml/lib
 LIBS = -lpthread -lxml2
 LDFLAGS = $(LIBDIRS) $(LIBS)
 LFLAGS  = -fopenmp
-VPATH = src/ src/math src/math/shapes
+VPATH = src/ src/shapes
 
 OBJECTS = main.o \
 camera.o \
@@ -31,6 +31,7 @@ xmlparser.o \
 objparser.o \
 bvh.o \
 instance.o \
+shape.o \
 
 
 CObjects=$(addprefix $(OBJDIR)/,$(OBJECTS))
