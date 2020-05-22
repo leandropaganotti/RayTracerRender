@@ -35,6 +35,7 @@ src/math/shapes/box.cpp
 src/math/shapes/box.h
 src/math/shapes/cylinder.cpp
 src/math/shapes/cylinder.h
+src/math/shapes/instance.cpp
 src/math/shapes/instance.h
 src/math/shapes/invisible.cpp
 src/math/shapes/invisible.h

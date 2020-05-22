@@ -66,13 +66,6 @@ Vector2 Plane::getUV(const Vector3 &phit, size_t) const
     return {v.x, v.y};
 }
 
-inline
-void Plane::fetchData(const Ray &ray, IntersectionData &isec) const
-{
-    isec.phit = ray.origin + isec.tnear * ray.direction;
-    isec.normal = N;
-}
-
 AABB Plane::getAABB() const
 {
     Vector3 v = Vector3(1,0,0) % N;
@@ -103,7 +96,7 @@ GPlane::GPlane(const Vector3 &o, const Vector3 &n): Plane(o, n)
 
 GPlane::~GPlane() {}
 
-void GPlane::fetchData(const Ray &ray, IntersectionData &isec) const
+void GPlane::getIsecData(const Ray &ray, IntersectionData &isec) const
 {
     isec.phit = ray.origin + isec.tnear * ray.direction;
     isec.normal = N;
@@ -117,12 +110,12 @@ void GPlane::fetchData(const Ray &ray, IntersectionData &isec) const
     }
 }
 
-std::shared_ptr<Material> GPlane::getMaterial() const
-{
-    return material;
-}
-
 void GPlane::setMaterial(const std::shared_ptr<Material> &value)
 {
     material = value ? value : Material::DiffuseWhite;
+}
+
+const Material *GPlane::getMaterial(size_t) const
+{
+    return material.get();
 }

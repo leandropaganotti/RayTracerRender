@@ -89,14 +89,6 @@ Vector2 Mesh::getUV(const Vector3 &phit, size_t idx) const
     return faces[idx]->getUV(phit, idx);
 }
 
-inline
-void Mesh::fetchData(const Ray &ray, IntersectionData &isec) const
-{
-    isec.phit = ray.origin + isec.tnear * ray.direction;
-    isec.normal = getNormal(isec.phit, isec.idx);
-    isec.uv = getUV(isec.phit, isec.idx);
-}
-
 AABB Mesh::getAABB() const
 {
     return bvh->getAABB();
@@ -111,21 +103,21 @@ GMesh::GMesh(std::shared_ptr<Mesh> mesh): Instance(mesh)
     material = Material::DiffuseWhite;
 }
 
-void GMesh::fetchData(const Ray &ray, IntersectionData &isec) const
+void GMesh::getIsecData(const Ray &ray, IntersectionData &isec) const
 {
-    Instance::fetchData(ray, isec);
+    Instance::getIsecData(ray, isec);
     isec.material = material.get();
     isec.color = material->Kd;
-}
-
-std::shared_ptr<Material> GMesh::getMaterial() const
-{
-    return material;
 }
 
 void GMesh::setMaterial(const std::shared_ptr<Material> &value)
 {
     material = value ? value : Material::DiffuseWhite;
+}
+
+const Material *GMesh::getMaterial(size_t) const
+{
+    return material.get();
 }
 
 /************************************************************************
@@ -210,10 +202,6 @@ std::ostream& operator <<(std::ostream &os, const MeshQuad &q)
 }
 
 Vector3 MeshQuad::getNormal(const Vector3 &, size_t) const { return Vector3(0);}
-
-Vector2 MeshQuad::getUV(const Vector3 &, size_t) const { return Vector2(0);}
-
-void MeshQuad::fetchData(const Ray &, IntersectionData &) const {}
 
 /************************************************************************
  * TriangleMesh class
@@ -304,20 +292,6 @@ Vector3 MeshTriangle::getNormal(const Vector3 &phit, size_t) const
     //N = (mesh->normals[nv[0]] + mesh->normals[nv[1]] + mesh->normals[nv[2]]).normalize();
 
     return N;
-}
-
-inline
-Vector2 MeshTriangle::getUV(const Vector3 &, size_t) const
-{
-    return Vector2(0);
-}
-
-inline
-void MeshTriangle::fetchData(const Ray &ray, IntersectionData &isec) const
-{
-    isec.phit = ray.origin + isec.tnear * ray.direction;
-    isec.normal = getNormal(isec.phit, isec.idx);
-    isec.uv = getUV(isec.phit, isec.idx);
 }
 
 std::ostream& operator <<(std::ostream &os, const MeshTriangle &t)

@@ -3,7 +3,7 @@
 #include "shape.h"
 #include <memory>
 
-class Plane: public ShapeNormalUV
+class Plane: public Shape
 {
 public:
     Plane(const Vector3& O={0.0f}, const Vector3& N={0.0f, 1.0f, 0.0f});
@@ -13,7 +13,6 @@ public:
     bool intersection(const Ray& ray, float tmax) const override;
     Vector3 getNormal(const Vector3 &, size_t) const override;
     Vector2 getUV(const Vector3& phit, size_t) const override;
-    virtual void fetchData(const Ray &ray, IntersectionData &isec) const override;
     AABB getAABB() const override;
 
     Vector3 getO() const;
@@ -33,10 +32,11 @@ public:
     GPlane(const Vector3& O={0.0f}, const Vector3& N={0.0f, 1.0f, 0.0f});
     virtual ~GPlane();
 
-    void fetchData(const Ray &ray, IntersectionData &isec) const override;
+    void getIsecData(const Ray &ray, IntersectionData &isec) const override;
 
-    std::shared_ptr<Material> getMaterial() const;
     void setMaterial(const std::shared_ptr<Material> &value);
+
+    const Material* getMaterial(size_t) const override;
 
 protected:
     std::shared_ptr<Material> material;

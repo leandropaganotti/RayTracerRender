@@ -10,6 +10,8 @@ Sphere::Sphere(const Vector3 &center, const float &radius) :
 
 }
 
+Sphere::~Sphere(){}
+
 Vector3 Sphere::getCenter() const
 {
     return center;
@@ -83,17 +85,6 @@ Vector3 Sphere::getNormal(const Vector3 &phit, size_t) const
     return (phit-center).normalize();
 }
 
-//       analytic solution
-//       Vec3f L = orig - center;
-//       float a = dotProduct(dir, dir);
-//       float b = 2 * dotProduct(dir, L);
-//       float c = dotProduct(L, L) - radius2;
-//       float t0, t1;
-//       if (!solveQuadratic(a, b, c, t0, t1)) return false;
-//       if (t0 < 0) t0 = t1;
-//       if (t0 < 0) return false;
-//       tnear = t0;
-//       return true;
 inline
 Vector2 Sphere::getUV(const Vector3 &phit, size_t) const
 {
@@ -101,13 +92,6 @@ Vector2 Sphere::getUV(const Vector3 &phit, size_t) const
     float u = 0.5 + atan2f(d.z, d.x) / (2.0f * M_PI);
     float v = 0.5 - asinf(d.y) / M_PI;
     return {u, v};
-}
-
-inline
-void Sphere::fetchData(const Ray &ray, IntersectionData &isec) const
-{
-    isec.phit = ray.origin + isec.tnear * ray.direction;
-    isec.normal = (isec.phit - center).normalize();
 }
 
 AABB Sphere::getAABB() const
@@ -120,9 +104,10 @@ GSphere::GSphere(const Vector3 &c, const float &r): Sphere(c, r)
     material = Material::DiffuseWhite;
 }
 
-void GSphere::fetchData(const Ray &ray, IntersectionData &isec) const
+void GSphere::getIsecData(const Ray &ray, IntersectionData &isec) const
 {
-    Sphere::fetchData(ray, isec);
+    isec.phit = ray.origin + isec.tnear * ray.direction;
+    isec.normal = (isec.phit - center).normalize();
     isec.material = material.get();
     isec.color = material->Kd;
     if(material->texture)
@@ -132,31 +117,31 @@ void GSphere::fetchData(const Ray &ray, IntersectionData &isec) const
     }
 }
 
-std::shared_ptr<Material> GSphere::getMaterial() const
-{
-    return material;
-}
-
 void GSphere::setMaterial(const std::shared_ptr<Material> &value)
 {
     material = value ? value : Material::DiffuseWhite;
 }
 
-GEllipsoid::GEllipsoid(): Instance(unitSphere){}
-
-std::shared_ptr<Material> GEllipsoid::getMaterial() const
+const Material *GSphere::getMaterial(size_t) const
 {
-    return material;
+    return material.get();
 }
+
+GEllipsoid::GEllipsoid(): Instance(unitSphere){}
 
 void GEllipsoid::setMaterial(const std::shared_ptr<Material> &value)
 {
     material = value ? value : Material::DiffuseWhite;
 }
 
-void GEllipsoid::fetchData(const Ray &ray, IntersectionData &isec) const
+const Material *GEllipsoid::getMaterial(size_t) const
 {
-    Instance::fetchData(ray, isec);
+    return material.get();
+}
+
+void GEllipsoid::getIsecData(const Ray &ray, IntersectionData &isec) const
+{
+    Instance::getIsecData(ray, isec);
     isec.material = material.get();
     isec.color = material->Kd;
     if(material->texture)

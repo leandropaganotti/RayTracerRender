@@ -20,7 +20,7 @@ bool InvisibleShape::intersection(const Ray &, float) const
 {
     return false;
 }
-void InvisibleShape::fetchData(const Ray &, IntersectionData &) const
+void InvisibleShape::getIsecData(const Ray &, IntersectionData &) const
 {
 }
 

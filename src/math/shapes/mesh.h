@@ -8,7 +8,7 @@
  class BVH;
  class MeshFace;
 
-class Mesh: public ShapeNormalUV
+class Mesh: public Shape
 {    
 public:
     void addVertex(const Vector3& v);
@@ -25,14 +25,13 @@ public:
     bool  intersection(const Ray& ray, float tmax) const override;
     Vector3 getNormal(const Vector3 &phit, size_t idx) const override;
     Vector2 getUV(const Vector3 &, size_t) const override;
-    virtual void fetchData(const Ray &ray, IntersectionData &isec) const override;
     AABB getAABB() const override;
 
 protected:
-    std::shared_ptr<Shape> bvh;
+    std::shared_ptr<IntersectionIF> bvh;
     std::vector<Vector3>   vertices;
     std::vector<Vector3>   normals;
-    std::vector<std::shared_ptr<ShapeNormalUV>>    faces;
+    std::vector<std::shared_ptr<Shape>>    faces;
 
     friend class MeshTriangle;
     friend class MeshQuad;
@@ -43,16 +42,17 @@ class GMesh: public Instance
 public:
     GMesh(std::shared_ptr<Mesh> mesh);
 
-    void fetchData(const Ray &ray, IntersectionData &isec) const override;
+    void getIsecData(const Ray &ray, IntersectionData &isec) const override;
 
-    std::shared_ptr<Material> getMaterial() const;
     void setMaterial(const std::shared_ptr<Material> &value);
+
+    const Material * getMaterial(size_t) const override;
 
 protected:
     std::shared_ptr<Material> material;
 };
 
-class MeshFace: public ShapeNormalUV
+class MeshFace: public Shape
 {
 public:
     size_t idx;
@@ -82,10 +82,6 @@ private:
     Vector3 nf;
     float area;
     AABB aabb;
-
-    //ignore those for now
-    Vector2 getUV(const Vector3 &, size_t) const override;
-    void fetchData(const Ray &, IntersectionData &) const override;
 };
 
 class MeshTriangle: public MeshFace
@@ -115,10 +111,6 @@ private:
     float area;
 
     AABB aabb;
-
-    //ignore those for now
-    Vector2 getUV(const Vector3 &, size_t) const override;
-    void fetchData(const Ray &, IntersectionData &) const override;
 };
 
 

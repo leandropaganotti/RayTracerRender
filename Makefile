@@ -30,6 +30,7 @@ mesh.o \
 xmlparser.o \
 objparser.o \
 bvh.o \
+instance.o \
 
 
 CObjects=$(addprefix $(OBJDIR)/,$(OBJECTS))

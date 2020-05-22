@@ -6,7 +6,7 @@
 /*
  * Axis-Aligned Box
 */
-class AABox: public ShapeNormalUV
+class AABox: public Shape
 {
 public:
     AABox(const Vector3 &min={-0.5f, -0.5f, 0.5f}, const Vector3 &max={0.5f,0.5f,-0.5f});
@@ -15,7 +15,6 @@ public:
     bool intersection(const Ray &ray, float tmax) const override;
     Vector3 getNormal(const Vector3 &phit, size_t idx) const override;
     Vector2 getUV(const Vector3 &phit, size_t idx) const override;
-    virtual void fetchData(const Ray &ray, IntersectionData &isec) const override;
     AABB getAABB() const override;
 
 public:
@@ -35,10 +34,11 @@ class GBox: public Instance
 public:
     GBox();
 
-    void fetchData(const Ray &ray, IntersectionData &isec) const override;
+    void getIsecData(const Ray &ray, IntersectionData &isec) const override;
 
-    std::shared_ptr<Material> getMaterial() const;
     void setMaterial(const std::shared_ptr<Material> &value);
+
+    const Material * getMaterial(size_t) const override;
 
 protected:
     std::shared_ptr<Material> material;

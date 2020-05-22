@@ -7,31 +7,31 @@ BVH::BVH()
 
 BVH::~BVH(){ }
 
-std::shared_ptr<Shape> BVH::Create(const std::vector<std::shared_ptr<ShapeNormalUV> > &shapes)
+std::shared_ptr<IntersectionIF> BVH::Create(const std::vector<std::shared_ptr<Shape> > &shapes)
 {
     if (shapes.size() == 0) return InvisibleShape::GetInstance();
 
-    std::vector<std::shared_ptr<Shape>> shapes_;
-    shapes_.push_back(std::shared_ptr<Shape>());
+    std::vector<std::shared_ptr<IntersectionIF>> shapes_;
+    shapes_.push_back(std::shared_ptr<IntersectionIF>());
     for (auto s: shapes)
         shapes_.push_back(s);
 
     return Create(shapes_, 1, shapes_.size()-1, 0);
 }
 
-std::shared_ptr<Shape> BVH::Create(const std::vector<std::shared_ptr<Shape> > &shapes)
+std::shared_ptr<IntersectionIF> BVH::Create(const std::vector<std::shared_ptr<IntersectionIF> > &shapes)
 {
     if (shapes.size() == 0) return InvisibleShape::GetInstance();
 
-    std::vector<std::shared_ptr<Shape>> shapes_;
-    shapes_.push_back(std::shared_ptr<Shape>());
+    std::vector<std::shared_ptr<IntersectionIF>> shapes_;
+    shapes_.push_back(std::shared_ptr<IntersectionIF>());
     for (auto s: shapes)
         shapes_.push_back(s);
 
     return Create(shapes_, 1, shapes_.size()-1, 0);
 }
 
-std::shared_ptr<Shape> BVH::Create(std::vector<std::shared_ptr<Shape> > &shapes, size_t l, size_t r, size_t axis)
+std::shared_ptr<IntersectionIF> BVH::Create(std::vector<std::shared_ptr<IntersectionIF> > &shapes, size_t l, size_t r, size_t axis)
 {
     if (l==r)
     {
@@ -85,7 +85,7 @@ bool BVH::intersection(const Ray &ray, float tmax) const
     return right->intersection(ray, tmax);
 }
 
-size_t BVH::qsplit(std::vector<std::shared_ptr<Shape> > &shapes, size_t l, size_t r, float pivot, size_t axis)
+size_t BVH::qsplit(std::vector<std::shared_ptr<IntersectionIF> > &shapes, size_t l, size_t r, float pivot, size_t axis)
 {
     size_t j = l-1;
     for(size_t i=l; i <= r; ++i)

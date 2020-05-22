@@ -136,18 +136,6 @@ Vector3 UnitYCylinder::getNormal(const Vector3 &phit, size_t idx) const
     }
 }
 
-Vector2 UnitYCylinder::getUV(const Vector3 &, size_t ) const
-{
-    return Vector2(0);
-}
-
-inline
-void UnitYCylinder::fetchData(const Ray &ray, IntersectionData &isec) const
-{
-    isec.phit = ray.origin + isec.tnear * ray.direction;
-    isec.normal = getNormal(isec.phit, isec.idx);
-}
-
 AABB UnitYCylinder::getAABB() const
 {
     return AABB({-1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, -1.0f});
@@ -158,19 +146,19 @@ GCylinder::GCylinder(): Instance(unitCylinder)
     material = Material::DiffuseWhite;
 }
 
-std::shared_ptr<Material> GCylinder::getMaterial() const
-{
-    return material;
-}
-
 void GCylinder::setMaterial(const std::shared_ptr<Material> &value)
 {
     material = value ? value : Material::DiffuseWhite;
 }
 
-void GCylinder::fetchData(const Ray &ray, IntersectionData &isec) const
+const Material *GCylinder::getMaterial(size_t) const
 {
-    shape->fetchData(ray, isec);
+    return material.get();
+}
+
+void GCylinder::getIsecData(const Ray &ray, IntersectionData &isec) const
+{
+    Instance::getIsecData(ray, isec);
     isec.material = material.get();
     isec.color = material->Kd;
 }

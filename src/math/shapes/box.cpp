@@ -121,12 +121,6 @@ void AABox::setMin(const Vector3 &value)
     min = value;
 }
 
-void AABox::fetchData(const Ray &ray, IntersectionData &isec) const
-{
-    isec.phit = ray.origin + isec.tnear * ray.direction;
-    isec.normal = getNormal(isec.phit, isec.idx);
-}
-
 AABB AABox::getAABB() const
 {
     return AABB(min, max);
@@ -137,9 +131,9 @@ GBox::GBox(): Instance(unitBox)
     material = Material::DiffuseWhite;
 }
 
-void GBox::fetchData(const Ray &ray, IntersectionData &isec) const
+void GBox::getIsecData(const Ray &ray, IntersectionData &isec) const
 {
-    Instance::fetchData(ray, isec);
+    Instance::getIsecData(ray, isec);
     isec.material = material.get();
     isec.color = material->Kd;
     if(material->texture)
@@ -149,12 +143,12 @@ void GBox::fetchData(const Ray &ray, IntersectionData &isec) const
     }
 }
 
-std::shared_ptr<Material> GBox::getMaterial() const
-{
-    return material;
-}
-
 void GBox::setMaterial(const std::shared_ptr<Material> &value)
 {
     material = value ? value : Material::DiffuseWhite;
+}
+
+const Material *GBox::getMaterial(size_t) const
+{
+    return material.get();
 }

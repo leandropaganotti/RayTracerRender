@@ -48,7 +48,7 @@ void RayTracer::render(const Scene& scene)
                 for (size_t jj=0; jj < grid; ++jj)
                 {
                     for (size_t n = 0; n < nrays_persubpixel; ++n)
-                    {                        
+                    {
                         const float x = i + gridSize * (ii + erand48(Xi));
                         const float y = j + gridSize * (jj + erand48(Xi));
                         Ray ray(camera.getPosition(), rayDirection(x, y));
@@ -89,21 +89,27 @@ bool RayTracer::castRay(const Ray &ray, IntersectionData &isec)
 
     if(!isec.shape) return false;
 
-    isec.shape->fetchData(ray, isec);
+    isec.shape->getIsecData(ray, isec);
+
     return true;
 }
 
 
 float RayTracer::castShadowRay(const Ray &ray, float tmax)
 {
+    float vis = 1.0f;
+    IntersectionData isec;
     for(auto &object : scene->objects)
     {
-        if (object->intersection(ray, tmax))
+        if (object->intersection(ray, tmax, isec))
         {
-            return 0.0f;
+            if (object->getMaterial(isec.idx)->type == Material::Type::TRANSPARENT)
+                vis *= 0.8f;
+            else
+                return 0.0f;
         }
     }
-    return 1.0f;
+    return vis;
 }
 
 void RayTracer::setTracer(RayTracerType type){
@@ -420,7 +426,7 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const uint8_t depth, const float 
         {
             const GSphere * const sphere = dynamic_cast<const GSphere*const>(obj.get());
             if (!sphere) continue; // only supported sphere for direct light
-            if (sphere->getMaterial()->E  == Vector::ZERO) continue; // skip non light
+            if (sphere->getMaterial(0)->E  == Vector::ZERO) continue; // skip non light
 
             Vector3 sampleToLight;
             float _1_pdf;
@@ -433,7 +439,7 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const uint8_t depth, const float 
                 float vis = castShadowRay(Ray(isec.phit + bias * isec.normal, sampleToLight), dist);
                 if (vis > 0.0f)
                 {
-                    direct += vis * brdf * sphere->getMaterial()->E * cosTheta * _1_pdf;
+                    direct += vis * brdf * sphere->getMaterial(0)->E * cosTheta * _1_pdf;
                 }
             }
         }
