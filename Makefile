@@ -3,7 +3,7 @@ OBJDIR = build
 
 CXXFLAGS =  -O3 -std=c++0x -Wall -W -fopenmp -Winline
 CXX = g++
-INCPATH = -I./src -I./src/math -I./src/shapes -I/usr/include/libxml2 -I./libxml/include/libxml2
+INCPATH = -I./src -I./src/shapes -I/usr/include/libxml2 -I./libxml/include/libxml2
 LIBDIRS = -L/usr/lib/x86_64-linux-gnu -L./libxml/lib
 LIBS = -lpthread -lxml2
 LDFLAGS = $(LIBDIRS) $(LIBS)
