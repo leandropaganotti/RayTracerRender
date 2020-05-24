@@ -1,10 +1,13 @@
 #include "material.h"
 
-const std::shared_ptr<Material> Material::DiffuseWhite = Material::Create("DiffuseWhite", Material::Type::DIFFUSE);
-const std::shared_ptr<Material> Material::Glass = Material::Create("Glass", Material::Type::TRANSPARENT);
-const std::shared_ptr<Material> Material::Mirror = Material::Create("Mirror", Material::Type::SPECULAR);
+namespace material
+{
+    const std::shared_ptr<Material> DiffuseWhite = Material::Create("DiffuseWhite", MaterialType::DIFFUSE);
+    const std::shared_ptr<Material> Glass = Material::Create("Glass", MaterialType::TRANSPARENT);
+    const std::shared_ptr<Material> Mirror = Material::Create("Mirror", MaterialType::SPECULAR);
+}
 
-std::shared_ptr<Material> Material::Create(const std::string &key, Type type)
+std::shared_ptr<Material> Material::Create(const std::string &key, MaterialType type)
 {
     return Resource::Create<Material>(key, new Material(type));
 }
@@ -18,7 +21,9 @@ std::shared_ptr<Material> Material::Get(const std::string &key)
     return Resource::Get<Material>(key);
 }
 
-Material::Material(Material::Type type)
+Material::~Material(){}
+
+Material::Material(MaterialType type)
 {
     Kd = 1.0f;
     E = 0.0f;
@@ -38,7 +43,7 @@ Material::Material()
     Ns = 30.0f;
     R0 = 0.9f;
     Ni = 1.55f; // refractive index for glass
-    type = Type::DIFFUSE;
+    type = MaterialType::DIFFUSE;
     texture = nullptr;
 }
 

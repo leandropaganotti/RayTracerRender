@@ -92,7 +92,7 @@ AABB Plane::getAABB() const
 
 GPlane::GPlane(const Vector3 &o, const Vector3 &n): Plane(o, n)
 {
-    material = Material::DiffuseWhite;
+    material = material::DiffuseWhite;
 }
 
 GPlane::~GPlane() {}
@@ -113,7 +113,7 @@ void GPlane::getIsecData(const Ray &ray, IntersectionData &isec) const
 
 void GPlane::setMaterial(const std::shared_ptr<Material> &value)
 {
-    material = value ? value : Material::DiffuseWhite;
+    material = value ? value : material::DiffuseWhite;
 }
 
 const Material *GPlane::getMaterial(size_t) const

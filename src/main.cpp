@@ -7,6 +7,9 @@
 #include "raytracer.h"
 #include "transformation.h"
 
+#include "resource.h"
+#include "material.h"
+
 using namespace std;
 
 char	    *xmlscene = NULL;	// xml file with scene description
@@ -17,7 +20,7 @@ void parseArguments(int argc, char **argv);
 
 int main(int argc, char **argv)
 {
-	parseArguments(argc, argv);
+    parseArguments(argc, argv);
 
     double time_in_ms_avg=0.0, time_in_ms=0.0;
     float angle = nimages ? 360.0 / nimages : 0.0;

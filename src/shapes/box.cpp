@@ -128,7 +128,7 @@ AABB AABox::getAABB() const
 
 GBox::GBox(): Instance(unitBox)
 {
-    material = Material::DiffuseWhite;
+    material = material::DiffuseWhite;
 }
 
 void GBox::getIsecData(const Ray &ray, IntersectionData &isec) const
@@ -145,7 +145,7 @@ void GBox::getIsecData(const Ray &ray, IntersectionData &isec) const
 
 void GBox::setMaterial(const std::shared_ptr<Material> &value)
 {
-    material = value ? value : Material::DiffuseWhite;
+    material = value ? value : material::DiffuseWhite;
 }
 
 const Material *GBox::getMaterial(size_t) const

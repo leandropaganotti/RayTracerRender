@@ -143,12 +143,12 @@ AABB UnitYCylinder::getAABB() const
 
 GCylinder::GCylinder(): Instance(unitCylinder)
 {
-    material = Material::DiffuseWhite;
+    material = material::DiffuseWhite;
 }
 
 void GCylinder::setMaterial(const std::shared_ptr<Material> &value)
 {
-    material = value ? value : Material::DiffuseWhite;
+    material = value ? value : material::DiffuseWhite;
 }
 
 const Material *GCylinder::getMaterial(size_t) const

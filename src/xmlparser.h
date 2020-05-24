@@ -49,5 +49,7 @@ private:
     float    toFloat(const xmlChar *str);
 
     int      toInt(const xmlChar *str);
+
+    void LogError(const xmlNode *node, const xmlAttr* attr, const std::string &msg);
 };
 

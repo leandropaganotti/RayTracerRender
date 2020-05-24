@@ -103,7 +103,7 @@ float RayTracer::castShadowRay(const Ray &ray, float tmax)
     {
         if (object->intersection(ray, tmax, isec))
         {
-            if (object->getMaterial(isec.idx)->type == Material::Type::TRANSPARENT)
+            if (object->getMaterial(isec.idx)->type == MaterialType::TRANSPARENT)
                 vis *= 0.8f;
             else
                 return 0.0f;
@@ -202,9 +202,9 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const uint8_t depth, cons
 //{
 //    const Material *material = &isec.object->getMaterial();
 
-//    if (material->type == Material::Type::TRANSPARENT)
+//    if (material->type == MaterialType::TRANSPARENT)
 //        return transparentMaterial(ray, scene, depth, isec, E);
-//    else if (material->type == Material::Type::SPECULAR)
+//    else if (material->type == MaterialType::SPECULAR)
 //    {
 //        float c = 1.0f - (isec.normal ^ -ray.direction);
 //        float R0 = material->reflectivity;
@@ -291,13 +291,13 @@ Vector3 RayTracer::rayTracer(const Ray &ray, const uint8_t depth, const float)
     if (!castRay(ray, isec))
         return scene->bgColor;
 
-    const Material::Type type = isec.material->type;
+    const MaterialType type = isec.material->type;
 
-    if (type == Material::Type::DIFFUSE)
+    if (type == MaterialType::DIFFUSE)
     {
         return phongShading(ray, isec);
     }
-    else if (type == Material::Type::SPECULAR)
+    else if (type == MaterialType::SPECULAR)
     {
         float kr = schlick(-ray.direction, isec.normal, isec.material->R0);
         float kt = 1.0f - kr;
@@ -314,7 +314,7 @@ Vector3 RayTracer::rayTracer(const Ray &ray, const uint8_t depth, const float)
 
         return kt*diffused + kr*reflected;
     }
-    else if (type == Material::Type::TRANSPARENT)
+    else if (type == MaterialType::TRANSPARENT)
     {
         return transparentMaterial(ray, depth, isec);
     }
@@ -331,9 +331,9 @@ Vector3 RayTracer::pathTracer(const Ray &ray, const uint8_t depth, const float)
     if (!castRay(ray, isec))
         return scene->bgColor;
 
-    Material::Type type = isec.material->type;
+    MaterialType type = isec.material->type;
 
-    if (type == Material::Type::DIFFUSE)
+    if (type == MaterialType::DIFFUSE)
     {
         /*
          * A Lambertian surface by definition reflects radiance equally into all directions. Its BRDF is simply
@@ -356,7 +356,7 @@ Vector3 RayTracer::pathTracer(const Ray &ray, const uint8_t depth, const float)
         float cosTheta = isec.normal ^ r.direction;
         return isec.material->E + isec.color * pathTracer(r, depth+1) * cosTheta * 2.0f;
     }
-    else if (type == Material::Type::SPECULAR)
+    else if (type == MaterialType::SPECULAR)
     {
         float kr = schlick(-ray.direction, isec.normal, isec.material->R0);
         float kt = 1.0f - kr;
@@ -379,7 +379,7 @@ Vector3 RayTracer::pathTracer(const Ray &ray, const uint8_t depth, const float)
 
         return kt*diffused + kr*reflected;
     }
-    else if (type == Material::Type::TRANSPARENT)
+    else if (type == MaterialType::TRANSPARENT)
     {
         return transparentMaterial(ray, depth, isec);
     }
@@ -395,14 +395,14 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const uint8_t depth, const float 
     if (!castRay(ray, isec))
         return scene->bgColor;
 
-    const Material::Type type = isec.material->type;
+    const MaterialType type = isec.material->type;
 
     float kt=1.0f, kr=0.0f; // default diffuse material values
-    if(type == Material::Type::TRANSPARENT)
+    if(type == MaterialType::TRANSPARENT)
     {
         return transparentMaterial(ray, depth, isec, E);
     }
-    else if (type == Material::Type::SPECULAR)
+    else if (type == MaterialType::SPECULAR)
     {
         kr = schlick(-ray.direction, isec.normal, isec.material->R0);
         kt = 1.0f - kr;

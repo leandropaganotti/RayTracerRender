@@ -101,7 +101,7 @@ AABB Sphere::getAABB() const
 
 GSphere::GSphere(const Vector3 &c, const float &r): Sphere(c, r)
 {
-    material = Material::DiffuseWhite;
+    material = material::DiffuseWhite;
 }
 
 void GSphere::getIsecData(const Ray &ray, IntersectionData &isec) const
@@ -119,7 +119,7 @@ void GSphere::getIsecData(const Ray &ray, IntersectionData &isec) const
 
 void GSphere::setMaterial(const std::shared_ptr<Material> &value)
 {
-    material = value ? value : Material::DiffuseWhite;
+    material = value ? value : material::DiffuseWhite;
 }
 
 const Material *GSphere::getMaterial(size_t) const
@@ -131,7 +131,7 @@ GEllipsoid::GEllipsoid(): Instance(unitSphere){}
 
 void GEllipsoid::setMaterial(const std::shared_ptr<Material> &value)
 {
-    material = value ? value : Material::DiffuseWhite;
+    material = value ? value : material::DiffuseWhite;
 }
 
 const Material *GEllipsoid::getMaterial(size_t) const

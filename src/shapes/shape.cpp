@@ -12,7 +12,7 @@ void Shape::getIsecData(const Ray &ray, IntersectionData &isec) const
 
 const Material *Shape::getMaterial(size_t) const
 {
-    return Material::DiffuseWhite.get();
+    return material::DiffuseWhite.get();
 }
 
 Vector2 Shape::getUV(const Vector3 &, size_t) const
