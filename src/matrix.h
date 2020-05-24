@@ -84,7 +84,7 @@ Ray Matrix4::operator *(const Ray &ray) const
 {
     Ray R;
     R.origin = (*this) * ray.origin;
-    R.direction = multiplyVector(ray.direction).normalize();
+    R.direction = multiplyVector(ray.direction);
     return R;
 }
 

@@ -1,16 +1,14 @@
 PROGRAM = render
 OBJDIR = build
 
-CXXFLAGS =  -O3 -std=c++14 -Wall -W -fopenmp
+CXXFLAGS =  -O3 -std=c++0x -Wall -W -fopenmp -Winline
 CXX = g++
-INCPATH = -I./src -I./src/math -I./src/math/shapes -I/usr/include/libxml2
-LIBDIRS = -L/usr/lib/x86_64-linux-gnu
-#INCPATH = -I./src -I./src/math -I./src/math/shapes -IC:\Users\lpaganotti\RayTracerRender\libxml\include\libxml2
-#LIBDIRS = -LC:\Users\lpaganotti\RayTracerRender\libxml\lib
+INCPATH = -I./src -I./src/shapes -I/usr/include/libxml2 -I./libxml/include/libxml2
+LIBDIRS = -L/usr/lib/x86_64-linux-gnu -L./libxml/lib
 LIBS = -lpthread -lxml2
 LDFLAGS = $(LIBDIRS) $(LIBS)
 LFLAGS  = -fopenmp
-VPATH = src/ src/math src/math/shapes
+VPATH = src/ src/shapes
 
 OBJECTS = main.o \
 camera.o \
@@ -24,15 +22,17 @@ texture.o \
 transformation.o \
 cameraoptions.o \
 material.o \
-shape.o \
 cylinder.o \
-invisibleshape.o \
-aabox.o \
+invisible.o \
+box.o \
 aabb.o \
 mesh.o \
+xmlparser.o \
 objparser.o \
-shapefactory.o \
-xmlparser.o 
+bvh.o \
+instance.o \
+shape.o \
+resource.o \
 
 
 CObjects=$(addprefix $(OBJDIR)/,$(OBJECTS))

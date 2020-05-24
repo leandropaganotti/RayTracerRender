@@ -12,6 +12,9 @@ public:
     Vector3 origin;
     Vector3 direction;
 
+    Vector3 invdir;
+    int posneg[3];
+
     friend std::ostream& operator<< (std::ostream& os, const Ray& r)
     {
         return os << r.origin << " " << r.direction ;

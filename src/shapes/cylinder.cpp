@@ -1,13 +1,16 @@
 #include "cylinder.h"
-#include "consts.h"
 #include "utils.h"
+#include "consts.h"
+#include "material.h"
+
+static std::shared_ptr<UnitYCylinder> unitCylinder = std::shared_ptr<UnitYCylinder>(new UnitYCylinder);
 
 UnitYCylinder::UnitYCylinder()
 {
 
 }
 
-bool UnitYCylinder::intersection(const Ray &ray, IntersectionData &isec) const
+bool UnitYCylinder::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
 {
     float a = ray.direction.x*ray.direction.x + ray.direction.z*ray.direction.z;
     float b = 2.0f*ray.direction.x*ray.origin.x + 2.0f*ray.direction.z*ray.origin.z;
@@ -27,8 +30,9 @@ bool UnitYCylinder::intersection(const Ray &ray, IntersectionData &isec) const
         else
         {
             // hit the cap
-            isec.tnear = t0 + (t1-t0) * (y0+1) / (y0-y1);
-            if (isec.tnear<=0) return false;
+            const float tval = t0 + (t1-t0) * (y0+1) / (y0-y1);
+            if (tval<=0 || tval > tmax) return false;
+            isec.tnear = tval;
             isec.idx=0;
             return true;
         }
@@ -36,7 +40,7 @@ bool UnitYCylinder::intersection(const Ray &ray, IntersectionData &isec) const
     else if (y0>=0 && y0<=1)
     {
         // hit the cylinder bit
-        if (t0<=0) return false;
+        if (t0<=0 || t0 > tmax) return false;
         isec.tnear=t0;
         isec.idx=1;
         return true;
@@ -48,8 +52,9 @@ bool UnitYCylinder::intersection(const Ray &ray, IntersectionData &isec) const
         else
         {
             // hit the cap
-            isec.tnear = t0 + (t1-t0) * (y0-1) / (y0-y1);
-            if (isec.tnear<=0) return false;
+            const float tval = t0 + (t1-t0) * (y0-1) / (y0-y1);
+            if (tval<=0 || tval > tmax) return false;
+            isec.tnear = tval;
             isec.idx=2;
             return true;
         }
@@ -58,7 +63,7 @@ bool UnitYCylinder::intersection(const Ray &ray, IntersectionData &isec) const
     return false;
 }
 
-bool UnitYCylinder::intersection(const Ray &ray, float &tnear) const
+bool UnitYCylinder::intersection(const Ray &ray, float tmax) const
 {
     /*
      * x2 + y2 = 1
@@ -87,16 +92,15 @@ bool UnitYCylinder::intersection(const Ray &ray, float &tnear) const
         else
         {
             // hit the cap
-            tnear = t0 + (t1-t0) * (y0+1) / (y0-y1);
-            if (tnear<=0) return false;
+            const float tval = t0 + (t1-t0) * (y0+1) / (y0-y1);
+            if (tval<=0 || tval > tmax) return false;
             return true;
         }
     }
     else if (y0>=0 && y0<=1)
     {
         // hit the cylinder bit
-        if (t0<=0) return false;
-        tnear=t0;
+        if (t0<=0 || t0 > tmax) return false;
         return true;
     }
     else if (y0>1)
@@ -106,8 +110,8 @@ bool UnitYCylinder::intersection(const Ray &ray, float &tnear) const
         else
         {
             // hit the cap
-            tnear = t0 + (t1-t0) * (y0-1) / (y0-y1);
-            if (tnear<=0) return false;
+            const float tval = t0 + (t1-t0) * (y0-1) / (y0-y1);
+            if (tval<=0 || tval > tmax) return false;
             return true;
         }
     }
@@ -115,7 +119,8 @@ bool UnitYCylinder::intersection(const Ray &ray, float &tnear) const
     return false;
 }
 
-Vector3 UnitYCylinder::normal(const Vector3 &phit, size_t idx) const
+inline
+Vector3 UnitYCylinder::getNormal(const Vector3 &phit, size_t idx) const
 {    
     if(idx==0)
     {
@@ -131,7 +136,29 @@ Vector3 UnitYCylinder::normal(const Vector3 &phit, size_t idx) const
     }
 }
 
-Vector2 UnitYCylinder::uv(const Vector3 &, size_t) const
+AABB UnitYCylinder::getAABB() const
 {
-    return Vector2(0.0f, 0.0f);
+    return AABB({-1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, -1.0f});
+}
+
+GCylinder::GCylinder(): Instance(unitCylinder)
+{
+    material = material::DiffuseWhite;
+}
+
+void GCylinder::setMaterial(const std::shared_ptr<Material> &value)
+{
+    material = value ? value : material::DiffuseWhite;
+}
+
+const Material *GCylinder::getMaterial(size_t) const
+{
+    return material.get();
+}
+
+void GCylinder::getIsecData(const Ray &ray, IntersectionData &isec) const
+{
+    Instance::getIsecData(ray, isec);
+    isec.material = material.get();
+    isec.color = material->Kd;
 }

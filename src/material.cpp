@@ -1,28 +1,30 @@
 #include "material.h"
 
-std::map<std::string, std::shared_ptr<Material>> Material::MaterialList;
-
-const std::shared_ptr<Material> Material::DiffuseWhite = Material::Create("DiffuseWhite", Material::Type::DIFFUSE);
-const std::shared_ptr<Material> Material::Glass = Material::Create("Glass", Material::Type::TRANSPARENT);
-const std::shared_ptr<Material> Material::Mirror = Material::Create("Mirror", Material::Type::SPECULAR);
-
-std::shared_ptr<Material> Material::Create(std::string name, Type type)
+namespace material
 {
-    std::shared_ptr<Material> m (new Material(name=="" ? std::to_string(MaterialList.size()) : name, type));
-    MaterialList[m->getName()] = m;
-    return m;
+    const std::shared_ptr<Material> DiffuseWhite = Material::Create("DiffuseWhite", MaterialType::DIFFUSE);
+    const std::shared_ptr<Material> Glass = Material::Create("Glass", MaterialType::TRANSPARENT);
+    const std::shared_ptr<Material> Mirror = Material::Create("Mirror", MaterialType::SPECULAR);
 }
 
-std::shared_ptr<Material> Material::GetByName(const std::string &name)
+std::shared_ptr<Material> Material::Create(const std::string &key, MaterialType type)
 {
-    auto m = MaterialList.find(name);
-    return m == MaterialList.end() ? nullptr : m->second;
+    return Resource::Create<Material>(key, new Material(type));
+}
+std::shared_ptr<Material> Material::Create(const std::string &key)
+{
+    return Resource::Create<Material>(key, new Material);
 }
 
-Material::Material(std::string name, Type type)
+std::shared_ptr<Material> Material::Get(const std::string &key)
 {
+    return Resource::Get<Material>(key);
+}
 
-    this->name = name;
+Material::~Material(){}
+
+Material::Material(MaterialType type)
+{
     Kd = 1.0f;
     E = 0.0f;
     Ks = 0.0f;
@@ -30,21 +32,19 @@ Material::Material(std::string name, Type type)
     R0 = 0.9f;
     Ni = 1.55f; // refractive index for glass
     this->type = type;
-    texture = Texture::SolidWhite;
+    texture = nullptr;
 }
 
-const Texture * Material::getTexture() const
+Material::Material()
 {
-    return texture.get();
+    Kd = 1.0f;
+    E = 0.0f;
+    Ks = 0.0f;
+    Ns = 30.0f;
+    R0 = 0.9f;
+    Ni = 1.55f; // refractive index for glass
+    type = MaterialType::DIFFUSE;
+    texture = nullptr;
 }
 
-void Material::setTexture(const std::shared_ptr<Texture> texture)
-{
-    this->texture = texture ? texture : Texture::SolidWhite;
-}
 
-void Material::setTexture(const std::string &name)
-{
-    if(!(this->texture = Texture::GetByName(name)))
-        this->texture = Texture::SolidWhite;
-}

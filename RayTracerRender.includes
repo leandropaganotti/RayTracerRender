@@ -1,5 +1,4 @@
-src/math
-src/math/shapes
 src
-.
 scenes
+.
+src/shapes

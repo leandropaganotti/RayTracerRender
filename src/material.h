@@ -3,44 +3,44 @@
 
 #include "vector.h"
 #include "texture.h"
+#include "resource.h"
 
 #include <vector>
-#include <string>
-#include <map>
-#include <memory>
 
-class Material
+class Material;
+
+enum class MaterialType { DIFFUSE, SPECULAR, TRANSPARENT };
+
+namespace material
+{
+    extern const std::shared_ptr<Material> DiffuseWhite;
+    extern const std::shared_ptr<Material> Glass;
+    extern const std::shared_ptr<Material> Mirror;
+}
+
+class Material: public Resource
 {
 public:
-    enum class Type { DIFFUSE, SPECULAR, TRANSPARENT };
-    Type type;
+    MaterialType type;
     Vector3 Kd;
     Vector3 E;
     float Ks;
     float Ns;
     float R0;
     float Ni;
-
-    const std::string& getName() const { return name;}
-
-    const Texture * getTexture() const;
-    void setTexture(const std::shared_ptr<Texture> texture);
-    void setTexture(const std::string &name);
-
-    static std::shared_ptr<Material> Create(std::string name="", Type type=Type::DIFFUSE);
-    static std::shared_ptr<Material> GetByName(const std::string &name);
-
-    static const std::shared_ptr<Material> DiffuseWhite;
-    static const std::shared_ptr<Material> Glass;
-    static const std::shared_ptr<Material> Mirror;
-
-protected:
-    Material(std::string name, Type type=Type::DIFFUSE);
-    std::string name;
     std::shared_ptr<Texture>  texture;
 
-    static std::map<std::string, std::shared_ptr<Material>> MaterialList;
+    static std::shared_ptr<Material> Create(const std::string &key, MaterialType type);
+    static std::shared_ptr<Material> Create(const std::string &key);
 
+    static std::shared_ptr<Material> Get(const std::string &key);
+
+
+
+    ~Material();
+protected:
+    Material(MaterialType type);
+    Material();
 };
 
 #endif // MATERIAL_H

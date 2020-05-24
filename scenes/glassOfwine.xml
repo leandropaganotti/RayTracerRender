@@ -2,7 +2,7 @@
 <scene name="glassofwine" grid="4" spp="4" index="1.0" maxdepth="5" bgcolor="0.01" ka="0.1" raytracer="path2">
     <CameraOptions position="0,4,10" lookingat="0, 1.8, 0" fov="40" width="320" height="640"></CameraOptions>
     <PointLight position="0,4,6" color="1" strength="1.5" k="0.05"></PointLight>
-    <plane name="floor" point="0, -0.2, 0" normal="0,1,0" material="DiffuseWhite" />
+    <plane name="floor" point="0, -0.2, 0" normal="0,1,0"/>
     <!--<ellipsoid>
         <transformation translate="1.1,0,0.2" rotate="0" scale="0.3, 2.5, 0.3" />
         <material type="diffuse" kd="0,1,0"/>
@@ -10,7 +10,7 @@
     <Sphere name="light" position="1,4.3,0" radius="0.5">
         <material type="diffuse" kd="1" E="65"></material>
     </Sphere>
-    <Box material="DiffuseWhite">
+    <Box>
         <transformation translate="0" rotate="0" scale="3, 0.1, 3" />
     </Box>
     <mesh name="glass" path="obj/glass.obj" material="Glass">

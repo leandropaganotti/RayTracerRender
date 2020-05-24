@@ -3,21 +3,23 @@
 
 #include <string>
 #include <vector>
-#include "object.h"
 #include "light.h"
 #include "consts.h"
 #include "cameraoptions.h"
+#include "shape.h"
+
+typedef std::vector<std::shared_ptr<Shape>> ObjectVector;
 
 class Scene
 {
 public:
     Scene();
     Scene(const std::string &fileName);
+    ~Scene();
 
-    void addObject(Object * obj);
     void addLight(Light * light);
 
-    void addObject(std::unique_ptr<Object> obj);
+    void addObject(std::shared_ptr<Shape> obj);
 
     void load(const std::string &fileName);
 
