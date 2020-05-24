@@ -1,28 +1,25 @@
 #include "material.h"
 
-std::map<std::string, std::shared_ptr<Material>> Material::MaterialList;
-
 const std::shared_ptr<Material> Material::DiffuseWhite = Material::Create("DiffuseWhite", Material::Type::DIFFUSE);
 const std::shared_ptr<Material> Material::Glass = Material::Create("Glass", Material::Type::TRANSPARENT);
 const std::shared_ptr<Material> Material::Mirror = Material::Create("Mirror", Material::Type::SPECULAR);
 
-std::shared_ptr<Material> Material::Create(std::string name, Type type)
+std::shared_ptr<Material> Material::Create(const std::string &key, Type type)
 {
-    std::shared_ptr<Material> m (new Material(name, type));
-    MaterialList[m->getName()] = m;
-    return m;
+    return Resource::Create<Material>(key, new Material(type));
+}
+std::shared_ptr<Material> Material::Create(const std::string &key)
+{
+    return Resource::Create<Material>(key, new Material);
 }
 
-std::shared_ptr<Material> Material::GetByName(const std::string &name)
+std::shared_ptr<Material> Material::Get(const std::string &key)
 {
-    auto m = MaterialList.find(name);
-    return m == MaterialList.end() ? nullptr : m->second;
+    return Resource::Get<Material>(key);
 }
 
-Material::Material(std::string name, Type type)
+Material::Material(Material::Type type)
 {
-
-    this->name = name;
     Kd = 1.0f;
     E = 0.0f;
     Ks = 0.0f;
@@ -32,4 +29,17 @@ Material::Material(std::string name, Type type)
     this->type = type;
     texture = nullptr;
 }
+
+Material::Material()
+{
+    Kd = 1.0f;
+    E = 0.0f;
+    Ks = 0.0f;
+    Ns = 30.0f;
+    R0 = 0.9f;
+    Ni = 1.55f; // refractive index for glass
+    type = Type::DIFFUSE;
+    texture = nullptr;
+}
+
 

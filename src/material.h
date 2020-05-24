@@ -3,13 +3,11 @@
 
 #include "vector.h"
 #include "texture.h"
+#include "resource.h"
 
 #include <vector>
-#include <string>
-#include <map>
-#include <memory>
 
-class Material
+class Material: public Resource
 {
 public:
     enum class Type { DIFFUSE, SPECULAR, TRANSPARENT };
@@ -22,21 +20,21 @@ public:
     float Ni;
     std::shared_ptr<Texture>  texture;
 
-    const std::string& getName() const { return name;}
+    static std::shared_ptr<Material> Create(const std::string &key, Type type);
+    static std::shared_ptr<Material> Create(const std::string &key);
 
-
-    static std::shared_ptr<Material> Create(std::string name, Type type);
-    static std::shared_ptr<Material> GetByName(const std::string &name);
+    static std::shared_ptr<Material> Get(const std::string &key);
 
     static const std::shared_ptr<Material> DiffuseWhite;
     static const std::shared_ptr<Material> Glass;
     static const std::shared_ptr<Material> Mirror;
 
+    ~Material(){
+        std::cout << "dtor "  << key << std::endl;
+    }
 protected:
-    Material(std::string name, Type type);
-    std::string name;
-    static std::map<std::string, std::shared_ptr<Material>> MaterialList;
-
+    Material(Type type);
+    Material();
 };
 
 #endif // MATERIAL_H

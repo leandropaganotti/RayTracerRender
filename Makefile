@@ -32,6 +32,7 @@ objparser.o \
 bvh.o \
 instance.o \
 shape.o \
+resource.o \
 
 
 CObjects=$(addprefix $(OBJDIR)/,$(OBJECTS))
