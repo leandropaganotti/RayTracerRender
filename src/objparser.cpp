@@ -51,17 +51,19 @@ std::vector<std::string> split(const std::string &s, char delim) {
   return elems;
 }
 
-std::shared_ptr<Mesh> OBJParser::ParseMesh(const std::string &path)
+void OBJParser::ParseMesh(std::shared_ptr<Mesh> &mesh, const std::string &path)
 {
+    if(!mesh) return;
+
     std::ifstream ifs (path, std::ifstream::in);
 
     if (!ifs.is_open())
     {
         std::cerr << "Error opening file: " << path << std::endl;
-        return nullptr;
+        return;
     }
 
-    auto mesh = std::shared_ptr<Mesh>(new Mesh);
+
     mesh->clear();
     mesh->addVertex({});
     mesh->addNormal({});
@@ -117,5 +119,4 @@ std::shared_ptr<Mesh> OBJParser::ParseMesh(const std::string &path)
     //std::cout << *mesh << std::endl;
     ifs.close();
     mesh->buildBoundingVolume();
-    return mesh;
 }

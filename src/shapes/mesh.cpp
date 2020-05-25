@@ -8,6 +8,11 @@
  * Mesh class
  ************************************************************************/
 
+std::shared_ptr<Mesh> Mesh::Create(const std::string &key)
+{
+    return Resource::Create<Mesh>(key, new Mesh);
+}
+
 void Mesh::addVertex(const Vector3 &v)
 {
     vertices.push_back(v);
@@ -92,6 +97,11 @@ Vector2 Mesh::getUV(const Vector3 &phit, size_t idx) const
 AABB Mesh::getAABB() const
 {
     return bvh->getAABB();
+}
+
+Mesh::Mesh()
+{
+
 }
 
 /************************************************************************

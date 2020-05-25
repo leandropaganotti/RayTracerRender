@@ -4,13 +4,16 @@
 #include "shape.h"
 #include "instance.h"
 #include "aabb.h"
+#include "resource.h"
 
  class BVH;
  class MeshFace;
 
-class Mesh: public Shape
+class Mesh: public Shape, public Resource
 {    
 public:
+    static std::shared_ptr<Mesh> Create(const std::string &key);
+
     void addVertex(const Vector3& v);
     void addNormal(const Vector3& n);
     void addFace(std::shared_ptr<MeshFace> face);
@@ -28,6 +31,7 @@ public:
     AABB getAABB() const override;
 
 protected:
+    Mesh();
     std::shared_ptr<IntersectionIF> bvh;
     std::vector<Vector3>   vertices;
     std::vector<Vector3>   normals;

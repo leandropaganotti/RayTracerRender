@@ -6,5 +6,5 @@
 class OBJParser
 {
 public:
-    static std::shared_ptr<Mesh> ParseMesh(const std::string &path);
+    static void ParseMesh(std::shared_ptr<Mesh> &mesh , const std::string &path);
 };

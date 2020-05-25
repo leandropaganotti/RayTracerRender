@@ -28,7 +28,6 @@ public:
 
     void parseDistantLight(xmlNode * xmlDistantLightNode, DistantLight & light);
 
-    //std::shared_ptr<ShapeWithMaterial>  parseShape(xmlNode * xmlObjectNode);
     std::shared_ptr<GPlane>  parsePlane(xmlNode * xmlPlaneNode);
     std::shared_ptr<GSphere>  parseSphere(xmlNode * xmlSphereNode);
     std::shared_ptr<GBox>  parseBox(xmlNode * xmlBoxNode);

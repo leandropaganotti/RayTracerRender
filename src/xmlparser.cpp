@@ -634,32 +634,37 @@ std::shared_ptr<GMesh> XMLParser::parseMesh(xmlNode *xmlMeshNode)
          return nullptr;
     }
 
-    std::shared_ptr<Mesh> mesh;
-    std::shared_ptr<Material> material;
-
     const xmlAttr *attr = NULL;
-    std::string name("");
+    std::string name(""), src(""), mat("");
 
     for (attr = xmlMeshNode->properties; attr; attr = attr->next)
     {
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
-        else if (equals(attr->name, "path"))
+        else if (equals(attr->name, "src"))
         {
-            mesh = OBJParser::ParseMesh((const char*)attr->children->content);
+            src = (const char*)attr->children->content;
         }
         else if (equals(attr->name, "material"))
         {
-            material = Material::Get((const char*)attr->children->content);
-            if(!material) LogError(xmlMeshNode, attr, "Can't find material");
+            mat = (const char*)attr->children->content;
         }
         else
             std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlMeshNode->name << "\':" << name << "\x1b[0m" << std::endl;
     }
 
-    if(!mesh) return nullptr;
+    auto mesh = Resource::Get<Mesh>(src);
+
+    if(!mesh)
+    {
+        mesh = Resource::Create<Mesh>(src);
+        OBJParser::ParseMesh(mesh, src);
+    }
 
     auto gmesh = std::shared_ptr<GMesh>(new GMesh(mesh));
+
+    auto material = Material::Get(mat);
+    if(!material) LogError(xmlMeshNode, attr, "Can't find material");
     gmesh->setMaterial(material);
 
     xmlNode *node = NULL;

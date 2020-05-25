@@ -40,7 +40,6 @@ src/raytracer.cpp
 src/raytracer.h
 src/resource.cpp
 src/resource.h
-src/resourceif.h
 src/scene.cpp
 src/scene.h
 src/shapes/box.cpp
