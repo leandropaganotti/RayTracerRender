@@ -35,10 +35,14 @@ void RayTracer::render(const Scene& scene)
 
     std::cout << std::endl;
     std::cout << "\r -> 0.00% completed" << std::flush;
-    #pragma omp parallel for schedule(dynamic, 1) shared(count)
+
+
     for (size_t i = 0; i < camera.getHeight(); ++i)
     {
         std::ostringstream ss;
+        #ifndef DEBUG
+        #pragma omp parallel for schedule(dynamic, 1) shared(count)
+        #endif
         for (size_t j = 0; j < camera.getWidth(); ++j)
         {
             buffer.at(i, j) = 0;

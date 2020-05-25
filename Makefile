@@ -1,56 +1,99 @@
-PROGRAM = render
-OBJDIR = build
-
-CXXFLAGS =  -O3 -std=c++0x -Wall -W -fopenmp -Winline
+#
+# Compiler flags
+#
 CXX = g++
-INCPATH = -I./src -I./src/shapes -I/usr/include/libxml2 -I./libxml/include/libxml2
-LIBDIRS = -L/usr/lib/x86_64-linux-gnu -L./libxml/lib
-LIBS = -lpthread -lxml2
-LDFLAGS = $(LIBDIRS) $(LIBS)
-LFLAGS  = -fopenmp
+CXXFLAGS =  -std=c++0x -Wall -W -Winline
 VPATH = src/ src/shapes
 
-OBJECTS = main.o \
-camera.o \
-image.o \
-light.o \
-plane.o \
-raytracer.o \
-scene.o \
-sphere.o \
-texture.o \
-transformation.o \
-cameraoptions.o \
-material.o \
-cylinder.o \
-invisible.o \
-box.o \
-aabb.o \
-mesh.o \
-xmlparser.o \
-objparser.o \
-bvh.o \
-instance.o \
-shape.o \
-resource.o \
+INCPATH = -I./src -I./src/shapes -I/usr/include/libxml2 -I./libxml/include/libxml2
+LIBDIRS = -L/usr/lib/x86_64-linux-gnu -L./libxml/lib
+LIBS = -lxml2
 
+LDFLAGS = $(LIBDIRS) $(LIBS)
+LFLAGS  = -fopenmp
 
-CObjects=$(addprefix $(OBJDIR)/,$(OBJECTS))
+#
+# Project files
+#
+SRCS = main.cpp \
+camera.cpp \
+image.cpp \
+light.cpp \
+plane.cpp \
+raytracer.cpp \
+scene.cpp \
+sphere.cpp \
+texture.cpp \
+transformation.cpp \
+cameraoptions.cpp \
+material.cpp \
+cylinder.cpp \
+invisible.cpp \
+box.cpp \
+aabb.cpp \
+mesh.cpp \
+xmlparser.cpp \
+objparser.cpp \
+bvh.cpp \
+instance.cpp \
+shape.cpp \
+resource.cpp \
 
+OBJS=$(SRCS:.cpp=.o )
+EXE  = render
 
-$(OBJDIR)/%.o : %.cpp
-	$(CXX) $(CXXFLAGS) $(INCPATH) -c $< -o $@
+#
+# Debug build settings
+#
+DBGDIR = debug
+DBGEXE = $(DBGDIR)/$(EXE)
+DBGOBJS = $(addprefix $(DBGDIR)/, $(OBJS))
+DBGCFLAGS = -g -O0 -DDEBUG
 
-all: $(PROGRAM)
+#
+# Release build settings
+#
+RELDIR = release
+RELEXE = $(RELDIR)/$(EXE)
+RELOBJS = $(addprefix $(RELDIR)/, $(OBJS))
+RELCFLAGS = -O3 -DNDEBUG
 
-$(PROGRAM): $(CObjects)
-	$(CXX) $(LFLAGS) $(CObjects) -o $@ $(LDFLAGS)
+.PHONY: all clean debug prep release remake
 
-$(CObjects): | $(OBJDIR)
+# Default build
+all: prep release
 
-$(OBJDIR):
-	mkdir $(OBJDIR)
+#
+# Debug rules
+#
+debug: $(DBGEXE)
+
+$(DBGEXE): $(DBGOBJS)
+	$(CXX) $(DBGOBJS) -o $@ $(LDFLAGS) $(LFLAGS)
+
+$(DBGDIR)/%.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(DBGCFLAGS) $(LFLAGS) $(INCPATH) -c $< -o $@
+
+#
+# Release rules
+#
+release: $(RELEXE)
+
+$(RELEXE): $(RELOBJS)
+	$(CXX) $(RELOBJS) -o $@ $(LDFLAGS) $(LFLAGS)
+
+$(RELDIR)/%.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(RELCFLAGS) $(LFLAGS) $(INCPATH) -c $< -o $@
+
+#
+# Other rules
+#
+prep:
+	@mkdir -p $(DBGDIR) $(RELDIR)
+
+remake: clean all
 
 clean:
-	$(RM) -f $(CObjects) $(PROGRAM)
+	rm -f $(RELEXE) $(RELOBJS) $(DBGEXE) $(DBGOBJS)
+
 
