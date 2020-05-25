@@ -2,3 +2,4 @@ src
 scenes
 .
 src/shapes
+libxml/include/libxml2

@@ -273,7 +273,11 @@ std::shared_ptr<Material> XMLParser::parseMaterial(xmlNode *xmlMaterialNode)
                 std::cerr << "\x1b[33;1m" << "unrecognized material type \'" << attr->children->content << "\'" << "\x1b[0m" << std::endl;
         }
         else if (equals(attr->name, "texture"))
-            material->texture = Texture::GetByName((const char*)attr->children->content);
+        {
+            material->texture = Resource::Get<Texture>((const char*)attr->children->content);
+            if(!material->texture)
+                LogError(xmlMaterialNode, attr, "Can't find Texture");
+        }
         else
             std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlMaterialNode->name << "\':" << name << "    \x1b[0m" << std::endl;
     }
