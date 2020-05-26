@@ -2,64 +2,90 @@
 #include "utils.h"
 #include "consts.h"
 #include "material.h"
+#include "float.h"
 
 static std::shared_ptr<UnitYCylinder> unitCylinder = std::shared_ptr<UnitYCylinder>(new UnitYCylinder);
 
 UnitYCylinder::UnitYCylinder()
 {
-
+    r = 0.5f;
+    r2 = r*r;
+    ymin = -0.5f;
+    ymax = 0.5;
 }
 
 bool UnitYCylinder::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
 {
     float a = ray.direction.x*ray.direction.x + ray.direction.z*ray.direction.z;
     float b = 2.0f*ray.direction.x*ray.origin.x + 2.0f*ray.direction.z*ray.origin.z;
-    float c = ray.origin.x*ray.origin.x + ray.origin.z*ray.origin.z - 1.0f;
+    float c = ray.origin.x*ray.origin.x + ray.origin.z*ray.origin.z - r2;
     float t0, t1;
-    if (!solveQuadratic(a, b, c, t0, t1)) return false;
 
-    if (t0 > t1) std::swap(t0, t1);
+    int idx=-1;
+    float t=FLT_MAX;
 
-    float y0 = ray.origin.y + t0 * ray.direction.y;
-    float y1 = ray.origin.y + t1 * ray.direction.y;
-
-    if (y0<0)
+    if (solveQuadratic(a, b, c, t0, t1))
     {
-        if (y1<0)
-            return false;
+        if (t0 > t1) std::swap(t0, t1);
+        t=t0;
+        if(t<0) t=t1;
+        if(t>0)
+        {
+            float y = ray.origin.y + t * ray.direction.y;
+            if (y<ymax && y>ymin)
+            {
+                idx=1;
+            }
+            else
+            {
+                t=FLT_MAX;
+            }
+        }
         else
         {
-            // hit the cap
-            const float tval = t0 + (t1-t0) * (y0+1) / (y0-y1);
-            if (tval<=0 || tval > tmax) return false;
-            isec.tnear = tval;
-            isec.idx=0;
-            return true;
+            t=FLT_MAX;
         }
     }
-    else if (y0>=0 && y0<=1)
+
+
+//    float y0 = ray.origin.y + t0 * ray.direction.y;
+//    float y1 = ray.origin.y + t1 * ray.direction.y;
+
+//    if(y0 < ymin && y1 < ymin) return false;
+//    if(y0 > ymax && y1 > ymax) return false;
+
+    float t2 = (ymax - ray.origin.y) / ray.direction.y;
+    if(t2 > 0){
+        float x = ray.origin.x + t2 * ray.direction.x;
+        float z = ray.origin.z + t2 * ray.direction.z;
+        if (x*x + z*z <= r2) {
+            if(t2 < t)
+            {
+                t=t2;
+                idx=2;
+            }
+        }
+    }
+
+    float t3 = (-ymin + ray.origin.y) / -ray.direction.y;
+    if(t3 > 0){
+        float x = ray.origin.x + t3 * ray.direction.x;
+        float z = ray.origin.z + t3 * ray.direction.z;
+        if (x*x + z*z <= r2) {
+            if(t3 < t)
+            {
+                t=t3;
+                idx=0;
+            }
+        }
+    }
+
+    if(idx>=0)
     {
-        // hit the cylinder bit
-        if (t0<=0 || t0 > tmax) return false;
-        isec.tnear=t0;
-        isec.idx=1;
+        isec.tnear =t;
+        isec.idx = idx;
         return true;
     }
-    else if (y0>1)
-    {
-        if (y1>1)
-            return false;
-        else
-        {
-            // hit the cap
-            const float tval = t0 + (t1-t0) * (y0-1) / (y0-y1);
-            if (tval<=0 || tval > tmax) return false;
-            isec.tnear = tval;
-            isec.idx=2;
-            return true;
-        }
-    }
-
     return false;
 }
 
@@ -76,7 +102,7 @@ bool UnitYCylinder::intersection(const Ray &ray, float tmax) const
     */
     float a = ray.direction.x*ray.direction.x + ray.direction.z*ray.direction.z;
     float b = 2.0f*ray.direction.x*ray.origin.x + 2.0f*ray.direction.z*ray.origin.z;
-    float c = ray.origin.x*ray.origin.x + ray.origin.z*ray.origin.z - 1.0f;
+    float c = ray.origin.x*ray.origin.x + ray.origin.z*ray.origin.z - r2;
     float t0, t1;
     if (!solveQuadratic(a, b, c, t0, t1)) return false;
 
@@ -85,9 +111,9 @@ bool UnitYCylinder::intersection(const Ray &ray, float tmax) const
     float y0 = ray.origin.y + t0 * ray.direction.y;
     float y1 = ray.origin.y + t1 * ray.direction.y;
 
-    if (y0<0)
+    if (y0<ymin)
     {
-        if (y1<0)
+        if (y1<ymin)
             return false;
         else
         {
@@ -97,15 +123,15 @@ bool UnitYCylinder::intersection(const Ray &ray, float tmax) const
             return true;
         }
     }
-    else if (y0>=0 && y0<=1)
+    else if (y0>=ymin && y0<=ymax)
     {
         // hit the cylinder bit
-        if (t0<=0 || t0 > tmax) return false;
+        if (t0<=ymin || t0 > tmax) return false;
         return true;
     }
-    else if (y0>1)
+    else if (y0>ymax)
     {
-        if (y1>1)
+        if (y1>ymax)
             return false;
         else
         {

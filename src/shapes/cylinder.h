@@ -12,6 +12,12 @@ public:
     bool intersection(const Ray &ray, float tmax) const override;
     Vector3 getNormal(const Vector3 &phit, size_t idx) const override;
     AABB getAABB() const override;
+
+protected:
+    float r;
+    float r2;
+    float ymin;
+    float ymax;
 };
 
 class GCylinder: public Instance
