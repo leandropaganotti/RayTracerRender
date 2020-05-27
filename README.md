@@ -16,8 +16,6 @@ More samples in images directory.
 
 ![Alt Rib](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/rib_0000_SPP4_T00.00.17.346.png)
 ![Alt ModifiedCornellBox](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/ModifiedCornellBox_0000.png)
-![Alt ModifiedCornellBox](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/ModifiedCornellBox2_IMG0000_SPP4096_T00:39:50:456.png)
-![Alt ModifiedCornellBox](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/ModifiedCornellBox3_IMG0000_SPP500_T00:04:34:478.png)
 ![Alt room](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/room_0000.png)
 ![Alt glass](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/IMG_1979.PNG)
 ![Alt monkey](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/monkeyModel_IMG0000_SPP8_T00:01:32:893.png)
