@@ -13,6 +13,7 @@ https://www.youtube.com/watch?v=JMeM5K6cYeA
 
 ### Images Samples
 More samples in images directory.
+![Alt Rib](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/rib_0000_SPP4_T00.00.17.346.png)
 
 ![Alt ModifiedCornellBox](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/ModifiedCornellBox_0000.png)
 ![Alt ModifiedCornellBox](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/ModifiedCornellBox2_IMG0000_SPP4096_T00:39:50:456.png)
