@@ -29,7 +29,7 @@ Material::Material(MaterialType type)
     E = 0.0f;
     Ks = 0.0f;
     Ns = 30.0f;
-    R0 = 1.0f;
+    R0 = 0.98f;
     Ni = 1.55f; // refractive index for glass
     this->type = type;
     texture = nullptr;
@@ -41,7 +41,7 @@ Material::Material()
     E = 0.0f;
     Ks = 0.0f;
     Ns = 30.0f;
-    R0 = 0.9f;
+    R0 = 0.98f;
     Ni = 1.55f; // refractive index for glass
     type = MaterialType::DIFFUSE;
     texture = nullptr;

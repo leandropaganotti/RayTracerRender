@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scene name="shapes" grid="2" spp="16" index="1.0" maxdepth="5" bgcolor="0" ka="0.1" raytracer="phong">
+	<CameraOptions position="0,4,6" lookingat="0" fov="50" width="640" height="480"></CameraOptions>
+	<PointLight position="3,10,6" color="1" strength="1.0" k="0.0"></PointLight>
+	<Plane name="floor" point="0, -0.01, 0" normal="0,1,0" >
+		<material type="diffuse" kd="0.5"><texture type="Tiles" name="tiles" rows="5" cols="5" color1="1" color2="0.1, 0.1, 0" angle="0"></texture></material>
+	</Plane>
+
+	<sphere material="Glass" position="-2,0.5,-3" radius="0.5" />
+	<cylinder material="Glass">
+		<transformation translate="-0.5, 0.5,-3" rotate="0" scale="1" />
+	</cylinder>
+	<ellipsoid material="Glass">
+		<transformation translate="2.5, 0.5, -3" rotate="0" scale="0.5,1,0.5" />
+	</ellipsoid >
+	<box material="Glass" >
+	<transformation translate="1, 0.5,-3" rotate="0" scale="1" />
+	</box>
+
+	<sphere material="Mirror" position="-2,0.5,0" radius="0.5" />
+	<cylinder material="Mirror">
+		<transformation translate="-0.5, 0.5,0" rotate="0" scale="1" />
+	</cylinder>
+	<ellipsoid material="Mirror">
+		<transformation translate="2.5, 0.5, 0" rotate="0" scale="0.5,1,0.5" />
+	</ellipsoid>
+	<box material="Mirror" >
+	<transformation translate="1, 0.5,0" rotate="0" scale="1" />
+	</box>
+
+	<sphere material="DiffuseWhite" position="-2,0.5,2.5" radius="0.5" />
+	<cylinder material="DiffuseWhite">
+		<transformation translate="-0.5, 0.5,2.5" rotate="0" scale="1" />
+	</cylinder>
+	<ellipsoid material="DiffuseWhite">
+		<transformation translate="2.5, 0.5, 2.5" rotate="0" scale="0.5,1,0.5" />
+	</ellipsoid >
+	<box material="DiffuseWhite">
+	<transformation translate="1, 0.5,2.5" rotate="0" scale="1" />
+	</box>
+</scene>

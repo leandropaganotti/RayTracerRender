@@ -668,7 +668,7 @@ std::shared_ptr<GMesh> XMLParser::parseMesh(xmlNode *xmlMeshNode)
     auto gmesh = std::shared_ptr<GMesh>(new GMesh(mesh));
 
     auto material = Material::Get(mat);
-    if(!material) LogError(xmlMeshNode, attr, "Can't find material");
+    //if(!material) LogError(xmlMeshNode, attr, "Can't find material");
     gmesh->setMaterial(material);
 
     xmlNode *node = NULL;

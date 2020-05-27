@@ -1,7 +1,6 @@
 Makefile
 scenes/3ballsOnTheFloor.xml
 scenes/4balls.xml
-scenes/4balls2.xml
 scenes/ModifiedCornellBox.xml
 scenes/ModifiedCornellBox2.xml
 scenes/ModifiedCornellBox3.xml
@@ -10,6 +9,7 @@ scenes/basic.xml
 scenes/glassOfwine.xml
 scenes/ptexture.xml
 scenes/refraction.xml
+scenes/shapes.xml
 scenes/suzanne.xml
 scenes/test.xml
 src/aabb.cpp
