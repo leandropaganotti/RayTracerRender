@@ -18,7 +18,7 @@ More samples in images directory.
 ![Alt ModifiedCornellBox](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/ModifiedCornellBox_0000.png)
 ![Alt room](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/room_0000.png)
 ![Alt glass](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/IMG_1979.PNG)
-![Alt monkey](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/monkeyModel_IMG0000_SPP8_T00:01:32:893.png)
+![Alt suzanne](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/suzanne_0000_SPP8_T00.00.09.557.png)
 ![Alt ballsOnTheMirror](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/ballsOnTheMirror.0000.jpg)
 ![Alt refraction](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/refraction.0000.png)
 ![Alt 3balls](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/3ballsOnTheFloor.0000.jpg)
