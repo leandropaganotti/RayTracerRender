@@ -23,6 +23,7 @@ class Material: public Resource
 public:
     MaterialType type;
     Vector3 Kd;
+    Vector3 Ka;
     Vector3 E;
     float Ks;
     float Ns;

@@ -26,6 +26,7 @@ Material::~Material(){}
 Material::Material(MaterialType type)
 {
     Kd = 1.0f;
+    Ka = 0.1f;
     E = 0.0f;
     Ks = 0.0f;
     Ns = 30.0f;
@@ -38,6 +39,7 @@ Material::Material(MaterialType type)
 Material::Material()
 {
     Kd = 1.0f;
+    Ka = 0.1f;
     E = 0.0f;
     Ks = 0.0f;
     Ns = 30.0f;

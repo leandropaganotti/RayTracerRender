@@ -21,6 +21,7 @@ src/camera.cpp
 src/camera.h
 src/cameraoptions.cpp
 src/cameraoptions.h
+src/color.h
 src/consts.h
 src/image.cpp
 src/image.h

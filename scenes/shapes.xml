@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scene name="shapes" grid="2" spp="16" index="1.0" maxdepth="5" bgcolor="0" ka="0.1" raytracer="phong">
+<scene name="shapes" grid="2" spp="16" index="1.0" maxdepth="5" bgcolor="0" raytracer="phong">
 	<CameraOptions position="0,4,6" lookingat="0" fov="50" width="640" height="480"></CameraOptions>
-	<PointLight position="3,10,6" color="1" strength="1.0" k="0.0"></PointLight>
+	<PointLight position="3,10,10" color="1" strength="1.0" k="0.0"></PointLight>
 	<Plane name="floor" point="0, -0.01, 0" normal="0,1,0" >
-		<material type="diffuse" kd="0.5"><texture type="Tiles" name="tiles" rows="5" cols="5" color1="1" color2="0.1, 0.1, 0" angle="0"></texture></material>
+		<material type="diffuse" kd="1" ka="0.3"><texture src="scenes/floor_texture.ppm" type="Texture2d" ></texture></material>
 	</Plane>
 
 	<sphere material="Glass" position="-2,0.5,-3" radius="0.5" />

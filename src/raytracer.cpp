@@ -475,7 +475,7 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const uint8_t depth, const float 
 Vector3 RayTracer::phongShading(const Ray &ray, const IntersectionData &isec)
 {
     //ambient
-    Vector3 phitColor = isec.color * scene->ka;
+    Vector3 phitColor = isec.color * isec.material->Ka;
 
     for(auto& light: scene->lights)
     {

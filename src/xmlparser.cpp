@@ -127,8 +127,6 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
              scene.maxDepth = toInt(attr->children->content);
         else if (equals(attr->name, "bgcolor"))
              scene.bgColor = toVector(attr->children->content);
-        else if (equals(attr->name, "ka"))
-             scene.ka = toFloat(attr->children->content);
         else if (equals(attr->name, "raytracer"))
         {
             if (equals(attr->children->content, "path"))
@@ -251,6 +249,8 @@ std::shared_ptr<Material> XMLParser::parseMaterial(xmlNode *xmlMaterialNode)
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "kd"))
             material->Kd = toVector(attr->children->content);
+        else if (equals(attr->name, "ka"))
+            material->Ka = toVector(attr->children->content);
         else if (equals(attr->name, "E"))
             material->E = toVector(attr->children->content);
         else if (equals(attr->name, "ks"))

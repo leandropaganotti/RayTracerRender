@@ -26,7 +26,6 @@ public:
     std::string     fileName;
     std::string     name;
     float           ambientIndex;
-    float           ka;
     size_t          spp;
     size_t          grid;
     size_t          maxDepth;

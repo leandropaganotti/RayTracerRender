@@ -69,7 +69,7 @@ bool AABox::intersection(const Ray &ray, float tmax, IntersectionData &isec) con
     r.posneg[1] = r.direction[1] > 0 ? 0 : 1;
     r.posneg[2] = r.direction[2] > 0 ? 0 : 1;
 
-    float imin = -1000000;
+    float imin = -INFINITY  ;
     float imax = tmax;
     int idxmin, idxmax;
 
