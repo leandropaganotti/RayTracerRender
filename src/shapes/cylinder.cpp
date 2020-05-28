@@ -150,7 +150,7 @@ Vector3 UnitYCylinder::getNormal(const Vector3 &phit, size_t idx) const
 {    
     if(idx==0)
     {
-        return Vector::DOWN;
+        return vector::DOWN;
     }
     else if(idx==1)
     {
@@ -158,7 +158,7 @@ Vector3 UnitYCylinder::getNormal(const Vector3 &phit, size_t idx) const
     }
     else
     {
-        return Vector::UP;
+        return vector::UP;
     }
 }
 

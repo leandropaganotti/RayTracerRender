@@ -157,3 +157,14 @@ struct Vector2
         return os << std::fixed << "[ " << v.x << " " << v.y <<  " ]";
     }
 };
+
+namespace vector
+{
+    const Vector3 ZERO(0.0f, 0.0f, 0.0f);
+    const Vector3 UP(0.0f, 1.0f, 0.0f);
+    const Vector3 DOWN(0.0f, -1.0f, 0.0f);
+    const Vector3 LEFT(-1.0f, 0.0f, 0.0f);
+    const Vector3 RIGHT(1.0f, 0.0f, 0.0f);
+    const Vector3 FRONT(0.0f, 0.0f, -1.0f);
+    const Vector3 BACK(0.0f, 0.0f, 1.0f);
+}

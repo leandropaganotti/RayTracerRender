@@ -412,7 +412,7 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const uint8_t depth, const float 
         kr = schlick(-ray.direction, isec.normal, isec.material->R0);
         kt = 1.0f - kr;
     }
-    if(isec.material->E != Vector::ZERO && depth == 1){
+    if(isec.material->E != vector::ZERO && depth == 1){
         float n=5, m=5;
         float nk = isec.normal ^ -ray.direction;
         float ek = (n+1)/(2*M_PI)*powf(nk, m);
@@ -431,7 +431,7 @@ Vector3 RayTracer::pathTracer2(const Ray& ray, const uint8_t depth, const float 
         {
             const GSphere * const sphere = dynamic_cast<const GSphere*const>(obj.get());
             if (!sphere) continue; // only supported sphere for direct light
-            if (sphere->getMaterial(0)->E  == Vector::ZERO) continue; // skip non light
+            if (sphere->getMaterial(0)->E  == vector::ZERO) continue; // skip non light
 
             Vector3 sampleToLight;
             float _1_pdf;

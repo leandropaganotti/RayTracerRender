@@ -12,7 +12,7 @@ class Camera
 {
 public:
     Camera();
-    void lookAt(const Vector3 &from, const Vector3 &to, const Vector3& up=Vector::UP);
+    void lookAt(const Vector3 &from, const Vector3 &to, const Vector3& up=vector::UP);
 
     const CameraOptions& getOptions()   const { return options; }
     const Vector3& getPosition()        const { return options.from; }
