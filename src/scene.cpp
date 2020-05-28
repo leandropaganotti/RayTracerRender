@@ -3,10 +3,15 @@
 #include <string.h>
 #include "xmlparser.h"
 
-Scene::Scene(): name("unamed"), ambientIndex(1.0f), spp(1), grid(1), maxDepth(3), bgColor(0), raytracer(RayTracerType::RayTracerPhong){}
-
-Scene::Scene(const std::string &fileName): name("unamed"), ambientIndex(1.0f), spp(1), grid(1), maxDepth(3), bgColor(0), raytracer(RayTracerType::RayTracerPhong)
+Scene::Scene()
 {
+    name = "unamed";
+}
+
+Scene::Scene(const std::string &fileName)
+{
+    name = "unamed";
+    this->fileName = fileName;
     load(fileName);
 }
 
@@ -33,8 +38,7 @@ std::ostream &operator <<(std::ostream &os, const Scene &scene)
 {
     os << "Scene: " << scene.name << " : " << scene.fileName << std::endl
     << "\t" << scene.cameraOptions << std::endl <<
-    "\tambientIndex: " << scene.ambientIndex << ", spp: " <<
-    scene.spp << ", grid: " << scene.grid << ", bgColor: " << scene.bgColor << ", raytracer: " << (int)scene.raytracer << std::endl;
+    "\t" << scene.renderOptions << std::endl;
 
     return os;
 }

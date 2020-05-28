@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scene name="shapes" grid="2" spp="16" index="1.0" maxdepth="5" bgcolor="0" raytracer="phong">
-	<CameraOptions position="0,2.5,7" lookingat="0" fov="50" width="640" height="480"></CameraOptions>
+<scene name="shapes">
+	<RenderOptions grid="2" spp="9" index="1.0" maxdepth="5" bgcolor="0" illum="phong" />
+	<CameraOptions position="0,2.5,7" lookingat="0" fov="50" width="640" height="480" />
 	<PointLight position="3,10,10" color="1" strength="1.0" k="0.0"></PointLight>
 	<Plane name="floor" point="0, -0.01, 0" normal="0,1,0" >
 		<material type="diffuse" kd="1" ka="0.3"><texture src="tex/stone-floor-tiles-500x500.ppm" type="Texture2d" ></texture></material>

@@ -23,6 +23,7 @@ public:
     void parseScene(xmlNode * xmlSceneNode, Scene & scene);
 
     void parseCameraOptions(xmlNode * xmlCameraOptionsNode, CameraOptions & options);
+    void parseRenderOptions(xmlNode * xmlRenderOptionsNode, RenderOptions & options);
 
     void parsePointLight(xmlNode * xmlPointLightNode, PointLight & light);
 

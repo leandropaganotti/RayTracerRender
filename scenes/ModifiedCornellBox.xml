@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scene name="ModifiedCornellBox" grid="2" spp="32" index="1.0" maxdepth="5" bgcolor="0" ka="0.1" raytracer="path">
+<scene name="ModifiedCornellBox">
+	<RenderOptions grid="2" spp="8" index="1.0" maxdepth="5" bgcolor="0" illum="global" />
     <CameraOptions position="0,1.7,5" lookingat="0,1.7,0" fov="50" width="640" height="480"></CameraOptions>
     <Sphere name="mirrorBall" position="-2,0.8,-1.5" radius="0.8">
         <material type="specular" kd="1" R0="0.95"></material>

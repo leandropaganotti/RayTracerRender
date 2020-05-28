@@ -38,6 +38,8 @@ bvh.cpp \
 instance.cpp \
 shape.cpp \
 resource.cpp \
+pathtracer.cpp \
+phong.cpp \
 
 OBJS=$(SRCS:.cpp=.o )
 EXE  = render

@@ -35,5 +35,5 @@ void CameraOptions::setFrom(const Vector3 &value)
 
 std::ostream &operator <<(std::ostream &os, const CameraOptions &opt)
 {
-    return os << "CameraOptions: " << opt.from << opt.to << " " << rad2deg(opt.fov) << " " << opt.width << " " << opt.height << " " << opt.aspectRatio;
+    return os << "CameraOptions: From=" << opt.from << ", To=" << opt.to << ", Fov=" << rad2deg(opt.fov) << ", W=" << opt.width << ", H=" << opt.height << ", Ratio=" << opt.aspectRatio;
 }

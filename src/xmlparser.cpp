@@ -117,27 +117,6 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
     {
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
-        else if (equals(attr->name, "spp"))
-             scene.spp = toInt(attr->children->content);
-        else if (equals(attr->name, "grid"))
-             scene.grid = toInt(attr->children->content);
-        else if (equals(attr->name, "index"))
-             scene.ambientIndex = toFloat(attr->children->content);
-        else if (equals(attr->name, "maxdepth"))
-             scene.maxDepth = toInt(attr->children->content);
-        else if (equals(attr->name, "bgcolor"))
-             scene.bgColor = toVector(attr->children->content);
-        else if (equals(attr->name, "raytracer"))
-        {
-            if (equals(attr->children->content, "path"))
-                scene.raytracer = RayTracerType::PathTracer;
-            else if (equals(attr->children->content, "path2"))
-                scene.raytracer = RayTracerType::PathTracerWithDirectLight;
-            else if (equals(attr->children->content, "phong"))
-                scene.raytracer = RayTracerType::RayTracerPhong;
-            else
-                std::cerr << "\x1b[33;1m" << "unrecognized attribute raytrace value \'" << attr->children->content << "\' " << "\x1b[0m" << std::endl;
-        }
         else
             std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlSceneNode->name << "\':" << name << "\x1b[0m" << std::endl;
     }
@@ -152,7 +131,8 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
         {
             if (equals(node->name, "CameraOptions"))
                 parseCameraOptions(node, scene.cameraOptions);
-
+            else if (equals(node->name, "RenderOptions"))
+                parseRenderOptions(node, scene.renderOptions);
             else if(equals(node->name, "PointLight"))
             {
                 PointLight *light = new PointLight();
@@ -226,6 +206,50 @@ void XMLParser::parseCameraOptions(xmlNode *xmlCameraOptionsNode, CameraOptions 
         if (node->type == XML_ELEMENT_NODE)
         {
             std::cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlCameraOptionsNode->name << "\'" << "\x1b[0m" << std::endl;
+        }
+    }
+}
+
+void XMLParser::parseRenderOptions(xmlNode *xmlRenderOptionsNode, RenderOptions &options)
+{
+    if(xmlRenderOptionsNode == NULL)
+    {
+        std::cerr << "\x1b[33;1m" << "error: could not parse RenderOptions, xmlNode pointer is NULL" << "\x1b[0m" << std::endl;
+        return;
+    }
+
+    const xmlAttr *attr = NULL;
+    for (attr = xmlRenderOptionsNode->properties; attr; attr = attr->next)
+    {
+        if (equals(attr->name, "spp"))
+             options.spp = toInt(attr->children->content);
+        else if (equals(attr->name, "grid"))
+             options.gridSizeXY = toInt(attr->children->content);
+        else if (equals(attr->name, "index"))
+             options.ambientIndex = toFloat(attr->children->content);
+        else if (equals(attr->name, "maxdepth"))
+             options.maxDepth = toInt(attr->children->content);
+        else if (equals(attr->name, "bgcolor"))
+             options.bgColor = toVector(attr->children->content);
+        else if (equals(attr->name, "illum"))
+        {
+            if (equals(attr->children->content, "phong"))
+                options.illum = Illumination::Phong;
+            else if (equals(attr->children->content, "global"))
+                options.illum = Illumination::GlobalIlumination;
+            else if (equals(attr->children->content, "global2"))
+                options.illum = Illumination::GlobalIluminationWithDirectSampling;
+            else
+                std::cerr << "\x1b[33;1m" << "unrecognized attribute raytrace value \'" << attr->children->content << "\' " << "\x1b[0m" << std::endl;
+        }
+    }
+
+    xmlNode *node = NULL;
+    for (node = xmlRenderOptionsNode->children; node; node = node->next)
+    {
+        if (node->type == XML_ELEMENT_NODE)
+        {
+            std::cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlRenderOptionsNode->name << "\'" << "\x1b[0m" << std::endl;
         }
     }
 }

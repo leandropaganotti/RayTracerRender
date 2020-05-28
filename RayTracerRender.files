@@ -37,9 +37,14 @@ src/object.cpp
 src/objmodel.cpp
 src/objparser.cpp
 src/objparser.h
+src/pathtracer.cpp
+src/pathtracer.h
+src/phong.cpp
+src/phong.h
 src/ray.h
 src/raytracer.cpp
 src/raytracer.h
+src/renderoptions.h
 src/resource.cpp
 src/resource.h
 src/scene.cpp

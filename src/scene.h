@@ -7,6 +7,7 @@
 #include "consts.h"
 #include "cameraoptions.h"
 #include "shape.h"
+#include "renderoptions.h"
 
 typedef std::vector<std::shared_ptr<Shape>> ObjectVector;
 
@@ -25,13 +26,8 @@ public:
 
     std::string     fileName;
     std::string     name;
-    float           ambientIndex;
-    size_t          spp;
-    size_t          grid;
-    size_t          maxDepth;
-    Vector3         bgColor;
-    RayTracerType   raytracer;
 
+    RenderOptions   renderOptions;
     CameraOptions   cameraOptions;
     ObjectVector    objects;
     LightVector     lights;

@@ -35,13 +35,15 @@ int main(int argc, char **argv)
 
     std::cout << scene << endl;
 
-    RayTracer raytracer;
-    Camera &camera = raytracer.getCamera();
-    camera.setOptions(scene.cameraOptions);
+    auto raytracer = RayTracer::Create(scene.renderOptions.illum);
+    raytracer->setRenderOptions(scene.renderOptions);
+    raytracer->setCameraOptions(scene.cameraOptions);
+
+    Camera &camera = raytracer->getCameraRef();
 
     const Vector3 from( scene.cameraOptions.getFrom() ), to( scene.cameraOptions.getTo());
 
-    size_t spp = ceilf(float(scene.spp)/(scene.grid*scene.grid)) * scene.grid * scene.grid;
+    size_t spp = ceilf(float(scene.renderOptions.spp)/(scene.renderOptions.gridSizeXY*scene.renderOptions.gridSizeXY)) * scene.renderOptions.gridSizeXY * scene.renderOptions.gridSizeXY;
 
     for (unsigned i=0; i < nimages; ++i)
     {
@@ -49,7 +51,7 @@ int main(int argc, char **argv)
         camera.lookAt( Transformation::T(to) * Transformation::Ry(deg2rad( i*angle )) * Transformation::T(-to) * from, to); // rotate around y-axis
 
 		auto start = std::chrono::high_resolution_clock::now();
-        raytracer.render(scene);
+        raytracer->render(scene);
 		auto end = std::chrono::high_resolution_clock::now();
 
         time_in_ms = chrono::duration_cast<chrono::milliseconds>(end - start).count();
@@ -64,7 +66,7 @@ int main(int argc, char **argv)
 		ss2 << output << "_" << std::setw(4) << std::setfill('0') << i;
 		if (detailedName) { ss2 << "_SPP" << spp << "_T" << time_str; }
         ss2 << ".ppm";
-        raytracer.getBuffer().save_ppm_bin(ss2.str().c_str());
+        raytracer->getBuffer().save_ppm_bin(ss2.str().c_str());
 
         time_in_ms_avg += time_in_ms;
     }
