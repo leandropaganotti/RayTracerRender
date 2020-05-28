@@ -460,10 +460,10 @@ std::shared_ptr<Texture> XMLParser::parseTexture(xmlNode *xmlTextureNode)
          return nullptr;
     }
 
-    std::shared_ptr<Texture> tex;
     const xmlAttr *attr = NULL;
     std::string name("");
     std::string type("");
+    std::string src("");
     float rows=1.0f, cols=1.0f, uedge=0.1f, vedge=0.1f, angle=0.0f;
     Vector3 color1=0, color2=1;
     for (attr = xmlTextureNode->properties; attr; attr = attr->next)
@@ -472,6 +472,8 @@ std::shared_ptr<Texture> XMLParser::parseTexture(xmlNode *xmlTextureNode)
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "type"))
             type = (const char*)attr->children->content;
+        else if (equals(attr->name, "src"))
+            src = (const char*)attr->children->content;
         else if (equals(attr->name, "rows"))
             rows = toFloat(attr->children->content);
         else if (equals(attr->name, "cols"))
@@ -491,14 +493,28 @@ std::shared_ptr<Texture> XMLParser::parseTexture(xmlNode *xmlTextureNode)
     }
 
     if (type == "Tiles")
-        tex = Tiles::Create(name, color1, color2, rows, cols, angle, uedge, vedge);
-    else if (type == "ChessBoard")
-        tex = ChessBoard::Create(name, color1, color2, rows, cols, angle);
-    else
     {
-        std::cerr << "\x1b[33;1m" << "Error parsing Texture, \'Type\' not found or invalid in " << xmlTextureNode->name << "\x1b[0m" << std::endl;
+        auto tex = Tiles::Create(name, color1, color2, rows, cols, angle, uedge, vedge);
+        return tex;
     }
-    return tex;
+    else if (type == "ChessBoard")
+    {
+        auto tex = ChessBoard::Create(name, color1, color2, rows, cols, angle);
+        return tex;
+    }
+    else if (type == "Texture2d")
+    {
+        auto tex = Texture2d::Create(src, src);
+        if(tex)
+        {
+            tex->setGridSizeU(cols);
+            tex->setGridSizeV(rows);
+        }
+        return tex;
+    }
+
+    std::cerr << "\x1b[33;1m" << "Error parsing Texture, \'Type\' not found or invalid in " << xmlTextureNode->name << "\x1b[0m" << std::endl;
+    return nullptr;
 }
 
 std::shared_ptr<GBox> XMLParser::parseBox(xmlNode *xmlBoxNode)

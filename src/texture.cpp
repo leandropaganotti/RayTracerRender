@@ -24,7 +24,7 @@ std::shared_ptr<ChessBoard> ChessBoard::Create(const std::string &key, const Vec
     return Resource::Create<ChessBoard>(key, chessboard);
 }
 
-const Vector3& ChessBoard::get(const Vector2 &uv) const
+const Vector3 ChessBoard::get(const Vector2 &uv) const
 {
     float s = uv.u*cos(deg2rad(angle)) - uv.v*sin(deg2rad(angle));
     float t = uv.v*cos(deg2rad(angle)) + uv.u*sin(deg2rad(angle));
@@ -50,7 +50,7 @@ std::shared_ptr<Tiles> Tiles::Create(const std::string &key, const Vector3 &colo
     return Resource::Create<Tiles>(key, tiles);
 }
 
-const Vector3& Tiles::get(const Vector2 &uv) const
+const Vector3 Tiles::get(const Vector2 &uv) const
 {
     float s = uv.u*cos(deg2rad(angle)) - uv.v*sin(deg2rad(angle));
     float t = uv.v*cos(deg2rad(angle)) + uv.u*sin(deg2rad(angle));
@@ -67,7 +67,7 @@ std::shared_ptr<Texture> Solid::Create(const std::string &key, const Vector3 &co
     return Resource::Create<Texture>(key, new Solid(color));
 }
 
-const Vector3 &Solid::get(const Vector2 &) const
+const Vector3 Solid::get(const Vector2 &) const
 {
     return color;
 }
@@ -75,4 +75,39 @@ const Vector3 &Solid::get(const Vector2 &) const
 Solid::Solid(const Vector3 &color): color(color)
 {
 
+}
+
+std::shared_ptr<Texture2d> Texture2d::Create(const std::string &key, const std::string &filepath)
+{
+    Image image;
+
+    if(image.read_ppm_bin(filepath.c_str()))
+    {
+        Texture2d *tex2d = new Texture2d(image);
+        return Resource::Create(key, tex2d);
+    }
+    return nullptr;
+}
+
+const Vector3 Texture2d::get(const Vector2 &uv) const
+{   
+    float i = modulo(uv.v*gridSizeV) * (image.height()-1);
+    float j = modulo(uv.u*gridSizeU) * (image.width()-1);
+    return image.at(std::round(i), std::round(j));
+}
+
+Texture2d::Texture2d(Image &image)
+{
+    this->image = std::move(image);
+    gridSizeU = gridSizeV = 1;
+}
+
+void Texture2d::setGridSizeV(unsigned int value)
+{
+    gridSizeV = value;
+}
+
+void Texture2d::setGridSizeU(unsigned int value)
+{
+    gridSizeU = value;
 }

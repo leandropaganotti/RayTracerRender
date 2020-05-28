@@ -13,6 +13,12 @@ Image::~Image()
     destroy();
 }
 
+Image &Image::operator=(Image &&img)
+{
+    move(img);
+    return *this;
+}
+
 void Image::save_ppm(const char *filename) const
 {
     std::ofstream outfile (filename, std::ofstream::out);
@@ -45,6 +51,56 @@ void Image::save_ppm_bin(const char *filename) const
         }
     }
     (void) fclose(fp);
+}
+
+bool Image::read_ppm_bin(const char *filename)
+{
+    std::ifstream ifs;
+    auto getNext = [&ifs](std::string &next){
+        ifs >> next;
+        while (next == "#") {
+            ifs.ignore(255, '\n');
+            ifs >> next;
+        }
+    };
+
+    ifs.open(filename, std::ios::binary);
+    try {
+        if (ifs.fail()) {
+            throw("Can't open input file");
+        }
+        std::string header, next;
+        size_t w, h, b;
+        ifs >> header;
+        if (header != "P6") throw("Can't read ppm file other than P6 format");
+        getNext(next);
+        w = std::atoi(next.c_str());
+        getNext(next);
+        h = std::atoi(next.c_str());
+        getNext(next);
+        b = std::atoi(next.c_str());
+        if(w == 0 || h == 0)
+        {
+            throw ("Can't read ppm file, width and height must be > 0");
+        }
+        ifs.ignore(255, '\n');
+        resize(w, h);
+        unsigned char pix[3];
+        for (size_t i = 0; i < h; ++i)
+        for (size_t j = 0; j < w; ++j) {
+            ifs.read(reinterpret_cast<char *>(pix), 3);
+            buffer[i][j].r = pix[0] / 255.f;
+            buffer[i][j].g = pix[1] / 255.f;
+            buffer[i][j].b = pix[2] / 255.f;
+        }
+        ifs.close();
+    }
+    catch (const char *err) {
+        fprintf(stderr, "%s\n", err);
+        ifs.close();
+        return false;
+    }
+    return true;
 }
 
 void Image::move(Image &image)
@@ -98,3 +154,5 @@ void Image::destroy()
         _width = _height = 0;
     }
 }
+
+

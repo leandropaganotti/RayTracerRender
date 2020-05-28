@@ -89,7 +89,7 @@ inline
 Vector2 Sphere::getUV(const Vector3 &phit, size_t) const
 {
     Vector3 d = (phit-center).normalize();
-    float u = 0.5 + atan2f(d.z, d.x) / (2.0f * M_PI);
+    float u = 0.5 + atan2f(d.x, d.z) / (2.0f * M_PI);
     float v = 0.5 - asinf(d.y) / M_PI;
     return {u, v};
 }

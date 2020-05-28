@@ -18,16 +18,18 @@ public:
     Image(const Image &image) = delete;
     Image(const Image &&image) = delete;
 
-    Image & operator=(const Image &image) = delete;
-    Image & operator=(const Image &&image) = delete;
+    Image & operator=(Image &image) = delete;
+    Image & operator=(Image &&image);
 
     void resize(size_t width, size_t height);
     void destroy();
 
     Vector3 & at(size_t i, size_t j);
+    const Vector3 & at(size_t i, size_t j) const;
 
     void save_ppm(const char* filename) const;
     void save_ppm_bin(const char * filename) const;
+    bool read_ppm_bin(const char * filename);
 
     void move(Image &image);
 
@@ -42,6 +44,11 @@ public:
 
 inline
 Vector3 &Image::at(size_t i, size_t j)
+{
+    return buffer[i][j];
+}
+inline
+const Vector3 &Image::at(size_t i, size_t j) const
 {
     return buffer[i][j];
 }

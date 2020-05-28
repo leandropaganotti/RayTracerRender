@@ -57,14 +57,11 @@ Vector3 Plane::getNormal(const Vector3 &, size_t) const
 inline
 Vector2 Plane::getUV(const Vector3 &phit, size_t) const
 {
-    const float e=0.001f;
-    const Vector3 v = phit - O;
-
-    if(N.x > e || N.x < -e) return {v.y, v.z};
-
-    if(N.y > e || N.y < -e) return {v.x, v.z};
-
-    return {v.x, v.y};
+    const Vector3 n(1,0,0), m(0,1,0);
+    Vector3 u,v;
+    u = N%n; if(u.length()<0.01f)u = N%m;
+    v=N%u;
+    return Vector2(u^phit, v^phit);
 }
 
 AABB Plane::getAABB() const
