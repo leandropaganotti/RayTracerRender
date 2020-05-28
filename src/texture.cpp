@@ -1,10 +1,11 @@
 #include "texture.h"
 #include "utils.h"
 #include "consts.h"
+#include "color.h"
 
 namespace texture
 {
-    const std::shared_ptr<Texture> SolidWhite = Solid::Create("SolidWhite", Color::WHITE);
+    const std::shared_ptr<Texture> SolidWhite = Solid::Create("SolidWhite", color::WHITE);
 }
 
 Texture::Texture()

@@ -10,6 +10,7 @@
 #include "material.h"
 #include "sphere.h"
 #include "bvh.h"
+#include "color.h"
 
 const float bias = 0.001f;
 
@@ -288,7 +289,7 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const uint8_t depth, cons
 
 Vector3 RayTracer::rayTracer(const Ray &ray, const uint8_t depth, const float)
 {
-    if(depth > scene->maxDepth) return Color::BLACK;
+    if(depth > scene->maxDepth) return color::BLACK;
 
     IntersectionData isec;
 
@@ -322,13 +323,13 @@ Vector3 RayTracer::rayTracer(const Ray &ray, const uint8_t depth, const float)
     {
         return transparentMaterial(ray, depth, isec);
     }
-    return Color::BLACK;
+    return color::BLACK;
 }
 
 inline
 Vector3 RayTracer::pathTracer(const Ray &ray, const uint8_t depth, const float)
 {
-    if(depth > scene->maxDepth) return Color::BLACK;
+    if(depth > scene->maxDepth) return color::BLACK;
 
     IntersectionData isec;
 
@@ -387,12 +388,12 @@ Vector3 RayTracer::pathTracer(const Ray &ray, const uint8_t depth, const float)
     {
         return transparentMaterial(ray, depth, isec);
     }
-    return Color::BLACK;
+    return color::BLACK;
 }
 
 Vector3 RayTracer::pathTracer2(const Ray& ray, const uint8_t depth, const float E)
 {
-    if(depth > scene->maxDepth) return Color::BLACK;
+    if(depth > scene->maxDepth) return color::BLACK;
 
     IntersectionData isec;
 
