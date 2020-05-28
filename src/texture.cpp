@@ -103,12 +103,12 @@ Texture2d::Texture2d(Image &image)
     gridSizeU = gridSizeV = 1;
 }
 
-void Texture2d::setGridSizeV(unsigned int value)
+void Texture2d::setGridSizeV(float value)
 {
     gridSizeV = value;
 }
 
-void Texture2d::setGridSizeU(unsigned int value)
+void Texture2d::setGridSizeU(float value)
 {
     gridSizeU = value;
 }
