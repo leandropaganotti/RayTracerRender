@@ -48,27 +48,25 @@ Vector3 Phong::phongShading(const Ray &ray, const IntersectionData &isec)
     //ambient
     Vector3 phitColor = isec.color * isec.material->Ka;
 
-    for(auto& lightObject: scene->lights)
+    for(auto& light: scene->lights)
     {
-        LightData light;
-        lightObject->getLightData(isec.phit, light);
+        LightData lightIsec;
+        light->getLightData(isec.phit, lightIsec);
 
-        float cosTheta = isec.normal ^ -light.direction; //NdotL
+        float cosTheta = isec.normal ^ -lightIsec.direction; //NdotL
         if( cosTheta > 0.0f )
         {
-            float vis = castShadowRay(Ray(isec.phit + bias * isec.normal, -light.direction), light.distance);
-            if (vis > 0.0f)
-            {
-                //diffuse
-                Vector3 diffuse = isec.color * light.intensity * cosTheta;
+            float vis = light->visibility(isec.phit + bias * isec.normal, scene->objects);
 
-                //specular
-                Vector3 toCamera = -ray.direction;
-                Vector3 reflected = reflect(light.direction, isec.normal);
-                Vector3 specular = isec.material->Ks * powf(std::max(0.0f, toCamera ^ reflected), isec.material->Ns);
+            //diffuse
+            Vector3 diffuse = isec.color * lightIsec.intensity * cosTheta;
 
-                phitColor +=  (diffuse + specular) * vis;
-            }
+            //specular
+            Vector3 toCamera = -ray.direction;
+            Vector3 reflected = reflect(lightIsec.direction, isec.normal);
+            Vector3 specular = isec.material->Ks * powf(std::max(0.0f, toCamera ^ reflected), isec.material->Ns);
+
+            phitColor +=  (diffuse + specular) * vis;
         }
     }
     return phitColor;

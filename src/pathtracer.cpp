@@ -122,7 +122,7 @@ Vector3 PathTracerWithDirectSampling::trace(const Ray &ray, const uint8_t depth,
                 float vis = castShadowRay(Ray(isec.phit + bias * isec.normal, sampleToLight), dist);
                 if (vis > 0.0f)
                 {
-                    direct += vis * brdf * sphere->getMaterial(0)->E * cosTheta * _1_pdf;
+                    direct += brdf * sphere->getMaterial(0)->E * cosTheta * _1_pdf;
                 }
             }
         }

@@ -25,9 +25,9 @@ public:
     void parseCameraOptions(xmlNode * xmlCameraOptionsNode, CameraOptions & options);
     void parseRenderOptions(xmlNode * xmlRenderOptionsNode, RenderOptions & options);
 
-    void parsePointLight(xmlNode * xmlPointLightNode, PointLight & light);
+    std::unique_ptr<Light> parsePointLight(xmlNode * xmlPointLightNode);
 
-    void parseDistantLight(xmlNode * xmlDistantLightNode, DistantLight & light);
+    std::unique_ptr<Light> parseDistantLight(xmlNode * xmlDistantLightNode);
 
     std::shared_ptr<GPlane>  parsePlane(xmlNode * xmlPlaneNode);
     std::shared_ptr<GSphere>  parseSphere(xmlNode * xmlSphereNode);

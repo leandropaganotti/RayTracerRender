@@ -17,9 +17,10 @@ Scene::Scene(const std::string &fileName)
 
 Scene::~Scene(){}
 
-void Scene::addLight(LightIF *light)
+void Scene::addLight(std::unique_ptr<Light> &&light)
 {
-    lights.emplace_back(light);
+    if(light)
+        lights.push_back(std::move(light));
 }
 
 void Scene::addObject(std::shared_ptr<Shape> obj)

@@ -4,6 +4,13 @@
 #include <vector>
 #include <float.h>
 #include <memory>
+#include "shape.h"
+#include "material.h"
+
+enum class LightType {
+    PointLight,
+    DistantLight
+};
 
 struct LightData
 {
@@ -12,20 +19,24 @@ struct LightData
     float   distance;
 };
 
-class LightIF
+class Light
 {
 public:
-    virtual void getLightData(const Vector3 &phit, LightData &light) const = 0;
-    virtual ~LightIF(){}
+    static std::unique_ptr<Light> Create(LightType type, bool shadow);
+
+    virtual void  getLightData(const Vector3 &phit, LightData &light) const = 0;
+    virtual float visibility(const Vector3 &phit, const std::vector<std::shared_ptr<Shape>> &objects);
+    virtual ~Light(){}
 };
 
-class PointLight: public LightIF
+class PointLight: public Light
 {
 public:
     PointLight(const Vector3 &position={0.0f}, const Vector3 &color={1.0f}, float strength=1.0f, float k=0.01f);
 
     float attenuation(const Vector3 &point) const;
-    void getLightData(const Vector3 &phit, LightData &light) const override;
+    void  getLightData(const Vector3 &phit, LightData &light) const override;
+    virtual float visibility(const Vector3 &phit, const std::vector<std::shared_ptr<Shape> > &objects) override;
 
     Vector3  getPosition() const;
     void     setPosition(const Vector3 &value);
@@ -43,11 +54,18 @@ protected:
     float k;
 };
 
-class DistantLight: public LightIF
+class PointLightShadowOff: public PointLight
+{
+public:
+    float visibility(const Vector3 &phit, const std::vector<std::shared_ptr<Shape> > &objects) override;
+};
+
+class DistantLight: public Light
 {
 public:
     DistantLight(const Vector3 &direction={0.0f, -1.0f, 0.0f}, const Vector3 &color={1.0f}, float strength=1.0f);
-    void getLightData(const Vector3 &phit, LightData &light) const;
+    void getLightData(const Vector3 &phit, LightData &light) const override;
+    float visibility(const Vector3 &phit, const std::vector<std::shared_ptr<Shape> > &objects) override;
 
     Vector3  getDirection() const;
     void     setDirection(const Vector3 &value);
@@ -62,3 +80,8 @@ protected:
     float strength;
 };
 
+class DistantLightShadowOff: public DistantLight
+{
+public:
+    float visibility(const Vector3 &phit, const std::vector<std::shared_ptr<Shape> > &objects) override;
+};

@@ -6,6 +6,8 @@
 
 bool XMLParser::equals(const xmlChar *lhs, const char *rhs)
 {
+    if(lhs == nullptr || rhs == nullptr) return false;
+
     unsigned int sz = strlen( (const char*) lhs);
 
     if (strlen(rhs) != sz) return false;
@@ -135,15 +137,11 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
                 parseRenderOptions(node, scene.renderOptions);
             else if(equals(node->name, "PointLight"))
             {
-                PointLight *light = new PointLight();
-                parsePointLight(node, *light);
-                scene.addLight(light);
+                scene.addLight(parsePointLight(node));
             }
             else if(equals(node->name, "DistantLight"))
             {
-                DistantLight *light = new DistantLight();
-                parseDistantLight(node, *light);
-                scene.addLight(light);
+                scene.addLight(parseDistantLight(node));
             }
             else if (equals(node->name, "sphere"))
             {
@@ -320,28 +318,35 @@ std::shared_ptr<Material> XMLParser::parseMaterial(xmlNode *xmlMaterialNode)
     return material;
 }
 
-void XMLParser::parsePointLight(xmlNode *xmlPointLightNode, PointLight & light)
+std::unique_ptr<Light> XMLParser::parsePointLight(xmlNode *xmlPointLightNode)
 {
     if(xmlPointLightNode == NULL)
     {
          std::cerr << "\x1b[33;1m" << "error: could not parse PointLight, xmlNode pointer is NULL" << "\x1b[0m" << std::endl;
-         return;
+         return nullptr;
     }
+
+    xmlChar *attShadow = xmlGetProp(xmlPointLightNode,(const xmlChar*)"shadow");
+    auto light = Light::Create(LightType::PointLight, !equals(attShadow, "false"));
+    xmlFree(attShadow);
 
     const xmlAttr *attr = NULL;
     std::string name("");
+    PointLight *lightRef = static_cast<PointLight*>(light.get());
     for (attr = xmlPointLightNode->properties; attr; attr = attr->next)
     {
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
+        else if (equals(attr->name, "shadow"))
+           ;
         else if (equals(attr->name, "position"))
-            light.setPosition( toVector(attr->children->content) );
+            lightRef->setPosition( toVector(attr->children->content) );
         else if (equals(attr->name, "color"))
-            light.setColor( toVector(attr->children->content) );
+            lightRef->setColor( toVector(attr->children->content) );
         else if (equals(attr->name, "strength"))
-            light.setStrength( toFloat(attr->children->content) );
+            lightRef->setStrength( toFloat(attr->children->content) );
         else if (equals(attr->name, "k"))
-            light.setK( toFloat(attr->children->content) );
+            lightRef->setK( toFloat(attr->children->content) );
         else
             std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlPointLightNode->name << "\':" << name << "\x1b[0m" << std::endl;
     }
@@ -354,28 +359,36 @@ void XMLParser::parsePointLight(xmlNode *xmlPointLightNode, PointLight & light)
             std::cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlPointLightNode->name << "\'" << "\x1b[0m" << std::endl;
         }
     }
+    return light;
 }
 
-void XMLParser::parseDistantLight(xmlNode *xmlDistantLightNode, DistantLight &light)
+std::unique_ptr<Light> XMLParser::parseDistantLight(xmlNode *xmlDistantLightNode)
 {
     if(xmlDistantLightNode == NULL)
     {
          std::cerr << "\x1b[33;1m" << "error: could not parse PointLight, xmlNode pointer is NULL" << "\x1b[0m" << std::endl;
-         return;
+         return nullptr;
     }
+
+    xmlChar *attShadow = xmlGetProp(xmlDistantLightNode,(const xmlChar*)"shadow");
+    auto light = Light::Create(LightType::DistantLight, !equals(attShadow, "false"));
+    xmlFree(attShadow);
 
     const xmlAttr *attr = NULL;
     std::string name("");
+    DistantLight *lightRef = static_cast<DistantLight*>(light.get());
     for (attr = xmlDistantLightNode->properties; attr; attr = attr->next)
     {
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
+        else if (equals(attr->name, "shadow"))
+           ;
         else if (equals(attr->name, "direction"))
-            light.setDirection( toVector(attr->children->content) );
+            lightRef->setDirection( toVector(attr->children->content) );
         else if (equals(attr->name, "color"))
-            light.setColor( toVector(attr->children->content) );
+            lightRef->setColor( toVector(attr->children->content) );
         else if (equals(attr->name, "strength"))
-            light.setStrength( toFloat(attr->children->content) );
+            lightRef->setStrength( toFloat(attr->children->content) );
         else
             std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlDistantLightNode->name << "\':" << name << "\x1b[0m" << std::endl;
     }
@@ -388,6 +401,7 @@ void XMLParser::parseDistantLight(xmlNode *xmlDistantLightNode, DistantLight &li
             std::cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlDistantLightNode->name << "\'" << "\x1b[0m" << std::endl;
         }
     }
+    return light;
 }
 
 std::shared_ptr<GPlane> XMLParser::parsePlane(xmlNode *xmlPlaneNode)
