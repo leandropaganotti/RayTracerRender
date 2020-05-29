@@ -22,7 +22,7 @@ bool UnitYCylinder::intersection(const Ray &ray, float tmax, IntersectionData &i
     float t0, t1;
 
     int idx=-1;
-    float t=FLT_MAX;
+    float t=tmax;
 
     if (solveQuadratic(a, b, c, t0, t1))
     {
@@ -38,21 +38,14 @@ bool UnitYCylinder::intersection(const Ray &ray, float tmax, IntersectionData &i
             }
             else
             {
-                t=FLT_MAX;
+                t=tmax;
             }
         }
         else
         {
-            t=FLT_MAX;
+            t=tmax;
         }
     }
-
-
-//    float y0 = ray.origin.y + t0 * ray.direction.y;
-//    float y1 = ray.origin.y + t1 * ray.direction.y;
-
-//    if(y0 < ymin && y1 < ymin) return false;
-//    if(y0 > ymax && y1 > ymax) return false;
 
     float t2 = (ymax - ray.origin.y) / ray.direction.y;
     if(t2 > 0){
@@ -80,7 +73,7 @@ bool UnitYCylinder::intersection(const Ray &ray, float tmax, IntersectionData &i
         }
     }
 
-    if(idx>=0)
+    if(idx>=0 && t < tmax)
     {
         isec.tnear =t;
         isec.idx = idx;

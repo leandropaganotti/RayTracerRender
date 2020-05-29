@@ -79,6 +79,7 @@ bool Image::read_ppm_bin(const char *filename)
         h = std::atoi(next.c_str());
         getNext(next);
         b = std::atoi(next.c_str());
+        UNUSED(b);
         if(w == 0 || h == 0)
         {
             throw ("Can't read ppm file, width and height must be > 0");

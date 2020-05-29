@@ -71,7 +71,7 @@ bool AABox::intersection(const Ray &ray, float tmax, IntersectionData &isec) con
 
     float imin = -INFINITY  ;
     float imax = tmax;
-    int idxmin, idxmax;
+    int idxmin=0, idxmax=0;
 
     int posneg = r.posneg[0];
     float t0 = (data[posneg].x - r.origin.x) * r.invdir.x;
