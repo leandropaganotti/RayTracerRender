@@ -28,7 +28,6 @@ src/image.h
 src/intersection.h
 src/light.cpp
 src/light.h
-src/list.h
 src/main.cpp
 src/material.cpp
 src/material.h

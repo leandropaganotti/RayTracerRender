@@ -9,16 +9,17 @@
 #include "shape.h"
 #include "renderoptions.h"
 
-typedef std::vector<std::shared_ptr<Shape>> ObjectVector;
-
 class Scene
 {
+    typedef std::vector<std::shared_ptr<Shape>> ObjectVector;
+    typedef std::vector<std::unique_ptr<LightIF>> LightVector;
+
 public:
     Scene();
     Scene(const std::string &fileName);
     ~Scene();
 
-    void addLight(Light * light);
+    void addLight(LightIF * light);
 
     void addObject(std::shared_ptr<Shape> obj);
 

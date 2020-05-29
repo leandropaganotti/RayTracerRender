@@ -1,13 +1,33 @@
 #include "light.h"
+#include "utils.h"
 
-Vector3 PointLight::getPos() const
+PointLight::PointLight(const Vector3 &pos, const Vector3 &color, float strength, float k):
+    position(pos), color(color), strength(strength), k(k)
+{}
+
+float PointLight::attenuation(const Vector3 &point) const
 {
-    return pos;
+    float d = point.distance(point);
+    return 1.0f / ( 1.0f + k * d * d);
 }
 
-void PointLight::setPos(const Vector3 &value)
+void PointLight::getLightData(const Vector3 &phit, LightData &light) const
 {
-    pos = value;
+    light.direction = phit - position;
+    light.distance = light.direction.length2();
+    light.intensity = strength * color / ( 4 * M_PI * light.distance);
+    light.distance = sqrtf(light.distance);
+    light.direction /= light.distance;
+}
+
+Vector3 PointLight::getPosition() const
+{
+    return position;
+}
+
+void PointLight::setPosition(const Vector3 &value)
+{
+    position = value;
 }
 
 Vector3 PointLight::getColor() const
@@ -61,12 +81,26 @@ void DistantLight::setStrength(float value)
     strength = value;
 }
 
-Vector3 DistantLight::getDir() const
+DistantLight::DistantLight(const Vector3 &dir, const Vector3 &color, float strength):
+    direction(dir), color(color), strength(strength)
 {
-    return dir;
+    this->direction.normalize();
 }
 
-void DistantLight::setDir(const Vector3 &value)
+void DistantLight::getLightData(const Vector3 &, LightData &light) const
 {
-    dir = value;
+    light.distance = INFINITY;
+    light.direction = direction;
+    light.intensity = color * strength;
+}
+
+Vector3 DistantLight::getDirection() const
+{
+    return direction;
+}
+
+void DistantLight::setDirection(const Vector3 &value)
+{
+    direction = value;
+    direction.normalize();
 }

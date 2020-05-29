@@ -114,6 +114,10 @@ struct Vector3
     {
         return sqrtf(x*x + y*y + z*z);
     }
+    float length2() const
+    {
+        return (x*x + y*y + z*z);
+    }
     const Vector3& normalize()
     {
         float m = length(); x/=m; y/=m; z/=m; return *this;

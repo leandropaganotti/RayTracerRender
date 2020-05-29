@@ -17,7 +17,7 @@ Scene::Scene(const std::string &fileName)
 
 Scene::~Scene(){}
 
-void Scene::addLight(Light *light)
+void Scene::addLight(LightIF *light)
 {
     lights.emplace_back(light);
 }

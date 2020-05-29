@@ -335,7 +335,7 @@ void XMLParser::parsePointLight(xmlNode *xmlPointLightNode, PointLight & light)
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "position"))
-            light.setPos( toVector(attr->children->content) );
+            light.setPosition( toVector(attr->children->content) );
         else if (equals(attr->name, "color"))
             light.setColor( toVector(attr->children->content) );
         else if (equals(attr->name, "strength"))
@@ -371,7 +371,7 @@ void XMLParser::parseDistantLight(xmlNode *xmlDistantLightNode, DistantLight &li
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "direction"))
-            light.setDir( toVector(attr->children->content) );
+            light.setDirection( toVector(attr->children->content) );
         else if (equals(attr->name, "color"))
             light.setColor( toVector(attr->children->content) );
         else if (equals(attr->name, "strength"))
