@@ -32,7 +32,6 @@ int main(int argc, char **argv)
     output = output.substr(0, output.find_last_of("."));
 
     Scene scene(xmlscene);
-
     std::cout << scene << endl;
 
     auto raytracer = RayTracer::Create(scene.renderOptions.illum);
@@ -43,28 +42,30 @@ int main(int argc, char **argv)
 
     const Vector3 from( scene.cameraOptions.getFrom() ), to( scene.cameraOptions.getTo());
 
-    size_t spp = ceilf(float(scene.renderOptions.spp)/(scene.renderOptions.gridSizeXY*scene.renderOptions.gridSizeXY)) * scene.renderOptions.gridSizeXY * scene.renderOptions.gridSizeXY;
+    const size_t n_subpixel = scene.renderOptions.gridSizeXY * scene.renderOptions.gridSizeXY;
+    const size_t nrays_persubpixel = scene.renderOptions.spp < n_subpixel ? 1 : scene.renderOptions.spp / n_subpixel;
+    const size_t spp = nrays_persubpixel * n_subpixel;
 
     for (unsigned i=0; i < nimages; ++i)
     {
         cout << "\n" << i+1 << "/" << nimages << ": at " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) <<  i*angle << " deg" << flush;
         camera.lookAt( Transformation::T(to) * Transformation::Ry(deg2rad( i*angle )) * Transformation::T(-to) * from, to); // rotate around y-axis
 
-		auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::high_resolution_clock::now();
         raytracer->render(scene);
-		auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::high_resolution_clock::now();
 
         time_in_ms = chrono::duration_cast<chrono::milliseconds>(end - start).count();
 
         std::stringstream ss;
-		int s=time_in_ms/1000, m=s/60, h=m/60;
+        int s=time_in_ms/1000, m=s/60, h=m/60;
         ss << std::setw(2) << std::setfill('0') << h << "." << std::setw(2) << std::setfill('0') << m << "." << std::setw(2) << std::setfill('0') << s << "." << std::setw(3) << std::setfill('0') << (unsigned long long)time_in_ms % 1000;
-		std::string time_str = ss.str();
+        std::string time_str = ss.str();
         cout << ", Time: " << time_str << endl << flush;
-		
-		std::stringstream ss2;
-		ss2 << output << "_" << std::setw(4) << std::setfill('0') << i;
-		if (detailedName) { ss2 << "_SPP" << spp << "_T" << time_str; }
+
+        std::stringstream ss2;
+        ss2 << output << "_" << std::setw(4) << std::setfill('0') << i;
+        if (detailedName) { ss2 << "_SPP" << spp << "_T" << time_str; }
         ss2 << ".ppm";
         raytracer->getBuffer().save_ppm_bin(ss2.str().c_str());
 
@@ -88,40 +89,40 @@ void usage (char **argv)
 
 void parseArguments(int argc, char **argv)
 {
-	if (argc < 2)
-	{
-		usage(argv);
-		exit(0);
-	}
-	
+    if (argc < 2)
+    {
+        usage(argv);
+        exit(0);
+    }
+
     int opt = 1;
     while (opt < argc) {
-		if (!strcmp(argv[opt], "-d")) 
-		{
-			detailedName = true;
-		}
-		else if (!strcmp(argv[opt], "-p"))
-		{
-			++opt;
-			if (opt < argc)
-			{
-				nimages = atoi(argv[opt]);
-			}
-			else
-			{
-				usage(argv);
-				exit(0);
-			}
-		}
-		else
-		{
-			xmlscene = argv[opt];
-		}
-		++opt;
+        if (!strcmp(argv[opt], "-d"))
+        {
+            detailedName = true;
+        }
+        else if (!strcmp(argv[opt], "-p"))
+        {
+            ++opt;
+            if (opt < argc)
+            {
+                nimages = atoi(argv[opt]);
+            }
+            else
+            {
+                usage(argv);
+                exit(0);
+            }
+        }
+        else
+        {
+            xmlscene = argv[opt];
+        }
+        ++opt;
     }
-	if (!xmlscene)
-	{
-		usage(argv);
-		exit(0);
-	}
+    if (!xmlscene)
+    {
+        usage(argv);
+        exit(0);
+    }
 }

@@ -143,6 +143,10 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
             {
                 scene.addLight(parseDistantLight(node));
             }
+            else if(equals(node->name, "SphericalLight"))
+            {
+                scene.addLight(parseSphericalLight(node));
+            }
             else if (equals(node->name, "sphere"))
             {
                 scene.addObject(parseSphere(node));
@@ -318,7 +322,7 @@ std::shared_ptr<Material> XMLParser::parseMaterial(xmlNode *xmlMaterialNode)
     return material;
 }
 
-std::unique_ptr<Light> XMLParser::parsePointLight(xmlNode *xmlPointLightNode)
+std::shared_ptr<Light> XMLParser::parsePointLight(xmlNode *xmlPointLightNode)
 {
     if(xmlPointLightNode == NULL)
     {
@@ -343,10 +347,10 @@ std::unique_ptr<Light> XMLParser::parsePointLight(xmlNode *xmlPointLightNode)
             lightRef->setPosition( toVector(attr->children->content) );
         else if (equals(attr->name, "color"))
             lightRef->setColor( toVector(attr->children->content) );
-        else if (equals(attr->name, "strength"))
-            lightRef->setStrength( toFloat(attr->children->content) );
-        else if (equals(attr->name, "k"))
-            lightRef->setK( toFloat(attr->children->content) );
+        else if (equals(attr->name, "intensity"))
+            lightRef->setIntensity( toVector(attr->children->content) );
+        else if (equals(attr->name, "atten"))
+            lightRef->setAttenuation( toFloat(attr->children->content) );
         else
             std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlPointLightNode->name << "\':" << name << "\x1b[0m" << std::endl;
     }
@@ -362,7 +366,7 @@ std::unique_ptr<Light> XMLParser::parsePointLight(xmlNode *xmlPointLightNode)
     return light;
 }
 
-std::unique_ptr<Light> XMLParser::parseDistantLight(xmlNode *xmlDistantLightNode)
+std::shared_ptr<Light> XMLParser::parseDistantLight(xmlNode *xmlDistantLightNode)
 {
     if(xmlDistantLightNode == NULL)
     {
@@ -387,8 +391,8 @@ std::unique_ptr<Light> XMLParser::parseDistantLight(xmlNode *xmlDistantLightNode
             lightRef->setDirection( toVector(attr->children->content) );
         else if (equals(attr->name, "color"))
             lightRef->setColor( toVector(attr->children->content) );
-        else if (equals(attr->name, "strength"))
-            lightRef->setStrength( toFloat(attr->children->content) );
+        else if (equals(attr->name, "intensity"))
+            lightRef->setIntensity( toVector(attr->children->content) );
         else
             std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlDistantLightNode->name << "\':" << name << "\x1b[0m" << std::endl;
     }
@@ -399,6 +403,52 @@ std::unique_ptr<Light> XMLParser::parseDistantLight(xmlNode *xmlDistantLightNode
         if (node->type == XML_ELEMENT_NODE)
         {
             std::cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlDistantLightNode->name << "\'" << "\x1b[0m" << std::endl;
+        }
+    }
+    return light;
+}
+
+std::shared_ptr<Light> XMLParser::parseSphericalLight(xmlNode *xmlsSphericalLightNode)
+{
+    if(xmlsSphericalLightNode == NULL)
+    {
+         std::cerr << "\x1b[33;1m" << "error: could not parse PointLight, xmlNode pointer is NULL" << "\x1b[0m" << std::endl;
+         return nullptr;
+    }
+
+    xmlChar *attShadow = xmlGetProp(xmlsSphericalLightNode,(const xmlChar*)"shadow");
+    auto light = Light::Create(LightType::SphericalLight, !equals(attShadow, "false"));
+    xmlFree(attShadow);
+
+    const xmlAttr *attr = NULL;
+    std::string name("");
+    SphericalLight *lightRef = static_cast<SphericalLight*>(light.get());
+    for (attr = xmlsSphericalLightNode->properties; attr; attr = attr->next)
+    {
+        if (equals(attr->name, "name"))
+            name = (const char*)attr->children->content;
+        else if (equals(attr->name, "shadow"))
+           ;
+        else if (equals(attr->name, "position"))
+            lightRef->setCenter( toVector(attr->children->content) );
+        else if (equals(attr->name, "color"))
+            lightRef->setColor( toVector(attr->children->content) );
+        else if (equals(attr->name, "intensity"))
+            lightRef->setIntensity( toVector(attr->children->content) );
+        else if (equals(attr->name, "radius"))
+            lightRef->setRadius(toFloat(attr->children->content) );
+        else if (equals(attr->name, "atten"))
+            lightRef->setAttenuation( toFloat(attr->children->content) );
+        else
+            std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlsSphericalLightNode->name << "\':" << name << "\x1b[0m" << std::endl;
+    }
+
+    xmlNode *node = NULL;
+    for (node = xmlsSphericalLightNode->children; node; node = node->next)
+    {
+        if (node->type == XML_ELEMENT_NODE)
+        {
+            std::cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlsSphericalLightNode->name << "\'" << "\x1b[0m" << std::endl;
         }
     }
     return light;

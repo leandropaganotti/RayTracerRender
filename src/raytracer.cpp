@@ -40,13 +40,13 @@ RayTracer::~RayTracer(){}
 void RayTracer::render(const Scene& scene)
 {
     this->scene = &scene;
-    const float grid = renderOptions.gridSizeXY;
-    const float gridSize = 1.0f/grid;
-    const size_t nrays_persubpixel = ceilf(renderOptions.spp/(grid*grid));
-    const size_t nrays_perpixel = nrays_persubpixel * grid * grid;
-
-    int count = 0;
-
+    const size_t grid_size_xy = renderOptions.gridSizeXY;
+    const size_t n_subpixel = grid_size_xy * grid_size_xy;
+    const size_t nrays_persubpixel = renderOptions.spp < n_subpixel ? 1 : renderOptions.spp / n_subpixel;
+    const size_t nrays_perpixel = nrays_persubpixel * n_subpixel;
+    const float w_subpixel = 1.0f/grid_size_xy;
+    size_t count = 0;
+    std::cout << " -> SPP: " << nrays_perpixel << std::endl;
     buffer.resize(camera.getWidth(), camera.getHeight());
 
     std::cout << std::endl;
@@ -62,15 +62,15 @@ void RayTracer::render(const Scene& scene)
         for (size_t j = 0; j < camera.getWidth(); ++j)
         {
             buffer.at(i, j) = 0;
-            for (size_t ii=0; ii < grid; ++ii)
+            for (size_t ii=0; ii < grid_size_xy; ++ii)
             {
                 unsigned short Xi[3]={0,0,(short unsigned int)(ii)};
-                for (size_t jj=0; jj < grid; ++jj)
+                for (size_t jj=0; jj < grid_size_xy; ++jj)
                 {
                     for (size_t n = 0; n < nrays_persubpixel; ++n)
                     {
-                        const float x = i + gridSize * (ii + erand48(Xi));
-                        const float y = j + gridSize * (jj + erand48(Xi));
+                        const float x = i + w_subpixel * (ii + erand48(Xi));
+                        const float y = j + w_subpixel * (jj + erand48(Xi));
                         Ray ray(camera.getPosition(), rayDirection(x, y));
                         buffer.at(i, j) += trace(ray, 1, 1.0f);
                     }

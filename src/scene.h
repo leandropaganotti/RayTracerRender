@@ -12,14 +12,14 @@
 class Scene
 {
     typedef std::vector<std::shared_ptr<Shape>> ObjectVector;
-    typedef std::vector<std::unique_ptr<Light>> LightVector;
+    typedef std::vector<std::shared_ptr<Light>> LightVector;
 
 public:
     Scene();
     Scene(const std::string &fileName);
     ~Scene();
 
-    void addLight(std::unique_ptr<Light> &&light);
+    void addLight(std::shared_ptr<Light> light);
 
     void addObject(std::shared_ptr<Shape> obj);
 
