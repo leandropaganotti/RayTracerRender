@@ -14,6 +14,8 @@ https://www.youtube.com/watch?v=JMeM5K6cYeA
 ### Images Samples
 More samples in images directory.
 
+
+![Alt Shapes](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/shapes_0035_SPP256_T00.00.27.882.gif)
 ![Alt Rib](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/rib_0000_SPP4_T00.00.17.346.png)
 ![Alt ModifiedCornellBox](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/ModifiedCornellBox_0000.png)
 ![Alt room](https://github.com/leandropaganotti/RayTracerRender/blob/master/images/room_0000.png)
