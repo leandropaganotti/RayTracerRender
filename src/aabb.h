@@ -21,6 +21,9 @@ public:
     Vector3 getMax() const;
     void setMax(const Vector3 &value);
 
+    Vector3 getExtent();
+    int getMaxExtent();
+
 protected:
     Vector3 data[2]; // 0 -> min,  1 -> max
 };

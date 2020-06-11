@@ -27,6 +27,22 @@ void AABB::setMax(const Vector3 &value)
     data[1] = value;
 }
 
+Vector3 AABB::getExtent()
+{
+    return data[1]-data[0];
+}
+
+int AABB::getMaxExtent()
+{
+    Vector3 e = getExtent();
+    if (e.x > e.y && e.x > e.z)
+        return 0;
+    else if (e.y > e.z)
+        return 1;
+    else
+        return 2;
+}
+
 void AABB::extend(const std::vector<Vector3> &vertices)
 {
     for(const auto &v: vertices)

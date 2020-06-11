@@ -1,5 +1,6 @@
 #include "bvh.h"
 #include "invisible.h"
+#include <algorithm>
 
 BVH::BVH()
 {
@@ -13,50 +14,32 @@ std::shared_ptr<IntersectionIF> BVH::Create(const std::vector<std::shared_ptr<Sh
     if (shapes.size() == 0) return InvisibleShape::GetInstance();
 
     std::vector<std::shared_ptr<IntersectionIF>> shapes_;
-    shapes_.push_back(std::shared_ptr<IntersectionIF>());
     for (auto s: shapes)
         shapes_.push_back(s);
 
-    return Create(shapes_, 1, shapes_.size()-1, 0);
+    return Create(shapes_, 1, shapes_.size()-1);
 }
 
-std::shared_ptr<IntersectionIF> BVH::Create(const std::vector<std::shared_ptr<IntersectionIF> > &shapes)
+std::shared_ptr<IntersectionIF> BVH::Create(std::vector<std::shared_ptr<IntersectionIF> > &shapes, size_t l, size_t r)
 {
-    if (shapes.size() == 0) return InvisibleShape::GetInstance();
-
-    std::vector<std::shared_ptr<IntersectionIF>> shapes_;
-    shapes_.push_back(std::shared_ptr<IntersectionIF>());
-    for (auto s: shapes)
-        shapes_.push_back(s);
-
-    return Create(shapes_, 1, shapes_.size()-1, 0);
-}
-
-std::shared_ptr<IntersectionIF> BVH::Create(std::vector<std::shared_ptr<IntersectionIF> > &shapes, size_t l, size_t r, size_t axis)
-{
-    if (l==r)
-    {
-        return shapes[l];
-    }
+    if (l==r) return shapes[l];
 
     AABB aabb;
     for (size_t i = l; i <= r; ++i)
-    {
         aabb.extend(shapes[i]->getAABB());
-    }
-    auto bvh = std::shared_ptr<BVH>(new BVH);
-    bvh->aabb = aabb;
-    if(l == (r-1))
-    {
-        bvh->left = shapes[l];
-        bvh->right = shapes[r];
-        return bvh;
-    }
-    size_t pivot = qsplit(shapes, l, r, aabb.getCenter()[axis], axis);
-    bvh->left = Create(shapes, l, pivot-1, (axis+1)%3);
-    bvh->right = Create(shapes, pivot, r, (axis+1)%3);
 
-    return bvh;
+    int axis = aabb.getMaxExtent();
+    sort(shapes.begin()+l,shapes.begin()+r+1,[axis](const std::shared_ptr<IntersectionIF> &a,const std::shared_ptr<IntersectionIF> &b){
+        return a->getAABB().getCenter()[axis] < b->getAABB().getCenter()[axis];
+    });
+
+    size_t m = l+(r-l)/2;
+    BVH *bvh = new BVH;
+    bvh->aabb = aabb;
+    bvh->left = Create(shapes, l, m);
+    bvh->right = Create(shapes, m+1, r);
+
+    return std::shared_ptr<IntersectionIF>(bvh);
 }
 
 AABB BVH::getAABB() const
