@@ -2,7 +2,7 @@
 # Compiler flags
 #
 CXX = g++
-CXXFLAGS =  -std=c++0x -Wall -W -Winline
+CXXFLAGS =  -std=c++14 -Wall -W -Winline
 VPATH = src/ src/shapes
 
 INCPATH = -I./src -I./src/shapes -I/usr/include/libxml2 -I./libxml/include/libxml2
@@ -40,6 +40,7 @@ shape.cpp \
 resource.cpp \
 pathtracer.cpp \
 phong.cpp \
+paramset.cpp \
 
 OBJS=$(SRCS:.cpp=.o )
 EXE  = render
