@@ -90,15 +90,13 @@ Vector3 PathTracerWithDirectSampling::trace(const Ray &ray, const uint8_t depth,
         kr = schlick(-ray.direction, isec.normal, isec.material->R0);
         kt = 1.0f - kr;
     }
-    if(isec.material->E != vector::ZERO && depth == 1){
-        float n=5, m=5;
-        float nk = isec.normal ^ -ray.direction;
-        float ek = (n+1)/(2*M_PI)*powf(nk, m);
-
-        Vector3 Lo = isec.material->E * ek / nk;
-
-        return Lo;
-    }
+//    if(isec.material->E != vector::ZERO && depth == 1){
+//        float n=5, m=5;
+//        float nk = isec.normal ^ -ray.direction;
+//        float ek = (n+1)/(2*M_PI)*powf(nk, m);
+//        Vector3 Lo = isec.material->E * ek / nk;
+//        return Lo;
+//    }
     Vector3 diffused, reflected;
     Vector3 brdf = isec.color * M_1_PI;
     if (kt > 0.0001f)

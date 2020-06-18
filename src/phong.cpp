@@ -44,7 +44,7 @@ Vector3 Phong::trace(const Ray &ray, const uint8_t depth, float E)
 }
 Vector3 Phong::phongShading(const Ray &ray, const IntersectionData &isec)
 {
-    Vector3 phitColor(0);
+    Vector3 phitColor(isec.color * isec.material->Ka); // starts with ambient component
 
     for(auto& light: scene->lights)
     {
@@ -55,15 +55,15 @@ Vector3 Phong::phongShading(const Ray &ray, const IntersectionData &isec)
         float vis = light->visibility(Ray(isec.phit + bias * isec.normal, -isecLight.direction), scene->objects);
 
         //diffuse
-        Vector3 diffuse = vis * isecLight.intensity * (isec.normal ^ -isecLight.direction);
+        Vector3 diffuse = isecLight.intensity * std::max(0.0f, (isec.normal ^ -isecLight.direction));
 
         //specular
         Vector3 toCamera = -ray.direction;
         Vector3 reflected = reflect(isecLight.direction, isec.normal);
-        Vector3 specular = vis * powf(std::max(0.0f, toCamera ^ reflected), isec.material->Ns);
+        Vector3 specular = powf(std::max(0.0f, toCamera ^ reflected), isec.material->Ns);
 
-        phitColor += (diffuse*isec.color + specular*isec.material->Ks);
+        phitColor += vis * (diffuse*isec.color + specular*isec.material->Ks);
 
     }
-    return isec.color * isec.material->Ka + phitColor;
+    return phitColor;
 }
