@@ -2,32 +2,43 @@
 #include "utils.h"
 #include "material.h"
 
-Light::Light()
-{
-    intensity = Vector3(1);
-    color = Vector3(1);
-}
+Light::Light():intensity(1), color(1){}
 
-std::shared_ptr<Light> Light::Create(LightType type, bool shadow)
+Light::~Light(){}
+
+std::shared_ptr<Light> Light::Create(LightType type, const ParamSet &params)
 {
     switch (type) {
     case LightType::PointLight:
-        if(shadow)
-            return std::shared_ptr<PointLight>(new PointLight);
-        else
-            return std::shared_ptr<PointLightShadowOff>(new PointLightShadowOff);
-
+    {
+        std::shared_ptr<PointLight> light;
+        light = params.get<bool>("shadowoff") ? std::shared_ptr<PointLight>(new PointLightShadowOff) : std::shared_ptr<PointLight>(new PointLight);
+        light->setPosition(params.get<Vector3>("position"));
+        light->setColor(params.get<Vector3>("color"));
+        light->setIntensity(params.get<Vector3>("intensity"));
+        light->setAttenuation(params.get<float>("atten"));
+        return light;
+    }
     case LightType::DistantLight:
-        if(shadow)
-            return std::shared_ptr<DistantLight>(new DistantLight);
-        else
-            return std::shared_ptr<DistantLightShadowOff>(new DistantLightShadowOff);
-
+    {
+        std::shared_ptr<DistantLight> light;
+        light = params.get<bool>("shadowoff") ? std::shared_ptr<DistantLight>(new DistantLightShadowOff) : std::shared_ptr<DistantLight>(new DistantLight);
+        light->setDirection(params.get<Vector3>("direction"));
+        light->setColor(params.get<Vector3>("color"));
+        light->setIntensity(params.get<Vector3>("intensity"));
+        return light;
+    }
     case LightType::SphericalLight:
-        if(shadow)
-            return std::shared_ptr<SphericalLight>(new SphericalLight);
-        else
-            return std::shared_ptr<SphericalLightShadowOff>(new SphericalLightShadowOff);
+    {
+        std::shared_ptr<SphericalLight> light;
+        light = params.get<bool>("shadowoff") ? std::shared_ptr<SphericalLight>(new SphericalLightShadowOff) : std::shared_ptr<SphericalLight>(new SphericalLight);
+        light->setCenter(params.get<Vector3>("position"));
+        light->setRadius(params.get<float>("radius"));
+        light->setColor(params.get<Vector3>("color"));
+        light->setIntensity(params.get<Vector3>("intensity"));
+        light->setAttenuation(params.get<float>("atten"));
+        return light;
+    }
     }
     return nullptr;
 }
@@ -51,11 +62,6 @@ void Light::setColor(const Vector3 &value)
 {
     color = value;
     intensity = intensity * color;
-}
-
-Vector3 Light::forEachSample(const Vector3 &, const std::function<Vector3 (const LightData &)> &) const
-{
-    return Vector3(0);
 }
 
 PointLight::PointLight()
@@ -94,26 +100,6 @@ float PointLight::visibility(const Ray &ray, const std::vector<std::shared_ptr<S
     return vis;
 }
 
-float PointLight::visibility(const Vector3 &phit, const std::vector<std::shared_ptr<Shape> > &objects) const
-{
-    float vis = 1.0f;
-    IntersectionData isec;
-    Ray ray(phit, position-phit);
-    float tmax = ray.direction.length();
-    ray.direction /= tmax;
-    for(auto &object : objects)
-    {
-        if (object->intersection(ray, tmax, isec))
-        {
-            if (object->getMaterial(isec.idx)->type == MaterialType::TRANSPARENT)
-                vis *= 0.8f;
-            else
-                return 0.0f;
-        }
-    }
-    return vis;
-}
-
 Vector3 PointLight::getPosition() const
 {
     return position;
@@ -132,11 +118,6 @@ float PointLight::getAttenuation() const
 void PointLight::setAttenuation(float value)
 {
     atten = value;
-}
-
-float PointLightShadowOff::visibility(const Vector3 &, const std::vector<std::shared_ptr<Shape> > &) const
-{
-    return 1.0f;
 }
 
 float PointLightShadowOff::visibility(const Ray &, const std::vector<std::shared_ptr<Shape> > &) const
@@ -159,24 +140,6 @@ void DistantLight::getLightData(const Vector3 &, LightData &light) const
     light.distance = INFINITY;
     light.direction = direction;
     light.intensity = intensity;
-}
-
-float DistantLight::visibility(const Vector3 &phit, const std::vector<std::shared_ptr<Shape> > &objects) const
-{
-    float vis = 1.0f;
-    IntersectionData isec;
-    Ray ray(phit, -direction);
-    for(auto &object : objects)
-    {
-        if (object->intersection(ray, INFINITY, isec))
-        {
-            if (object->getMaterial(isec.idx)->type == MaterialType::TRANSPARENT)
-                vis *= 0.8f;
-            else
-                return 0.0f;
-        }
-    }
-    return vis;
 }
 
 float DistantLight::visibility(const Ray &ray, const std::vector<std::shared_ptr<Shape> > &objects) const
@@ -207,35 +170,9 @@ void DistantLight::setDirection(const Vector3 &value)
     direction.normalize();
 }
 
-float DistantLightShadowOff::visibility(const Vector3 &, const std::vector<std::shared_ptr<Shape> > &) const
-{
-    return 1.0f;
-}
-
 float DistantLightShadowOff::visibility(const Ray &, const std::vector<std::shared_ptr<Shape> > &) const
 {
     return 1.0f;
-}
-
-float SphericalLight::visibility(const Vector3 &phit, const std::vector<std::shared_ptr<Shape> > &objects) const
-{
-    float vis = 1.0f, _1_pdf;
-    Ray ray;
-    ray.origin = phit;
-    IntersectionData isec;
-    sampleSolidAngleSphere(phit, ray.direction,  _1_pdf);
-    float tmax = (ray.origin - center).length() - radius;
-    for(auto &object : objects)
-    {
-        if (object->intersection(ray, tmax, isec))
-        {
-            if (object->getMaterial(isec.idx)->type == MaterialType::TRANSPARENT)
-                vis *= 0.8f;
-            else
-                return 0.0f;
-        }
-    }
-    return vis;
 }
 
 float SphericalLight::visibility(const Ray &ray, const std::vector<std::shared_ptr<Shape> > &objects) const
@@ -254,23 +191,6 @@ float SphericalLight::visibility(const Ray &ray, const std::vector<std::shared_p
         }
     }
     return vis;
-}
-
-Vector3 SphericalLight::forEachSample(const Vector3 &phit, const std::function<Vector3(const LightData &)> &fn) const
-{
-    Vector3 phitColor(0);
-    size_t n=10;
-    for(size_t i=0; i < n; ++i)
-    {
-        LightData data;
-        sampleSolidAngleSphere(phit, data.direction,  data._1_pdf);
-        data.distance = (phit-center).length() - radius;
-        data.direction = -data.direction;
-        data.intensity = intensity * 1/(1+atten*data.distance*data.distance);
-        phitColor += fn(data);
-    }
-
-    return phitColor/n;
 }
 
 float SphericalLight::getAttenuation() const
@@ -295,11 +215,6 @@ void SphericalLight::getLightData(const Vector3 &phit, LightData &light) const
     light.direction = -light.direction;
     light.intensity = intensity * 1/(1+atten*light.distance*light.distance);
 
-}
-
-float SphericalLightShadowOff::visibility(const Vector3 &, const std::vector<std::shared_ptr<Shape> > &) const
-{
-    return 1.0f;
 }
 
 float SphericalLightShadowOff::visibility(const Ray &, const std::vector<std::shared_ptr<Shape> > &) const

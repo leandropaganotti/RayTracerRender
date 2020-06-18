@@ -16,7 +16,10 @@ public:
     void set(const std::string &name, const T &value);
 
     template<class T>
-    T get(const std::string &name);
+    T get(const std::string &name) const;
+
+    template<class T>
+    bool get(const std::string &name, T &p) const;
 
     ParamSet& operator=(const ParamSet &other);
 private:
@@ -45,7 +48,7 @@ void ParamSet::set(const std::string &name, const T &value)
 }
 
 template<class T>
-T ParamSet::get(const std::string &name)
+T ParamSet::get(const std::string &name) const
 {
     if(params<T>.find(this) == params<T>.end())
         return T{};
@@ -53,4 +56,15 @@ T ParamSet::get(const std::string &name)
         return T{};
 
     return params<T>[this][name];
+}
+template<class T>
+bool ParamSet::get(const std::string &name, T &p) const
+{
+    if(params<T>.find(this) == params<T>.end())
+        return false;
+    if(params<T>[this].find(name) == params<T>[this].end())
+        return false;
+
+    p = params<T>[this][name];
+    return true;
 }

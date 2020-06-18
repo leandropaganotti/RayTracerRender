@@ -18,7 +18,7 @@ bool XMLParser::equals(const xmlChar *lhs, const char *rhs)
     return true;
 }
 
-Vector3 XMLParser::toVector(const xmlChar *str)
+Vector3 XMLParser::toVector3(const xmlChar *str)
 {
     if (str == NULL) return Vector3(0.0f);
 
@@ -67,11 +67,22 @@ int XMLParser::toInt(const xmlChar *str)
     return str == NULL ? 0 : atoi((const char*)str);
 }
 
-void XMLParser::LogError(const xmlNode *node, const xmlAttr* attr, const std::string &msg)
+bool XMLParser::toBool(const xmlChar *str)
 {
+    return equals(str, "true") ? true : false;
+}
 
-    std::cerr << "\x1b[33;1m Error: <" << node->name << " " << attr->name << "=\'" << (const char*)attr->children->content << "\'>: " << msg << "\x1b[0m" << std::endl;
-
+void XMLParser::LogError(const xmlNode *node, const xmlAttr* attr, const char *msg)
+{
+    if(node)
+    {
+        std::stringstream ss;
+        ss << "\x1b[33;1m Error: <" << node->name;
+        if(attr)
+            ss << " " << (const char*)attr->name << "=\'" << (const char*)attr->children->content << "\'";
+        ss << ">: " << msg << "\x1b[0m" << std::endl;
+        std::cerr << ss.str();
+    }
 }
 
 void XMLParser::parseFile(const char *filename, Scene & scene)
@@ -98,7 +109,6 @@ void XMLParser::parseFile(const char *filename, Scene & scene)
 
         // start parsing the xml tree here
         parseScene(xmlSceneNode, scene);
-
         xmlFreeDoc(doc);
 
         xmlCleanupParser();
@@ -189,9 +199,9 @@ void XMLParser::parseCameraOptions(xmlNode *xmlCameraOptionsNode, CameraOptions 
     for (attr = xmlCameraOptionsNode->properties; attr; attr = attr->next)
     {
         if (equals(attr->name, "position"))
-            options.setFrom( toVector(attr->children->content) );
+            options.setFrom( toVector3(attr->children->content) );
         else if (equals(attr->name, "lookingat"))
-            options.setTo( toVector(attr->children->content) );
+            options.setTo( toVector3(attr->children->content) );
         else if (equals(attr->name, "fov"))
             options.setFov( deg2rad(toFloat(attr->children->content) ));
         else if (equals(attr->name, "width"))
@@ -232,7 +242,7 @@ void XMLParser::parseRenderOptions(xmlNode *xmlRenderOptionsNode, RenderOptions 
         else if (equals(attr->name, "maxdepth"))
              options.maxDepth = toInt(attr->children->content);
         else if (equals(attr->name, "bgcolor"))
-             options.bgColor = toVector(attr->children->content);
+             options.bgColor = toVector3(attr->children->content);
         else if (equals(attr->name, "illum"))
         {
             if (equals(attr->children->content, "phong"))
@@ -274,11 +284,11 @@ std::shared_ptr<Material> XMLParser::parseMaterial(xmlNode *xmlMaterialNode)
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "kd"))
-            material->Kd = toVector(attr->children->content);
+            material->Kd = toVector3(attr->children->content);
         else if (equals(attr->name, "ka"))
-            material->Ka = toVector(attr->children->content);
+            material->Ka = toVector3(attr->children->content);
         else if (equals(attr->name, "E"))
-            material->E = toVector(attr->children->content);
+            material->E = toVector3(attr->children->content);
         else if (equals(attr->name, "ks"))
             material->Ks = toFloat(attr->children->content);
         else if (equals(attr->name, "m"))
@@ -324,43 +334,34 @@ std::shared_ptr<Material> XMLParser::parseMaterial(xmlNode *xmlMaterialNode)
 
 std::shared_ptr<Light> XMLParser::parsePointLight(xmlNode *xmlPointLightNode)
 {
-    if(xmlPointLightNode == NULL)
-    {
-         std::cerr << "\x1b[33;1m" << "error: could not parse PointLight, xmlNode pointer is NULL" << "\x1b[0m" << std::endl;
-         return nullptr;
-    }
-
-    xmlChar *attShadow = xmlGetProp(xmlPointLightNode,(const xmlChar*)"shadow");
-    auto light = Light::Create(LightType::PointLight, !equals(attShadow, "false"));
-    xmlFree(attShadow);
-
+    ParamSet params;
     const xmlAttr *attr = NULL;
-    std::string name("");
-    PointLight *lightRef = static_cast<PointLight*>(light.get());
     for (attr = xmlPointLightNode->properties; attr; attr = attr->next)
     {
         if (equals(attr->name, "name"))
-            name = (const char*)attr->children->content;
-        else if (equals(attr->name, "shadow"))
-           ;
+            params.set<std::string>((const char*)attr->name, (const char*)attr->children->content);
+        else if (equals(attr->name, "shadowoff"))
+            params.set<bool>((const char*)attr->name, toBool(attr->children->content));
         else if (equals(attr->name, "position"))
-            lightRef->setPosition( toVector(attr->children->content) );
+            params.set<Vector3>((const char*)attr->name, toVector3(attr->children->content));
         else if (equals(attr->name, "color"))
-            lightRef->setColor( toVector(attr->children->content) );
+            params.set<Vector3>((const char*)attr->name, toVector3(attr->children->content) );
         else if (equals(attr->name, "intensity"))
-            lightRef->setIntensity( toVector(attr->children->content) );
+            params.set<Vector3>((const char*)attr->name, toVector3(attr->children->content) );
         else if (equals(attr->name, "atten"))
-            lightRef->setAttenuation( toFloat(attr->children->content) );
+            params.set<float>((const char*)attr->name, toFloat(attr->children->content) );
         else
-            std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlPointLightNode->name << "\':" << name << "\x1b[0m" << std::endl;
+            LogError(xmlPointLightNode, attr, "unrecognized attribute");
     }
+
+    auto light = Light::Create(LightType::PointLight, params);
 
     xmlNode *node = NULL;
     for (node = xmlPointLightNode->children; node; node = node->next)
     {
         if (node->type == XML_ELEMENT_NODE)
         {
-            std::cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlPointLightNode->name << "\'" << "\x1b[0m" << std::endl;
+            LogError(node, nullptr, "unrecognized element");
         }
     }
     return light;
@@ -368,41 +369,32 @@ std::shared_ptr<Light> XMLParser::parsePointLight(xmlNode *xmlPointLightNode)
 
 std::shared_ptr<Light> XMLParser::parseDistantLight(xmlNode *xmlDistantLightNode)
 {
-    if(xmlDistantLightNode == NULL)
-    {
-         std::cerr << "\x1b[33;1m" << "error: could not parse PointLight, xmlNode pointer is NULL" << "\x1b[0m" << std::endl;
-         return nullptr;
-    }
-
-    xmlChar *attShadow = xmlGetProp(xmlDistantLightNode,(const xmlChar*)"shadow");
-    auto light = Light::Create(LightType::DistantLight, !equals(attShadow, "false"));
-    xmlFree(attShadow);
-
+    ParamSet params;
     const xmlAttr *attr = NULL;
-    std::string name("");
-    DistantLight *lightRef = static_cast<DistantLight*>(light.get());
     for (attr = xmlDistantLightNode->properties; attr; attr = attr->next)
     {
         if (equals(attr->name, "name"))
-            name = (const char*)attr->children->content;
-        else if (equals(attr->name, "shadow"))
-           ;
+            params.set<std::string>((const char*)attr->name, (const char*)attr->children->content);
+        else if (equals(attr->name, "shadowoff"))
+            params.set<bool>((const char*)attr->name, toBool(attr->children->content));
         else if (equals(attr->name, "direction"))
-            lightRef->setDirection( toVector(attr->children->content) );
+            params.set<Vector3>((const char*)attr->name, toVector3(attr->children->content));
         else if (equals(attr->name, "color"))
-            lightRef->setColor( toVector(attr->children->content) );
+            params.set<Vector3>((const char*)attr->name, toVector3(attr->children->content) );
         else if (equals(attr->name, "intensity"))
-            lightRef->setIntensity( toVector(attr->children->content) );
+            params.set<Vector3>((const char*)attr->name, toVector3(attr->children->content) );
         else
-            std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlDistantLightNode->name << "\':" << name << "\x1b[0m" << std::endl;
+            LogError(xmlDistantLightNode, attr, "unrecognized attribute");
     }
+
+    auto light = Light::Create(LightType::DistantLight, params);
 
     xmlNode *node = NULL;
     for (node = xmlDistantLightNode->children; node; node = node->next)
     {
         if (node->type == XML_ELEMENT_NODE)
         {
-            std::cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlDistantLightNode->name << "\'" << "\x1b[0m" << std::endl;
+            LogError(node, nullptr, "unrecognized element");
         }
     }
     return light;
@@ -410,45 +402,36 @@ std::shared_ptr<Light> XMLParser::parseDistantLight(xmlNode *xmlDistantLightNode
 
 std::shared_ptr<Light> XMLParser::parseSphericalLight(xmlNode *xmlsSphericalLightNode)
 {
-    if(xmlsSphericalLightNode == NULL)
-    {
-         std::cerr << "\x1b[33;1m" << "error: could not parse PointLight, xmlNode pointer is NULL" << "\x1b[0m" << std::endl;
-         return nullptr;
-    }
-
-    xmlChar *attShadow = xmlGetProp(xmlsSphericalLightNode,(const xmlChar*)"shadow");
-    auto light = Light::Create(LightType::SphericalLight, !equals(attShadow, "false"));
-    xmlFree(attShadow);
-
+    ParamSet params;
     const xmlAttr *attr = NULL;
-    std::string name("");
-    SphericalLight *lightRef = static_cast<SphericalLight*>(light.get());
     for (attr = xmlsSphericalLightNode->properties; attr; attr = attr->next)
     {
         if (equals(attr->name, "name"))
-            name = (const char*)attr->children->content;
-        else if (equals(attr->name, "shadow"))
-           ;
+            params.set<std::string>((const char*)attr->name, (const char*)attr->children->content);
+        else if (equals(attr->name, "shadowoff"))
+            params.set<bool>((const char*)attr->name, toBool(attr->children->content));
         else if (equals(attr->name, "position"))
-            lightRef->setCenter( toVector(attr->children->content) );
+            params.set<Vector3>((const char*)attr->name, toVector3(attr->children->content));
         else if (equals(attr->name, "color"))
-            lightRef->setColor( toVector(attr->children->content) );
+            params.set<Vector3>((const char*)attr->name, toVector3(attr->children->content) );
         else if (equals(attr->name, "intensity"))
-            lightRef->setIntensity( toVector(attr->children->content) );
-        else if (equals(attr->name, "radius"))
-            lightRef->setRadius(toFloat(attr->children->content) );
+            params.set<Vector3>((const char*)attr->name, toVector3(attr->children->content) );
         else if (equals(attr->name, "atten"))
-            lightRef->setAttenuation( toFloat(attr->children->content) );
+            params.set<float>((const char*)attr->name, toFloat(attr->children->content) );
+        else if (equals(attr->name, "radius"))
+            params.set<float>((const char*)attr->name, toFloat(attr->children->content) );
         else
-            std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlsSphericalLightNode->name << "\':" << name << "\x1b[0m" << std::endl;
+            LogError(xmlsSphericalLightNode, attr, "unrecognized attribute");
     }
+
+    auto light = Light::Create(LightType::SphericalLight, params);
 
     xmlNode *node = NULL;
     for (node = xmlsSphericalLightNode->children; node; node = node->next)
     {
         if (node->type == XML_ELEMENT_NODE)
         {
-            std::cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlsSphericalLightNode->name << "\'" << "\x1b[0m" << std::endl;
+            LogError(node, nullptr, "unrecognized element");
         }
     }
     return light;
@@ -471,9 +454,9 @@ std::shared_ptr<GPlane> XMLParser::parsePlane(xmlNode *xmlPlaneNode)
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "point"))
-            plane->setO(toVector(attr->children->content));
+            plane->setO(toVector3(attr->children->content));
         else if (equals(attr->name, "normal"))
-            plane->setN(toVector(attr->children->content));
+            plane->setN(toVector3(attr->children->content));
         else if (equals(attr->name, "material"))
             plane->setMaterial(Material::Get((const char*)attr->children->content));
         else
@@ -512,7 +495,7 @@ std::shared_ptr<GSphere> XMLParser::parseSphere(xmlNode * xmlSphereNode)
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "position"))
-            sphere->setCenter( toVector(attr->children->content) );
+            sphere->setCenter( toVector3(attr->children->content) );
         else if (equals(attr->name, "radius"))
             sphere->setRadius( toFloat(attr->children->content) );
         else if (equals(attr->name, "material"))
@@ -571,9 +554,9 @@ std::shared_ptr<Texture> XMLParser::parseTexture(xmlNode *xmlTextureNode)
         else if (equals(attr->name, "vedge"))
             vedge = toFloat(attr->children->content);
         else if (equals(attr->name, "color1"))
-            color1 = toVector(attr->children->content);
+            color1 = toVector3(attr->children->content);
         else if (equals(attr->name, "color2"))
-            color2 = toVector(attr->children->content);
+            color2 = toVector3(attr->children->content);
         else if (equals(attr->name, "angle"))
             angle = toFloat(attr->children->content);
         else
@@ -805,16 +788,16 @@ Matrix4 XMLParser::parseTransformation(xmlNode *xmlTrnasformationNode)
     for (attr = xmlTrnasformationNode->properties; attr; attr = attr->next)
     {
         if (equals(attr->name, "translate"))
-            translate = toVector(attr->children->content);
+            translate = toVector3(attr->children->content);
         else if (equals(attr->name, "rotate"))
         {
-            rotate = toVector(attr->children->content);
+            rotate = toVector3(attr->children->content);
             rotate.x = deg2rad(rotate.x);
             rotate.y = deg2rad(rotate.y);
             rotate.z = deg2rad(rotate.z);
         }
         else if (equals(attr->name, "scale"))
-            scale = toVector(attr->children->content);
+            scale = toVector3(attr->children->content);
         else
             std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlTrnasformationNode->name << "\'" << "\x1b[0m" << std::endl;
     }

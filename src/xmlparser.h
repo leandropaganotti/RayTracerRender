@@ -44,12 +44,14 @@ public:
 private:
     bool     equals(const xmlChar *lhs, const char *rhs);
 
-    Vector3 toVector(const xmlChar *str);
+    Vector3  toVector3(const xmlChar *str);
 
     float    toFloat(const xmlChar *str);
 
     int      toInt(const xmlChar *str);
 
-    void LogError(const xmlNode *node, const xmlAttr* attr, const std::string &msg);
+    bool     toBool(const xmlChar *str);
+
+    void LogError(const xmlNode *node, const xmlAttr* attr, const char *msg);
 };
 

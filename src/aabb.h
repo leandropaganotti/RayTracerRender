@@ -16,13 +16,13 @@ public:
     Vector3 getCenter();
 
     Vector3 getMin() const;
-    void setMin(const Vector3 &value);
+    void    setMin(const Vector3 &value);
 
     Vector3 getMax() const;
-    void setMax(const Vector3 &value);
+    void    setMax(const Vector3 &value);
 
     Vector3 getExtent();
-    int getMaxExtent();
+    int     getMaxExtent();
 
 protected:
     Vector3 data[2]; // 0 -> min,  1 -> max
