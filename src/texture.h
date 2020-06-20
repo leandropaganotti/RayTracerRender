@@ -70,13 +70,13 @@ public:
     static std::shared_ptr<Texture2d> Create(const std::string &key, const std::string &filepath);
     const Vector3 get(const Vector2 &uv) const override;
 
-    void setGridSizeU(float value);
-    void setGridSizeV(float value);
+    void setWidth(float value);
+    void setHeight(float value);
 
 protected:
     Texture2d(Image &image);
     Image image;
-    float gridSizeU;
-    float gridSizeV;
+    float width;  // in meters
+    float height; // in meters
 };
 

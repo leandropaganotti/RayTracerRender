@@ -82,15 +82,15 @@ bool Sphere::intersection(const Ray &ray, float tmax) const
 inline
 Vector3 Sphere::getNormal(const Vector3 &phit, size_t) const
 {
-    return (phit-center).normalize();
+    return (phit-center) / radius;
 }
 
 inline
 Vector2 Sphere::getUV(const Vector3 &phit, size_t) const
 {
-    Vector3 d = (phit-center).normalize();
-    float u = 0.5 + atan2f(d.x, d.z) / (2.0f * M_PI);
-    float v = 0.5 - asinf(d.y) / M_PI;
+    Vector3 n = (phit-center) / radius;
+    float u = 0.5 + atan2f(n.x, n.z) / (2.0f * M_PI);
+    float v = 0.5 - asinf(n.y) / M_PI;
     return {u, v};
 }
 

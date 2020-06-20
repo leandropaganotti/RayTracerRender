@@ -535,7 +535,7 @@ std::shared_ptr<Texture> XMLParser::parseTexture(xmlNode *xmlTextureNode)
     std::string name("");
     std::string type("");
     std::string src("");
-    float rows=1.0f, cols=1.0f, uedge=0.1f, vedge=0.1f, angle=0.0f;
+    float rows=1.0f, cols=1.0f, uedge=0.1f, vedge=0.1f, angle=0.0f, width=1.0f, height=1.0f;
     Vector3 color1=0, color2=1;
     for (attr = xmlTextureNode->properties; attr; attr = attr->next)
     {
@@ -549,6 +549,10 @@ std::shared_ptr<Texture> XMLParser::parseTexture(xmlNode *xmlTextureNode)
             rows = toFloat(attr->children->content);
         else if (equals(attr->name, "cols"))
             cols = toFloat(attr->children->content);
+        else if (equals(attr->name, "width"))
+            width = toFloat(attr->children->content);
+        else if (equals(attr->name, "height"))
+            height = toFloat(attr->children->content);
         else if (equals(attr->name, "uedge"))
             uedge = toFloat(attr->children->content);
         else if (equals(attr->name, "vedge"))
@@ -578,8 +582,8 @@ std::shared_ptr<Texture> XMLParser::parseTexture(xmlNode *xmlTextureNode)
         auto tex = Texture2d::Create(src, src);
         if(tex)
         {
-            tex->setGridSizeU(cols);
-            tex->setGridSizeV(rows);
+            tex->setWidth(width);
+            tex->setHeight(height);
         }
         return tex;
     }

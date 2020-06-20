@@ -82,7 +82,7 @@ std::shared_ptr<Texture2d> Texture2d::Create(const std::string &key, const std::
 {
     Image image;
 
-    if(image.read_ppm_bin(filepath.c_str()))
+    if(image.read(filepath.c_str()))
     {
         Texture2d *tex2d = new Texture2d(image);
         return Resource::Create(key, tex2d);
@@ -91,24 +91,44 @@ std::shared_ptr<Texture2d> Texture2d::Create(const std::string &key, const std::
 }
 
 const Vector3 Texture2d::get(const Vector2 &uv) const
-{   
-    float i = modulo(uv.v*gridSizeV) * (image.height()-1);
-    float j = modulo(uv.u*gridSizeU) * (image.width()-1);
-    return image.at(std::round(i), std::round(j));
+{
+    float u = uv.u / width;
+    float v = uv.v / height;
+
+    u -= int(u);
+    v -= int(v);
+
+    if(u<0.0f) u +=1.0f;
+    if(v<0.0f) v +=1.0f;
+
+    u *= image.width()-3;
+    v *= image.height()-3;
+
+    int iu = int(u);
+    int iv = int(v);
+
+    float tu = u-iu;
+    float tv = v-iv;
+
+    Vector3 c = image.at(iv, iu)*(1-tu)*(1-tv)+
+            image.at(iv, iu+1)*tu*(1-tv)+
+            image.at(iv+1, iu)*(1-tu)*tv+
+            image.at(iv+1, iu+1)*tu*tv;
+    return c;
 }
 
 Texture2d::Texture2d(Image &image)
 {
     this->image = std::move(image);
-    gridSizeU = gridSizeV = 1;
+    width = height = 1.0; // meters
 }
 
-void Texture2d::setGridSizeV(float value)
+void Texture2d::setHeight(float value)
 {
-    gridSizeV = value;
+    height = value;
 }
 
-void Texture2d::setGridSizeU(float value)
+void Texture2d::setWidth(float value)
 {
-    gridSizeU = value;
+    width = value;
 }
