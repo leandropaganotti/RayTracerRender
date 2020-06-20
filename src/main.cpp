@@ -6,7 +6,6 @@
 #include <sstream>
 #include "raytracer.h"
 #include "transformation.h"
-
 #include "resource.h"
 #include "material.h"
 
@@ -66,8 +65,7 @@ int main(int argc, char **argv)
         std::stringstream ss2;
         ss2 << output << "_" << std::setw(4) << std::setfill('0') << i;
         if (detailedName) { ss2 << "_SPP" << spp << "_T" << time_str; }
-        ss2 << ".ppm";
-        raytracer->getBuffer().save_ppm_bin(ss2.str().c_str());
+        raytracer->getBuffer().write_png(ss2.str().c_str());
 
         time_in_ms_avg += time_in_ms;
     }

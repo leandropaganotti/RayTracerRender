@@ -1,76 +1,75 @@
-#ifndef IMAGE_H
-#define IMAGE_H
+#pragma once
 
 #include "vector.h"
 #include "utils.h"
 
 class Image
-{   
-    size_t _width;
-    size_t _height;
-
-    Vector3 **buffer;
-
+{     
 public:
-    Image(size_t width=0, size_t height=0);
+    Image(int width=0, int height=0);
     ~Image();
 
-    Image(const Image &image) = delete;
-    Image(const Image &&image) = delete;
-
-    Image & operator=(Image &image) = delete;
+    Image(Image &&image);
     Image & operator=(Image &&image);
 
-    void resize(size_t width, size_t height);
-    void destroy();
+    Vector3 & at(int i, int j);
+    const Vector3 & at(int i, int j) const;
 
-    Vector3 & at(size_t i, size_t j);
-    const Vector3 & at(size_t i, size_t j) const;
-
-    void save_ppm(const char* filename) const;
-    void save_ppm_bin(const char * filename) const;
     bool read_ppm_bin(const char * filename);
+    bool read(const char * filename);
+    void write_jpg(const char* filename, float gamma=1/2.2f) const;
+    void write_hdr(const char* filename) const;
+    void write_png(const char* filename, float gamma=1/2.2f) const;
+    void write_ppm(const char* filename) const;
+    void write_ppm_bin(const char * filename) const;
 
-    void move(Image &image);
+    int   width() const;
+    void  width(const int value);
+    int   height() const;
+    void  height(const int value);
 
-    size_t  width() const;
-    void    width(const size_t value);
-    size_t  height() const;
-    void    height(const size_t value);
+    void resize(int width, int height);
 
     friend std::ostream& operator << (std::ostream& os, Image& img);
+
+protected:
+    int w;
+    int h;
+
+    Vector3 *buffer;
+    void destroy();
 };
 
 
 inline
-Vector3 &Image::at(size_t i, size_t j)
+Vector3 &Image::at(int i, int j)
 {
-    return buffer[i][j];
+    return buffer[i*w+j];
 }
 inline
-const Vector3 &Image::at(size_t i, size_t j) const
+const Vector3 &Image::at(int i, int j) const
 {
-    return buffer[i][j];
+    return buffer[i*w+j];
 }
 inline
-size_t Image::width() const
+int Image::width() const
 {
-    return _width;
+    return w;
 }
 inline
-void Image::width(const size_t value)
+void Image::width(const int value)
 {
-    _width = value;
+    w = value;
 }
 inline
-size_t Image::height() const
+int Image::height() const
 {
-    return _height;
+    return h;
 }
 inline
-void Image::height(const size_t value)
+void Image::height(const int value)
 {
-    _height = value;
+    h = value;
 }
 
 #endif // IMAGE_H

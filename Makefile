@@ -5,7 +5,7 @@ CXX = g++
 CXXFLAGS =  -std=c++14 -Wall -W -Winline
 VPATH = src/ src/shapes
 
-INCPATH = -I./src -I./src/shapes -I/usr/include/libxml2 -I./libxml/include/libxml2
+INCPATH = -I. -I./src -I./src/shapes -I/usr/include/libxml2 -I./libxml/include/libxml2
 LIBDIRS = -L/usr/lib/x86_64-linux-gnu -L./libxml/lib
 LIBS = -lxml2
 
