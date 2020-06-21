@@ -3,37 +3,44 @@
 #include "aabb.h"
 #include "material.h"
 
-Plane::Plane(const Vector3 &O, const Vector3 &N):
-    O(O), N(N)
+Plane::Plane(const Vector3 &origin, const Vector3 &normal):
+    origin(origin), w(normal)
 {
-
+    this->w.normalize();
+    const Vector3 n(0,1,0), m(1,0,0);
+    this->v = w%n; if(this->v.length()<0.01f)this->v = w%m;
+    this->u=normal%this->v;
 }
 
 Plane::~Plane(){}
 
-Vector3 Plane::getN() const
+Vector3 Plane::getNormal() const
 {
-    return N;
+    return w;
 }
 
-void Plane::setN(const Vector3 &value)
+void Plane::setNormal(const Vector3 &value)
 {
-    N = value;
+    w = value;
+    w.normalize();
+    const Vector3 n(0,1,0), m(1,0,0);
+    v = w%n; if(v.length()<0.01f)v = w%m;
+    u=w%v;
 }
 
-Vector3 Plane::getO() const
+Vector3 Plane::getOrigin() const
 {
-    return O;
+    return origin;
 }
 
-void Plane::setO(const Vector3 &value)
+void Plane::setOrigin(const Vector3 &value)
 {
-    O = value;
+    origin = value;
 }
 
 bool Plane::intersection(const Ray &ray, float tmax, IntersectionData& isec) const
 {
-    const float t = ((O-ray.origin) ^ N) / (ray.direction ^ N);
+    const float t = ((origin-ray.origin) ^ w) / (ray.direction ^ w);
 
     if( t < 0.0f || t > tmax) return false;
 
@@ -44,44 +51,39 @@ bool Plane::intersection(const Ray &ray, float tmax, IntersectionData& isec) con
 
 bool Plane::intersection(const Ray &ray, float tmax) const
 {
-    const float t = ((O-ray.origin) ^ N) / (ray.direction ^ N);
+    const float t = ((origin-ray.origin) ^ w) / (ray.direction ^ w);
     return ( t > 0.0f && t < tmax) ? true : false;
 }
 
 inline
 Vector3 Plane::getNormal(const Vector3 &, size_t) const
 {
-    return N;
+    return w;
 }
 
 inline
 Vector2 Plane::getUV(const Vector3 &phit, size_t) const
 {
-    const Vector3 n(0,1,0), m(1,0,0);
-    Vector3 u,v;
-    v = N%n; if(v.length()<0.01f)v = N%m;
-    u=N%v;
-
-    Vector2 uv(u^phit, v^phit);
-    return uv;
+    Vector3 p = phit - origin;
+    return Vector2(u^p, v^p);
 }
 
 AABB Plane::getAABB() const
 {
-    Vector3 v = Vector3(1,0,0) % N;
-    if(v.length() < 0.1) v = Vector3(0,1,0) % N;
+    Vector3 v = Vector3(1,0,0) % w;
+    if(v.length() < 0.1f) v = Vector3(0,1,0) % w;
 
     float t=1000.0;
-    Vector3 P0 = O - t * v.normalize();
-    Vector3 P1 = O + t * v.normalize();
+    Vector3 P0 = origin - t * v.normalize();
+    Vector3 P1 = origin + t * v.normalize();
     AABB aabb;
 
-    aabb.extend(P0+0.1*N);
-    aabb.extend(P1-0.1*N);
+    aabb.extend(P0+0.1*w);
+    aabb.extend(P1-0.1*w);
 
-    v = v % N;
-    P0 = O - t * v.normalize();
-    P1 = O + t * v.normalize();
+    v = v % w;
+    P0 = origin - t * v.normalize();
+    P1 = origin + t * v.normalize();
 
     aabb.extend(P0);
     aabb.extend(P1);
@@ -89,7 +91,7 @@ AABB Plane::getAABB() const
     return aabb;
 }
 
-GPlane::GPlane(const Vector3 &o, const Vector3 &n): Plane(o, n)
+GPlane::GPlane(const Vector3 &origin, const Vector3 &normal): Plane(origin, normal)
 {
     material = material::DiffuseWhite;
 }
@@ -99,7 +101,7 @@ GPlane::~GPlane() {}
 void GPlane::getIsecData(const Ray &ray, IntersectionData &isec) const
 {
     isec.phit = ray.origin + isec.tnear * ray.direction;
-    isec.normal = N;
+    isec.normal = w;
     isec.material = material.get();
     isec.color = material->Kd;
 

@@ -453,10 +453,10 @@ std::shared_ptr<GPlane> XMLParser::parsePlane(xmlNode *xmlPlaneNode)
     {
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
-        else if (equals(attr->name, "point"))
-            plane->setO(toVector3(attr->children->content));
+        else if (equals(attr->name, "origin"))
+            plane->setOrigin(toVector3(attr->children->content));
         else if (equals(attr->name, "normal"))
-            plane->setN(toVector3(attr->children->content));
+            plane->setNormal(toVector3(attr->children->content));
         else if (equals(attr->name, "material"))
             plane->setMaterial(Material::Get((const char*)attr->children->content));
         else

@@ -71,5 +71,3 @@ void Image::height(const int value)
 {
     h = value;
 }
-
-#endif // IMAGE_H
