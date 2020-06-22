@@ -101,7 +101,7 @@ struct Vector3
         return (*this - rhs).length();
     }
 
-    /** Math cector functions */
+    /** Math vector functions */
     float dot(const Vector3& v) const
     {
         return x*v.x + y*v.y + z*v.z;

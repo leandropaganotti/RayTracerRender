@@ -8,6 +8,7 @@ class AABB
 public:    
     AABB();
     AABB(const Vector3 &min, const Vector3 &max);
+    void reset(const std::vector<Vector3>& vertices);
     void extend(const std::vector<Vector3>& vertices);
     void extend(const Vector3 &v);
     void extend(const AABB &aabb);

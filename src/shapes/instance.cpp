@@ -95,5 +95,5 @@ void Instance::updateAABB()
     corners[5] = model * Vector3(max.x, min.y, max.z);
     corners[6] = model * Vector3(max.x, max.y, min.z);
     corners[7] = model * max;
-    aabb.extend(corners);
+    aabb.reset(corners);
 }
