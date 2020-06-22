@@ -83,9 +83,9 @@ std::ostream &operator <<(std::ostream &os, const Mesh &m)
 }
 
 inline
-Vector3 Mesh::getNormal(const Vector3 &phit, size_t idx) const
+void Mesh::getNormal(IntersectionData &isec) const
 {
-    return faces[idx]->getNormal(phit, idx);
+    faces[isec.idx]->getNormal(isec);
 }
 
 inline
@@ -211,7 +211,7 @@ std::ostream& operator <<(std::ostream &os, const MeshQuad &q)
     return os << q.v[0] << " " << q.v[1] << " " << q.v[2] << " " << q.v[3] << " - " << "  " << q.nf ;
 }
 
-Vector3 MeshQuad::getNormal(const Vector3 &, size_t) const { return Vector3(0);}
+void MeshQuad::getNormal(IntersectionData&) const { }
 
 /************************************************************************
  * TriangleMesh class
@@ -291,17 +291,15 @@ AABB MeshTriangle::getAABB() const
 }
 
 inline
-Vector3 MeshTriangle::getNormal(const Vector3 &phit, size_t) const
+void MeshTriangle::getNormal(IntersectionData& isec) const
 {
-    float _u = (((mesh->vertices[v[2]] - mesh->vertices[v[1]]) % (phit - mesh->vertices[v[1]])).length() / 2) / area;
-    float _v = (((mesh->vertices[v[0]] - mesh->vertices[v[2]]) % (phit - mesh->vertices[v[2]])).length() / 2) / area;
+    float _u = (((mesh->vertices[v[2]] - mesh->vertices[v[1]]) % (isec.phit - mesh->vertices[v[1]])).length() / 2) / area;
+    float _v = (((mesh->vertices[v[0]] - mesh->vertices[v[2]]) % (isec.phit - mesh->vertices[v[2]])).length() / 2) / area;
     float _w = 1 - _u - _v;
 
-    Vector3 N =  _u*mesh->normals[nv[0]] + _v*mesh->normals[nv[1]] + _w*mesh->normals[nv[2]];
+    isec.normal = _u*mesh->normals[nv[0]] + _v*mesh->normals[nv[1]] + _w*mesh->normals[nv[2]];
 
     //N = (mesh->normals[nv[0]] + mesh->normals[nv[1]] + mesh->normals[nv[2]]).normalize();
-
-    return N;
 }
 
 std::ostream& operator <<(std::ostream &os, const MeshTriangle &t)

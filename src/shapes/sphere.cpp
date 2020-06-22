@@ -80,9 +80,9 @@ bool Sphere::intersection(const Ray &ray, float tmax) const
 }
 
 inline
-Vector3 Sphere::getNormal(const Vector3 &phit, size_t) const
+void Sphere::getNormal(IntersectionData &isec) const
 {
-    return (phit-center) / radius;
+    isec.normal = (isec.phit-center) / radius;
 }
 
 inline

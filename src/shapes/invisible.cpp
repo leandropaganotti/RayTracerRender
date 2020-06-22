@@ -25,9 +25,8 @@ void InvisibleShape::getIsecData(const Ray &, IntersectionData &) const
 {
 }
 
-Vector3 InvisibleShape::getNormal(const Vector3 &, size_t ) const
+void InvisibleShape::getNormal(IntersectionData&) const
 {
-    return Vector3(0);
 }
 
 Vector2 InvisibleShape::getUV(const Vector3 &, size_t ) const

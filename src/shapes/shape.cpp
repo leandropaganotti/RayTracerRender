@@ -5,7 +5,7 @@
 void Shape::getIsecData(const Ray &ray, IntersectionData &isec) const
 {
     isec.phit = ray.origin + isec.tnear * ray.direction;
-    isec.normal = getNormal(isec.phit, isec.idx);
+    getNormal(isec);
     isec.material = getMaterial(isec.idx);
     isec.uv = getUV(isec.phit, isec.idx);
 }

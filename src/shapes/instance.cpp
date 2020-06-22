@@ -49,9 +49,15 @@ bool Instance::intersection(const Ray &ray, float tmax) const
     return false;
 }
 
-Vector3 Instance::getNormal(const Vector3 &phit, size_t idx) const
+inline
+void Instance::getNormal(IntersectionData &isec) const
 {
-    return (inverseTranspose * shape->getNormal(inverse * phit, idx)).normalize();
+
+    std::swap(isec.phit, isec.phit_local);
+    shape->getNormal(isec);
+    isec.normal = (inverseTranspose * isec.normal).normalize();
+    std::swap(isec.phit, isec.phit_local);
+
 }
 
 Vector2 Instance::getUV(const Vector3 &phit, size_t idx) const
@@ -61,7 +67,7 @@ Vector2 Instance::getUV(const Vector3 &phit, size_t idx) const
 
 void Instance::getIsecData(const Ray &, IntersectionData &isec) const
 {
-    isec.normal = (inverseTranspose * shape->getNormal(isec.phit_local, isec.idx)).normalize();
+    getNormal(isec);
 }
 
 AABB Instance::getAABB() const

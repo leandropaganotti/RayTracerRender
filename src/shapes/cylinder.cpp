@@ -139,19 +139,19 @@ bool UnitYCylinder::intersection(const Ray &ray, float tmax) const
 }
 
 inline
-Vector3 UnitYCylinder::getNormal(const Vector3 &phit, size_t idx) const
+void UnitYCylinder::getNormal(IntersectionData &isec) const
 {    
-    if(idx==0)
+    if(isec.idx==0)
     {
-        return vector::DOWN;
+        isec.normal = vector::DOWN;
     }
-    else if(idx==1)
+    else if(isec.idx==1)
     {
-        return Vector3(phit.x, 0.0f, phit.z).normalize();
+        isec.normal = Vector3(isec.phit.x, 0.0f, isec.phit.z).normalize();
     }
     else
     {
-        return vector::UP;
+        isec.normal = vector::UP;
     }
 }
 

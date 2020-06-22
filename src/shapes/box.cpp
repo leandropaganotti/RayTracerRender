@@ -90,14 +90,14 @@ bool AABox::intersection(const Ray &ray, float tmax) const
 }
 
 inline
-Vector3 AABox::getNormal(const Vector3 &, size_t idx) const
+void AABox::getNormal(IntersectionData &isec) const
 {
-    if (idx == 0)      return Vector3(-1,0,0);
-    else if (idx == 1) return Vector3(1,0,0);
-    else if (idx == 2) return Vector3(0,-1,0);
-    else if (idx == 3) return Vector3(0,1,0);
-    else if (idx == 4) return Vector3(0,0,-1);
-    else               return Vector3(0,0,1);
+    if (isec.idx == 0)      isec.normal = vector::LEFT;
+    else if (isec.idx == 1) isec.normal = vector::RIGHT;
+    else if (isec.idx == 2) isec.normal = vector::DOWN;
+    else if (isec.idx == 3) isec.normal = vector::UP;
+    else if (isec.idx == 4) isec.normal = vector::FRONT;
+    else                    isec.normal = vector::BACK;
 }
 
 inline

@@ -11,7 +11,7 @@ public:
 
     bool intersection(const Ray& ray, float tmax, IntersectionData& isec) const override;
     bool intersection(const Ray& ray, float tmax) const override;
-    Vector3 getNormal(const Vector3 &, size_t) const override;
+    void getNormal(IntersectionData& isec) const override;
     Vector2 getUV(const Vector3& phit, size_t) const override;
     AABB getAABB() const override;
 

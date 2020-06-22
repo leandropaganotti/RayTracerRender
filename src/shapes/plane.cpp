@@ -56,9 +56,9 @@ bool Plane::intersection(const Ray &ray, float tmax) const
 }
 
 inline
-Vector3 Plane::getNormal(const Vector3 &, size_t) const
+void Plane::getNormal(IntersectionData &isec) const
 {
-    return w;
+    isec.normal = w;
 }
 
 inline
