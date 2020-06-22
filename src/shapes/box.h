@@ -19,14 +19,12 @@ public:
 
 public:
     Vector3 getMin() const;
-    void setMin(const Vector3 &value);
+    void    setMin(const Vector3 &value);
 
     Vector3 getMax() const;
-    void setMax(const Vector3 &value);
+    void    setMax(const Vector3 &value);
 
 protected:
-    Vector3 min;
-    Vector3 max;
     Vector3 data[2]; // 0 -> min,  1 -> max
 };
 
