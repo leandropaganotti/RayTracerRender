@@ -47,26 +47,26 @@ AABB BVH::getAABB() const
     return aabb;
 }
 
-bool BVH::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
+bool BVH::intersection(const Ray &ray, IntersectionData &isec) const
 {
-    if(!aabb.intersection(ray, tmax)) return false;
+    if(!aabb.intersection(ray)) return false;
 
-    bool hit_left = left->intersection(ray, tmax, isec);
+    bool hit_left = left->intersection(ray, isec);
     if ( hit_left )
     {
-        tmax = isec.tnear;
+        ray.tmax = isec.tnear;
     }
 
-    bool hit_right = right->intersection(ray, tmax, isec);
+    bool hit_right = right->intersection(ray, isec);
     return hit_left || hit_right;
 }
 
-bool BVH::intersection(const Ray &ray, float tmax) const
+bool BVH::intersection(const Ray &ray) const
 {
-    if(!aabb.intersection(ray, tmax)) return false;
+    if(!aabb.intersection(ray)) return false;
 
-    if ( left->intersection(ray, tmax) ) return true;
-    return right->intersection(ray, tmax);
+    if ( left->intersection(ray) ) return true;
+    return right->intersection(ray);
 }
 
 size_t BVH::qsplit(std::vector<std::shared_ptr<IntersectionIF> > &shapes, size_t l, size_t r, float pivot, size_t axis)

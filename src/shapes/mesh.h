@@ -24,10 +24,10 @@ public:
     friend std::ostream& operator << (std::ostream& os, const Mesh &m);
 
     // Shape interface
-    bool  intersection(const Ray& ray, float tmax, IntersectionData& isec) const override;
-    bool  intersection(const Ray& ray, float tmax) const override;
+    bool  intersection(const Ray& ray, IntersectionData& isec) const override;
+    bool  intersection(const Ray& ray) const override;
     void getNormal(IntersectionData& isec) const override;
-    Vector2 getUV(const Vector3 &, size_t) const override;
+    void getUV(IntersectionData &isec) const override;
     AABB getAABB() const override;
 
 protected:
@@ -45,8 +45,6 @@ class GMesh: public Instance
 {
 public:
     GMesh(std::shared_ptr<Mesh> mesh);
-
-    void getIsecData(const Ray &ray, IntersectionData &isec) const override;
 
     void setMaterial(const std::shared_ptr<Material> &value);
 
@@ -71,8 +69,8 @@ public:
     MeshQuad(const Mesh *m, size_t v0, size_t v1, size_t v2, size_t v3, size_t nv0, size_t nv1, size_t nv2, size_t nv3);
 
     // Shape interface
-    bool  intersection(const Ray& ray, float tmax, IntersectionData& isec) const override;
-    bool  intersection(const Ray& ray, float tmax) const override;
+    bool  intersection(const Ray& ray, IntersectionData& isec) const override;
+    bool  intersection(const Ray& ray) const override;
 
     AABB getAABB() const override;
     void getNormal(IntersectionData& isec) const override;
@@ -95,8 +93,8 @@ public:
     MeshTriangle(const Mesh *m, size_t v0, size_t v1, size_t v2, size_t nv0, size_t nv1, size_t nv2 );
 
     // Shape interface
-    bool  intersection(const Ray& ray, float tmax, IntersectionData& isec) const override;
-    bool  intersection(const Ray& ray, float tmax) const override;
+    bool  intersection(const Ray& ray, IntersectionData& isec) const override;
+    bool  intersection(const Ray& ray) const override;
 
     AABB getAABB() const override;
     void getNormal(IntersectionData& isec) const override;

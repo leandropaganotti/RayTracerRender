@@ -9,10 +9,10 @@ public:
     Plane(const Vector3& origin={0.0f}, const Vector3& normal={0.0f, 1.0f, 0.0f});
     virtual ~Plane();
 
-    bool intersection(const Ray& ray, float tmax, IntersectionData& isec) const override;
-    bool intersection(const Ray& ray, float tmax) const override;
+    bool intersection(const Ray& ray, IntersectionData& isec) const override;
+    bool intersection(const Ray& ray) const override;
     void getNormal(IntersectionData& isec) const override;
-    Vector2 getUV(const Vector3& phit, size_t) const override;
+    void getUV(IntersectionData& isec) const override;
     AABB getAABB() const override;
 
     Vector3 getOrigin() const;

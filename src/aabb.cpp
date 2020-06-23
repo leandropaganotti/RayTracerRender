@@ -74,10 +74,10 @@ void AABB::extend(const AABB &aabb)
     extend(aabb.getMax());
 }
 
-bool AABB::intersection(const Ray &ray, float tmax) const
+bool AABB::intersection(const Ray &ray) const
 {
     float imin = 0;
-    float imax = tmax;
+    float imax = ray.tmax;
 
     int posneg = ray.posneg[0];
     float t0 = (data[posneg].x - ray.origin.x) * ray.invdir.x;

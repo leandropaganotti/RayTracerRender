@@ -25,7 +25,7 @@ public:
 protected:
     Vector3 rayDirection(float i, float j) const;
     bool    castRay(const Ray &ray, IntersectionData &isec);
-    float   castShadowRay(const Ray &ray, float tmax);
+    float   castShadowRay(const Ray &ray);
 
     Vector3 specularReflection(const Ray &ray, const uint8_t depth, const IntersectionData &isec);
     Vector3 transparentMaterial(const Ray &ray, const uint8_t depth, const IntersectionData &isec, float E);

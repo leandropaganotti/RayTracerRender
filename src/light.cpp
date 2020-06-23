@@ -86,10 +86,10 @@ float PointLight::visibility(const Ray &ray, const std::vector<std::shared_ptr<S
 {
     float vis = 1.0f;
     IntersectionData isec;
-    float tmax = (ray.origin - position).length();
+    ray.tmax = (ray.origin - position).length();
     for(auto &object : objects)
     {
-        if (object->intersection(ray, tmax, isec))
+        if (object->intersection(ray, isec))
         {
             if (object->getMaterial(isec.idx)->type == MaterialType::TRANSPARENT)
                 vis *= 0.8f;
@@ -148,7 +148,7 @@ float DistantLight::visibility(const Ray &ray, const std::vector<std::shared_ptr
     IntersectionData isec;
     for(auto &object : objects)
     {
-        if (object->intersection(ray, INFINITY, isec))
+        if (object->intersection(ray, isec))
         {
             if (object->getMaterial(isec.idx)->type == MaterialType::TRANSPARENT)
                 vis *= 0.8f;
@@ -179,10 +179,10 @@ float SphericalLight::visibility(const Ray &ray, const std::vector<std::shared_p
 {
     float vis = 1.0f;
     IntersectionData isec;
-    float tmax = (ray.origin - center).length() - radius;
+    ray.tmax = (ray.origin - center).length() - radius;
     for(auto &object : objects)
     {
-        if (object->intersection(ray, tmax, isec))
+        if (object->intersection(ray, isec))
         {
             if (object->getMaterial(isec.idx)->type == MaterialType::TRANSPARENT)
                 vis *= 0.8f;

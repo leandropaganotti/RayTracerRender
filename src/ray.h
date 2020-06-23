@@ -6,11 +6,13 @@
 class Ray
 {
 public:
-    Ray() = default;
-    Ray(const Vector3& origin, const Vector3& direction): origin(origin), direction(direction){}
+    Ray(){tmax=INFINITY;};
+    Ray(const Vector3& o, const Vector3& d): origin(o), direction(d), tmax(INFINITY){}
+    Ray(const Vector3& o, const Vector3& d, float tmax): origin(o), direction(d), tmax(tmax){}
 
     Vector3 origin;
     Vector3 direction;
+    mutable float tmax;
 
     Vector3 invdir;
     int posneg[3];

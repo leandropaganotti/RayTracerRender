@@ -18,7 +18,7 @@ void AABox::setMax(const Vector3 &value)
     data[1] = value;
 }
 
-bool AABox::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
+bool AABox::intersection(const Ray &ray, IntersectionData &isec) const
 {
     Ray r = ray;
     r.invdir = 1.0f / ray.direction;
@@ -27,7 +27,7 @@ bool AABox::intersection(const Ray &ray, float tmax, IntersectionData &isec) con
     r.posneg[2] = r.direction[2] > 0 ? 0 : 1;
 
     float imin = -INFINITY  ;
-    float imax = tmax;
+    float imax = ray.tmax;
     int idxmin=0, idxmax=0;
 
     int posneg = r.posneg[0];
@@ -65,7 +65,7 @@ bool AABox::intersection(const Ray &ray, float tmax, IntersectionData &isec) con
     return  false;
 }
 
-bool AABox::intersection(const Ray &ray, float tmax) const
+bool AABox::intersection(const Ray &ray) const
 {
     Vector3 invdir = 1.0f / ray.direction;
 
@@ -84,7 +84,7 @@ bool AABox::intersection(const Ray &ray, float tmax) const
     float tval;
     if(tmin_ < 0) { tval = tmax_; } else { tval = tmin_; }
 
-    if (tval > tmax) return false;
+    if (tval > ray.tmax) return false;
 
     return true;
 }
@@ -101,28 +101,16 @@ void AABox::getNormal(IntersectionData &isec) const
 }
 
 inline
-Vector2 AABox::getUV(const Vector3 &phit, size_t idx) const
+void AABox::getUV(IntersectionData &isec) const
 {
-    Vector3 p = phit + 0.5f;
+    Vector3 p = isec.phit + 0.5f;
 
-    if (idx == 0)      return Vector2(p.z, 1.0f-p.y);
-    else if (idx == 1) return Vector2(1.0f-p.z, 1.0f-p.y);
-    else if (idx == 2) return Vector2(p.x, 1.0f-p.z);
-    else if (idx == 3) return Vector2(p.x, p.z);
-    else if (idx == 4) return Vector2(1.0f-p.x, 1.0f-p.y);
-    else               return Vector2(p.x, 1.0f-p.y);
-
-
-    if (idx == 0 || idx == 1)
-    {
-        return {p.z, p.y};
-    } else if (idx == 2 || idx == 3)
-    {
-        return {p.x, p.z};
-    } else
-    {
-        return {p.x, p.y};
-    }
+    if (isec.idx == 0)      isec.uv = Vector2(p.z, 1.0f-p.y);
+    else if (isec.idx == 1) isec.uv = Vector2(1.0f-p.z, 1.0f-p.y);
+    else if (isec.idx == 2) isec.uv = Vector2(p.x, 1.0f-p.z);
+    else if (isec.idx == 3) isec.uv = Vector2(p.x, p.z);
+    else if (isec.idx == 4) isec.uv = Vector2(1.0f-p.x, 1.0f-p.y);
+    else                    isec.uv = Vector2(p.x, 1.0f-p.y);
 }
 
 Vector3 AABox::getMin() const
@@ -143,18 +131,6 @@ AABB AABox::getAABB() const
 GBox::GBox(): Instance(unitBox)
 {
     material = material::DiffuseWhite;
-}
-
-void GBox::getIsecData(const Ray &ray, IntersectionData &isec) const
-{
-    Instance::getIsecData(ray, isec);
-    isec.material = material.get();
-    isec.color = material->Kd;
-    if(material->texture)
-    {
-        isec.uv = static_cast<AABox*>(shape.get())->getUV(isec.phit_local, isec.idx);
-        isec.color = isec.color * material->texture->get(isec.uv);
-    }
 }
 
 void GBox::setMaterial(const std::shared_ptr<Material> &value)

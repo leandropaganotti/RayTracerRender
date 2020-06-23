@@ -1,6 +1,7 @@
 #include "instance.h"
 #include "invisible.h"
 #include "float.h"
+#include "material.h"
 
 Instance::Instance(std::shared_ptr<Shape> shape)
 {
@@ -10,16 +11,16 @@ Instance::Instance(std::shared_ptr<Shape> shape)
 
 Instance::~Instance() {}
 
-bool Instance::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
+bool Instance::intersection(const Ray &ray, IntersectionData &isec) const
 {
     Ray ray_local = inverse * ray;
     IntersectionData isec_local;
-    if (shape->intersection(ray_local, FLT_MAX, isec_local))
+    if (shape->intersection(ray_local, isec_local))
     {
         Vector3 phit_local = ray_local.origin + isec_local.tnear * ray_local.direction;
         Vector3 phit = model * phit_local;
         float tnear = (phit - ray.origin).length();
-        if(tnear < tmax)
+        if(tnear < ray.tmax)
         {
             isec.idx = isec_local.idx;
             isec.tnear = tnear;
@@ -32,16 +33,16 @@ bool Instance::intersection(const Ray &ray, float tmax, IntersectionData &isec) 
     return false;
 }
 
-bool Instance::intersection(const Ray &ray, float tmax) const
+bool Instance::intersection(const Ray &ray) const
 {
     Ray ray_local = inverse * ray;
     IntersectionData isec_local;
-    if (shape->intersection(ray_local, FLT_MAX, isec_local))
+    if (shape->intersection(ray_local, isec_local))
     {
         Vector3 phit_local = ray_local.origin + isec_local.tnear * ray_local.direction;
         Vector3 phit = model * phit_local;
         float tnear = (phit - ray.origin).length();
-        if(tnear < tmax)
+        if(tnear < ray.tmax)
         {
             return true;
         }
@@ -52,22 +53,31 @@ bool Instance::intersection(const Ray &ray, float tmax) const
 inline
 void Instance::getNormal(IntersectionData &isec) const
 {
-
     std::swap(isec.phit, isec.phit_local);
     shape->getNormal(isec);
     isec.normal = (inverseTranspose * isec.normal).normalize();
     std::swap(isec.phit, isec.phit_local);
-
 }
 
-Vector2 Instance::getUV(const Vector3 &phit, size_t idx) const
+void Instance::getUV(IntersectionData &isec) const
 {
-    return shape->getUV(inverse * phit, idx);
+    std::swap(isec.phit, isec.phit_local);
+    shape->getUV(isec);
+    std::swap(isec.phit, isec.phit_local);
 }
 
 void Instance::getIsecData(const Ray &, IntersectionData &isec) const
 {
-    getNormal(isec);
+    std::swap(isec.phit, isec.phit_local);
+    shape->getNormal(isec);
+    isec.normal = (inverseTranspose * isec.normal).normalize();
+    isec.material = getMaterial(isec.idx);
+    isec.color = isec.material->Kd;
+    if(isec.material->texture){
+        shape->getUV(isec);
+        isec.color = isec.color * isec.material->texture->get(isec.uv);
+    }
+    std::swap(isec.phit, isec.phit_local);
 }
 
 AABB Instance::getAABB() const
@@ -75,6 +85,7 @@ AABB Instance::getAABB() const
     return aabb;
 }
 
+inline
 const Material *Instance::getMaterial(size_t idx) const
 {
     return shape->getMaterial(idx);

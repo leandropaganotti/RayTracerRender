@@ -34,7 +34,7 @@ void Sphere::setRadius(float value)
 }
 
 inline
-bool Sphere::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
+bool Sphere::intersection(const Ray &ray, IntersectionData &isec) const
 {
     float t0, t1;
 
@@ -51,7 +51,7 @@ bool Sphere::intersection(const Ray &ray, float tmax, IntersectionData &isec) co
         t0 = t1;
         if (t0 < 0) return false;
     }
-    if(t0 > tmax) return false;
+    if(t0 > ray.tmax) return false;
 
     isec.tnear = t0;
     isec.shape = this;
@@ -59,7 +59,7 @@ bool Sphere::intersection(const Ray &ray, float tmax, IntersectionData &isec) co
 }
 
 inline
-bool Sphere::intersection(const Ray &ray, float tmax) const
+bool Sphere::intersection(const Ray &ray) const
 {
     float t0, t1;
 
@@ -76,7 +76,7 @@ bool Sphere::intersection(const Ray &ray, float tmax) const
         t0 = t1;
         if (t0 < 0) return false;
     }
-    return t0 < tmax ? true : false;
+    return t0 < ray.tmax ? true : false;
 }
 
 inline
@@ -86,12 +86,11 @@ void Sphere::getNormal(IntersectionData &isec) const
 }
 
 inline
-Vector2 Sphere::getUV(const Vector3 &phit, size_t) const
+void Sphere::getUV(IntersectionData &isec) const
 {
-    Vector3 n = (phit-center) / radius;
-    float u = 0.5 + atan2f(n.x, n.z) / (2.0f * M_PI);
-    float v = 0.5 - asinf(n.y) / M_PI;
-    return {u, v};
+    Vector3 n = (isec.phit-center) / radius;
+    isec.uv.u = 0.5 + atan2f(n.x, n.z) / (2.0f * M_PI);
+    isec.uv.v = 0.5 - asinf(n.y) / M_PI;
 }
 
 AABB Sphere::getAABB() const
@@ -107,12 +106,12 @@ GSphere::GSphere(const Vector3 &c, const float &r): Sphere(c, r)
 void GSphere::getIsecData(const Ray &ray, IntersectionData &isec) const
 {
     isec.phit = ray.origin + isec.tnear * ray.direction;
-    isec.normal = (isec.phit - center).normalize();
+    isec.normal = (isec.phit - center) / radius;
     isec.material = material.get();
     isec.color = material->Kd;
     if(material->texture)
     {
-        isec.uv = Sphere::getUV(isec.phit, 0);
+        Sphere::getUV(isec);
         isec.color = isec.color * material->texture->get(isec.uv);
     }
 }
@@ -140,18 +139,6 @@ void GEllipsoid::setMaterial(const std::shared_ptr<Material> &value)
 const Material *GEllipsoid::getMaterial(size_t) const
 {
     return material.get();
-}
-
-void GEllipsoid::getIsecData(const Ray &ray, IntersectionData &isec) const
-{
-    Instance::getIsecData(ray, isec);
-    isec.material = material.get();
-    isec.color = material->Kd;
-    if(material->texture)
-    {
-        isec.uv = static_cast<Sphere*>(shape.get())->getUV(isec.phit_local, 0);
-        isec.color = isec.color * material->texture->get(isec.uv);
-    }
 }
 
 void Sphere::sampleSolidAngleSphere(const Vector3 &point, Vector3 &sample, float &_1_pdf) const{

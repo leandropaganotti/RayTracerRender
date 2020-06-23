@@ -9,10 +9,10 @@ public:
     Sphere(const Vector3 &center={0.0f}, const float &radius=1.0f);
     virtual ~Sphere();
 
-    bool  intersection(const Ray &ray, float tmax, IntersectionData &isec) const override;
-    bool  intersection(const Ray& ray, float tmax) const override;
+    bool  intersection(const Ray &ray, IntersectionData &isec) const override;
+    bool  intersection(const Ray& ray) const override;
     void getNormal(IntersectionData& isec) const override;
-    Vector2 getUV(const Vector3 &phit, size_t idx) const override;
+    void getUV(IntersectionData &isec) const override;
     AABB getAABB() const override;
 
     Vector3  getCenter() const;
@@ -47,8 +47,6 @@ class GEllipsoid: public Instance
 {
 public:
     GEllipsoid();
-
-    void getIsecData(const Ray &ray, IntersectionData &isec) const override;
 
     void setMaterial(const std::shared_ptr<Material> &value);
 

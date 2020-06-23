@@ -97,13 +97,12 @@ Vector3 RayTracer::rayDirection(float i, float j) const
 
 bool RayTracer::castRay(const Ray &ray, IntersectionData &isec)
 {
-    float tmax = FLT_MAX;
     isec.shape = nullptr;
     for(auto &object : scene->objects)
     {
-        if (object->intersection(ray, tmax, isec))
+        if (object->intersection(ray, isec))
         {
-            tmax = isec.tnear;
+            ray.tmax = isec.tnear;
         }
     }
 
@@ -115,13 +114,13 @@ bool RayTracer::castRay(const Ray &ray, IntersectionData &isec)
 }
 
 
-float RayTracer::castShadowRay(const Ray &ray, float tmax)
+float RayTracer::castShadowRay(const Ray &ray)
 {
     float vis = 1.0f;
     IntersectionData isec;
     for(auto &object : scene->objects)
     {
-        if (object->intersection(ray, tmax, isec))
+        if (object->intersection(ray, isec))
         {
             if (object->getMaterial(isec.idx)->type == MaterialType::TRANSPARENT)
                 vis *= 0.8f;

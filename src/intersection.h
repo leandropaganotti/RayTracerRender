@@ -24,8 +24,8 @@ struct IntersectionData
 class IntersectionIF
 {
 public:
-    virtual bool intersection(const Ray &ray, float tmax, IntersectionData &isec) const = 0;
-    virtual bool intersection(const Ray &ray, float tmax) const = 0;
+    virtual bool intersection(const Ray &ray, IntersectionData &isec) const = 0;
+    virtual bool intersection(const Ray &ray) const = 0;
     virtual AABB getAABB() const = 0;
     virtual ~IntersectionIF(){};
 };

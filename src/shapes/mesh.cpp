@@ -44,24 +44,24 @@ void Mesh::buildBoundingVolume()
     bvh = BVH::Create(faces);
 }
 
-bool Mesh::intersection(const Ray& ray, float tmax, IntersectionData &isec) const
+bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
 {
     Ray r = ray;
     r.invdir = 1.0f / ray.direction;
     r.posneg[0] = r.direction[0] > 0 ? 0 : 1;
     r.posneg[1] = r.direction[1] > 0 ? 0 : 1;
     r.posneg[2] = r.direction[2] > 0 ? 0 : 1;
-    return bvh->intersection(r, tmax, isec);
+    return bvh->intersection(r, isec);
 }
 
-bool Mesh::intersection(const Ray& ray, float tmax) const
+bool Mesh::intersection(const Ray& ray) const
 {
     Ray r = ray;
     r.invdir = 1.0f / ray.direction;
     r.posneg[0] = r.direction[0] > 0 ? 0 : 1;
     r.posneg[1] = r.direction[1] > 0 ? 0 : 1;
     r.posneg[2] = r.direction[2] > 0 ? 0 : 1;
-    return bvh->intersection(r, tmax);
+    return bvh->intersection(r);
 }
 
 std::ostream &operator <<(std::ostream &os, const Mesh &m)
@@ -89,9 +89,9 @@ void Mesh::getNormal(IntersectionData &isec) const
 }
 
 inline
-Vector2 Mesh::getUV(const Vector3 &phit, size_t idx) const
+void Mesh::getUV(IntersectionData &isec) const
 {
-    return faces[idx]->getUV(phit, idx);
+    faces[isec.idx]->getUV(isec);
 }
 
 AABB Mesh::getAABB() const
@@ -111,13 +111,6 @@ Mesh::Mesh()
 GMesh::GMesh(std::shared_ptr<Mesh> mesh): Instance(mesh)
 {
     material = material::DiffuseWhite;
-}
-
-void GMesh::getIsecData(const Ray &ray, IntersectionData &isec) const
-{
-    Instance::getIsecData(ray, isec);
-    isec.material = material.get();
-    isec.color = material->Kd;
 }
 
 void GMesh::setMaterial(const std::shared_ptr<Material> &value)
@@ -153,11 +146,11 @@ MeshQuad::MeshQuad(const Mesh *m, size_t v0, size_t v1, size_t v2, size_t v3, si
 
 }
 
-bool MeshQuad::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
+bool MeshQuad::intersection(const Ray &ray, IntersectionData &isec) const
 {
     float t = ((mesh->vertices[v[0]]-ray.origin) ^ nf) / (ray.direction ^ nf);
 
-    if( t < 0.0f || t > tmax) return false;
+    if( t < 0.0f || t > ray.tmax) return false;
 
     Vector3 phit = ray.origin + t * ray.direction;
 
@@ -178,11 +171,11 @@ bool MeshQuad::intersection(const Ray &ray, float tmax, IntersectionData &isec) 
     return true;
 }
 
-bool MeshQuad::intersection(const Ray &ray, float tmax) const
+bool MeshQuad::intersection(const Ray &ray) const
 {
     float t = ((mesh->vertices[v[0]]-ray.origin) ^ nf) / (ray.direction ^ nf);
 
-    if( t < 0.0f || t > tmax) return false;
+    if( t < 0.0f || t > ray.tmax) return false;
 
     Vector3 phit = ray.origin + t * ray.direction;
 
@@ -232,7 +225,7 @@ MeshTriangle::MeshTriangle(const Mesh *m, size_t v0, size_t v1, size_t v2, size_
     aabb.extend({mesh->vertices[v0], mesh->vertices[v1], mesh->vertices[v2]});
 }
 
-bool MeshTriangle::intersection(const Ray &ray, float tmax, IntersectionData &isec) const
+bool MeshTriangle::intersection(const Ray &ray, IntersectionData &isec) const
 {
     float A = mesh->vertices[v[0]].x - mesh->vertices[v[1]].x;
     float B = mesh->vertices[v[0]].y - mesh->vertices[v[1]].y;
@@ -271,7 +264,7 @@ bool MeshTriangle::intersection(const Ray &ray, float tmax, IntersectionData &is
 
     float tval = -(F*AKJB + E*JCAL + D*BLKC  ) / denon;
 
-    if(tval < 0.0f || tval > tmax) return false;
+    if(tval < 0.0f || tval > ray.tmax) return false;
 
     isec.tnear = tval;
     isec.idx = idx;
@@ -279,10 +272,10 @@ bool MeshTriangle::intersection(const Ray &ray, float tmax, IntersectionData &is
     return true;
 }
 
-bool MeshTriangle::intersection(const Ray &ray, float tmax) const
+bool MeshTriangle::intersection(const Ray &ray) const
 {
     IntersectionData isec;
-    return intersection(ray, tmax, isec);
+    return intersection(ray, isec);
 }
 
 AABB MeshTriangle::getAABB() const

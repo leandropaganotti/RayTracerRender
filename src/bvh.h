@@ -10,8 +10,8 @@ class BVH: public IntersectionIF
 public:
     ~BVH();
     static std::shared_ptr<IntersectionIF> Create(const std::vector<std::shared_ptr<Shape>> &shapes);
-    bool intersection(const Ray &ray, float tmax, IntersectionData &isec) const override;
-    bool intersection(const Ray &ray, float tmax) const override;
+    bool intersection(const Ray &ray, IntersectionData &isec) const override;
+    bool intersection(const Ray &ray) const override;
 
     AABB getAABB() const override;
 

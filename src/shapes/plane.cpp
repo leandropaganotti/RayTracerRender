@@ -38,21 +38,21 @@ void Plane::setOrigin(const Vector3 &value)
     origin = value;
 }
 
-bool Plane::intersection(const Ray &ray, float tmax, IntersectionData& isec) const
+bool Plane::intersection(const Ray &ray, IntersectionData& isec) const
 {
     const float t = ((origin-ray.origin) ^ w) / (ray.direction ^ w);
 
-    if( t < 0.0f || t > tmax) return false;
+    if( t < 0.0f || t > ray.tmax) return false;
 
     isec.tnear = t;
     isec.shape = this;
     return true;
 }
 
-bool Plane::intersection(const Ray &ray, float tmax) const
+bool Plane::intersection(const Ray &ray) const
 {
     const float t = ((origin-ray.origin) ^ w) / (ray.direction ^ w);
-    return ( t > 0.0f && t < tmax) ? true : false;
+    return ( t > 0.0f && t < ray.tmax) ? true : false;
 }
 
 inline
@@ -62,10 +62,10 @@ void Plane::getNormal(IntersectionData &isec) const
 }
 
 inline
-Vector2 Plane::getUV(const Vector3 &phit, size_t) const
+void Plane::getUV(IntersectionData &isec) const
 {
-    Vector3 p = phit - origin;
-    return Vector2(u^p, v^p);
+    Vector3 p = isec.phit - origin;
+    isec.uv = Vector2(u^p, v^p);
 }
 
 AABB Plane::getAABB() const
@@ -107,7 +107,7 @@ void GPlane::getIsecData(const Ray &ray, IntersectionData &isec) const
 
     if(material->texture)
     {
-        isec.uv = Plane::getUV(isec.phit, 0);
+        getUV(isec);
         isec.color = material->texture->get(isec.uv) * material->Kd;
     }
 }

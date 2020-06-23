@@ -12,7 +12,7 @@ public:
     void extend(const std::vector<Vector3>& vertices);
     void extend(const Vector3 &v);
     void extend(const AABB &aabb);
-    bool intersection(const Ray &ray, float tmax) const;
+    bool intersection(const Ray &ray) const;
 
     Vector3 getCenter();
 

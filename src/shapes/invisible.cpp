@@ -13,11 +13,11 @@ std::shared_ptr<InvisibleShape> InvisibleShape::GetInstance()
    return instance;
 }
 
-bool InvisibleShape::intersection(const Ray &, float, IntersectionData &) const
+bool InvisibleShape::intersection(const Ray &, IntersectionData &) const
 {
     return false;
 }
-bool InvisibleShape::intersection(const Ray &, float) const
+bool InvisibleShape::intersection(const Ray &) const
 {
     return false;
 }
@@ -29,9 +29,8 @@ void InvisibleShape::getNormal(IntersectionData&) const
 {
 }
 
-Vector2 InvisibleShape::getUV(const Vector3 &, size_t ) const
+void InvisibleShape::getUV(IntersectionData &) const
 {
-    return Vector2(0);
 }
 
 AABB InvisibleShape::getAABB() const
