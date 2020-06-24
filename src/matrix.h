@@ -3,6 +3,7 @@
 #include <iostream>
 #include "vector.h"
 #include "ray.h"
+#include "aabb.h"
 
 class Matrix4
 {
@@ -20,6 +21,8 @@ public:
     Matrix4 operator * (const Matrix4& M)   const;
     Vector3 operator * (const Vector3& P)   const;
     Ray     operator * (const Ray& ray)     const;
+    AABB    operator * (const AABB& aabb)   const;
+
 
     Vector3 multiplyVector(const Vector3& V) const;
 
@@ -85,7 +88,25 @@ Ray Matrix4::operator *(const Ray &ray) const
     Ray R;
     R.origin = (*this) * ray.origin;
     R.direction = multiplyVector(ray.direction);
+    R.tmax = ray.tmax;
     return R;
+}
+
+inline
+AABB Matrix4::operator * (const AABB& aabb) const
+{
+    std::vector<Vector3> corners(8);
+    Vector3 min = aabb.getMin(), max = aabb.getMax();
+    corners[0] = (*this) * min;
+    corners[1] = (*this) * Vector3(min.x, min.y, max.z);
+    corners[2] = (*this) * Vector3(min.x, max.y, min.z);
+    corners[3] = (*this) * Vector3(max.x, min.y, min.z);
+    corners[4] = (*this) * Vector3(min.x, max.y, max.z);
+    corners[5] = (*this) * Vector3(max.x, min.y, max.z);
+    corners[6] = (*this) * Vector3(max.x, max.y, min.z);
+    corners[7] = (*this) * max;
+
+    return AABB(corners);
 }
 
 inline

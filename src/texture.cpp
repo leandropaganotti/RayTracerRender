@@ -1,6 +1,5 @@
 #include "texture.h"
 #include "utils.h"
-#include "consts.h"
 #include "color.h"
 
 namespace texture

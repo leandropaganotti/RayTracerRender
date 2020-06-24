@@ -37,7 +37,7 @@ Vector3 PathTracer::trace(const Ray &ray, const uint8_t depth, const float E)
         r.origin = isec.phit + bias * isec.normal;
         r.direction = randomUnitVectorInHemisphereOf(isec.normal);
         float cosTheta = isec.normal ^ r.direction;
-        return isec.material->E + isec.color * trace(r, depth+1, E) * cosTheta * 2.0f;
+        return isec.material->E + isec.albedo * trace(r, depth+1, E) * cosTheta * 2.0f;
     }
     else if (type == MaterialType::SPECULAR)
     {
@@ -57,7 +57,7 @@ Vector3 PathTracer::trace(const Ray &ray, const uint8_t depth, const float E)
             r.origin = isec.phit + bias * isec.normal;
             r.direction = randomUnitVectorInHemisphereOf(isec.normal);
             float cosTheta = isec.normal ^ r.direction;
-            diffused = isec.material->E + isec.color * trace(r, depth+1, E) * cosTheta * 2.0f;
+            diffused = isec.material->E + isec.albedo * trace(r, depth+1, E) * cosTheta * 2.0f;
         }
 
         return kt*diffused + kr*reflected;
@@ -98,32 +98,32 @@ Vector3 PathTracerWithDirectSampling::trace(const Ray &ray, const uint8_t depth,
 //        return Lo;
 //    }
     Vector3 diffused, reflected;
-    Vector3 brdf = isec.color * M_1_PI;
+    Vector3 brdf = isec.albedo * M_1_PI;
     if (kt > 0.0001f)
     {
         //direct light
         Vector3 direct(0);
-        for(auto &obj : scene->objects)
-        {
-            const GSphere * const sphere = dynamic_cast<const GSphere*const>(obj.get());
-            if (!sphere) continue; // only supported sphere for direct light
-            if (sphere->getMaterial(0)->E  == vector::ZERO) continue; // skip non light
+//        for(auto &obj : scene->objects)
+//        {
+//            const GSphere * const sphere = dynamic_cast<const GSphere*const>(obj.get());
+//            if (!sphere) continue; // only supported sphere for direct light
+//            if (sphere->getMaterial(0)->E  == vector::ZERO) continue; // skip non light
 
-            Vector3 sampleToLight;
-            float _1_pdf;
-            sphere->sampleSolidAngleSphere(isec.phit, sampleToLight, _1_pdf);
+//            Vector3 sampleToLight;
+//            float _1_pdf;
+//            sphere->sampleSolidAngleSphere(isec.phit, sampleToLight, _1_pdf);
 
-            float cosTheta = isec.normal ^ sampleToLight;
-            if( cosTheta > 0.0f )
-            {
-                float dist = (isec.phit - sphere->getCenter()).length() - sphere->getRadius() - bias;
-                float vis = castShadowRay(Ray(isec.phit + bias * isec.normal, sampleToLight, dist));
-                if (vis > 0.0f)
-                {
-                    direct += brdf * sphere->getMaterial(0)->E * cosTheta * _1_pdf;
-                }
-            }
-        }
+//            float cosTheta = isec.normal ^ sampleToLight;
+//            if( cosTheta > 0.0f )
+//            {
+//                float dist = (isec.phit - sphere->getCenter()).length() - sphere->getRadius() - bias;
+//                float vis = castShadowRay(Ray(isec.phit + bias * isec.normal, sampleToLight, dist));
+//                if (vis > 0.0f)
+//                {
+//                    direct += brdf * sphere->getMaterial(0)->E * cosTheta * _1_pdf;
+//                }
+//            }
+//        }
 
         //indirect light
         const float _1_pdf = (2.0f*M_PI);//1/(2*M_PI)

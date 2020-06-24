@@ -12,6 +12,7 @@
 #include "box.h"
 #include "cylinder.h"
 #include "mesh.h"
+#include "object.h"
 
 class XMLParser
 {
@@ -29,17 +30,16 @@ public:
     std::shared_ptr<Light> parseDistantLight(xmlNode * xmlDistantLightNode);
     std::shared_ptr<Light> parseSphericalLight(xmlNode * xmlsSphericalLightNode);
 
-    std::shared_ptr<GPlane>  parsePlane(xmlNode * xmlPlaneNode);
-    std::shared_ptr<GSphere>  parseSphere(xmlNode * xmlSphereNode);
-    std::shared_ptr<GBox>  parseBox(xmlNode * xmlBoxNode);
-    std::shared_ptr<GCylinder>  parseCylinder(xmlNode * xmlCylinderNode);
-    std::shared_ptr<GEllipsoid> parseEllipsoid(xmlNode * xmlEllipsoidNode);
-    std::shared_ptr<GMesh>  parseMesh(xmlNode * xmlMeshNode);
+    std::shared_ptr<Object>  parsePlane(xmlNode * xmlPlaneNode);
+    std::shared_ptr<Object>  parseSphere(xmlNode * xmlSphereNode);
+    std::shared_ptr<Object>  parseBox(xmlNode * xmlBoxNode);
+    std::shared_ptr<Object>  parseCylinder(xmlNode * xmlCylinderNode);
+    std::shared_ptr<Object>  parseMesh(xmlNode * xmlMeshNode);
 
 
     Matrix4 parseTransformation(xmlNode * xmlTrnasformationNode);
     std::shared_ptr<Material> parseMaterial(xmlNode * xmlMaterialNode);
-    std::shared_ptr<Texture> parseTexture(xmlNode * xmlTextureNode);
+    std::shared_ptr<Texture>  parseTexture(xmlNode * xmlTextureNode);
 
 private:
     bool     equals(const xmlChar *lhs, const char *rhs);

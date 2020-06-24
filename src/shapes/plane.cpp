@@ -55,6 +55,13 @@ bool Plane::intersection(const Ray &ray) const
     return ( t > 0.0f && t < ray.tmax) ? true : false;
 }
 
+void Plane::getIsecData(IntersectionData &isec) const
+{
+    isec.normal = w;
+    Vector3 p = isec.phit - origin;
+    isec.uv = Vector2(u^p, v^p);
+}
+
 inline
 void Plane::getNormal(IntersectionData &isec) const
 {
@@ -89,35 +96,4 @@ AABB Plane::getAABB() const
     aabb.extend(P1);
 
     return aabb;
-}
-
-GPlane::GPlane(const Vector3 &origin, const Vector3 &normal): Plane(origin, normal)
-{
-    material = material::DiffuseWhite;
-}
-
-GPlane::~GPlane() {}
-
-void GPlane::getIsecData(const Ray &ray, IntersectionData &isec) const
-{
-    isec.phit = ray.origin + isec.tnear * ray.direction;
-    isec.normal = w;
-    isec.material = material.get();
-    isec.color = material->Kd;
-
-    if(material->texture)
-    {
-        getUV(isec);
-        isec.color = material->texture->get(isec.uv) * material->Kd;
-    }
-}
-
-void GPlane::setMaterial(const std::shared_ptr<Material> &value)
-{
-    material = value ? value : material::DiffuseWhite;
-}
-
-const Material *GPlane::getMaterial(size_t) const
-{
-    return material.get();
 }

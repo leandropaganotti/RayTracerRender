@@ -89,6 +89,12 @@ bool AABox::intersection(const Ray &ray) const
     return true;
 }
 
+void AABox::getIsecData(IntersectionData &isec) const
+{
+    getUV(isec);
+    getNormal(isec);
+}
+
 inline
 void AABox::getNormal(IntersectionData &isec) const
 {
@@ -126,19 +132,4 @@ void AABox::setMin(const Vector3 &value)
 AABB AABox::getAABB() const
 {
     return AABB(data[0], data[1]);
-}
-
-GBox::GBox(): Instance(unitBox)
-{
-    material = material::DiffuseWhite;
-}
-
-void GBox::setMaterial(const std::shared_ptr<Material> &value)
-{
-    material = value ? value : material::DiffuseWhite;
-}
-
-const Material *GBox::getMaterial(size_t) const
-{
-    return material.get();
 }

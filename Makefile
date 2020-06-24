@@ -2,7 +2,7 @@
 # Compiler flags
 #
 CXX = g++
-CXXFLAGS =  -std=c++14 -Wall -W -Winline
+CXXFLAGS =  -std=c++14 -Wall -W
 VPATH = src/ src/shapes
 
 INCPATH = -I. -I./src -I./src/shapes -I/usr/include/libxml2 -I./libxml/include/libxml2
@@ -35,8 +35,6 @@ mesh.cpp \
 xmlparser.cpp \
 objparser.cpp \
 bvh.cpp \
-instance.cpp \
-shape.cpp \
 resource.cpp \
 pathtracer.cpp \
 phong.cpp \

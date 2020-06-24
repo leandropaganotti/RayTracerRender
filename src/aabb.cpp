@@ -112,6 +112,12 @@ AABB::AABB(const Vector3 &min, const Vector3 &max)
     data[1] = max;
 }
 
+AABB::AABB(const std::vector<Vector3> &vertices)
+{
+    data[0] = data[1] =  Vector3(0);
+    extend(vertices);
+}
+
 void AABB::reset(const std::vector<Vector3> &vertices)
 {
     data[0] = data[1] =  Vector3(0);

@@ -1,6 +1,5 @@
 #include "cameraoptions.h"
 #include "utils.h"
-#include "consts.h"
 
 CameraOptions::CameraOptions():
         from(0), to(vector::FRONT), fov(FOV), width(WIDTH), height(HEIGHT), aspectRatio(float(WIDTH)/HEIGHT)

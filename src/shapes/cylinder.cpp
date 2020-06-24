@@ -1,6 +1,5 @@
 #include "cylinder.h"
 #include "utils.h"
-#include "consts.h"
 #include "material.h"
 #include "float.h"
 
@@ -138,6 +137,12 @@ bool UnitYCylinder::intersection(const Ray &ray) const
     return false;
 }
 
+void UnitYCylinder::getIsecData(IntersectionData &isec) const
+{
+    getUV(isec);
+    getNormal(isec);
+}
+
 inline
 void UnitYCylinder::getNormal(IntersectionData &isec) const
 {    
@@ -147,7 +152,7 @@ void UnitYCylinder::getNormal(IntersectionData &isec) const
     }
     else if(isec.idx==1)
     {
-        isec.normal = Vector3(isec.phit.x, 0.0f, isec.phit.z).normalize();
+        isec.normal = Vector3(isec.phit.x, 0.0f, isec.phit.z) / r;
     }
     else
     {
@@ -155,22 +160,12 @@ void UnitYCylinder::getNormal(IntersectionData &isec) const
     }
 }
 
+void UnitYCylinder::getUV(IntersectionData &) const
+{
+
+}
+
 AABB UnitYCylinder::getAABB() const
 {
-    return AABB({-1.0f, 0.0f, 1.0f}, {1.0f, 1.0f, -1.0f});
-}
-
-GCylinder::GCylinder(): Instance(unitCylinder)
-{
-    material = material::DiffuseWhite;
-}
-
-void GCylinder::setMaterial(const std::shared_ptr<Material> &value)
-{
-    material = value ? value : material::DiffuseWhite;
-}
-
-const Material *GCylinder::getMaterial(size_t) const
-{
-    return material.get();
+    return AABB({-0.5f, -0.5f, -0.5f}, {-0.5f, -0.5f, -0.5f});
 }

@@ -6,19 +6,19 @@ class Shape;
 class Material;
 class Ray;
 class AABB;
+class Object;
 
 struct IntersectionData
 {
     float tnear;
     size_t idx;
     const Shape * shape;
-
+    const Object * object;
     Vector3 phit;
-    Vector3 phit_local;
     Vector3 normal;
     const Material * material;
     Vector2 uv;
-    Vector3 color;
+    Vector3 albedo;
 };
 
 class IntersectionIF

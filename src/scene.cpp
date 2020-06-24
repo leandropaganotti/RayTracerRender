@@ -26,6 +26,12 @@ void Scene::addLight(std::shared_ptr<Light> light)
 void Scene::addObject(std::shared_ptr<Shape> obj)
 {
     if(obj)
+        objects2.push_back(obj);
+}
+
+void Scene::addObject(std::shared_ptr<Object> obj)
+{
+    if(obj)
         objects.push_back(obj);
 }
 

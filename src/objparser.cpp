@@ -103,7 +103,8 @@ void OBJParser::ParseMesh(std::shared_ptr<Mesh> &mesh, const std::string &path)
             size_t v3 = stoull(list1[0]);
             size_t nv3 = stoull(list1[2]);
 
-            mesh->addFace(std::shared_ptr<MeshFace>(new MeshTriangle(mesh.get(), v1, v2, v3, nv1, nv2, nv3)));
+            std::shared_ptr<MeshTriangle> face(new MeshTriangle(mesh.get(), v1, v2, v3, nv1, nv2, nv3));
+            mesh->addFace(face);
 
             if(list.size() == 5)
             {
@@ -111,7 +112,8 @@ void OBJParser::ParseMesh(std::shared_ptr<Mesh> &mesh, const std::string &path)
                 size_t v4 = stoull(list1[0]);
                 size_t nv4 = stoull(list1[2]);
 
-                mesh->addFace(std::shared_ptr<MeshFace>(new MeshTriangle(mesh.get(), v1, v3, v4, nv1, nv3, nv4)));
+                face = std::shared_ptr<MeshTriangle>(new MeshTriangle(mesh.get(), v1, v3, v4, nv1, nv3, nv4));
+                mesh->addFace(face);
             }
         }
     }

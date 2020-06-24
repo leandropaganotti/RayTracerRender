@@ -1,7 +1,6 @@
 #pragma once
 
 #include "shape.h"
-#include "instance.h"
 
 /*
  * Axis-Aligned Box
@@ -13,6 +12,7 @@ public:
 
     bool intersection(const Ray &ray, IntersectionData &isec) const override;
     bool intersection(const Ray &ray) const override;
+    void getIsecData(IntersectionData &isec) const override;
     void getNormal(IntersectionData& isec) const override;
     void getUV(IntersectionData &isec) const override;
     AABB getAABB() const override;
@@ -28,15 +28,3 @@ protected:
     Vector3 data[2]; // 0 -> min,  1 -> max
 };
 
-class GBox: public Instance
-{
-public:
-    GBox();
-
-    void setMaterial(const std::shared_ptr<Material> &value);
-
-    const Material * getMaterial(size_t) const override;
-
-protected:
-    std::shared_ptr<Material> material;
-};

@@ -3,6 +3,7 @@
 #include "utils.h"
 #include "objparser.h"
 #include "transformation.h"
+#include "object.h"
 
 bool XMLParser::equals(const xmlChar *lhs, const char *rhs)
 {
@@ -117,12 +118,6 @@ void XMLParser::parseFile(const char *filename, Scene & scene)
 
 void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
 {
-    if(xmlSceneNode == NULL)
-    {
-        std::cerr << "\x1b[33;1m" << "error: could not parse Scene, xmlNode pointer is NULL" << "\x1b[0m" << std::endl;
-        return;
-    }
-
     const xmlAttr *attr = NULL;
     std::string name("");
     for (attr = xmlSceneNode->properties; attr; attr = attr->next)
@@ -130,7 +125,7 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
         else
-            std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlSceneNode->name << "\':" << name << "\x1b[0m" << std::endl;
+            LogError(xmlSceneNode, attr, "unrecognized attribute");
     }
 
     if(xmlSceneNode->properties && equals(xmlSceneNode->properties->name, "name"))
@@ -161,10 +156,6 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
             {
                 scene.addObject(parseSphere(node));
             }
-            else if (equals(node->name, "ellipsoid"))
-            {
-                scene.addObject(parseEllipsoid(node));
-            }
             else if (equals(node->name, "box"))
             {
                 scene.addObject(parseBox(node));
@@ -182,7 +173,7 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
                 scene.addObject(parseMesh(node));
             }
             else
-                std::cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlSceneNode->name << "\'" << "\x1b[0m" << std::endl;
+                LogError(node, nullptr, "unrecognized element");
         }
     }
 }
@@ -252,7 +243,7 @@ void XMLParser::parseRenderOptions(xmlNode *xmlRenderOptionsNode, RenderOptions 
             else if (equals(attr->children->content, "global2"))
                 options.illum = Illumination::GlobalIluminationWithDirectSampling;
             else
-                std::cerr << "\x1b[33;1m" << "unrecognized attribute raytrace value \'" << attr->children->content << "\' " << "\x1b[0m" << std::endl;
+                LogError(xmlRenderOptionsNode, attr, "unrecognized illum attribute value");
         }
     }
 
@@ -437,15 +428,11 @@ std::shared_ptr<Light> XMLParser::parseSphericalLight(xmlNode *xmlsSphericalLigh
     return light;
 }
 
-std::shared_ptr<GPlane> XMLParser::parsePlane(xmlNode *xmlPlaneNode)
+std::shared_ptr<Object> XMLParser::parsePlane(xmlNode *xmlPlaneNode)
 {
-    if(xmlPlaneNode == NULL)
-    {
-         std::cerr << "\x1b[33;1m" << "error: could not parse Plane, xmlNode pointer is NULL" << "\x1b[0m" << std::endl;
-         return nullptr;
-    }
-
-    auto plane = std::shared_ptr<GPlane>( new GPlane);
+    auto plane = std::shared_ptr<Plane>( new Plane);
+    std::shared_ptr<Material> material;
+    Matrix4 transform;
 
     const xmlAttr *attr = NULL;
     std::string name("");
@@ -458,9 +445,9 @@ std::shared_ptr<GPlane> XMLParser::parsePlane(xmlNode *xmlPlaneNode)
         else if (equals(attr->name, "normal"))
             plane->setNormal(toVector3(attr->children->content));
         else if (equals(attr->name, "material"))
-            plane->setMaterial(Material::Get((const char*)attr->children->content));
+            material = Material::Get((const char*)attr->children->content);
         else
-            std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlPlaneNode->name << "\':" << name << "\x1b[0m" << std::endl;
+            LogError(xmlPlaneNode, attr, "unrecognized attribute");
     }
 
     xmlNode *node = NULL;
@@ -469,24 +456,22 @@ std::shared_ptr<GPlane> XMLParser::parsePlane(xmlNode *xmlPlaneNode)
         if (node->type == XML_ELEMENT_NODE)
         {
             if (equals(node->name, "material"))
-                plane->setMaterial(parseMaterial(node));
+                material = parseMaterial(node);
+            else if(equals(node->name, "transformation"))
+                transform = parseTransformation(node);
             else
-                std::cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlPlaneNode->name << "\'" << "\x1b[0m" << std::endl;
+                LogError(node, nullptr, "unrecognized element");
         }
     }
 
-    return plane;
+    return std::shared_ptr<Object>(new TransformedObject(plane, material, transform));
 }
 
-std::shared_ptr<GSphere> XMLParser::parseSphere(xmlNode * xmlSphereNode)
+std::shared_ptr<Object> XMLParser::parseSphere(xmlNode * xmlSphereNode)
 {
-    if(xmlSphereNode == NULL)
-    {
-        std::cerr << "\x1b[33;1m" << "error: could not parse Sphere, xmlNode pointer is NULL" << "\x1b[0m" << std::endl;
-        return nullptr;
-    }
-
-    auto sphere = std::shared_ptr<GSphere>(new GSphere);
+    auto sphere = std::shared_ptr<Sphere>(new Sphere);
+    std::shared_ptr<Material> material;
+    Matrix4 transform;
 
     const xmlAttr *attr = NULL;
     std::string name("");
@@ -500,12 +485,11 @@ std::shared_ptr<GSphere> XMLParser::parseSphere(xmlNode * xmlSphereNode)
             sphere->setRadius( toFloat(attr->children->content) );
         else if (equals(attr->name, "material"))
         {
-            auto material = Material::Get((const char*)attr->children->content);
+            material = Material::Get((const char*)attr->children->content);
             if(!material) LogError(xmlSphereNode, attr, "Can't find material");
-            sphere->setMaterial(material);
         }
         else
-            std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlSphereNode->name << "\':" << name << "\x1b[0m" << std::endl;
+            LogError(xmlSphereNode, attr, "unrecognized attribute");
     }
 
     xmlNode *node = NULL;
@@ -514,13 +498,15 @@ std::shared_ptr<GSphere> XMLParser::parseSphere(xmlNode * xmlSphereNode)
         if (node->type == XML_ELEMENT_NODE)
         {
             if (equals(node->name, "material"))
-                sphere->setMaterial(parseMaterial(node));
+                material = parseMaterial(node);
+            else if (equals(node->name, "transformation"))
+                transform = parseTransformation(node);
             else
-                std::cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlSphereNode->name << "\'" << "\x1b[0m" << std::endl;
+                LogError(node, nullptr, "unrecognized element");
         }
     }
 
-    return sphere;
+    return std::shared_ptr<Object>(new TransformedObject(sphere, material, transform));
 }
 
 std::shared_ptr<Texture> XMLParser::parseTexture(xmlNode *xmlTextureNode)
@@ -592,58 +578,46 @@ std::shared_ptr<Texture> XMLParser::parseTexture(xmlNode *xmlTextureNode)
     return nullptr;
 }
 
-std::shared_ptr<GBox> XMLParser::parseBox(xmlNode *xmlBoxNode)
+std::shared_ptr<Object> XMLParser::parseBox(xmlNode *xmlBoxNode)
 {
-    if(xmlBoxNode == NULL)
-    {
-         std::cerr << "\x1b[33;1m" << "error: could not parse Box, xmlNode pointer is NULL" << "\x1b[0m" << std::endl;
-         return nullptr;
-    }
-
-    auto box = std::shared_ptr<GBox>(new GBox);
-
     const xmlAttr *attr = NULL;
     std::string name("");
+    std::shared_ptr<Material> material;
     for (attr = xmlBoxNode->properties; attr; attr = attr->next)
     {
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "material"))
         {
-            auto material = Material::Get((const char*)attr->children->content);
+            material = Material::Get((const char*)attr->children->content);
             if(!material) LogError(xmlBoxNode, attr, "Can't find material");
-            box->setMaterial(material);
         }
         else
-            std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlBoxNode->name << "\':" << name << "\x1b[0m" << std::endl;
+            LogError(xmlBoxNode, attr, "unrecognized attribute");
     }
 
+    Matrix4 transform;
     xmlNode *node = NULL;
     for (node = xmlBoxNode->children; node; node = node->next)
     {
         if (node->type == XML_ELEMENT_NODE)
         {
             if (equals(node->name, "material"))
-                box->setMaterial(parseMaterial(node));
+                material = parseMaterial(node);
             else if (equals(node->name, "transformation"))
-                box->setTransformation(parseTransformation(node));
+                transform = parseTransformation(node);
             else
-                std::cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlBoxNode->name << "\'" << "\x1b[0m" << std::endl;
+                LogError(node, nullptr, "unrecognized element");
         }
     }
-
-    return box;
+    auto box = std::shared_ptr<AABox>(new AABox);
+    return std::shared_ptr<Object>(new TransformedObject(box, material, transform));
 }
 
-std::shared_ptr<GCylinder> XMLParser::parseCylinder(xmlNode *xmlCylinderNode)
+std::shared_ptr<Object> XMLParser::parseCylinder(xmlNode *xmlCylinderNode)
 {
-    if(xmlCylinderNode == NULL)
-    {
-         std::cerr << "\x1b[33;1m" << "error: could not parse Box, xmlNode pointer is NULL" << "\x1b[0m" << std::endl;
-         return nullptr;
-    }
-
-    auto cylinder = std::shared_ptr<GCylinder>(new GCylinder);
+    auto cylinder = std::shared_ptr<UnitYCylinder>(new UnitYCylinder);
+    std::shared_ptr<Material> material;
 
     const xmlAttr *attr = NULL;
     std::string name("");
@@ -653,84 +627,36 @@ std::shared_ptr<GCylinder> XMLParser::parseCylinder(xmlNode *xmlCylinderNode)
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "material"))
         {
-            auto material = Material::Get((const char*)attr->children->content);
+            material = Material::Get((const char*)attr->children->content);
             if(!material) LogError(xmlCylinderNode, attr, "Can't find material");
-            cylinder->setMaterial(material);
         }
         else
-            std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlCylinderNode->name << "\':" << name << "\x1b[0m" << std::endl;
+            LogError(xmlCylinderNode, attr, "unrecognized attribute");
     }
 
+    Matrix4 transform;
     xmlNode *node = NULL;
     for (node = xmlCylinderNode->children; node; node = node->next)
     {
         if (node->type == XML_ELEMENT_NODE)
         {
             if (equals(node->name, "material"))
-                cylinder->setMaterial(parseMaterial(node));
+                material = parseMaterial(node);
             else if (equals(node->name, "transformation"))
-                cylinder->setTransformation(parseTransformation(node));
+                transform = parseTransformation(node);
             else
-                std::cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlCylinderNode->name << "\'" << "\x1b[0m" << std::endl;
+                LogError(node, nullptr, "unrecognized element");
         }
     }
 
-    return cylinder;
+    return std::shared_ptr<Object>(new TransformedObject(cylinder, material, transform));
 }
 
-std::shared_ptr<GEllipsoid> XMLParser::parseEllipsoid(xmlNode *xmlEllipsoidNode)
+std::shared_ptr<Object> XMLParser::parseMesh(xmlNode *xmlMeshNode)
 {
-    if(xmlEllipsoidNode == NULL)
-    {
-         std::cerr << "\x1b[33;1m" << "error: could not parse Box, xmlNode pointer is NULL" << "\x1b[0m" << std::endl;
-         return nullptr;
-    }
-
-    auto ellipsoid = std::shared_ptr<GEllipsoid>(new GEllipsoid);
-
     const xmlAttr *attr = NULL;
-    std::string name("");
-    for (attr = xmlEllipsoidNode->properties; attr; attr = attr->next)
-    {
-        if (equals(attr->name, "name"))
-            name = (const char*)attr->children->content;
-        else if (equals(attr->name, "material"))
-        {
-            auto material = Material::Get((const char*)attr->children->content);
-            if(!material) LogError(xmlEllipsoidNode, attr, "Can't find material");
-            ellipsoid->setMaterial(material);
-        }
-        else
-            std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlEllipsoidNode->name << "\':" << name << "\x1b[0m" << std::endl;
-    }
-
-    xmlNode *node = NULL;
-    for (node = xmlEllipsoidNode->children; node; node = node->next)
-    {
-        if (node->type == XML_ELEMENT_NODE)
-        {
-            if (equals(node->name, "material"))
-                ellipsoid->setMaterial(parseMaterial(node));
-            else if (equals(node->name, "transformation"))
-                ellipsoid->setTransformation(parseTransformation(node));
-            else
-                std::cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlEllipsoidNode->name << "\'" << "\x1b[0m" << std::endl;
-        }
-    }
-
-    return ellipsoid;
-}
-
-std::shared_ptr<GMesh> XMLParser::parseMesh(xmlNode *xmlMeshNode)
-{
-    if(xmlMeshNode == NULL)
-    {
-         std::cerr << "\x1b[33;1m" << "error: could not parse Box, xmlNode pointer is NULL" << "\x1b[0m" << std::endl;
-         return nullptr;
-    }
-
-    const xmlAttr *attr = NULL;
-    std::string name(""), src(""), mat("");
+    std::string name(""), src("");
+    std::shared_ptr<Material> material;
 
     for (attr = xmlMeshNode->properties; attr; attr = attr->next)
     {
@@ -742,10 +668,11 @@ std::shared_ptr<GMesh> XMLParser::parseMesh(xmlNode *xmlMeshNode)
         }
         else if (equals(attr->name, "material"))
         {
-            mat = (const char*)attr->children->content;
+            material = Material::Get((const char*)attr->children->content);
+            if(!material) LogError(xmlMeshNode, attr, "Can't find material");
         }
         else
-            std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlMeshNode->name << "\':" << name << "\x1b[0m" << std::endl;
+            LogError(xmlMeshNode, attr, "unrecognized attribute");
     }
 
     auto mesh = Resource::Get<Mesh>(src);
@@ -756,11 +683,7 @@ std::shared_ptr<GMesh> XMLParser::parseMesh(xmlNode *xmlMeshNode)
         OBJParser::ParseMesh(mesh, src);
     }
 
-    auto gmesh = std::shared_ptr<GMesh>(new GMesh(mesh));
-
-    auto material = Material::Get(mat);
-    //if(!material) LogError(xmlMeshNode, attr, "Can't find material");
-    gmesh->setMaterial(material);
+    Matrix4 transform;
 
     xmlNode *node = NULL;
     for (node = xmlMeshNode->children; node; node = node->next)
@@ -768,15 +691,15 @@ std::shared_ptr<GMesh> XMLParser::parseMesh(xmlNode *xmlMeshNode)
         if (node->type == XML_ELEMENT_NODE)
         {
             if (equals(node->name, "material"))
-                gmesh->setMaterial(parseMaterial(node));
+                material = parseMaterial(node);
             else if (equals(node->name, "transformation"))
-                gmesh->setTransformation(parseTransformation(node));
+                transform = parseTransformation(node);
             else
-                std::cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlMeshNode->name << "\'" << "\x1b[0m" << std::endl;
+                LogError(node, nullptr, "unrecognized element");
         }
     }
-
-    return gmesh;
+    mesh->setMaterial(material);
+    return std::shared_ptr<Object>(new TransformedObject(mesh, transform));
 }
 
 Matrix4 XMLParser::parseTransformation(xmlNode *xmlTrnasformationNode)

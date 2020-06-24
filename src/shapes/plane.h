@@ -11,6 +11,7 @@ public:
 
     bool intersection(const Ray& ray, IntersectionData& isec) const override;
     bool intersection(const Ray& ray) const override;
+    void getIsecData(IntersectionData &isec) const override;
     void getNormal(IntersectionData& isec) const override;
     void getUV(IntersectionData& isec) const override;
     AABB getAABB() const override;
@@ -26,20 +27,4 @@ protected:
     Vector3 w;          // normal to the plane
     Vector3 u;          // orthonormal bases
     Vector3 v;
-};
-
-class GPlane: public Plane
-{
-public:
-    GPlane(const Vector3& origin={0.0f}, const Vector3& normal={0.0f, 1.0f, 0.0f});
-    virtual ~GPlane();
-
-    void getIsecData(const Ray &ray, IntersectionData &isec) const override;
-
-    void setMaterial(const std::shared_ptr<Material> &value);
-
-    const Material* getMaterial(size_t) const override;
-
-protected:
-    std::shared_ptr<Material> material;
 };

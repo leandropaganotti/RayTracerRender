@@ -1,7 +1,6 @@
 #pragma once
 
 #include "shape.h"
-#include "instance.h"
 
 class UnitYCylinder: public Shape
 {
@@ -10,7 +9,9 @@ public:
 
     bool intersection(const Ray &ray, IntersectionData &isec) const override;
     bool intersection(const Ray &ray) const override;
+    void getIsecData(IntersectionData &isec) const override;
     void getNormal(IntersectionData& isec) const override;
+    void getUV(IntersectionData &) const override;
     AABB getAABB() const override;
 
 protected:
@@ -20,15 +21,3 @@ protected:
     float ymax;
 };
 
-class GCylinder: public Instance
-{
-public:
-    GCylinder();
-
-    void setMaterial(const std::shared_ptr<Material> &value);
-
-    const Material* getMaterial(size_t idx) const override;
-
-protected:
-    std::shared_ptr<Material> material;
-};

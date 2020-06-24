@@ -7,6 +7,7 @@
 #include "sphere.h"
 #include <functional>
 #include "paramset.h"
+#include "object.h"
 
 enum class LightType
 {
@@ -32,7 +33,7 @@ public:
     static std::shared_ptr<Light> Create(LightType type, const ParamSet &params);
 
     virtual void  getLightData(const Vector3 &phit, LightData &light) const = 0;
-    virtual float visibility(const Ray &ray, const std::vector<std::shared_ptr<Shape>> &objects) const = 0;
+    virtual float visibility(const Ray &ray, const std::vector<std::shared_ptr<Object>> &objects) const = 0;
 
     Vector3 getIntensity() const;
     void    setIntensity(const Vector3 &value);
@@ -51,7 +52,7 @@ public:
     virtual ~PointLight();
 
     virtual void  getLightData(const Vector3 &phit, LightData &light) const override;
-    virtual float visibility(const Ray &ray, const std::vector<std::shared_ptr<Shape> > &objects) const override;
+    virtual float visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const override;
 
     Vector3  getPosition() const;
     void     setPosition(const Vector3 &value);
@@ -67,7 +68,7 @@ protected:
 class PointLightShadowOff: public PointLight
 {
 public:
-    float visibility(const Ray &ray, const std::vector<std::shared_ptr<Shape> > &objects) const override;
+    float visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const override;
 };
 
 class DistantLight: public Light
@@ -77,7 +78,7 @@ public:
     virtual ~DistantLight();
 
     virtual void  getLightData(const Vector3 &phit, LightData &light) const override;
-    virtual float visibility(const Ray &ray, const std::vector<std::shared_ptr<Shape> > &objects) const override;
+    virtual float visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const override;
 
     Vector3  getDirection() const;
     void     setDirection(const Vector3 &value);
@@ -89,7 +90,7 @@ protected:
 class DistantLightShadowOff: public DistantLight
 {
 public:
-    float visibility(const Ray &ray, const std::vector<std::shared_ptr<Shape> > &objects) const override;
+    float visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const override;
 };
 
 class SphericalLight: public Sphere, public Light
@@ -97,7 +98,7 @@ class SphericalLight: public Sphere, public Light
 public:
     SphericalLight();
     virtual void  getLightData(const Vector3 &phit, LightData &light) const override;
-    virtual float visibility(const Ray &ray, const std::vector<std::shared_ptr<Shape> > &objects) const override;
+    virtual float visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const override;
 
     float getAttenuation() const;
     void  setAttenuation(float value);
@@ -110,7 +111,7 @@ protected:
 class SphericalLightShadowOff: public SphericalLight
 {
 public:
-    float visibility(const Ray &ray, const std::vector<std::shared_ptr<Shape> > &objects) const override;
+    float visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const override;
 };
 
 

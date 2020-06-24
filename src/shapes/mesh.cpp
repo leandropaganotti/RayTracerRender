@@ -23,12 +23,13 @@ void Mesh::addNormal(const Vector3 &n)
     normals.push_back(n);
 }
 
-void Mesh::addFace(std::shared_ptr<MeshFace> face)
+void Mesh::addFace(const std::shared_ptr<MeshTriangle> &face)
 {
     if(face)
     {
         face->idx = faces.size();
-        faces.push_back(face);
+        auto obj = std::shared_ptr<SimpleObject>(new SimpleObject(face, material));
+        faces.push_back(std::move(obj));
     }
 }
 
@@ -64,6 +65,11 @@ bool Mesh::intersection(const Ray& ray) const
     return bvh->intersection(r);
 }
 
+void Mesh::getIsecData(IntersectionData &isec) const
+{
+    faces[isec.idx]->getIsecData(isec);
+}
+
 std::ostream &operator <<(std::ostream &os, const Mesh &m)
 {
     os << "Mesh:" << std::endl;
@@ -82,18 +88,6 @@ std::ostream &operator <<(std::ostream &os, const Mesh &m)
     return os ;
 }
 
-inline
-void Mesh::getNormal(IntersectionData &isec) const
-{
-    faces[isec.idx]->getNormal(isec);
-}
-
-inline
-void Mesh::getUV(IntersectionData &isec) const
-{
-    faces[isec.idx]->getUV(isec);
-}
-
 AABB Mesh::getAABB() const
 {
     return bvh->getAABB();
@@ -104,107 +98,11 @@ Mesh::Mesh()
 
 }
 
-/************************************************************************
- * GMesh class
- ************************************************************************/
-
-GMesh::GMesh(std::shared_ptr<Mesh> mesh): Instance(mesh)
+void Mesh::setMaterial(const std::shared_ptr<Material> &value)
 {
-    material = material::DiffuseWhite;
+    for (auto &f: faces)
+        f->setMaterial(value);
 }
-
-void GMesh::setMaterial(const std::shared_ptr<Material> &value)
-{
-    material = value ? value : material::DiffuseWhite;
-}
-
-const Material *GMesh::getMaterial(size_t) const
-{
-    return material.get();
-}
-
-/************************************************************************
- * QuadMesh class
- ************************************************************************/
-
-MeshQuad::MeshQuad(const Mesh *m, size_t v0, size_t v1, size_t v2, size_t v3, size_t nv0, size_t nv1, size_t nv2, size_t nv3)
-{
-    mesh = m;
-    v[0] = v0;
-    v[1] = v1;
-    v[2] = v2;
-    v[3] = v3;
-    nv[0] = nv0;
-    nv[1] = nv1;
-    nv[2] = nv2;
-    nv[3] = nv3;
-
-    nf = (mesh->normals[nv0] + mesh->normals[nv1] + mesh->normals[nv2]).normalize();
-    aabb.extend({mesh->vertices[v0], mesh->vertices[v1], mesh->vertices[v2], mesh->vertices[v3]});
-    area = ((mesh->vertices[v1] - mesh->vertices[v0]) % (mesh->vertices[v2] - mesh->vertices[v0])).length() / 2;
-    area += ((mesh->vertices[v2] - mesh->vertices[v0]) % (mesh->vertices[v3] - mesh->vertices[v0])).length() / 2;
-
-}
-
-bool MeshQuad::intersection(const Ray &ray, IntersectionData &isec) const
-{
-    float t = ((mesh->vertices[v[0]]-ray.origin) ^ nf) / (ray.direction ^ nf);
-
-    if( t < 0.0f || t > ray.tmax) return false;
-
-    Vector3 phit = ray.origin + t * ray.direction;
-
-    Vector3 PV0 =  mesh->vertices[v[0]] - phit;
-    Vector3 PV1 =  mesh->vertices[v[1]] - phit;
-    Vector3 PV2 =  mesh->vertices[v[2]] - phit;
-    Vector3 PV3 =  mesh->vertices[v[3]] - phit;
-
-    if ((PV0 ^ PV1) > 0.0f &&
-
-    (PV1 ^ PV2) > 0.0f &&
-
-    (PV2 ^ PV3) > 0.0f &&
-
-    (PV3 ^ PV0) > 0.0f) return false;
-
-    isec.tnear = t;
-    return true;
-}
-
-bool MeshQuad::intersection(const Ray &ray) const
-{
-    float t = ((mesh->vertices[v[0]]-ray.origin) ^ nf) / (ray.direction ^ nf);
-
-    if( t < 0.0f || t > ray.tmax) return false;
-
-    Vector3 phit = ray.origin + t * ray.direction;
-
-    Vector3 PV0 =  mesh->vertices[v[0]] - phit;
-    Vector3 PV1 =  mesh->vertices[v[1]] - phit;
-    Vector3 PV2 =  mesh->vertices[v[2]] - phit;
-    Vector3 PV3 =  mesh->vertices[v[3]] - phit;
-
-    float a  = (PV0 % PV1).length() ;
-    a += (PV1 % PV2).length() ;
-    a += (PV2 % PV3).length() ;
-    a += (PV3 % PV0).length() ;
-    a /= 2;
-    if((a - area) > 0.001f) return false;
-
-    return true;
-}
-
-AABB MeshQuad::getAABB() const
-{
-    return aabb;
-}
-
-std::ostream& operator <<(std::ostream &os, const MeshQuad &q)
-{
-    return os << q.v[0] << " " << q.v[1] << " " << q.v[2] << " " << q.v[3] << " - " << "  " << q.nf ;
-}
-
-void MeshQuad::getNormal(IntersectionData&) const { }
 
 /************************************************************************
  * TriangleMesh class
@@ -268,7 +166,7 @@ bool MeshTriangle::intersection(const Ray &ray, IntersectionData &isec) const
 
     isec.tnear = tval;
     isec.idx = idx;
-    isec.shape = mesh;
+    isec.shape = this;
     return true;
 }
 
@@ -276,6 +174,12 @@ bool MeshTriangle::intersection(const Ray &ray) const
 {
     IntersectionData isec;
     return intersection(ray, isec);
+}
+
+void MeshTriangle::getIsecData(IntersectionData &isec) const
+{
+    getUV(isec);
+    getNormal(isec);
 }
 
 AABB MeshTriangle::getAABB() const
@@ -292,7 +196,13 @@ void MeshTriangle::getNormal(IntersectionData& isec) const
 
     isec.normal = _u*mesh->normals[nv[0]] + _v*mesh->normals[nv[1]] + _w*mesh->normals[nv[2]];
 
-    //N = (mesh->normals[nv[0]] + mesh->normals[nv[1]] + mesh->normals[nv[2]]).normalize();
+    //isec.normal = (mesh->normals[nv[0]] + mesh->normals[nv[1]] + mesh->normals[nv[2]]).normalize();
+}
+
+inline
+void MeshTriangle::getUV(IntersectionData &isec) const
+{
+    isec.uv = Vector2(0);
 }
 
 std::ostream& operator <<(std::ostream &os, const MeshTriangle &t)

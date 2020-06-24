@@ -5,8 +5,9 @@
 	<SphericalLight position="5,10,10" color="1" intensity="75" radius="1.5" atten="1"/>
 	<DistantLight direction="1, -1, 0" color="1" intensity="0.2" shadowoff="true" />
 
-	<Plane name="floor" origin="0, -0.01, 0" normal="0,1,0" >
-		<material type="diffuse" kd="1" ka="0.5"><texture src="tex/stone-floor-tiles-500x500.ppm" type="Texture2d" ></texture></material>
+	<Plane name="floor" origin="0" normal="0,1,0">
+		<material type="diffuse" kd="1" ka="0.5"><texture src="tex/test.png" type="Texture2d" width="1" height="1"></texture></material>
+		<transformation translate="0" rotate="0,180,0" scale="1" />
 	</Plane>
 
 	<Plane name="sky" origin="0, 20, 0" normal="0,-1,0" >
@@ -17,9 +18,9 @@
 	<cylinder material="Glass">
 		<transformation translate="-0.5, 0.5,-3" rotate="0" scale="1" />
 	</cylinder>
-	<ellipsoid material="Glass">
+	<sphere material="Glass">
 		<transformation translate="2.5, 0.5, -3" rotate="0" scale="0.5,1,0.5" />
-	</ellipsoid >
+	</sphere >
 	<box material="Glass" >
 	<transformation translate="1, 0.5,-3" rotate="0" scale="1" />
 	</box>
@@ -28,27 +29,32 @@
 	<cylinder material="Mirror">
 		<transformation translate="-0.5, 0.5,0" rotate="0" scale="1" />
 	</cylinder>
-	<ellipsoid material="Mirror">
+	<sphere material="Mirror">
 		<transformation translate="2.5, 0.5, 0" rotate="0" scale="0.5,1,0.5" />
-	</ellipsoid>
+	</sphere>
 	<box material="Mirror" >
 	<transformation translate="1, 0.5,0" rotate="0" scale="1" />
 	</box>
 
 	<sphere material="DiffuseWhite" position="-2,0.5,2.5" radius="0.5">
 		<material type="diffuse" kd="1" ka="0.5">
+		<texture src="tex/test.png" type="Texture2d" width="1" height="1" />
 		</material>
 	</sphere>
 	<cylinder material="DiffuseWhite">
 		<transformation translate="-0.5, 0.5,2.5" rotate="0" scale="1" />
 		<material type="diffuse" kd="1" ka="0.5"/>
 	</cylinder>
-	<ellipsoid material="DiffuseWhite">
+	<sphere material="DiffuseWhite">
 		<transformation translate="2.5, 0.5, 2.5" rotate="0" scale="0.5,1,0.5" />
-		<material type="diffuse" kd="1" ka="0.5" />
-	</ellipsoid >
+		<material type="diffuse" kd="1" ka="0.5" >
+		<texture src="tex/test.png" type="Texture2d" width="1" height="1" />
+		</material>
+	</sphere >
 	<box material="DiffuseWhite">
 		<transformation translate="1, 0.5,2.5" rotate="0" scale="1" />
-		<material type="diffuse" kd="1" ka="0.5" />
+		<material type="diffuse" kd="1" ka="0.5" >
+		<texture src="tex/test.png" type="Texture2d" width="1" height="1" />
+		</material>
 	</box>
 </scene>

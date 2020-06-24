@@ -1,16 +1,16 @@
 #pragma once
 
 #include "shape.h"
-#include "instance.h"
 
 class Sphere: public Shape
 {    
 public:
-    Sphere(const Vector3 &center={0.0f}, const float &radius=1.0f);
+    Sphere(const Vector3 &center={0.0f}, const float &radius=0.5f);
     virtual ~Sphere();
 
-    bool  intersection(const Ray &ray, IntersectionData &isec) const override;
-    bool  intersection(const Ray& ray) const override;
+    bool intersection(const Ray &ray, IntersectionData &isec) const override;
+    bool intersection(const Ray& ray) const override;
+    void getIsecData(IntersectionData &isec) const override;
     void getNormal(IntersectionData& isec) const override;
     void getUV(IntersectionData &isec) const override;
     AABB getAABB() const override;
@@ -26,32 +26,4 @@ protected:
     Vector3 center;                 // position of the sphere
     float radius;                   // sphere radius and radius^2
     float radius2;
-};
-
-class GSphere: public Sphere
-{
-public:
-    GSphere(const Vector3 &c={0.0f}, const float &r=1.0f);
-
-    void getIsecData(const Ray &ray, IntersectionData &isec) const override;
-
-    void setMaterial(const std::shared_ptr<Material> &value);
-
-    const Material* getMaterial(size_t) const override;
-
-protected:
-    std::shared_ptr<Material> material;
-};
-
-class GEllipsoid: public Instance
-{
-public:
-    GEllipsoid();
-
-    void setMaterial(const std::shared_ptr<Material> &value);
-
-    const Material* getMaterial(size_t) const override;
-
-protected:
-    std::shared_ptr<Material> material;
 };

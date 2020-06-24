@@ -22,7 +22,6 @@ src/camera.h
 src/cameraoptions.cpp
 src/cameraoptions.h
 src/color.h
-src/consts.h
 src/image.cpp
 src/image.h
 src/intersection.h
@@ -32,7 +31,7 @@ src/main.cpp
 src/material.cpp
 src/material.h
 src/matrix.h
-src/object.cpp
+src/object.h
 src/objmodel.cpp
 src/objparser.cpp
 src/objparser.h
@@ -54,15 +53,12 @@ src/shapes/box.cpp
 src/shapes/box.h
 src/shapes/cylinder.cpp
 src/shapes/cylinder.h
-src/shapes/instance.cpp
-src/shapes/instance.h
 src/shapes/invisible.cpp
 src/shapes/invisible.h
 src/shapes/mesh.cpp
 src/shapes/mesh.h
 src/shapes/plane.cpp
 src/shapes/plane.h
-src/shapes/shape.cpp
 src/shapes/shape.h
 src/shapes/sphere.cpp
 src/shapes/sphere.h

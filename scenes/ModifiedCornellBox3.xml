@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scene name="ModifiedCornellBox" grid="2" spp="32" index="1.0" maxdepth="5" raytracer="path2">
-    <CameraOptions position="0,1.7,5" lookingat="0,1.7,0" fov="50" width="640" height="480"></CameraOptions>
+<scene name="ModifiedCornellBox" >
+	<RenderOptions grid="4" spp="2048" index="1.0" maxdepth="5" illum="global2" />
+	<CameraOptions position="0,1.7,5" lookingat="0,1.7,0" fov="50" width="640" height="480" />
     <Sphere name="mirrorBall" position="-2,0.8,-1.5" radius="0.8">
         <material type="specular" kd="1" R0="1"></material>
     </Sphere>
@@ -37,7 +38,7 @@
     <Sphere name="blue" position="1.1,0.4,-2.0" radius="0.4">
         <material type="diffuse" kd="0,0,1"></material>
     </Sphere>
-    <Sphere name="light" position="0,3.0,0" radius="0.05">
-        <material type="diffuse" kd="1" E="1800"></material>
+	<Sphere name="light" position="0,6.9,0" radius="3.5">
+		<material type="diffuse" kd="1" E="6"></material>
     </Sphere>
 </scene>

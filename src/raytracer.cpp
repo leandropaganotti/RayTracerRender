@@ -6,7 +6,6 @@
 #include <iomanip>
 #include <sstream>
 #include <iostream>
-#include "consts.h"
 #include "material.h"
 #include "sphere.h"
 #include "bvh.h"
@@ -97,7 +96,7 @@ Vector3 RayTracer::rayDirection(float i, float j) const
 
 bool RayTracer::castRay(const Ray &ray, IntersectionData &isec)
 {
-    isec.shape = nullptr;
+    isec.tnear = INFINITY;
     for(auto &object : scene->objects)
     {
         if (object->intersection(ray, isec))
@@ -106,11 +105,13 @@ bool RayTracer::castRay(const Ray &ray, IntersectionData &isec)
         }
     }
 
-    if(!isec.shape) return false;
-
-    isec.shape->getIsecData(ray, isec);
-
-    return true;
+    if(isec.tnear < INFINITY)
+    {
+        isec.phit = ray.origin + isec.tnear * ray.direction;
+        isec.object->getIsecData(isec);
+        return true;
+    }
+    return false;
 }
 
 
@@ -122,7 +123,7 @@ float RayTracer::castShadowRay(const Ray &ray)
     {
         if (object->intersection(ray, isec))
         {
-            if (object->getMaterial(isec.idx)->type == MaterialType::TRANSPARENT)
+            if (isec.material->type == MaterialType::TRANSPARENT)
                 vis *= 0.8f;
             else
                 return 0.0f;

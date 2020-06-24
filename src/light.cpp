@@ -82,7 +82,7 @@ void PointLight::getLightData(const Vector3 &phit, LightData &light) const
     light.direction /= light.distance;
 }
 
-float PointLight::visibility(const Ray &ray, const std::vector<std::shared_ptr<Shape> > &objects) const
+float PointLight::visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const
 {
     float vis = 1.0f;
     IntersectionData isec;
@@ -91,7 +91,7 @@ float PointLight::visibility(const Ray &ray, const std::vector<std::shared_ptr<S
     {
         if (object->intersection(ray, isec))
         {
-            if (object->getMaterial(isec.idx)->type == MaterialType::TRANSPARENT)
+            if (isec.material->type == MaterialType::TRANSPARENT)
                 vis *= 0.8f;
             else
                 return 0.0f;
@@ -120,7 +120,7 @@ void PointLight::setAttenuation(float value)
     atten = value;
 }
 
-float PointLightShadowOff::visibility(const Ray &, const std::vector<std::shared_ptr<Shape> > &) const
+float PointLightShadowOff::visibility(const Ray &, const std::vector<std::shared_ptr<Object> > &) const
 {
     return 1.0f;
 }
@@ -142,7 +142,7 @@ void DistantLight::getLightData(const Vector3 &, LightData &light) const
     light.intensity = intensity;
 }
 
-float DistantLight::visibility(const Ray &ray, const std::vector<std::shared_ptr<Shape> > &objects) const
+float DistantLight::visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const
 {
     float vis = 1.0f;
     IntersectionData isec;
@@ -150,7 +150,7 @@ float DistantLight::visibility(const Ray &ray, const std::vector<std::shared_ptr
     {
         if (object->intersection(ray, isec))
         {
-            if (object->getMaterial(isec.idx)->type == MaterialType::TRANSPARENT)
+            if (isec.material->type == MaterialType::TRANSPARENT)
                 vis *= 0.8f;
             else
                 return 0.0f;
@@ -170,12 +170,12 @@ void DistantLight::setDirection(const Vector3 &value)
     direction.normalize();
 }
 
-float DistantLightShadowOff::visibility(const Ray &, const std::vector<std::shared_ptr<Shape> > &) const
+float DistantLightShadowOff::visibility(const Ray &, const std::vector<std::shared_ptr<Object> > &) const
 {
     return 1.0f;
 }
 
-float SphericalLight::visibility(const Ray &ray, const std::vector<std::shared_ptr<Shape> > &objects) const
+float SphericalLight::visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const
 {
     float vis = 1.0f;
     IntersectionData isec;
@@ -184,7 +184,7 @@ float SphericalLight::visibility(const Ray &ray, const std::vector<std::shared_p
     {
         if (object->intersection(ray, isec))
         {
-            if (object->getMaterial(isec.idx)->type == MaterialType::TRANSPARENT)
+            if (isec.material->type == MaterialType::TRANSPARENT)
                 vis *= 0.8f;
             else
                 return 0.0f;
@@ -217,7 +217,7 @@ void SphericalLight::getLightData(const Vector3 &phit, LightData &light) const
 
 }
 
-float SphericalLightShadowOff::visibility(const Ray &, const std::vector<std::shared_ptr<Shape> > &) const
+float SphericalLightShadowOff::visibility(const Ray &, const std::vector<std::shared_ptr<Object> > &) const
 {
     return 1.0f;
 }
