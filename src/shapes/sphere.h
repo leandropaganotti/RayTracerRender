@@ -1,6 +1,7 @@
 #pragma once
 
 #include "shape.h"
+#include <memory>
 
 class Sphere: public Shape
 {    
@@ -27,3 +28,8 @@ protected:
     float radius;                   // sphere radius and radius^2
     float radius2;
 };
+
+namespace shape
+{
+   extern std::shared_ptr<Sphere> unitSphere;
+}

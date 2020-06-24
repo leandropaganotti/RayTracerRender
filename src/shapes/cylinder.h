@@ -1,6 +1,7 @@
 #pragma once
 
 #include "shape.h"
+#include <memory>
 
 class UnitYCylinder: public Shape
 {
@@ -21,3 +22,7 @@ protected:
     float ymax;
 };
 
+namespace shape
+{
+    extern std::shared_ptr<Shape> unitCylinder;
+}

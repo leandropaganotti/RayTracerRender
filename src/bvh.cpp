@@ -11,7 +11,7 @@ BVH::~BVH(){ }
 
 std::shared_ptr<IntersectionIF> BVH::Create(const std::vector<std::shared_ptr<SimpleObject> > &objects)
 {
-    if (objects.size() == 0) return InvisibleShape::GetInstance();
+    if (objects.size() == 0) return shape::Invisible;
 
     std::vector<std::shared_ptr<IntersectionIF>> shapes_;
     for (auto s: objects)

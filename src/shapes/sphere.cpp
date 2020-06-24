@@ -2,7 +2,10 @@
 #include "material.h"
 #include "utils.h"
 
-static std::shared_ptr<Sphere> unitSphere = std::shared_ptr<Sphere>(new Sphere(0.0f, 0.5f));
+namespace shape
+{
+    std::shared_ptr<Sphere> unitSphere = std::shared_ptr<Sphere>(new Sphere(0.0f, 0.5f));
+}
 
 Sphere::Sphere(const Vector3 &center, const float &radius) :
     center(center), radius(radius), radius2(radius * radius)

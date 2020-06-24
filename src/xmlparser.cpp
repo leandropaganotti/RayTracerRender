@@ -469,9 +469,10 @@ std::shared_ptr<Object> XMLParser::parsePlane(xmlNode *xmlPlaneNode)
 
 std::shared_ptr<Object> XMLParser::parseSphere(xmlNode * xmlSphereNode)
 {
-    auto sphere = std::shared_ptr<Sphere>(new Sphere);
     std::shared_ptr<Material> material;
     Matrix4 transform;
+    Vector3 position(0);
+    float radius=0.5f;
 
     const xmlAttr *attr = NULL;
     std::string name("");
@@ -480,9 +481,9 @@ std::shared_ptr<Object> XMLParser::parseSphere(xmlNode * xmlSphereNode)
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "position"))
-            sphere->setCenter( toVector3(attr->children->content) );
+            position = toVector3(attr->children->content);
         else if (equals(attr->name, "radius"))
-            sphere->setRadius( toFloat(attr->children->content) );
+            radius = toFloat(attr->children->content);
         else if (equals(attr->name, "material"))
         {
             material = Material::Get((const char*)attr->children->content);
@@ -491,6 +492,8 @@ std::shared_ptr<Object> XMLParser::parseSphere(xmlNode * xmlSphereNode)
         else
             LogError(xmlSphereNode, attr, "unrecognized attribute");
     }
+
+    transform = Transformation::T(position) * Transformation::S(Vector3(radius*2.0f));
 
     xmlNode *node = NULL;
     for (node = xmlSphereNode->children; node; node = node->next)
@@ -506,7 +509,7 @@ std::shared_ptr<Object> XMLParser::parseSphere(xmlNode * xmlSphereNode)
         }
     }
 
-    return std::shared_ptr<Object>(new TransformedObject(sphere, material, transform));
+    return std::shared_ptr<Object>(new TransformedObject(shape::unitSphere, material, transform));
 }
 
 std::shared_ptr<Texture> XMLParser::parseTexture(xmlNode *xmlTextureNode)
@@ -610,13 +613,12 @@ std::shared_ptr<Object> XMLParser::parseBox(xmlNode *xmlBoxNode)
                 LogError(node, nullptr, "unrecognized element");
         }
     }
-    auto box = std::shared_ptr<AABox>(new AABox);
-    return std::shared_ptr<Object>(new TransformedObject(box, material, transform));
+
+    return std::shared_ptr<Object>(new TransformedObject(shape::unitBox, material, transform));
 }
 
 std::shared_ptr<Object> XMLParser::parseCylinder(xmlNode *xmlCylinderNode)
 {
-    auto cylinder = std::shared_ptr<UnitYCylinder>(new UnitYCylinder);
     std::shared_ptr<Material> material;
 
     const xmlAttr *attr = NULL;
@@ -649,7 +651,7 @@ std::shared_ptr<Object> XMLParser::parseCylinder(xmlNode *xmlCylinderNode)
         }
     }
 
-    return std::shared_ptr<Object>(new TransformedObject(cylinder, material, transform));
+    return std::shared_ptr<Object>(new TransformedObject(shape::unitCylinder, material, transform));
 }
 
 std::shared_ptr<Object> XMLParser::parseMesh(xmlNode *xmlMeshNode)

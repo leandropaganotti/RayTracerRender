@@ -3,7 +3,10 @@
 #include "material.h"
 #include "float.h"
 
-static std::shared_ptr<UnitYCylinder> unitCylinder = std::shared_ptr<UnitYCylinder>(new UnitYCylinder);
+namespace shape
+{
+    std::shared_ptr<Shape> unitCylinder = std::shared_ptr<UnitYCylinder>(new UnitYCylinder);
+}
 
 UnitYCylinder::UnitYCylinder()
 {

@@ -1,6 +1,11 @@
 #include "invisible.h"
 #include "aabb.h"
 
+namespace shape
+{
+    std::shared_ptr<Shape> Invisible = InvisibleShape::GetInstance();
+}
+
 std::shared_ptr<InvisibleShape> InvisibleShape::instance = std::shared_ptr<InvisibleShape>(new InvisibleShape);
 
 InvisibleShape::InvisibleShape()

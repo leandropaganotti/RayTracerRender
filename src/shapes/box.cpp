@@ -2,7 +2,10 @@
 #include "material.h"
 #include "float.h"
 
-static std::shared_ptr<AABox> unitBox = std::shared_ptr<AABox>(new AABox);
+namespace shape
+{
+    std::shared_ptr<AABox> unitBox = std::shared_ptr<AABox>(new AABox);
+}
 
 AABox::AABox(const Vector3 &min, const Vector3 &max): data{min, max}
 {

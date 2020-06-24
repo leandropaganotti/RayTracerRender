@@ -1,7 +1,7 @@
 #pragma once
 
 #include "shape.h"
-
+#include <memory>
 /*
  * Axis-Aligned Box
 */
@@ -28,3 +28,7 @@ protected:
     Vector3 data[2]; // 0 -> min,  1 -> max
 };
 
+namespace shape
+{
+    extern std::shared_ptr<AABox> unitBox;
+}

@@ -16,9 +16,9 @@ public:
 class SimpleObject: public Object
 {
 public:
-    SimpleObject(const std::shared_ptr<Shape> &s, const std::shared_ptr<Material> &material):shape(s), material(material)
+    SimpleObject(const std::shared_ptr<Shape> &s, const std::shared_ptr<Material> &m):shape(s), material(m)
     {
-        if(!shape) shape = InvisibleShape::GetInstance();
+        if(!this->shape) this->shape = shape::Invisible;
         if(!this->material) this->material = material::DiffuseWhite;
     }
     virtual ~SimpleObject(){}
