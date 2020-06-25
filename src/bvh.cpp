@@ -9,28 +9,6 @@ BVH::BVH()
 
 BVH::~BVH(){ }
 
-std::shared_ptr<IntersectionIF> BVH::Create(const std::vector<std::shared_ptr<SimpleObject> > &objects)
-{
-    if (objects.size() == 0) return shape::Invisible;
-
-    std::vector<std::shared_ptr<IntersectionIF>> shapes_;
-    for (auto s: objects)
-        shapes_.push_back(s);
-
-    return Create(shapes_, 0, shapes_.size()-1);
-}
-
-std::shared_ptr<IntersectionIF> BVH::Create(const std::vector<std::shared_ptr<Object> > &objects)
-{
-    if (objects.size() == 0) return shape::Invisible;
-
-    std::vector<std::shared_ptr<IntersectionIF>> shapes_;
-    for (auto s: objects)
-        shapes_.push_back(s);
-
-    return Create(shapes_, 0, shapes_.size()-1);
-}
-
 std::shared_ptr<IntersectionIF> BVH::Create(std::vector<std::shared_ptr<IntersectionIF> > &shapes, size_t l, size_t r)
 {
     if (l==r) return shapes[l];
@@ -78,22 +56,4 @@ bool BVH::intersection(const Ray &ray) const
 
     if ( left->intersection(ray) ) return true;
     return right->intersection(ray);
-}
-
-size_t BVH::qsplit(std::vector<std::shared_ptr<IntersectionIF> > &shapes, size_t l, size_t r, float pivot, size_t axis)
-{
-    size_t j = l-1;
-    for(size_t i=l; i <= r; ++i)
-    {
-        float center = shapes[i]->getAABB().getCenter()[axis];
-        if (center < pivot)
-        {
-            ++j;
-            auto tmp = shapes[i];
-            shapes[i] = shapes[j];
-            shapes[j] = tmp;
-        }
-    }
-    if(j==(l-1) || j==r) return (l+r)/2;
-    return j+1;
 }

@@ -35,7 +35,6 @@ mesh.cpp \
 xmlparser.cpp \
 objparser.cpp \
 bvh.cpp \
-resource.cpp \
 pathtracer.cpp \
 phong.cpp \
 paramset.cpp \

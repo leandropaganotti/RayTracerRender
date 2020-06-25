@@ -42,7 +42,13 @@ void Mesh::clear()
 
 void Mesh::buildBoundingVolume()
 {
-    bvh = BVH::Create(faces);
+    if (faces.size() == 0) bvh = shape::Invisible;
+
+    std::vector<std::shared_ptr<IntersectionIF>> leaves;
+    for (auto o: faces)
+        leaves.push_back(o);
+
+    bvh = BVH::Create(leaves, 0, leaves.size()-1);
 }
 
 bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const

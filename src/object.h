@@ -5,6 +5,7 @@
 #include "material.h"
 #include <memory>
 #include "invisible.h"
+#include "bvh.h"
 
 class Object: public IntersectionIF
 {
@@ -119,6 +120,56 @@ private:
     Matrix4 inverseTranspose;
 };
 
+class GroupedObject: public Object
+{
+public:
+    virtual ~GroupedObject(){}
+    bool intersection(const Ray &ray, IntersectionData &isec) const override
+    {
+        Ray r = ray;
+        r.invdir = 1.0f / ray.direction;
+        r.posneg[0] = r.direction[0] > 0 ? 0 : 1;
+        r.posneg[1] = r.direction[1] > 0 ? 0 : 1;
+        r.posneg[2] = r.direction[2] > 0 ? 0 : 1;
+        return bvh->intersection(r, isec);
+    }
+    bool intersection(const Ray &ray) const override
+    {
+        Ray r = ray;
+        r.invdir = 1.0f / ray.direction;
+        r.posneg[0] = r.direction[0] > 0 ? 0 : 1;
+        r.posneg[1] = r.direction[1] > 0 ? 0 : 1;
+        r.posneg[2] = r.direction[2] > 0 ? 0 : 1;
+        return bvh->intersection(r);
+    }
+    AABB getAABB() const override
+    {
+        return bvh->getAABB();
+    }
+    void addObject(std::shared_ptr<Object> &o)
+    {
+        if(o)
+        objects.push_back(o);
+    }
+    void addObject(std::shared_ptr<Object> &&o)
+    {
+        if(o)
+        objects.push_back(o);
+    }
+    void buildBVH()
+    {
+        if (objects.size() == 0) bvh = shape::Invisible;
 
+        std::vector<std::shared_ptr<IntersectionIF>> leaves;
+        for (auto o: objects)
+            leaves.push_back(o);
 
+        bvh = BVH::Create(leaves, 0, leaves.size()-1);
+    }
+private:
+    std::shared_ptr<IntersectionIF> bvh;
+    std::vector<std::shared_ptr<Object>> objects;
+
+    void getIsecData(IntersectionData &) const override {}
+};
 
