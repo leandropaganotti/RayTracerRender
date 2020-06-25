@@ -31,8 +31,9 @@ src/main.cpp
 src/material.cpp
 src/material.h
 src/matrix.h
+src/mesh.cpp
+src/mesh.h
 src/object.h
-src/objmodel.cpp
 src/objparser.cpp
 src/objparser.h
 src/paramset.cpp
@@ -54,13 +55,13 @@ src/shapes/cylinder.cpp
 src/shapes/cylinder.h
 src/shapes/invisible.cpp
 src/shapes/invisible.h
-src/shapes/mesh.cpp
-src/shapes/mesh.h
 src/shapes/plane.cpp
 src/shapes/plane.h
 src/shapes/shape.h
 src/shapes/sphere.cpp
 src/shapes/sphere.h
+src/shapes/triangle.cpp
+src/shapes/triangle.h
 src/texture.cpp
 src/texture.h
 src/transformation.cpp

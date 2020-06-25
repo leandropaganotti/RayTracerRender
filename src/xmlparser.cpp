@@ -670,8 +670,8 @@ std::shared_ptr<Object> XMLParser::parseMesh(xmlNode *xmlMeshNode)
 
     if(!mesh)
     {
-        mesh = Resource<Mesh>::Create(src);
-        OBJParser::ParseMesh(mesh, src);
+        mesh = OBJParser::ParseMesh(src);
+        Resource<Mesh>::Add(src, mesh);
     }
 
     Matrix4 transform;

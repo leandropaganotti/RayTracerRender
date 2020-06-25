@@ -38,6 +38,7 @@ bvh.cpp \
 pathtracer.cpp \
 phong.cpp \
 paramset.cpp \
+triangle.cpp \
 
 OBJS=$(SRCS:.cpp=.o )
 EXE  = render

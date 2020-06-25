@@ -12,6 +12,7 @@ class Object: public IntersectionIF
 public:
     virtual ~Object(){}
     virtual void getIsecData(IntersectionData &isec) const = 0;
+    virtual void setMaterial(const std::shared_ptr<Material> &material) = 0;
 };
 
 class SimpleObject: public Object
@@ -59,7 +60,7 @@ public:
     {
         return material.get();
     }
-    void setMaterial(const std::shared_ptr<Material> &value)
+    void setMaterial(const std::shared_ptr<Material> &value) override
     {
         material = value ? value : material::DiffuseWhite;
     }
@@ -112,6 +113,10 @@ public:
         object->getIsecData(isec);
         isec.normal = (inverseTranspose * isec.normal).normalize();
         isec.phit = phit;
+    }
+    void setMaterial(const std::shared_ptr<Material> &value) override
+    {
+        object->setMaterial(value);
     }
 private:
     std::shared_ptr<Object> object;
@@ -166,10 +171,17 @@ public:
 
         bvh = BVH::Create(leaves, 0, leaves.size()-1);
     }
-private:
+    void getIsecData(IntersectionData &isec) const override
+    {
+        objects[isec.idx]->getIsecData(isec);
+    }
+    void setMaterial(const std::shared_ptr<Material> &value) override
+    {
+        for(auto &o: objects)
+            o->setMaterial(value);
+    }
+
     std::shared_ptr<IntersectionIF> bvh;
     std::vector<std::shared_ptr<Object>> objects;
-
-    void getIsecData(IntersectionData &) const override {}
 };
 

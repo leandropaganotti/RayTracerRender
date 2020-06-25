@@ -1,118 +1,5 @@
+#include "triangle.h"
 #include "mesh.h"
-#include <float.h>
-#include "material.h"
-#include "invisible.h"
-#include "bvh.h"
-
-/************************************************************************
- * Mesh class
- ************************************************************************/
-
-std::shared_ptr<Mesh> Mesh::Create()
-{
-    return std::shared_ptr<Mesh>(new Mesh);
-}
-
-void Mesh::addVertex(const Vector3 &v)
-{
-    vertices.push_back(v);
-}
-
-void Mesh::addNormal(const Vector3 &n)
-{
-    normals.push_back(n);
-}
-
-void Mesh::addFace(const std::shared_ptr<MeshTriangle> &face)
-{
-    if(face)
-    {
-        face->idx = faces.size();
-        auto obj = std::shared_ptr<SimpleObject>(new SimpleObject(face, material));
-        faces.push_back(std::move(obj));
-    }
-}
-
-void Mesh::clear()
-{
-    vertices.clear();
-    normals.clear();
-    faces.clear();
-}
-
-void Mesh::buildBoundingVolume()
-{
-    if (faces.size() == 0) bvh = shape::Invisible;
-
-    std::vector<std::shared_ptr<IntersectionIF>> leaves;
-    for (auto o: faces)
-        leaves.push_back(o);
-
-    bvh = BVH::Create(leaves, 0, leaves.size()-1);
-}
-
-bool Mesh::intersection(const Ray& ray, IntersectionData &isec) const
-{
-    Ray r = ray;
-    r.invdir = 1.0f / ray.direction;
-    r.posneg[0] = r.direction[0] > 0 ? 0 : 1;
-    r.posneg[1] = r.direction[1] > 0 ? 0 : 1;
-    r.posneg[2] = r.direction[2] > 0 ? 0 : 1;
-    return bvh->intersection(r, isec);
-}
-
-bool Mesh::intersection(const Ray& ray) const
-{
-    Ray r = ray;
-    r.invdir = 1.0f / ray.direction;
-    r.posneg[0] = r.direction[0] > 0 ? 0 : 1;
-    r.posneg[1] = r.direction[1] > 0 ? 0 : 1;
-    r.posneg[2] = r.direction[2] > 0 ? 0 : 1;
-    return bvh->intersection(r);
-}
-
-void Mesh::getIsecData(IntersectionData &isec) const
-{
-    faces[isec.idx]->getIsecData(isec);
-}
-
-std::ostream &operator <<(std::ostream &os, const Mesh &m)
-{
-    os << "Mesh:" << std::endl;
-    os << "|Vertices: " << std::endl;
-    for(size_t i= 0 ; i < m.vertices.size(); ++i)
-        std::cout << "||" << i << ":" << m.vertices[i] << std::endl;
-
-    os << "|Normals: " << std::endl;
-    for(size_t i= 0 ; i < m.normals.size(); ++i)
-        std::cout << "||" << i << ":" << m.normals[i] << std::endl;
-
-    os << "|Faces: " << std::endl;
-    for(size_t i= 0 ; i < m.faces.size(); ++i)
-        std::cout << "||" << i << ":" << m.faces[i] << std::endl;
-
-    return os ;
-}
-
-AABB Mesh::getAABB() const
-{
-    return bvh->getAABB();
-}
-
-Mesh::Mesh()
-{
-
-}
-
-void Mesh::setMaterial(const std::shared_ptr<Material> &value)
-{
-    for (auto &f: faces)
-        f->setMaterial(value);
-}
-
-/************************************************************************
- * TriangleMesh class
- ************************************************************************/
 
 MeshTriangle::MeshTriangle(const Mesh *m, size_t v0, size_t v1, size_t v2, size_t nv0, size_t nv1, size_t nv2)
 {
@@ -127,6 +14,7 @@ MeshTriangle::MeshTriangle(const Mesh *m, size_t v0, size_t v1, size_t v2, size_
     nf = (mesh->normals[nv0] + mesh->normals[nv1] + mesh->normals[nv2]).normalize();
     area = ((mesh->vertices[v1] - mesh->vertices[v0]) % (mesh->vertices[v2] - mesh->vertices[v0])).length() / 2;
     aabb.extend({mesh->vertices[v0], mesh->vertices[v1], mesh->vertices[v2]});
+    idx = mesh->objects.size();
 }
 
 bool MeshTriangle::intersection(const Ray &ray, IntersectionData &isec) const

@@ -1,4 +1,7 @@
 #include "objparser.h"
+#include "triangle.h"
+#include "mesh.h"
+
 #include <fstream>
 #include <vector>
 #include <sstream>
@@ -51,23 +54,21 @@ std::vector<std::string> split(const std::string &s, char delim) {
   return elems;
 }
 
-void OBJParser::ParseMesh(std::shared_ptr<Mesh> &mesh, const std::string &path)
+std::shared_ptr<Mesh> OBJParser::ParseMesh(const std::string &filepath)
 {
-    if(!mesh) return;
+    std::shared_ptr<Mesh> mesh = Mesh::Create();
 
-    std::ifstream ifs (path, std::ifstream::in);
+    std::ifstream ifs (filepath, std::ifstream::in);
 
     if (!ifs.is_open())
     {
-        std::cerr << "Error opening file: " << path << std::endl;
-        return;
+        std::cerr << "Error opening file: " << filepath << std::endl;
+        return nullptr;
     }
-
 
     mesh->clear();
     mesh->addVertex({});
     mesh->addNormal({});
-    //mesh->addFace(std::shared_ptr<MeshTriangle>());
 
     std::string line;
     while (!ifs.eof())
@@ -104,7 +105,7 @@ void OBJParser::ParseMesh(std::shared_ptr<Mesh> &mesh, const std::string &path)
             size_t nv3 = stoull(list1[2]);
 
             std::shared_ptr<MeshTriangle> face(new MeshTriangle(mesh.get(), v1, v2, v3, nv1, nv2, nv3));
-            mesh->addFace(face);
+            mesh->addObject(std::shared_ptr<SimpleObject>(new SimpleObject(face, material::DiffuseWhite)));
 
             if(list.size() == 5)
             {
@@ -113,12 +114,13 @@ void OBJParser::ParseMesh(std::shared_ptr<Mesh> &mesh, const std::string &path)
                 size_t nv4 = stoull(list1[2]);
 
                 face = std::shared_ptr<MeshTriangle>(new MeshTriangle(mesh.get(), v1, v3, v4, nv1, nv3, nv4));
-                mesh->addFace(face);
+                mesh->addObject(std::shared_ptr<SimpleObject>(new SimpleObject(face, material::DiffuseWhite)));
             }
         }
     }
 
     //std::cout << *mesh << std::endl;
     ifs.close();
-    mesh->buildBoundingVolume();
+    mesh->buildBVH();
+    return mesh;
 }

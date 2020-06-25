@@ -40,5 +40,5 @@ void InvisibleShape::getUV(IntersectionData &) const
 
 AABB InvisibleShape::getAABB() const
 {
-    return AABB();
+    return AABB(Vector3(0), Vector3(0));
 }

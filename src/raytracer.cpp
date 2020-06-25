@@ -93,20 +93,9 @@ Vector3 RayTracer::rayDirection(float i, float j) const
     return dir.normalize();
 }
 
-
 bool RayTracer::castRay(const Ray &ray, IntersectionData &isec)
 {
-    isec.tnear = INFINITY;
-//    for(auto &object : scene->objects)
-//    {
-//        if (object->intersection(ray, isec))
-//        {
-//            ray.tmax = isec.tnear;
-//        }
-//    }
-    scene->intersection(ray, isec);
-
-    if(isec.tnear < INFINITY)
+    if(scene->intersection(ray, isec))
     {
         isec.phit = ray.origin + isec.tnear * ray.direction;
         isec.object->getIsecData(isec);

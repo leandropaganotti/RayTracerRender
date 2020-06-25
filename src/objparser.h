@@ -1,10 +1,12 @@
 #pragma once
 
 #include <string>
-#include "mesh.h"
+#include <memory>
+
+class Mesh;
 
 class OBJParser
 {
 public:
-    static void ParseMesh(std::shared_ptr<Mesh> &mesh , const std::string &path);
+    static std::shared_ptr<Mesh> ParseMesh(const std::string &filepath);
 };

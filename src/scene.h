@@ -26,7 +26,6 @@ public:
     CameraOptions   cameraOptions;
 
     std::vector<std::shared_ptr<Light>>     lights;
-    std::vector<std::shared_ptr<Object>>   objects;
 
     friend std::ostream &operator <<(std::ostream &os, const Scene &scene);
 };
