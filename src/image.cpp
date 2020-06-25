@@ -21,6 +21,7 @@ Image::~Image()
 
 Image::Image(Image &&image)
 {
+    buffer = nullptr;
     *this = std::move(image);
 }
 
