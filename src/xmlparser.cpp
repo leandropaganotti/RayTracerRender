@@ -259,54 +259,46 @@ void XMLParser::parseRenderOptions(xmlNode *xmlRenderOptionsNode, RenderOptions 
 
 std::shared_ptr<Material> XMLParser::parseMaterial(xmlNode *xmlMaterialNode)
 {
-    if(xmlMaterialNode == NULL)
-    {
-         std::cerr << "\x1b[33;1m" << "error: could not parse Material, xmlNode pointer is NULL" << "\x1b[0m" << std::endl;
-         return nullptr;
-    }
-
-    xmlChar *attName = xmlGetProp(xmlMaterialNode,(const xmlChar*)"name");
-    std::shared_ptr<Material> material = Material::Create(attName? (const char*)attName : "");
-    xmlFree(attName);
+    Material material;
     const xmlAttr *attr = NULL;
     std::string name = "";
     for (attr = xmlMaterialNode->properties; attr; attr = attr->next)
     {
         if (equals(attr->name, "name"))
-            name = (const char*)attr->children->content;
+            material.name = (const char*)attr->children->content;
         else if (equals(attr->name, "kd"))
-            material->Kd = toVector3(attr->children->content);
+            material.Kd = toVector3(attr->children->content);
         else if (equals(attr->name, "ka"))
-            material->Ka = toVector3(attr->children->content);
+            material.Ka = toVector3(attr->children->content);
         else if (equals(attr->name, "E"))
-            material->E = toVector3(attr->children->content);
+            material.E = toVector3(attr->children->content);
         else if (equals(attr->name, "ks"))
-            material->Ks = toFloat(attr->children->content);
+            material.Ks = toFloat(attr->children->content);
         else if (equals(attr->name, "m"))
-            material->Ns = toFloat(attr->children->content);
+            material.Ns = toFloat(attr->children->content);
         else if (equals(attr->name, "R0"))
-            material->R0 = toFloat(attr->children->content);
+            material.R0 = toFloat(attr->children->content);
         else if (equals(attr->name, "index"))
-            material->Ni = toFloat(attr->children->content);
+            material.Ni = toFloat(attr->children->content);
         else if (equals(attr->name, "type"))
         {
             if (equals(attr->children->content, "DIFFUSE"))
-                material->type = MaterialType::DIFFUSE;
+                material.type = MaterialType::DIFFUSE;
             else if (equals(attr->children->content, "SPECULAR"))
-                material->type = MaterialType::SPECULAR;
+                material.type = MaterialType::SPECULAR;
             else if (equals(attr->children->content, "TRANSPARENT"))
-                material->type = MaterialType::TRANSPARENT;
+                material.type = MaterialType::TRANSPARENT;
             else
-                std::cerr << "\x1b[33;1m" << "unrecognized material type \'" << attr->children->content << "\'" << "\x1b[0m" << std::endl;
+                LogError(xmlMaterialNode, attr, "unrecognized material type");
         }
         else if (equals(attr->name, "texture"))
         {
-            material->texture = Resource::Get<Texture>((const char*)attr->children->content);
-            if(!material->texture)
+            material.texture = Resource<Texture>::Get((const char*)attr->children->content);
+            if(!material.texture)
                 LogError(xmlMaterialNode, attr, "Can't find Texture");
         }
         else
-            std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlMaterialNode->name << "\':" << name << "    \x1b[0m" << std::endl;
+            LogError(xmlMaterialNode, attr, "unrecognized attribute");
     }
 
     xmlNode *node = NULL;
@@ -315,12 +307,20 @@ std::shared_ptr<Material> XMLParser::parseMaterial(xmlNode *xmlMaterialNode)
         if (node->type == XML_ELEMENT_NODE)
         {
             if (equals(node->name, "texture"))
-                material->texture = parseTexture(node);
+                material.texture = parseTexture(node);
             else
-                std::cerr << "\x1b[33;1m" << "unrecognized element \'" << node->name << "\' in element \'" << xmlMaterialNode->name << "\'" << "\x1b[0m" << std::endl;
+                LogError(node, nullptr, "unrecognized element");
         }
     }
-    return material;
+
+    std::shared_ptr<Material> m;
+    if(material.name != "")
+       m = Resource<Material>::Create(material.name);
+    else
+       m = Material::Create();
+
+    *m = material; // TODO
+    return m;
 }
 
 std::shared_ptr<Light> XMLParser::parsePointLight(xmlNode *xmlPointLightNode)
@@ -445,7 +445,7 @@ std::shared_ptr<Object> XMLParser::parsePlane(xmlNode *xmlPlaneNode)
         else if (equals(attr->name, "normal"))
             plane->setNormal(toVector3(attr->children->content));
         else if (equals(attr->name, "material"))
-            material = Material::Get((const char*)attr->children->content);
+            material = Resource<Material>::Get((const char*)attr->children->content);
         else
             LogError(xmlPlaneNode, attr, "unrecognized attribute");
     }
@@ -486,7 +486,7 @@ std::shared_ptr<Object> XMLParser::parseSphere(xmlNode * xmlSphereNode)
             radius = toFloat(attr->children->content);
         else if (equals(attr->name, "material"))
         {
-            material = Material::Get((const char*)attr->children->content);
+            material = Resource<Material>::Get((const char*)attr->children->content);
             if(!material) LogError(xmlSphereNode, attr, "Can't find material");
         }
         else
@@ -514,71 +514,60 @@ std::shared_ptr<Object> XMLParser::parseSphere(xmlNode * xmlSphereNode)
 
 std::shared_ptr<Texture> XMLParser::parseTexture(xmlNode *xmlTextureNode)
 {
-    if(xmlTextureNode == NULL)
-    {
-         std::cerr << "\x1b[33;1m" << "error: could not parse Texture, xmlNode pointer is NULL" << "\x1b[0m" << std::endl;
-         return nullptr;
-    }
-
-    const xmlAttr *attr = NULL;
     std::string name("");
-    std::string type("");
-    std::string src("");
-    float rows=1.0f, cols=1.0f, uedge=0.1f, vedge=0.1f, angle=0.0f, width=1.0f, height=1.0f;
-    Vector3 color1=0, color2=1;
+    const xmlAttr *attr = NULL;
+    ParamSet params;
     for (attr = xmlTextureNode->properties; attr; attr = attr->next)
     {
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "type"))
-            type = (const char*)attr->children->content;
-        else if (equals(attr->name, "src"))
-            src = (const char*)attr->children->content;
-        else if (equals(attr->name, "rows"))
-            rows = toFloat(attr->children->content);
-        else if (equals(attr->name, "cols"))
-            cols = toFloat(attr->children->content);
-        else if (equals(attr->name, "width"))
-            width = toFloat(attr->children->content);
-        else if (equals(attr->name, "height"))
-            height = toFloat(attr->children->content);
-        else if (equals(attr->name, "uedge"))
-            uedge = toFloat(attr->children->content);
-        else if (equals(attr->name, "vedge"))
-            vedge = toFloat(attr->children->content);
-        else if (equals(attr->name, "color1"))
-            color1 = toVector3(attr->children->content);
-        else if (equals(attr->name, "color2"))
-            color2 = toVector3(attr->children->content);
-        else if (equals(attr->name, "angle"))
-            angle = toFloat(attr->children->content);
-        else
-            std::cerr << "\x1b[33;1m" << "unrecognized attribute \'" << attr->name << "\' in element \'" << xmlTextureNode->name << "\'" << "\x1b[0m" << std::endl;
-    }
-
-    if (type == "Tiles")
-    {
-        auto tex = Tiles::Create(name, color1, color2, rows, cols, angle, uedge, vedge);
-        return tex;
-    }
-    else if (type == "ChessBoard")
-    {
-        auto tex = ChessBoard::Create(name, color1, color2, rows, cols, angle);
-        return tex;
-    }
-    else if (type == "Texture2d")
-    {
-        auto tex = Texture2d::Create(src, src);
-        if(tex)
         {
-            tex->setWidth(width);
-            tex->setHeight(height);
+            if (equals(attr->children->content, "Tiles"))               params.set<TextureType>("type", TextureType::Tiles);
+            else if (equals(attr->children->content, "Checkerboard"))   params.set<TextureType>("type", TextureType::CheckerBoard);
+            else if (equals(attr->children->content, "Texture2d"))      params.set<TextureType>("type", TextureType::Texture2d);
+            else if (equals(attr->children->content, "SolidTexture"))   params.set<TextureType>("type", TextureType::SolidTexture);
         }
-        return tex;
+        else if (equals(attr->name, "src"))
+            params.set<std::string>("src", (const char*)attr->children->content);
+        else if (equals(attr->name, "rows"))
+            params.set<float>("rows", toFloat(attr->children->content));
+        else if (equals(attr->name, "cols"))
+            params.set<float>("cols" , toFloat(attr->children->content));
+        else if (equals(attr->name, "width"))
+            params.set<float>("width" , toFloat(attr->children->content));
+        else if (equals(attr->name, "height"))
+            params.set<float>("height" , toFloat(attr->children->content));
+        else if (equals(attr->name, "uedge"))
+            params.set<float>("uedge", toFloat(attr->children->content));
+        else if (equals(attr->name, "vedge"))
+            params.set<float>("vedge" , toFloat(attr->children->content));
+        else if (equals(attr->name, "color"))
+            params.set<Vector3>("color" , toVector3(attr->children->content));
+        else if (equals(attr->name, "color1"))
+            params.set<Vector3>("color1" , toVector3(attr->children->content));
+        else if (equals(attr->name, "color2"))
+            params.set<Vector3>("color2" , toVector3(attr->children->content));
+        else if (equals(attr->name, "angle"))
+            params.set<float>("angle", toFloat(attr->children->content));
+        else
+            LogError(xmlTextureNode, attr, "unrecognized attribute");
     }
 
-    std::cerr << "\x1b[33;1m" << "Error parsing Texture, \'Type\' not found or invalid in " << xmlTextureNode->name << "\x1b[0m" << std::endl;
-    return nullptr;
+    TextureType type;
+    if(!params.get<TextureType>("type", type))
+    {
+        LogError(xmlTextureNode, nullptr, "texture type attribute not found or invalid");
+        return nullptr;
+    }
+
+    std::shared_ptr<Texture> texture;
+    if(name != "")
+        texture = Resource<Texture>::Create(name, params);
+    else
+        texture = Texture::Create(params);
+
+    return texture;
 }
 
 std::shared_ptr<Object> XMLParser::parseBox(xmlNode *xmlBoxNode)
@@ -592,7 +581,7 @@ std::shared_ptr<Object> XMLParser::parseBox(xmlNode *xmlBoxNode)
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "material"))
         {
-            material = Material::Get((const char*)attr->children->content);
+            material = Resource<Material>::Get((const char*)attr->children->content);
             if(!material) LogError(xmlBoxNode, attr, "Can't find material");
         }
         else
@@ -629,7 +618,7 @@ std::shared_ptr<Object> XMLParser::parseCylinder(xmlNode *xmlCylinderNode)
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "material"))
         {
-            material = Material::Get((const char*)attr->children->content);
+            material = Resource<Material>::Get((const char*)attr->children->content);
             if(!material) LogError(xmlCylinderNode, attr, "Can't find material");
         }
         else
@@ -670,18 +659,18 @@ std::shared_ptr<Object> XMLParser::parseMesh(xmlNode *xmlMeshNode)
         }
         else if (equals(attr->name, "material"))
         {
-            material = Material::Get((const char*)attr->children->content);
+            material = Resource<Material>::Get((const char*)attr->children->content);
             if(!material) LogError(xmlMeshNode, attr, "Can't find material");
         }
         else
             LogError(xmlMeshNode, attr, "unrecognized attribute");
     }
 
-    auto mesh = Resource::Get<Mesh>(src);
+    auto mesh = Resource<Mesh>::Get(src);
 
     if(!mesh)
     {
-        mesh = Resource::Create<Mesh>(src);
+        mesh = Resource<Mesh>::Create(src);
         OBJParser::ParseMesh(mesh, src);
     }
 

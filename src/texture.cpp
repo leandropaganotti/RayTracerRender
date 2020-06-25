@@ -4,27 +4,19 @@
 
 namespace texture
 {
-    const std::shared_ptr<Texture> SolidWhite = Solid::Create("SolidWhite", color::WHITE);
+    const std::shared_ptr<Texture> SolidWhite = SolidTexture::Create(color::WHITE);
 }
 
-Texture::Texture()
-{
-}
+Texture::Texture(){}
 
 Texture::~Texture() {}
 
-std::shared_ptr<ChessBoard> ChessBoard::Create(const std::string &key, const Vector3 &color1, const Vector3 &color2, float rows, float cols, float angle)
+std::shared_ptr<Checkerboard> Checkerboard::Create(const Vector3 &color1, const Vector3 &color2, float rows, float cols, float angle)
 {
-    ChessBoard *chessboard = new ChessBoard;
-    chessboard->color1 = color1;
-    chessboard->color2 = color2;
-    chessboard->rows = rows;
-    chessboard->cols = cols;
-    chessboard->angle = angle;    
-    return Resource::Create<ChessBoard>(key, chessboard);
+    return std::shared_ptr<Checkerboard>(new Checkerboard(color1, color2, rows, cols, angle));
 }
 
-const Vector3 ChessBoard::get(const Vector2 &uv) const
+const Vector3 Checkerboard::get(const Vector2 &uv) const
 {
     float s = uv.u*cos(deg2rad(angle)) - uv.v*sin(deg2rad(angle));
     float t = uv.v*cos(deg2rad(angle)) + uv.u*sin(deg2rad(angle));
@@ -35,19 +27,15 @@ const Vector3 ChessBoard::get(const Vector2 &uv) const
 		return color2;
 }
 
-ChessBoard::ChessBoard(){}
-
-std::shared_ptr<Tiles> Tiles::Create(const std::string &key, const Vector3 &colorTile, const Vector3 &colorEdge, float rows, float cols, float angle, float uedge, float vedge)
+Checkerboard::Checkerboard(const Vector3 &color1, const Vector3 &color2, float rows, float cols, float angle):
+    color1(color1), color2(color2), rows(rows), cols(cols), angle(angle)
 {
-    Tiles *tiles = new Tiles;
-    tiles->colorTile = colorTile;
-    tiles->colorEdge = colorEdge;
-    tiles->rows = rows;
-    tiles->cols = cols;
-    tiles->angle = angle;
-    tiles->uedge = uedge;
-    tiles->vedge = vedge;
-    return Resource::Create<Tiles>(key, tiles);
+
+}
+
+std::shared_ptr<Tiles> Tiles::Create(const Vector3 &colorTile, const Vector3 &colorEdge, float rows, float cols, float angle, float uedge, float vedge)
+{
+    return std::shared_ptr<Tiles>(new Tiles(colorTile, colorEdge, rows, cols, angle, uedge, vedge));
 }
 
 const Vector3 Tiles::get(const Vector2 &uv) const
@@ -60,31 +48,34 @@ const Vector3 Tiles::get(const Vector2 &uv) const
         return colorEdge;
 }
 
-Tiles::Tiles(){}
-
-std::shared_ptr<Texture> Solid::Create(const std::string &key, const Vector3 &color)
+Tiles::Tiles(const Vector3 &colorTile, const Vector3 &colorEdge, float rows, float cols, float angle, float uedge, float vedge):
+    colorTile(colorTile), colorEdge(colorEdge), rows(rows), cols(cols), angle(angle), uedge(uedge), vedge(vedge)
 {
-    return Resource::Create<Texture>(key, new Solid(color));
+
 }
 
-const Vector3 Solid::get(const Vector2 &) const
+std::shared_ptr<SolidTexture> SolidTexture::Create(const Vector3 &color)
+{
+    return std::shared_ptr<SolidTexture>(new SolidTexture(color));
+}
+
+const Vector3 SolidTexture::get(const Vector2 &) const
 {
     return color;
 }
 
-Solid::Solid(const Vector3 &color): color(color)
+SolidTexture::SolidTexture(const Vector3 &color): color(color)
 {
 
 }
 
-std::shared_ptr<Texture2d> Texture2d::Create(const std::string &key, const std::string &filepath)
+std::shared_ptr<Texture2d> Texture2d::Create(const std::string &filepath, float w, float h)
 {
     Image image;
 
     if(image.read(filepath.c_str()))
     {
-        Texture2d *tex2d = new Texture2d(image);
-        return Resource::Create(key, tex2d);
+        return std::shared_ptr<Texture2d>(new Texture2d(std::move(image), w, h));
     }
     return nullptr;
 }
@@ -116,18 +107,62 @@ const Vector3 Texture2d::get(const Vector2 &uv) const
     return c;
 }
 
-Texture2d::Texture2d(Image &image)
+Texture2d::Texture2d(Image &&img, float w, float h): image(std::move(img)), width(w), height(h)
 {
-    this->image = std::move(image);
-    width = height = 1.0; // meters
+
 }
 
-void Texture2d::setHeight(float value)
+std::shared_ptr<Texture> Texture::Create(const ParamSet &params)
 {
-    height = value;
-}
-
-void Texture2d::setWidth(float value)
-{
-    width = value;
+    TextureType type;
+    if(params.get<TextureType>("type", type))
+    {
+        switch (type)
+        {
+        case TextureType::SolidTexture:
+        {
+            Vector3 color(0);
+            params.get<Vector3>("color", color);
+            return SolidTexture::Create(color);
+        }
+        break;
+        case TextureType::Tiles:
+        {
+            Vector3 color1(1), color2(0);
+            float rows=1.0f, cols=1.0f, angle=0.0f, uedge=0.01f, vedge=0.01f;
+            params.get<Vector3>("color1", color1);
+            params.get<Vector3>("color2", color2);
+            params.get<float>("rows", rows);
+            params.get<float>("cols", cols);
+            params.get<float>("angle", angle);
+            params.get<float>("uedge", uedge);
+            params.get<float>("vedge", vedge);
+            return Tiles::Create(color1, color2, rows, cols, angle, uedge, vedge);
+        }
+        break;
+        case TextureType::CheckerBoard:
+        {
+            Vector3 color1(1), color2(0);
+            float rows=1.0f, cols=1.0f, angle=0.0f;
+            params.get<Vector3>("color1", color1);
+            params.get<Vector3>("color2", color2);
+            params.get<float>("rows", rows);
+            params.get<float>("cols", cols);
+            params.get<float>("angle", angle);
+            return Checkerboard::Create(color1, color2, rows, cols, angle);
+        }
+        break;
+        case TextureType::Texture2d:
+        {
+            std::string filepath{};
+            float w=1.0, h=1.0f;
+            params.get<std::string>("src", filepath);
+            params.get<float>("width", w);
+            params.get<float>("height", h);
+            return Texture2d::Create(filepath, w, h);
+        }
+        break;
+        }
+    }
+    return nullptr;
 }

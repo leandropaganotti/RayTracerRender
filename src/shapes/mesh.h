@@ -9,10 +9,10 @@
  class BVH;
  class MeshTriangle;
 
-class Mesh: public Object, public Resource
+class Mesh: public Object
 {    
 public:
-    static std::shared_ptr<Mesh> Create(const std::string &key);
+    static std::shared_ptr<Mesh> Create();
 
     void addVertex(const Vector3& v);
     void addNormal(const Vector3& n);
@@ -21,14 +21,15 @@ public:
     void clear();
     void buildBoundingVolume();
 
-    friend std::ostream& operator << (std::ostream& os, const Mesh &m);
 
-    bool  intersection(const Ray& ray, IntersectionData& isec) const override;
-    bool  intersection(const Ray& ray) const override;
+    bool intersection(const Ray& ray, IntersectionData& isec) const override;
+    bool intersection(const Ray& ray) const override;
     void getIsecData(IntersectionData &isec) const override;
     AABB getAABB() const override;
 
     void setMaterial(const std::shared_ptr<Material> &value);
+
+    friend std::ostream& operator << (std::ostream& os, const Mesh &m);
 
 protected:
     Mesh();
@@ -40,7 +41,6 @@ protected:
     std::shared_ptr<Material> material;
 
     friend class MeshTriangle;
-    friend class MeshQuad;
 };
 
 class MeshTriangle: public Shape

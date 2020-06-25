@@ -8,9 +8,9 @@
  * Mesh class
  ************************************************************************/
 
-std::shared_ptr<Mesh> Mesh::Create(const std::string &key)
+std::shared_ptr<Mesh> Mesh::Create()
 {
-    return Resource::Create<Mesh>(key, new Mesh);
+    return std::shared_ptr<Mesh>(new Mesh);
 }
 
 void Mesh::addVertex(const Vector3 &v)

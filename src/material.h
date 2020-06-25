@@ -7,20 +7,27 @@
 
 #include <vector>
 
-class Material;
+struct Material;
 
 enum class MaterialType { DIFFUSE, SPECULAR, TRANSPARENT };
 
 namespace material
 {
-    extern const std::shared_ptr<Material> DiffuseWhite;
-    extern const std::shared_ptr<Material> Glass;
-    extern const std::shared_ptr<Material> Mirror;
+    extern std::shared_ptr<Material> DiffuseWhite;
+    extern std::shared_ptr<Material> Glass;
+    extern std::shared_ptr<Material> Mirror;
 }
 
-class Material: public Resource
+struct Material
 {
-public:
+    Material();
+    Material(const std::string &name, MaterialType type);
+    ~Material();
+
+    static std::shared_ptr<Material> Create();
+    static std::shared_ptr<Material> CreateResource(const std::string &name, MaterialType type);
+
+    std::string name;
     MaterialType type;
     Vector3 Kd;
     Vector3 Ka;
@@ -30,18 +37,6 @@ public:
     float R0;
     float Ni;
     std::shared_ptr<Texture>  texture;
-
-    static std::shared_ptr<Material> Create(const std::string &key, MaterialType type);
-    static std::shared_ptr<Material> Create(const std::string &key);
-
-    static std::shared_ptr<Material> Get(const std::string &key);
-
-
-
-    ~Material();
-protected:
-    Material(MaterialType type);
-    Material();
 };
 
 #endif // MATERIAL_H

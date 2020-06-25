@@ -2,29 +2,28 @@
 
 namespace material
 {
-    const std::shared_ptr<Material> DiffuseWhite = Material::Create("DiffuseWhite", MaterialType::DIFFUSE);
-    const std::shared_ptr<Material> Glass = Material::Create("Glass", MaterialType::TRANSPARENT);
-    const std::shared_ptr<Material> Mirror = Material::Create("Mirror", MaterialType::SPECULAR);
+    std::shared_ptr<Material> DiffuseWhite = Material::CreateResource("DiffuseWhite", MaterialType::DIFFUSE);
+    std::shared_ptr<Material> Glass = Material::CreateResource("Glass", MaterialType::TRANSPARENT);
+    std::shared_ptr<Material> Mirror = Material::CreateResource("Mirror", MaterialType::SPECULAR);
 }
 
-std::shared_ptr<Material> Material::Create(const std::string &key, MaterialType type)
+std::shared_ptr<Material> Material::CreateResource(const std::string &name, MaterialType type)
 {
-    return Resource::Create<Material>(key, new Material(type));
-}
-std::shared_ptr<Material> Material::Create(const std::string &key)
-{
-    return Resource::Create<Material>(key, new Material);
-}
-
-std::shared_ptr<Material> Material::Get(const std::string &key)
-{
-    return Resource::Get<Material>(key);
+    std::shared_ptr<Material> material = std::shared_ptr<Material>(new Material(name, type));
+    Resource<Material>::Add(name, material);
+    return material;
 }
 
 Material::~Material(){}
 
-Material::Material(MaterialType type)
+std::shared_ptr<Material> Material::Create()
 {
+    return std::shared_ptr<Material>(new Material);
+}
+
+Material::Material(const std::string &name, MaterialType type)
+{
+    this->name = name;
     Kd = 1.0f;
     Ka = 0.1f;
     E = 0.0f;
@@ -38,6 +37,7 @@ Material::Material(MaterialType type)
 
 Material::Material()
 {
+    name = "";
     Kd = 1.0f;
     Ka = 0.1f;
     E = 0.0f;
