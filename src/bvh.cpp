@@ -17,7 +17,18 @@ std::shared_ptr<IntersectionIF> BVH::Create(const std::vector<std::shared_ptr<Si
     for (auto s: objects)
         shapes_.push_back(s);
 
-    return Create(shapes_, 1, shapes_.size()-1);
+    return Create(shapes_, 0, shapes_.size()-1);
+}
+
+std::shared_ptr<IntersectionIF> BVH::Create(const std::vector<std::shared_ptr<Object> > &objects)
+{
+    if (objects.size() == 0) return shape::Invisible;
+
+    std::vector<std::shared_ptr<IntersectionIF>> shapes_;
+    for (auto s: objects)
+        shapes_.push_back(s);
+
+    return Create(shapes_, 0, shapes_.size()-1);
 }
 
 std::shared_ptr<IntersectionIF> BVH::Create(std::vector<std::shared_ptr<IntersectionIF> > &shapes, size_t l, size_t r)
