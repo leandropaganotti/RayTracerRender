@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scene name="ptexture" grid="1" spp="1" index="1.0" maxdepth="5" bgcolor="0" ka="0.1">
+<scene name="ptexture" >
+	<RenderOptions grid="4" spp="4" index="1.0" maxdepth="5" bgcolor="0" illum="phong" />
     <CameraOptions position="0,1.5,6" lookingat="0, 1, 0" fov="35" width="640" height="480"></CameraOptions>
-    <PointLight position="0,2,2" color="1" strength="1.0" k="0.001"></PointLight>    
-    <plane name="floor" point="-100, 0, 100" normal="0,1,0">
+	<PointLight position="0,2,2" color="1" intensity="1.0" atten="0.001"></PointLight>
+	<plane name="floor" origin="-100, 0, 100" normal="0,1,0">
         <material type="specular" kd="0.75, 0.25, 0.25" ks="0" R0="0.03">
-            <texture type="ChessBoard" name="chessBoard" rows="1" cols="1" color1="1" color2="0" angle="45"></texture>
+			<texture type="checkerboard" name="chessBoard" rows="1" cols="1" color1="1" color2="0" angle="45"></texture>
         </material>
     </plane>
     <Sphere name="left" position="-1.8,0.5,0" radius="0.5" material="Mirror" />

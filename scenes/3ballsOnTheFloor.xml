@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scene name="3ballsOnTheFloor" grid="2" spp="16" index="1.0" maxdepth="3" bgcolor="0" ka="0.1">
+<scene name="3ballsOnTheFloor" >
+	<RenderOptions grid="4" spp="4" index="1.0" maxdepth="3" bgcolor="0" illum="phong" />
     <CameraOptions position="0,2,13" lookingat="0" fov="35" width="640" height="480"></CameraOptions>
-    <PointLight position="0,3,6.5" color="1" strength="1.5" k="0.05"></PointLight>
+	<PointLight position="0,3,6.5" color="1" intensity="1.5" atten="0.05"></PointLight>
     <Sphere name="left" position="-2.5,1,2.5" radius="1">
         <material type="specular" kd="1,0,0" ks="1" m="250" R0="0.1" ></material>
     </Sphere>
@@ -11,9 +12,9 @@
     <Sphere name="right" position="2.5, 1, 2.5" radius="1">
         <material type="specular" kd="0,0,1" ks="0" m="350" R0="0.8" ></material>
     </Sphere>
-    <Plane name="floor" point="0" normal="0,1,0" >
+	<Plane name="floor" origin="0" normal="0,1,0" >
         <material type="specular" kd="1" ks="1" m="250" R0="0.3">
-            <texture type="ChessBoard" rows="1" cols="1" color1="1" color2="0" angle="0"></texture>
+			<texture type="checkerboard" rows="1" cols="1" color1="1" color2="0" angle="0"></texture>
         </material>
     </Plane>
 </scene>
