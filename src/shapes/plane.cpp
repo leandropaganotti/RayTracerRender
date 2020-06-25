@@ -77,20 +77,16 @@ void Plane::getUV(IntersectionData &isec) const
 
 AABB Plane::getAABB() const
 {
-    Vector3 v = Vector3(1,0,0) % w;
-    if(v.length() < 0.1f) v = Vector3(0,1,0) % w;
-
     float t=1000.0;
-    Vector3 P0 = origin - t * v.normalize();
-    Vector3 P1 = origin + t * v.normalize();
+    Vector3 P0 = origin - t * v;
+    Vector3 P1 = origin + t * v;
     AABB aabb;
 
     aabb.extend(P0+0.1*w);
     aabb.extend(P1-0.1*w);
 
-    v = v % w;
-    P0 = origin - t * v.normalize();
-    P1 = origin + t * v.normalize();
+    P0 = origin - t * u;
+    P1 = origin + t * u;
 
     aabb.extend(P0);
     aabb.extend(P1);

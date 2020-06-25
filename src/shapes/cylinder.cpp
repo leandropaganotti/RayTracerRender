@@ -170,5 +170,5 @@ void UnitYCylinder::getUV(IntersectionData &) const
 
 AABB UnitYCylinder::getAABB() const
 {
-    return AABB({-0.5f, -0.5f, -0.5f}, {-0.5f, -0.5f, -0.5f});
+    return AABB({-0.5f, -0.5f, -0.5f}, {0.5f, 0.5f, 0.5f});
 }
