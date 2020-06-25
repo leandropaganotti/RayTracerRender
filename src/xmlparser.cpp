@@ -274,7 +274,7 @@ std::shared_ptr<Material> XMLParser::parseMaterial(xmlNode *xmlMaterialNode)
             material.E = toVector3(attr->children->content);
         else if (equals(attr->name, "ks"))
             material.Ks = toFloat(attr->children->content);
-        else if (equals(attr->name, "m"))
+        else if (equals(attr->name, "ns"))
             material.Ns = toFloat(attr->children->content);
         else if (equals(attr->name, "R0"))
             material.R0 = toFloat(attr->children->content);

@@ -80,6 +80,7 @@ void PointLight::getLightData(const Vector3 &phit, LightData &light) const
     light.intensity = intensity * (1.0f / ( 1.0f + atten * light.distance )); // attenuation = 1/(1+atten*dist*dist) -> default atten=4*pi
     light.distance = sqrtf(light.distance);
     light.direction /= light.distance;
+    light._1_pdf = 1.0f;
 }
 
 float PointLight::visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const
@@ -140,6 +141,7 @@ void DistantLight::getLightData(const Vector3 &, LightData &light) const
     light.distance = INFINITY;
     light.direction = direction;
     light.intensity = intensity;
+    light._1_pdf = 1.0f;
 }
 
 float DistantLight::visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const

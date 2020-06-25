@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scene name="ModifiedCornellBox" >
-	<RenderOptions grid="2" spp="8" index="1.0" maxdepth="5" bgcolor="0" illum="global" />
+	<RenderOptions grid="2" spp="8" index="1.0" maxdepth="5" bgcolor="1" illum="global2" />
     <CameraOptions position="0,1.7,5" lookingat="0,1.7,0" fov="50" width="640" height="480"></CameraOptions>
     <Sphere name="mirrorBall" position="-2,0.8,-1.5" radius="0.8">
         <material type="specular" ks="0.9" R0="1"></material>
     </Sphere>
     <Sphere name="glassBall" position="1.8,1.5,0.2" radius="0.5">
-        <material type="transparent" index="1.5" m="150" ks="1"></material>
+		<material type="transparent" index="1.5" ns="150" ks="1"></material>
     </Sphere>
 	<plane name="floor" origin="0,0,0" normal="0,1,0">
         <material type="diffuse" kd="0.70" >
@@ -43,13 +43,12 @@
     <Sphere name="blue" position="1.1,0.4,-2.0" radius="0.4">
         <material type="diffuse" kd="0,0,1"></material>
     </Sphere>
-    <Sphere name="light" position="0,4,-5" radius="0.1">
-        <material type="diffuse" kd="1" E="8000"></material>
-    </Sphere>
+
     <Box>
         <transformation translate="-1.5,1,3.7" rotate="0, 30, 0" scale="1, 3, 1"></transformation>
         <material type="diffuse" kd="0.184, 0.310, 0.310" E="0"></material>
     </Box>
+	<SphericalLight position="0,4,-5" color="1" intensity="8000" radius="0.1" atten="0"/>
 </scene>
 
 

@@ -103,27 +103,22 @@ Vector3 PathTracerWithDirectSampling::trace(const Ray &ray, const uint8_t depth,
     {
         //direct light
         Vector3 direct(0);
-//        for(auto &obj : scene->objects)
-//        {
-//            const GSphere * const sphere = dynamic_cast<const GSphere*const>(obj.get());
-//            if (!sphere) continue; // only supported sphere for direct light
-//            if (sphere->getMaterial(0)->E  == vector::ZERO) continue; // skip non light
+        for(auto &light : scene->lights)
+        {
+            LightData isecLight;
+            light->getLightData(isec.phit, isecLight);
 
-//            Vector3 sampleToLight;
-//            float _1_pdf;
-//            sphere->sampleSolidAngleSphere(isec.phit, sampleToLight, _1_pdf);
+            float vis = light->visibility(Ray(isec.phit + bias * isec.normal, -isecLight.direction), scene->objects);
 
-//            float cosTheta = isec.normal ^ sampleToLight;
-//            if( cosTheta > 0.0f )
-//            {
-//                float dist = (isec.phit - sphere->getCenter()).length() - sphere->getRadius() - bias;
-//                float vis = castShadowRay(Ray(isec.phit + bias * isec.normal, sampleToLight, dist));
-//                if (vis > 0.0f)
-//                {
-//                    direct += brdf * sphere->getMaterial(0)->E * cosTheta * _1_pdf;
-//                }
-//            }
-//        }
+            //diffuse
+            Vector3 diffuse = brdf * isecLight.intensity * std::max(0.0f, (isec.normal ^ -isecLight.direction)) * isecLight._1_pdf;
+
+            //specular
+            Vector3 toCamera = -ray.direction;
+            Vector3 reflected = reflect(isecLight.direction, isec.normal);
+            Vector3 specular = powf(std::max(0.0f, toCamera ^ reflected), isec.material->Ns) * isec.material->Ks;
+            direct += vis * (diffuse + specular);
+        }
 
         //indirect light
         const float _1_pdf = (2.0f*M_PI);//1/(2*M_PI)
