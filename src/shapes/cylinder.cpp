@@ -142,8 +142,24 @@ bool UnitYCylinder::intersection(const Ray &ray) const
 
 void UnitYCylinder::getIsecData(IntersectionData &isec) const
 {
-    getUV(isec);
-    getNormal(isec);
+    if(isec.idx==0)
+    {
+        isec.normal = vector::DOWN;
+        isec.uv.u = isec.phit.x + 0.5;
+        isec.uv.v = isec.phit.z + 0.5;
+    }
+    else if(isec.idx==1)
+    {
+        isec.normal = Vector3(isec.phit.x, 0.0f, isec.phit.z) / r;
+        isec.uv.u = atan2(isec.phit.x, isec.phit.z) / (2*M_PI) +0.5;
+        isec.uv.v = 1.0f - isec.phit.y + 0.5f;
+    }
+    else
+    {
+        isec.normal = vector::UP;
+        isec.uv.u = isec.phit.x + 0.5;
+        isec.uv.v = isec.phit.z + 0.5;
+    }
 }
 
 inline
@@ -162,10 +178,24 @@ void UnitYCylinder::getNormal(IntersectionData &isec) const
         isec.normal = vector::UP;
     }
 }
-
-void UnitYCylinder::getUV(IntersectionData &) const
+inline
+void UnitYCylinder::getUV(IntersectionData &isec) const
 {
-
+    if(isec.idx==0)
+    {
+        isec.uv.u = isec.phit.x + 0.5;
+        isec.uv.v = isec.phit.z + 0.5;
+    }
+    else if(isec.idx==1)
+    {
+        isec.uv.u = atan2(isec.phit.x, isec.phit.z) / (2*M_PI) +0.5;
+        isec.uv.v = 1.0f - isec.phit.y + 0.5f;
+    }
+    else
+    {
+        isec.uv.u = isec.phit.x + 0.5;
+        isec.uv.v = isec.phit.z + 0.5;
+    }
 }
 
 AABB UnitYCylinder::getAABB() const
