@@ -57,8 +57,11 @@ int main(int argc, char **argv)
         time_in_ms = chrono::duration_cast<chrono::milliseconds>(end - start).count();
 
         std::stringstream ss;
-        int s=time_in_ms/1000, m=s/60, h=m/60;
-        ss << std::setw(2) << std::setfill('0') << h << "." << std::setw(2) << std::setfill('0') << m << "." << std::setw(2) << std::setfill('0') << s << "." << std::setw(3) << std::setfill('0') << (unsigned long long)time_in_ms % 1000;
+        int ms = (unsigned long long)time_in_ms % 1000;
+        int s  = ((unsigned long long)time_in_ms / 1000) % 60;
+        int m  = ((unsigned long long)time_in_ms / 1000 / 60) % 60;
+        int h  = ((unsigned long long)time_in_ms / 1000 / 60 / 60);
+        ss << std::setw(2) << std::setfill('0') << h << "." << std::setw(2) << std::setfill('0') << m << "." << std::setw(2) << std::setfill('0') << s << "." << std::setw(3) << std::setfill('0') << ms;
         std::string time_str = ss.str();
         cout << ", Time: " << time_str << endl << flush;
 
