@@ -17,6 +17,7 @@ MeshTriangle::MeshTriangle(const Mesh *m, size_t v0, size_t v1, size_t v2, size_
     idx = mesh->objects.size();
 }
 
+inline
 bool MeshTriangle::intersection(const Ray &ray, IntersectionData &isec) const
 {
     float A = mesh->vertices[v[0]].x - mesh->vertices[v[1]].x;
@@ -96,7 +97,8 @@ void MeshTriangle::getNormal(IntersectionData& isec) const
 inline
 void MeshTriangle::getUV(IntersectionData &isec) const
 {
-    isec.uv = Vector2(0);
+    isec.uv.u = 0;
+    isec.uv.v = 0;
 }
 
 std::ostream& operator <<(std::ostream &os, const MeshTriangle &t)

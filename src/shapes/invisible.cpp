@@ -3,19 +3,7 @@
 
 namespace shape
 {
-    std::shared_ptr<Shape> Invisible = InvisibleShape::GetInstance();
-}
-
-std::shared_ptr<InvisibleShape> InvisibleShape::instance = std::shared_ptr<InvisibleShape>(new InvisibleShape);
-
-InvisibleShape::InvisibleShape()
-{
-
-}
-
-std::shared_ptr<InvisibleShape> InvisibleShape::GetInstance()
-{
-   return instance;
+    std::shared_ptr<Shape> Invisible = std::make_shared<InvisibleShape>();
 }
 
 bool InvisibleShape::intersection(const Ray &, IntersectionData &) const

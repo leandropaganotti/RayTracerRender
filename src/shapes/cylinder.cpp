@@ -5,7 +5,7 @@
 
 namespace shape
 {
-    std::shared_ptr<Shape> unitCylinder = std::shared_ptr<UnitYCylinder>(new UnitYCylinder);
+    std::shared_ptr<Shape> unitCylinder = CreateShape<UnitYCylinder>();
 }
 
 UnitYCylinder::UnitYCylinder()

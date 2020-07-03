@@ -7,7 +7,6 @@ class UnitYCylinder: public Shape
 {
 public:
     UnitYCylinder();
-
     bool intersection(const Ray &ray, IntersectionData &isec) const override;
     bool intersection(const Ray &ray) const override;
     void getIsecData(IntersectionData &isec) const override;

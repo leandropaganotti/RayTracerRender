@@ -59,7 +59,8 @@ void Plane::getIsecData(IntersectionData &isec) const
 {
     isec.normal = w;
     Vector3 p = isec.phit - origin;
-    isec.uv = Vector2(u^p, v^p);
+    isec.uv.u = u^p;
+    isec.uv.v = v^p;
 }
 
 inline

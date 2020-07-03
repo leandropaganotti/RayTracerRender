@@ -17,10 +17,10 @@ public:
     AABB getAABB() const override;
 
     Vector3 getOrigin() const;
-    void setOrigin(const Vector3 &value);
+    void    setOrigin(const Vector3 &value);
 
     Vector3 getNormal() const;
-    void setNormal(const Vector3 &value);
+    void    setNormal(const Vector3 &value);
 
 protected:
     Vector3 origin;     // a point O(origin) on the plane

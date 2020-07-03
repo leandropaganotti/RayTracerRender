@@ -4,7 +4,7 @@
 
 namespace shape
 {
-    std::shared_ptr<Sphere> unitSphere = std::shared_ptr<Sphere>(new Sphere(0.0f, 0.5f));
+    std::shared_ptr<Sphere> unitSphere = CreateShape<Sphere>(0.0f, 0.5f);
 }
 
 Sphere::Sphere(const Vector3 &center, const float &radius) :
