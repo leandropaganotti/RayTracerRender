@@ -1,6 +1,7 @@
 #include "light.h"
 #include "utils.h"
 #include "material.h"
+#include "scene.h"
 
 Light::Light():intensity(1), color(1){}
 
@@ -41,6 +42,11 @@ std::shared_ptr<Light> Light::Create(LightType type, const ParamSet &params)
     }
     }
     return nullptr;
+}
+
+float Light::visibility(const Ray &ray, const Scene *scene) const
+{
+    return 1.0f;
 }
 
 Vector3 Light::getIntensity() const
@@ -99,6 +105,13 @@ float PointLight::visibility(const Ray &ray, const std::vector<std::shared_ptr<O
         }
     }
     return vis;
+}
+
+float PointLight::visibility(const Ray &ray, const Scene *scene) const
+{
+    ray.tmax = (ray.origin - position).length();
+    if(scene->intersection(ray)) return 0.0f;
+    return 1.0f;
 }
 
 Vector3 PointLight::getPosition() const

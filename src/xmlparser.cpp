@@ -690,7 +690,7 @@ std::shared_ptr<Object> XMLParser::parseMesh(xmlNode *xmlMeshNode)
         }
     }
     mesh->setMaterial(material);
-    return std::shared_ptr<Object>(new TransformedObject(mesh, transform));
+    return std::make_shared<TransformedObject>(mesh, transform);
 }
 
 Matrix4 XMLParser::parseTransformation(xmlNode *xmlTrnasformationNode)

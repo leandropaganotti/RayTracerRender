@@ -8,6 +8,8 @@
 #include "transformation.h"
 #include "resource.h"
 #include "material.h"
+#include "objectvector.h"
+#include "bvh.h"
 
 using namespace std;
 
@@ -30,7 +32,7 @@ int main(int argc, char **argv)
     output = output.substr(output.find_last_of("/\\")+1);
     output = output.substr(0, output.find_last_of("."));
 
-    Scene scene(xmlscene);
+    Scene scene(xmlscene, std::make_shared<BVH>());
     std::cout << scene << endl;
 
     auto raytracer = RayTracer::Create(scene.renderOptions.illum);

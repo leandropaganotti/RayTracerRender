@@ -26,10 +26,7 @@ Vector3 Phong::trace(const Ray &ray, const uint8_t depth, float E)
         Vector3 diffused(0), reflected(0);
         if (kr > 0.0001f)
         {
-            Ray r;
-            r.origin = isec.phit + bias * isec.normal;
-            r.direction = reflect(ray.direction, isec.normal).normalize();
-            reflected = trace(r, depth + 1, E);
+            reflected = trace(Ray(isec.phit + bias * isec.normal, reflect(ray.direction, isec.normal).normalize()), depth + 1, E);
         }
         if (kt > 0.0001f)
             diffused = phongShading(ray, isec);
@@ -52,7 +49,7 @@ Vector3 Phong::phongShading(const Ray &ray, const IntersectionData &isec)
         LightData isecLight;
         light->getLightData(isec.phit, isecLight);
 
-        float vis = light->visibility(Ray(isec.phit + bias * isec.normal, -isecLight.direction), scene->objects);
+        float vis = light->visibility(Ray(isec.phit + bias * isec.normal, -isecLight.direction), scene);
 
         //diffuse
         Vector3 diffuse = isecLight.intensity * std::max(0.0f, (isec.normal ^ -isecLight.direction));

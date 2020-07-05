@@ -33,9 +33,7 @@ Vector3 PathTracer::trace(const Ray &ray, const uint8_t depth, const float E)
             I am not recurring in case of hit a light so:
             if hit light return E otherwise material->color * pathTrace() * cos * 2
         */
-        Ray r;
-        r.origin = isec.phit + bias * isec.normal;
-        r.direction = randomUnitVectorInHemisphereOf(isec.normal);
+        Ray r(isec.phit + bias * isec.normal, randomUnitVectorInHemisphereOf(isec.normal));
         float cosTheta = isec.normal ^ r.direction;
         return isec.material->E + isec.albedo * trace(r, depth+1, E) * cosTheta * 2.0f;
     }
@@ -46,16 +44,12 @@ Vector3 PathTracer::trace(const Ray &ray, const uint8_t depth, const float E)
         Vector3 diffused(0), reflected(0);
         if (kr > 0.0001f)
         {
-            Ray r;
-            r.origin = isec.phit + bias * isec.normal;
-            r.direction = reflect(ray.direction, isec.normal).normalize();
+            Ray r(isec.phit + bias * isec.normal, reflect(ray.direction, isec.normal).normalize());
             reflected = trace(r, depth+1, 0);
         }
         if (kt > 0.0001f)
         {
-            Ray r;
-            r.origin = isec.phit + bias * isec.normal;
-            r.direction = randomUnitVectorInHemisphereOf(isec.normal);
+            Ray r(isec.phit + bias * isec.normal, randomUnitVectorInHemisphereOf(isec.normal));
             float cosTheta = isec.normal ^ r.direction;
             diffused = isec.material->E + isec.albedo * trace(r, depth+1, E) * cosTheta * 2.0f;
         }
@@ -122,9 +116,7 @@ Vector3 PathTracerWithDirectSampling::trace(const Ray &ray, const uint8_t depth,
 
         //indirect light
         const float _1_pdf = (2.0f*M_PI);//1/(2*M_PI)
-        Ray r;
-        r.origin = isec.phit + bias * isec.normal;
-        r.direction = randomUnitVectorInHemisphereOf(isec.normal);
+        Ray r(isec.phit + bias * isec.normal, randomUnitVectorInHemisphereOf(isec.normal));
         float cosTheta = isec.normal ^ r.direction;
         //Vector3 indirect =  (E*material->E) + isec.object->color(isec) * pathTracer2(r, scene, depth+1, 0.0f);
         Vector3 indirect =  (E*isec.material->E) + brdf * trace(r, depth+1, 0.0f) * cosTheta * _1_pdf;
@@ -134,9 +126,7 @@ Vector3 PathTracerWithDirectSampling::trace(const Ray &ray, const uint8_t depth,
 
     if(kr > 0.0001f)
     {
-        Ray r;
-        r.origin = isec.phit + bias * isec.normal;
-        r.direction = reflect(ray.direction, isec.normal).normalize();
+        Ray r(isec.phit + bias * isec.normal, reflect(ray.direction, isec.normal).normalize());
         reflected = trace(r, depth+1, E);
     }
 

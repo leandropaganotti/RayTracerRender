@@ -10,6 +10,13 @@ class Object;
 
 struct IntersectionData
 {
+    IntersectionData()
+    {
+        tnear = INFINITY;
+        shape = nullptr;
+        object = nullptr;
+        material = nullptr;
+    }
     float tnear;
     size_t idx;
     const Shape * shape;

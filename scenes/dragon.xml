@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scene name="dragon">
+	<RenderOptions grid="4" spp="1" index="1.0" maxdepth="5" bgcolor="0" illum="phong" />
+	<CameraOptions position="0.5,1.7,5" lookingat="-0.2, 0.2,0" fov="55" width="640" height="480"></CameraOptions>
+	<PointLight position="0,2.5,2.5" color="1" intensity="1.0" atten="0"></PointLight>
+	<mesh name="dragon"  src="obj/dragon_cubic_UV_3k.obj">
+		<material type="diffuse" kd="0.019, 0.160, 0.4" ka="0.02" ks="0.7" ns="50"></material>
+		<transformation translate="0,0,1.5" rotate="0, 30, 0" scale="0.5"/>
+	</mesh>
+
+	<plane name="floor" origin="0" normal="0,1,0">
+	<material type="specular" kd="1" ks="0" ka="0.05" R0="0.8">
+	<texture src="tex/marble.jpg" type="Texture2d" width="4.5" height="3"/>
+	</material>
+	</plane>
+
+	<plane name="sky" origin="0, 10, 0" normal="0,-1,0">
+	<material type="diffuse" kd="1" ks="0" ka="0.5" >
+	<texture src="tex/night_skies_04.jpg" type="Texture2d" width="100" height="100"/>
+	</material>
+	<transformation translate="-50, 0, -50" rotate="0" scale="1"/>
+	</plane>
+	<sphere position="0, 2.5, 2.5" radius="0.25">
+	<material kd="1" E="50"/>
+	</sphere>
+</scene>

@@ -5,7 +5,6 @@
 #include "material.h"
 #include <memory>
 #include "invisible.h"
-#include "bvh.h"
 
 class Object: public IntersectionIF
 {
@@ -76,21 +75,20 @@ public:
     TransformedObject(const std::shared_ptr<Object> &o, const Matrix4 &t):
         object(o), model(t)
     {
-        if(!object) object = std::shared_ptr<SimpleObject>(new SimpleObject(nullptr, nullptr));
+        if(!object) object = std::make_shared<SimpleObject>(shape::Invisible, material::DiffuseWhite);
         inverse = t.getInverse();
         inverseTranspose = inverse.getTranspose();
     }
-    TransformedObject(const std::shared_ptr<Shape> &shape, const std::shared_ptr<Material> &material, const Matrix4 &transform):
-        object(std::shared_ptr<SimpleObject>(new SimpleObject(shape, material))), model(transform)
+    TransformedObject(const std::shared_ptr<Shape> &s, const std::shared_ptr<Material> &m, const Matrix4 &t):
+        object(std::make_shared<SimpleObject>(s, m)), model(t)
     {
-        inverse = transform.getInverse();
+        inverse = t.getInverse();
         inverseTranspose = inverse.getTranspose();
     }
 
     bool intersection(const Ray &ray, IntersectionData &isec) const override
     {
-        Ray ray_local = inverse * ray;
-        if (object->intersection(ray_local, isec))
+        if (object->intersection(inverse * ray, isec))
         {
             isec.object = this;
             return true;
@@ -99,8 +97,7 @@ public:
     }
     bool intersection(const Ray &ray) const override
     {
-        Ray ray_local = inverse * ray;
-        return object->intersection(ray_local);
+        return object->intersection(inverse * ray);
     }
     AABB getAABB() const override
     {
@@ -124,64 +121,3 @@ private:
     Matrix4 inverse;
     Matrix4 inverseTranspose;
 };
-
-class GroupedObject: public Object
-{
-public:
-    virtual ~GroupedObject(){}
-    bool intersection(const Ray &ray, IntersectionData &isec) const override
-    {
-        Ray r = ray;
-        r.invdir = 1.0f / ray.direction;
-        r.posneg[0] = r.direction[0] > 0 ? 0 : 1;
-        r.posneg[1] = r.direction[1] > 0 ? 0 : 1;
-        r.posneg[2] = r.direction[2] > 0 ? 0 : 1;
-        return bvh->intersection(r, isec);
-    }
-    bool intersection(const Ray &ray) const override
-    {
-        Ray r = ray;
-        r.invdir = 1.0f / ray.direction;
-        r.posneg[0] = r.direction[0] > 0 ? 0 : 1;
-        r.posneg[1] = r.direction[1] > 0 ? 0 : 1;
-        r.posneg[2] = r.direction[2] > 0 ? 0 : 1;
-        return bvh->intersection(r);
-    }
-    AABB getAABB() const override
-    {
-        return bvh->getAABB();
-    }
-    void addObject(std::shared_ptr<Object> &o)
-    {
-        if(o)
-        objects.push_back(o);
-    }
-    void addObject(std::shared_ptr<Object> &&o)
-    {
-        if(o)
-        objects.push_back(o);
-    }
-    void buildBVH()
-    {
-        if (objects.size() == 0) bvh = shape::Invisible;
-
-        std::vector<std::shared_ptr<IntersectionIF>> leaves;
-        for (auto o: objects)
-            leaves.push_back(o);
-
-        bvh = BVH::Create(leaves, 0, leaves.size()-1);
-    }
-    void getIsecData(IntersectionData &isec) const override
-    {
-        objects[isec.idx]->getIsecData(isec);
-    }
-    void setMaterial(const std::shared_ptr<Material> &value) override
-    {
-        for(auto &o: objects)
-            o->setMaterial(value);
-    }
-
-    std::shared_ptr<IntersectionIF> bvh;
-    std::vector<std::shared_ptr<Object>> objects;
-};
-

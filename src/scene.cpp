@@ -3,13 +3,14 @@
 #include <string.h>
 #include "xmlparser.h"
 
-Scene::Scene()
+Scene::Scene(const std::shared_ptr<Aggregate> &agg): aggregate(agg)
 {
     name = "unamed";
 }
 
-Scene::Scene(const std::string &fileName)
+Scene::Scene(const std::string &fileName, const std::shared_ptr<Aggregate> &agg)
 {
+    aggregate = agg;
     name = "unamed";
     this->fileName = fileName;
     readFromXMLFile(fileName);
@@ -27,8 +28,13 @@ void Scene::readFromXMLFile(const std::string &fileName)
 {
     this->fileName = fileName;
     XMLParser().parseFile(fileName.c_str(), *this);
+    aggregate->create(objects);
+}
 
-    buildBVH();
+void Scene::addObject(std::shared_ptr<Object> &&o)
+{
+    if(o)
+    objects.push_back(o);
 }
 
 std::ostream &operator <<(std::ostream &os, const Scene &scene)

@@ -56,7 +56,7 @@ std::vector<std::string> split(const std::string &s, char delim) {
 
 std::shared_ptr<Mesh> OBJParser::ParseMesh(const std::string &filepath)
 {
-    std::shared_ptr<Mesh> mesh = Mesh::Create();
+    std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
 
     std::ifstream ifs (filepath, std::ifstream::in);
 
@@ -66,7 +66,6 @@ std::shared_ptr<Mesh> OBJParser::ParseMesh(const std::string &filepath)
         return nullptr;
     }
 
-    mesh->clear();
     mesh->addVertex({});
     mesh->addNormal({});
 
@@ -104,8 +103,8 @@ std::shared_ptr<Mesh> OBJParser::ParseMesh(const std::string &filepath)
             size_t v3 = stoull(list1[0]);
             size_t nv3 = stoull(list1[2]);
 
-            std::shared_ptr<MeshTriangle> face(new MeshTriangle(mesh.get(), v1, v2, v3, nv1, nv2, nv3));
-            mesh->addObject(std::shared_ptr<SimpleObject>(new SimpleObject(face, material::DiffuseWhite)));
+            std::shared_ptr<MeshTriangle> face = std::make_shared<MeshTriangle>(mesh.get(), v1, v2, v3, nv1, nv2, nv3);
+            mesh->addFace(face);
 
             if(list.size() == 5)
             {
@@ -113,14 +112,14 @@ std::shared_ptr<Mesh> OBJParser::ParseMesh(const std::string &filepath)
                 size_t v4 = stoull(list1[0]);
                 size_t nv4 = stoull(list1[2]);
 
-                face = std::shared_ptr<MeshTriangle>(new MeshTriangle(mesh.get(), v1, v3, v4, nv1, nv3, nv4));
-                mesh->addObject(std::shared_ptr<SimpleObject>(new SimpleObject(face, material::DiffuseWhite)));
+                face = std::make_shared<MeshTriangle>(mesh.get(), v1, v3, v4, nv1, nv3, nv4);
+                mesh->addFace(face);
             }
         }
     }
 
     //std::cout << *mesh << std::endl;
     ifs.close();
-    mesh->buildBVH();
+    mesh->buildAggregate();
     return mesh;
 }

@@ -9,6 +9,8 @@
 #include "paramset.h"
 #include "object.h"
 
+class Scene;
+
 enum class LightType
 {
     PointLight,
@@ -34,6 +36,7 @@ public:
 
     virtual void  getLightData(const Vector3 &phit, LightData &light) const = 0;
     virtual float visibility(const Ray &ray, const std::vector<std::shared_ptr<Object>> &objects) const = 0;
+    virtual float visibility(const Ray &ray, const Scene *scene) const;
 
     Vector3 getIntensity() const;
     void    setIntensity(const Vector3 &value);
@@ -53,6 +56,7 @@ public:
 
     virtual void  getLightData(const Vector3 &phit, LightData &light) const override;
     virtual float visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const override;
+    virtual float visibility(const Ray &ray, const Scene *scene) const override;
 
     Vector3  getPosition() const;
     void     setPosition(const Vector3 &value);

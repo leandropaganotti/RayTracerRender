@@ -85,11 +85,7 @@ Vector3 Matrix4::operator *(const Vector3 &P) const
 inline
 Ray Matrix4::operator *(const Ray &ray) const
 {
-    Ray R;
-    R.origin = (*this) * ray.origin;
-    R.direction = multiplyVector(ray.direction);
-    R.tmax = ray.tmax;
-    return R;
+    return Ray((*this) * ray.origin, multiplyVector(ray.direction), ray.tmax);
 }
 
 inline

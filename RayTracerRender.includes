@@ -3,3 +3,4 @@ scenes
 .
 src/shapes
 libxml/include/libxml2
+src/aggregates

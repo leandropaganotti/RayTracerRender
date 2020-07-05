@@ -5,6 +5,7 @@ scenes/ModifiedCornellBox2.xml
 scenes/ModifiedCornellBox3.xml
 scenes/ballsOnTheMirror.xml
 scenes/basicGlobal2.xml
+scenes/dragon.xml
 scenes/glassOfwine.xml
 scenes/ptexture.xml
 scenes/refraction.xml
@@ -14,8 +15,11 @@ scenes/suzanne.xml
 scenes/testGlobal.xml
 src/aabb.cpp
 src/aabb.h
-src/bvh.cpp
-src/bvh.h
+src/aggregates/aggregate.h
+src/aggregates/bvh.cpp
+src/aggregates/bvh.h
+src/aggregates/objectvector.cpp
+src/aggregates/objectvector.h
 src/camera.cpp
 src/camera.h
 src/cameraoptions.cpp

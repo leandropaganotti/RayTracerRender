@@ -3,9 +3,9 @@
 #
 CXX = g++
 CXXFLAGS =  -std=c++14 -Wall -W
-VPATH = src/ src/shapes
+VPATH = src/ src/shapes src/aggregates
 
-INCPATH = -I. -I./src -I./src/shapes -I/usr/include/libxml2 -I./libxml/include/libxml2
+INCPATH = -I. -I./src -I./src/shapes -I./src/aggregates -I/usr/include/libxml2 -I./libxml/include/libxml2
 LIBDIRS = -L/usr/lib/x86_64-linux-gnu -L./libxml/lib
 LIBS = -lxml2
 
@@ -39,6 +39,8 @@ pathtracer.cpp \
 phong.cpp \
 paramset.cpp \
 triangle.cpp \
+objectvector.cpp \
+
 
 OBJS=$(SRCS:.cpp=.o )
 EXE  = render

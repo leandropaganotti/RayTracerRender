@@ -3,15 +3,11 @@
 #include "material.h"
 #include "invisible.h"
 #include "bvh.h"
+#include "triangle.h"
 
 /************************************************************************
  * Mesh class
  ************************************************************************/
-
-std::shared_ptr<Mesh> Mesh::Create()
-{
-    return std::shared_ptr<Mesh>(new Mesh);
-}
 
 void Mesh::addVertex(const Vector3 &v)
 {
@@ -23,10 +19,27 @@ void Mesh::addNormal(const Vector3 &n)
     normals.push_back(n);
 }
 
-void Mesh::clear()
+void Mesh::addFace(const std::shared_ptr<MeshTriangle> &face)
 {
-    vertices.clear();
-    normals.clear();
+    face->idx = faces.size();
+    faces.emplace_back(std::make_shared<SimpleObject>(face, mtlInUse));
+}
+
+void Mesh::setMaterial(const std::shared_ptr<Material> &m)
+{
+    mtlInUse = m ? m : material::DiffuseWhite;
+    for(auto &f: faces)
+        f->setMaterial(mtlInUse);
+}
+
+void Mesh::useMaterial(const std::shared_ptr<Material> &m)
+{
+    mtlInUse = m ? m : material::DiffuseWhite;
+}
+
+void Mesh::buildAggregate()
+{
+    aggregate->create(faces);
 }
 
 std::ostream &operator <<(std::ostream &os, const Mesh &m)
@@ -49,5 +62,11 @@ std::ostream &operator <<(std::ostream &os, const Mesh &m)
 
 Mesh::Mesh()
 {
+    mtlInUse = material::DiffuseWhite;
+    aggregate = std::make_shared<BVH>();
+}
 
+Mesh::Mesh(const std::shared_ptr<Aggregate> &agg): aggregate(agg)
+{
+    mtlInUse = material::DiffuseWhite;
 }

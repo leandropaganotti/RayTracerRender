@@ -107,27 +107,13 @@ bool RayTracer::castRay(const Ray &ray, IntersectionData &isec)
 
 float RayTracer::castShadowRay(const Ray &ray)
 {
-    float vis = 1.0f;
-    IntersectionData isec;
-    for(auto &object : scene->objects)
-    {
-        if (object->intersection(ray, isec))
-        {
-            if (isec.material->type == MaterialType::TRANSPARENT)
-                vis *= 0.8f;
-            else
-                return 0.0f;
-        }
-    }
-    return vis;
+    return scene->intersection(ray) ? 1.0f : 0.0f;
 }
 
 inline
 Vector3 RayTracer::specularReflection(const Ray &ray, const uint8_t depth, const IntersectionData &isec)
 {
-    Ray R;
-    R.origin = isec.phit + bias * isec.normal;
-    R.direction = reflect(ray.direction, isec.normal).normalize();
+    Ray R(isec.phit + bias * isec.normal, reflect(ray.direction, isec.normal).normalize());
     return trace(R, depth + 1, 1.0f);
 }
 
@@ -171,19 +157,14 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const uint8_t depth, cons
         kr = (Rs * Rs + Rp * Rp) / 2.0f;
         kt = 1.0f - kr;
 
-        Ray T;
-        T.origin = phit - bias * normal;
-        T.direction = n * ray.direction + (n * cosi - cost) * normal;
-        T.direction.normalize();
+        Ray T(phit - bias * normal, (n * ray.direction + (n * cosi - cost) * normal).normalize());
         transmited = trace(T, depth + 1, E) * kt;
     }
 
     // reflection
     if(kr)
     {
-        Ray R;
-        R.origin = phit + bias * normal;
-        R.direction = reflect(ray.direction, normal).normalize();
+        Ray R(phit + bias * normal, reflect(ray.direction, normal).normalize());
         reflected = trace(R, depth + 1, E) * kr;
     }
     return transmited + reflected;
@@ -202,8 +183,13 @@ void RayTracer::setRenderOptions(const RenderOptions &value)
 Vector3 Minimum::trace(const Ray &ray, const uint8_t, const float)
 {
     IntersectionData isec;
-    if (!castRay(ray, isec))
-        return renderOptions.bgColor;
-    return isec.material->Kd;
+    if(scene->intersection(ray, isec))
+    {
+        return isec.material->Kd;
+        isec.phit = ray.origin + isec.tnear * ray.direction;
+        isec.object->getIsecData(isec);
+        return isec.albedo;
+    }
+    return renderOptions.bgColor;
 }
 

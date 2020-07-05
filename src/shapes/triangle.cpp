@@ -14,12 +14,13 @@ MeshTriangle::MeshTriangle(const Mesh *m, size_t v0, size_t v1, size_t v2, size_
     nf = (mesh->normals[nv0] + mesh->normals[nv1] + mesh->normals[nv2]).normalize();
     area = ((mesh->vertices[v1] - mesh->vertices[v0]) % (mesh->vertices[v2] - mesh->vertices[v0])).length() / 2;
     aabb.extend({mesh->vertices[v0], mesh->vertices[v1], mesh->vertices[v2]});
-    idx = mesh->objects.size();
 }
 
 inline
 bool MeshTriangle::intersection(const Ray &ray, IntersectionData &isec) const
 {
+//    if(idx==268)
+//        std::cout << idx << std::endl;
     float A = mesh->vertices[v[0]].x - mesh->vertices[v[1]].x;
     float B = mesh->vertices[v[0]].y - mesh->vertices[v[1]].y;
     float C = mesh->vertices[v[0]].z - mesh->vertices[v[1]].z;
@@ -59,10 +60,14 @@ bool MeshTriangle::intersection(const Ray &ray, IntersectionData &isec) const
 
     if(tval < 0.0f || tval > ray.tmax) return false;
 
+    if(isnanf(tval)) return false;
+
     isec.tnear = tval;
     isec.idx = idx;
     isec.shape = this;
     return true;
+
+
 }
 
 bool MeshTriangle::intersection(const Ray &ray) const
