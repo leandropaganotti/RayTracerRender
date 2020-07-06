@@ -82,10 +82,23 @@ AABB BVH::getAABB() const
 
 void BVH::create(const std::vector<std::shared_ptr<Object> > &objects)
 {
+    destroy();
     if (objects.size() == 0) root = shape::Invisible;
 
     std::vector<std::shared_ptr<IntersectionIF>> leaves;
-    for (auto o: objects)
+    for (auto &o: objects)
+        leaves.push_back(o);
+
+    root = BVHNode::Create(leaves, 0, leaves.size()-1);
+}
+
+void BVH::create(const std::vector<std::shared_ptr<Shape> > &shapes)
+{
+    destroy();
+    if (shapes.size() == 0) root = shape::Invisible;
+
+    std::vector<std::shared_ptr<IntersectionIF>> leaves;
+    for (auto &o: shapes)
         leaves.push_back(o);
 
     root = BVHNode::Create(leaves, 0, leaves.size()-1);

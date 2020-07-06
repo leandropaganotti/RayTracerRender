@@ -12,8 +12,9 @@ public:
     bool intersection(const Ray &ray) const override;
     AABB getAABB() const override;
     void create(const std::vector<std::shared_ptr<Object> > &) override;
+    void create(const std::vector<std::shared_ptr<Shape> > &) override;
     void destroy() override;
 protected:
     AABB aabb;
-    const std::vector<std::shared_ptr<Object>> *objects;
+    std::vector<std::shared_ptr<IntersectionIF>> objects;
 };

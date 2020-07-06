@@ -4,6 +4,7 @@
 #include "invisible.h"
 #include "bvh.h"
 #include "triangle.h"
+#include "objectvector.h"
 
 /************************************************************************
  * Mesh class
@@ -22,14 +23,12 @@ void Mesh::addNormal(const Vector3 &n)
 void Mesh::addFace(const std::shared_ptr<MeshTriangle> &face)
 {
     face->idx = faces.size();
-    faces.emplace_back(std::make_shared<SimpleObject>(face, mtlInUse));
+    faces.push_back(face);
 }
 
 void Mesh::setMaterial(const std::shared_ptr<Material> &m)
 {
     mtlInUse = m ? m : material::DiffuseWhite;
-    for(auto &f: faces)
-        f->setMaterial(mtlInUse);
 }
 
 void Mesh::useMaterial(const std::shared_ptr<Material> &m)

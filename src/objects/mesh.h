@@ -29,7 +29,7 @@ public:
 protected:
     std::vector<Vector3>                        vertices;
     std::vector<Vector3>                        normals;
-    std::vector<std::shared_ptr<Object>>        faces;
+    std::vector<std::shared_ptr<Shape>>         faces;
     std::shared_ptr<Material>                   mtlInUse; // material in use when creating new faces/triangles
     std::shared_ptr<Aggregate>                  aggregate;
 
@@ -39,6 +39,7 @@ protected:
     {
         if(aggregate->intersection(ray, isec))
         {
+            isec.material = mtlInUse.get();
             isec.object = this;
             return true;
         }
@@ -54,7 +55,16 @@ protected:
     }
     void getIsecData(IntersectionData &isec) const override
     {
-        faces[isec.idx]->getIsecData(isec);
+        if(isec.material->texture)
+        {
+            faces[isec.idx]->getIsecData(isec); // get normal and uv coord
+            isec.albedo = mtlInUse->Kd * mtlInUse->texture->get(isec.uv);
+        }
+        else
+        {
+            faces[isec.idx]->getNormal(isec);
+            isec.albedo = mtlInUse->Kd;
+        }
     }
 };
 
