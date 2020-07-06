@@ -24,7 +24,7 @@ public:
     }
     virtual ~SimpleObject(){}
 
-    bool intersection(const Ray &ray, IntersectionData &isec) const override
+    virtual bool intersection(const Ray &ray, IntersectionData &isec) const override
     {
         if (shape->intersection(ray, isec))
         {
@@ -34,15 +34,15 @@ public:
         }
         return false;
     }
-    bool intersection(const Ray &ray) const override
+    virtual bool intersection(const Ray &ray) const override
     {
         return shape->intersection(ray);
     }
-    AABB getAABB() const override
+    virtual AABB getAABB() const override
     {
         return shape->getAABB();
     }
-    void getIsecData(IntersectionData &isec) const override
+    virtual void getIsecData(IntersectionData &isec) const override
     {
         if(material->texture)
         {
@@ -67,6 +67,57 @@ public:
 protected:
     std::shared_ptr<Shape> shape;
     std::shared_ptr<Material> material;
+};
+
+class TransformedSimpleObject: public SimpleObject
+{
+public:
+    TransformedSimpleObject(const std::shared_ptr<Shape> &s, const std::shared_ptr<Material> &m, const Matrix4 &t):
+        SimpleObject(s, m), model(t)
+    {
+        inverse = t.getInverse();
+        inverseTranspose = inverse.getTranspose();
+    }
+    ~TransformedSimpleObject(){}
+    bool intersection(const Ray &ray, IntersectionData &isec) const override
+    {
+        if (shape->intersection(inverse * ray, isec))
+        {
+            isec.material = material.get();
+            isec.object = this;
+            return true;
+        }
+        return false;
+    }
+    bool intersection(const Ray &ray) const override
+    {
+        return shape->intersection(inverse * ray);
+    }
+    void getIsecData(IntersectionData &isec) const override
+    {
+        Vector3 phit(isec.phit);
+        isec.phit = inverse * phit;
+        if(material->texture)
+        {
+            shape->getIsecData(isec); // get normal and uv coord
+            isec.albedo = material->Kd * material->texture->get(isec.uv);
+        }
+        else
+        {
+            shape->getNormal(isec);
+            isec.albedo = material->Kd;
+        }
+        isec.normal = (inverseTranspose * isec.normal).normalize();
+        isec.phit = phit;
+    }
+    AABB getAABB() const override
+    {
+        return model * shape->getAABB();
+    }
+protected:
+    Matrix4 model;
+    Matrix4 inverse;
+    Matrix4 inverseTranspose;
 };
 
 class TransformedObject: public Object

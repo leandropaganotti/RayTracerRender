@@ -507,8 +507,6 @@ std::shared_ptr<Object> XMLParser::parseSphere(xmlNode * xmlSphereNode)
 
     transform = Transformation::T(position) * Transformation::S(Vector3(radius*2.0f));
 
-
-
     xmlNode *node = NULL;
     for (node = xmlSphereNode->children; node; node = node->next)
     {
