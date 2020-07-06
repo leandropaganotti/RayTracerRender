@@ -6,7 +6,7 @@
 class Plane: public Shape
 {
 public:
-    Plane(const Vector3& origin={0.0f}, const Vector3& normal={0.0f, 1.0f, 0.0f});
+    Plane(const Vector3& origin=vector::ZERO, const Vector3& normal=vector::BACK);
     virtual ~Plane();
 
     bool intersection(const Ray& ray, IntersectionData& isec) const override;
@@ -24,7 +24,9 @@ public:
 
 protected:
     Vector3 origin;     // a point O(origin) on the plane
-    Vector3 w;          // normal to the plane
-    Vector3 u;          // orthonormal bases
+
+    // orthonormal bases
+    Vector3 u;
     Vector3 v;
+    Vector3 w;
 };

@@ -15,4 +15,6 @@ public:
     static Matrix4 Rz(float angle);
 
     static Matrix4 TSR(const Vector3 &translate, const Vector3 &rotate, const Vector3 &scale);
+
+    static Matrix4 RotationDir(const Vector3& direction);
 };

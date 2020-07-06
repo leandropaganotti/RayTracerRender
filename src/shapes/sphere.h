@@ -28,8 +28,3 @@ protected:
     float radius;                   // sphere radius and radius^2
     float radius2;
 };
-
-namespace shape
-{
-   extern std::shared_ptr<Sphere> unitSphere;
-}

@@ -3,9 +3,9 @@
 #
 CXX = g++
 CXXFLAGS =  -std=c++14 -Wall -W
-VPATH = src/ src/shapes src/aggregates
+VPATH = src/ src/shapes src/aggregates src/objects
 
-INCPATH = -I. -I./src -I./src/shapes -I./src/aggregates -I/usr/include/libxml2 -I./libxml/include/libxml2
+INCPATH = -I. -I./src -I./src/shapes -I./src/aggregates -I./src/objects -I/usr/include/libxml2 -I./libxml/include/libxml2
 LIBDIRS = -L/usr/lib/x86_64-linux-gnu -L./libxml/lib
 LIBS = -lxml2
 
@@ -40,6 +40,7 @@ phong.cpp \
 paramset.cpp \
 triangle.cpp \
 objectvector.cpp \
+objectfactory.cpp \
 
 
 OBJS=$(SRCS:.cpp=.o )

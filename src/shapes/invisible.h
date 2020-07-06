@@ -13,8 +13,3 @@ public:
     void getUV(IntersectionData &) const override;
     AABB getAABB() const override;
 };
-
-namespace shape
-{
-    extern std::shared_ptr<Shape> Invisible;
-}

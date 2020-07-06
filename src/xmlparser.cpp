@@ -3,6 +3,7 @@
 #include "utils.h"
 #include "objparser.h"
 #include "transformation.h"
+#include "objectfactory.h"
 #include "object.h"
 
 bool XMLParser::equals(const xmlChar *lhs, const char *rhs)
@@ -430,9 +431,10 @@ std::shared_ptr<Light> XMLParser::parseSphericalLight(xmlNode *xmlsSphericalLigh
 
 std::shared_ptr<Object> XMLParser::parsePlane(xmlNode *xmlPlaneNode)
 {
-    auto plane = std::shared_ptr<Plane>( new Plane);
     std::shared_ptr<Material> material;
     Matrix4 transform;
+    bool _static=false;
+    Vector3 origin=vector::ZERO, normal=vector::BACK;
 
     const xmlAttr *attr = NULL;
     std::string name("");
@@ -441,14 +443,18 @@ std::shared_ptr<Object> XMLParser::parsePlane(xmlNode *xmlPlaneNode)
         if (equals(attr->name, "name"))
             name = (const char*)attr->children->content;
         else if (equals(attr->name, "origin"))
-            plane->setOrigin(toVector3(attr->children->content));
+            origin = toVector3(attr->children->content);
         else if (equals(attr->name, "normal"))
-            plane->setNormal(toVector3(attr->children->content));
+            normal = toVector3(attr->children->content);
         else if (equals(attr->name, "material"))
             material = Resource<Material>::Get((const char*)attr->children->content);
+        else if (equals(attr->name, "static"))
+            _static = toBool(attr->children->content);
         else
             LogError(xmlPlaneNode, attr, "unrecognized attribute");
     }
+
+    transform = Transformation::T(origin) * Transformation::RotationDir(normal);
 
     xmlNode *node = NULL;
     for (node = xmlPlaneNode->children; node; node = node->next)
@@ -464,7 +470,10 @@ std::shared_ptr<Object> XMLParser::parsePlane(xmlNode *xmlPlaneNode)
         }
     }
 
-    return std::shared_ptr<Object>(new TransformedObject(plane, material, transform));
+    if(_static)
+        return ObjectFactory::CreatePlaneStatic(origin, normal, material);
+    else
+        return ObjectFactory::CreatePlane(material, transform);
 }
 
 std::shared_ptr<Object> XMLParser::parseSphere(xmlNode * xmlSphereNode)
@@ -472,6 +481,7 @@ std::shared_ptr<Object> XMLParser::parseSphere(xmlNode * xmlSphereNode)
     std::shared_ptr<Material> material;
     Matrix4 transform;
     Vector3 position(0);
+    bool _static = false;
     float radius=0.5f;
 
     const xmlAttr *attr = NULL;
@@ -484,6 +494,8 @@ std::shared_ptr<Object> XMLParser::parseSphere(xmlNode * xmlSphereNode)
             position = toVector3(attr->children->content);
         else if (equals(attr->name, "radius"))
             radius = toFloat(attr->children->content);
+        else if (equals(attr->name, "static"))
+            _static = toBool(attr->children->content);
         else if (equals(attr->name, "material"))
         {
             material = Resource<Material>::Get((const char*)attr->children->content);
@@ -495,6 +507,8 @@ std::shared_ptr<Object> XMLParser::parseSphere(xmlNode * xmlSphereNode)
 
     transform = Transformation::T(position) * Transformation::S(Vector3(radius*2.0f));
 
+
+
     xmlNode *node = NULL;
     for (node = xmlSphereNode->children; node; node = node->next)
     {
@@ -502,14 +516,17 @@ std::shared_ptr<Object> XMLParser::parseSphere(xmlNode * xmlSphereNode)
         {
             if (equals(node->name, "material"))
                 material = parseMaterial(node);
-            else if (equals(node->name, "transformation"))
+            else if (!_static && equals(node->name, "transformation"))
                 transform = parseTransformation(node);
             else
                 LogError(node, nullptr, "unrecognized element");
         }
     }
 
-    return std::shared_ptr<Object>(new TransformedObject(shape::unitSphere, material, transform));
+    if(_static)
+        return ObjectFactory::CreateSphereStatic(position, radius, material);
+    else
+        return ObjectFactory::CreateSphere(material, transform);
 }
 
 std::shared_ptr<Texture> XMLParser::parseTexture(xmlNode *xmlTextureNode)

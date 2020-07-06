@@ -3,13 +3,18 @@
 #include "aabb.h"
 #include "material.h"
 
-Plane::Plane(const Vector3 &origin, const Vector3 &normal):
-    origin(origin), w(normal)
+namespace shape {
+    std::shared_ptr<Shape> xyPlane = std::make_shared<Plane>(vector::ZERO, vector::BACK);
+}
+
+Plane::Plane(const Vector3 &origin, const Vector3 &normal)
 {
-    this->w.normalize();
-    const Vector3 n(0,1,0), m(1,0,0);
-    this->v = w%n; if(this->v.length()<0.01f)this->v = w%m;
-    this->u=normal%this->v;
+    const Vector3 n(1,0,0), m(0,1,0);
+    this->origin = origin;
+    w = normal;
+    w.normalize();
+    u = w%n; if(u.length()<0.01f)u = w%m;
+    v=w%u;
 }
 
 Plane::~Plane(){}
@@ -21,11 +26,11 @@ Vector3 Plane::getNormal() const
 
 void Plane::setNormal(const Vector3 &value)
 {
+    const Vector3 n(1,0,0), m(0,1,0);
     w = value;
     w.normalize();
-    const Vector3 n(0,1,0), m(1,0,0);
-    v = w%n; if(v.length()<0.01f)v = w%m;
-    u=w%v;
+    u = w%n; if(u.length()<0.01f)u = w%m;
+    v=w%u;
 }
 
 Vector3 Plane::getOrigin() const

@@ -20,8 +20,3 @@ protected:
     float ymin;
     float ymax;
 };
-
-namespace shape
-{
-    extern std::shared_ptr<Shape> unitCylinder;
-}

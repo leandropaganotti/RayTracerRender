@@ -1,6 +1,6 @@
-src
-scenes
-.
-src/shapes
 libxml/include/libxml2
+.
+src
+src/shapes
 src/aggregates
+src/objects

@@ -34,9 +34,11 @@ src/main.cpp
 src/material.cpp
 src/material.h
 src/matrix.h
-src/mesh.cpp
-src/mesh.h
-src/object.h
+src/objects/mesh.cpp
+src/objects/mesh.h
+src/objects/object.h
+src/objects/objectfactory.cpp
+src/objects/objectfactory.h
 src/objparser.cpp
 src/objparser.h
 src/paramset.cpp
