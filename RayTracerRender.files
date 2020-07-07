@@ -39,10 +39,6 @@ src/objects/mesh.h
 src/objects/object.h
 src/objects/objectfactory.cpp
 src/objects/objectfactory.h
-src/objparser.cpp
-src/objparser.h
-src/paramset.cpp
-src/paramset.h
 src/pathtracer.cpp
 src/pathtracer.h
 src/phong.cpp
@@ -51,7 +47,6 @@ src/ray.h
 src/raytracer.cpp
 src/raytracer.h
 src/renderoptions.h
-src/resource.h
 src/sampler2d.cpp
 src/sampler2d.h
 src/scene.cpp
@@ -73,7 +68,12 @@ src/texture.cpp
 src/texture.h
 src/transformation.cpp
 src/transformation.h
-src/utils.h
+src/utilities/objparser.cpp
+src/utilities/objparser.h
+src/utilities/paramset.cpp
+src/utilities/paramset.h
+src/utilities/resource.h
+src/utilities/utils.h
+src/utilities/xmlparser.cpp
+src/utilities/xmlparser.h
 src/vector.h
-src/xmlparser.cpp
-src/xmlparser.h

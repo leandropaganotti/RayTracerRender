@@ -3,9 +3,9 @@
 #
 CXX = g++
 CXXFLAGS =  -std=c++14 -Wall -W
-VPATH = src/ src/shapes src/aggregates src/objects
+VPATH = src/ src/shapes src/aggregates src/objects src/utilities
 
-INCPATH = -I. -I./src -I./src/shapes -I./src/aggregates -I./src/objects -I/usr/include/libxml2 -I./libxml/include/libxml2
+INCPATH = -I. -I./src -I./src/shapes -I./src/aggregates -I./src/objects -I./src/utilities -I/usr/include/libxml2 -I./libxml/include/libxml2
 LIBDIRS = -L/usr/lib/x86_64-linux-gnu -L./libxml/lib
 LIBS = -lxml2
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scene name="shapes">
-	<RenderOptions grid="4" spp="128" index="1.0" maxdepth="15" bgcolor="0" illum="phong" />
+	<RenderOptions spp="9" index="1.0" maxdepth="15" bgcolor="0" illum="phong" />
 	<CameraOptions position="0,2.5,7" lookingat="0" fov="50" width="640" height="480" />
 	<PointLight position="1.5, 4, 7" color="1" intensity="1" shadowoff="false" atten="0"/>
 
