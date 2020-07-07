@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scene name="shapes">
-	<RenderOptions grid="4" spp="4" index="1.0" maxdepth="15" bgcolor="0" illum="phong" />
+	<RenderOptions grid="4" spp="128" index="1.0" maxdepth="15" bgcolor="0" illum="phong" />
 	<CameraOptions position="0,2.5,7" lookingat="0" fov="50" width="640" height="480" />
-	<PointLight position="1.5, 4, 7" color="1" intensity="1" shadowoff="true" atten="0"/>
+	<PointLight position="1.5, 4, 7" color="1" intensity="1" shadowoff="false" atten="0"/>
 
 	<Plane name="floor" origin="0" normal="0,1,0" static="true">
 		<material name="mat1" type="diffuse" kd="1" ka="0.5">

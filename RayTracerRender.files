@@ -52,6 +52,8 @@ src/raytracer.cpp
 src/raytracer.h
 src/renderoptions.h
 src/resource.h
+src/sampler2d.cpp
+src/sampler2d.h
 src/scene.cpp
 src/scene.h
 src/shapes/box.cpp

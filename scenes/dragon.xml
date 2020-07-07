@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scene name="dragon">
-	<RenderOptions grid="8" spp="128" index="1.0" maxdepth="5" bgcolor="0" illum="global2" />
-	<CameraOptions position="0.5,1.7,5" lookingat="-0.2, 0.2,0" fov="55" width="640" height="480"></CameraOptions>
+	<RenderOptions grid="1" spp="16" index="1.0" maxdepth="5" bgcolor="0" illum="" />
+	<CameraOptions position="0.5,1.7,5" lookingat="-0.2, 0.2,0" fov="35" width="640" height="480"></CameraOptions>
 	<SphericalLight position="0.5,2.5,2.5" radius="0.25" color="1" intensity="150.0" atten="0"></SphericalLight>
 	<mesh name="dragon"  src="obj/dragon_cubic_UV_3k.obj">
 		<material type="diffuse" kd="0.019, 0.160, 0.4" ka="0.02" ks="0.7" ns="50"></material>

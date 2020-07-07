@@ -227,8 +227,6 @@ void XMLParser::parseRenderOptions(xmlNode *xmlRenderOptionsNode, RenderOptions 
     {
         if (equals(attr->name, "spp"))
              options.spp = toInt(attr->children->content);
-        else if (equals(attr->name, "grid"))
-             options.gridSizeXY = toInt(attr->children->content);
         else if (equals(attr->name, "index"))
              options.ambientIndex = toFloat(attr->children->content);
         else if (equals(attr->name, "maxdepth"))

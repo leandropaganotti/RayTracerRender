@@ -41,6 +41,7 @@ paramset.cpp \
 triangle.cpp \
 objectvector.cpp \
 objectfactory.cpp \
+sampler2d.cpp \
 
 
 OBJS=$(SRCS:.cpp=.o )

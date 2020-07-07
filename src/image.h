@@ -7,13 +7,15 @@ class Image
 {     
 public:
     Image(int width=0, int height=0);
+    Image(int width, int height, const Vector3 &value);
+
     ~Image();
 
     Image(Image &&image);
     Image & operator=(Image &&image);
 
-    Vector3 & at(int i, int j);
-    const Vector3 & at(int i, int j) const;
+    inline Vector3 & at(int i, int j);
+    inline const Vector3 & at(int i, int j) const;
 
     bool read_ppm_bin(const char * filename);
     bool read(const char * filename);

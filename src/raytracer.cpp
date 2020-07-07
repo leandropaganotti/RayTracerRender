@@ -39,49 +39,39 @@ RayTracer::~RayTracer(){}
 void RayTracer::render(const Scene& scene)
 {
     this->scene = &scene;
-    const size_t grid_size_xy = renderOptions.gridSizeXY;
-    const size_t n_subpixel = grid_size_xy * grid_size_xy;
-    const size_t nrays_persubpixel = renderOptions.spp < n_subpixel ? 1 : renderOptions.spp / n_subpixel;
-    const size_t nrays_perpixel = nrays_persubpixel * n_subpixel;
-    const float w_subpixel = 1.0f/grid_size_xy;
-    size_t count = 0;
-    std::cout << " -> SPP: " << nrays_perpixel << std::endl;
-    buffer.resize(camera.getWidth(), camera.getHeight());
 
-    std::cout << std::endl;
+    int sqrt_samples = sqrt(renderOptions.spp);
+    int spp = sqrt_samples * sqrt_samples;
+    std::vector<Vector2> samples = rng(spp);
+    filter(samples);
+
+    std::cout << " -> SPP: " << spp << std::endl << std::endl;
+
     std::cout << "\r -> 0.00% completed" << std::flush;
 
-
+    size_t count = 0, total = camera.getWidth()*camera.getHeight();
+    buffer.resize(camera.getWidth(), camera.getHeight());
     for (size_t i = 0; i < camera.getHeight(); ++i)
     {
-        std::ostringstream ss;
+
         #ifndef DEBUG
         #pragma omp parallel for schedule(dynamic, 1) shared(count)
         #endif
         for (size_t j = 0; j < camera.getWidth(); ++j)
         {
             buffer.at(i, j) = 0;
-            for (size_t ii=0; ii < grid_size_xy; ++ii)
+            for (auto &sample: samples)
             {
-                unsigned short Xi[3]={0,0,(short unsigned int)(ii)};
-                for (size_t jj=0; jj < grid_size_xy; ++jj)
-                {
-                    for (size_t n = 0; n < nrays_persubpixel; ++n)
-                    {
-                        const float x = i + w_subpixel * (ii + erand48(Xi));
-                        const float y = j + w_subpixel * (jj + erand48(Xi));
-                        Ray ray(camera.getRay(x, y));
-                        buffer.at(i, j) += trace(ray, 1, 1.0f);
-                    }
-                }
+                Ray ray(camera.getRay(i+sample.y, j+sample.x));
+                buffer.at(i, j) += trace(ray, 1, 1.0f);
             }
-            buffer.at(i, j) /= nrays_perpixel;
-        }
-        ++count;
-        ss << "\r -> " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) << count/float(camera.getHeight()) * 100.0f << "% completed";
-        std::cout << ss.str() << std::flush;
-    }
+            buffer.at(i, j) /= spp;
+            ++count;
 
+        }
+        std::cout << "\r -> " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) << count/float(total) * 100.0f << "% completed" << std::flush;
+    }
+    std::cout << "\r -> " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) << count/float(total) * 100.0f << "% completed" << std::flush;
 }
 
 Vector3 RayTracer::transparentMaterial(const Ray &ray, const uint8_t depth, const IntersectionData &isec, float E)

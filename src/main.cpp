@@ -11,16 +11,26 @@
 #include "objectvector.h"
 #include "bvh.h"
 
-using namespace std;
-
 char	    *xmlscene = NULL;	// xml file with scene description
-unsigned    nimages  = 1;   // generates nimages from difterent angles around y-axis
+unsigned    nimages  = 1;       // generates nimages from difterent angles around y-axis
 bool        detailedName = false;
 
 void parseArguments(int argc, char **argv);
 
 int main(int argc, char **argv)
 {
+//    std::vector<Vector2> samples;
+//    Random s0;
+//    s0(samples, 512);
+//    CreateSomplesImage("random", samples);
+//    samples.clear();
+
+//    Jitter s1;
+//    s1(samples, 512);
+//    CreateSomplesImage("random_jitter", samples);
+//    samples.clear();
+
+//    return 0;
     parseArguments(argc, argv);
 
     double time_in_ms_avg=0.0, time_in_ms=0.0;
@@ -33,7 +43,7 @@ int main(int argc, char **argv)
     output = output.substr(0, output.find_last_of("."));
 
     Scene scene(xmlscene, std::make_shared<BVH>());
-    std::cout << scene << endl;
+    std::cout << scene << std::endl;
 
     auto raytracer = RayTracer::Create(scene.renderOptions.illum);
     raytracer->setRenderOptions(scene.renderOptions);
@@ -43,20 +53,16 @@ int main(int argc, char **argv)
 
     const Vector3 from( scene.cameraOptions.getFrom() ), to( scene.cameraOptions.getTo());
 
-    const size_t n_subpixel = scene.renderOptions.gridSizeXY * scene.renderOptions.gridSizeXY;
-    const size_t nrays_persubpixel = scene.renderOptions.spp < n_subpixel ? 1 : scene.renderOptions.spp / n_subpixel;
-    const size_t spp = nrays_persubpixel * n_subpixel;
-
     for (unsigned i=0; i < nimages; ++i)
     {
-        cout << "\n" << i+1 << "/" << nimages << ": at " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) <<  i*angle << " deg" << flush;
+        std::cout << "\n" << i+1 << "/" << nimages << ": at " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) <<  i*angle << " deg" << std::flush;
         camera.lookAt( Transform::T(to) * Transform::Ry(deg2rad( i*angle )) * Transform::T(-to) * from, to); // rotate around y-axis
 
         auto start = std::chrono::high_resolution_clock::now();
         raytracer->render(scene);
         auto end = std::chrono::high_resolution_clock::now();
 
-        time_in_ms = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+        time_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
         std::stringstream ss;
         int ms = (unsigned long long)time_in_ms % 1000;
@@ -65,18 +71,18 @@ int main(int argc, char **argv)
         int h  = ((unsigned long long)time_in_ms / 1000 / 60 / 60);
         ss << std::setw(2) << std::setfill('0') << h << "." << std::setw(2) << std::setfill('0') << m << "." << std::setw(2) << std::setfill('0') << s << "." << std::setw(3) << std::setfill('0') << ms;
         std::string time_str = ss.str();
-        cout << ", Time: " << time_str << endl << flush;
+        std::cout << ", Time: " << time_str << std::endl << std::flush;
 
         std::stringstream ss2;
         ss2 << output << "_" << std::setw(4) << std::setfill('0') << i;
-        if (detailedName) { ss2 << "_SPP" << spp << "_T" << time_str; }
+        if (detailedName) { ss2 << "_SPP" << scene.renderOptions.spp << "_T" << time_str; }
         raytracer->getBuffer().write_png(ss2.str().c_str());
 
         time_in_ms_avg += time_in_ms;
     }
 
     time_in_ms_avg = time_in_ms_avg / (nimages);
-    cout << endl << "Total Average in ms: " << time_in_ms_avg << endl;
+    std::cout << std::endl << "Total Average in ms: " << time_in_ms_avg << std::endl;
 
     return 0;
 }

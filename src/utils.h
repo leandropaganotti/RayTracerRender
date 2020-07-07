@@ -34,6 +34,22 @@ float erand48(unsigned short xsubi[3])
     UNUSED(xsubi);
     return dis(gen);
 }
+inline
+float drand48(){ return dis(gen); }
+
+
+struct RNG
+{
+    RNG()
+    {
+        srand(time(0));
+    }
+    float operator()()
+    {
+        return (float) rand()/RAND_MAX;
+    }
+};
+
 //#endif
 
 typedef struct timeval timestamp;

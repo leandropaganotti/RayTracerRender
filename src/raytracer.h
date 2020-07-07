@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "scene.h"
 #include "renderoptions.h"
+#include "sampler2d.h"
 
 class RayTracer
 {
@@ -30,6 +31,9 @@ protected:
     Camera camera;
     Image  buffer;
     const Scene *scene;
+    Jitter rng;
+    TentFilter filter;
+
     virtual Vector3 trace(const Ray &ray, const uint8_t depth, float E) = 0;
 };
 
