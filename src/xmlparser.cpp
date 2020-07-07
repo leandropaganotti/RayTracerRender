@@ -244,6 +244,9 @@ void XMLParser::parseRenderOptions(xmlNode *xmlRenderOptionsNode, RenderOptions 
             else
                 LogError(xmlRenderOptionsNode, attr, "unrecognized illum attribute value");
         }
+        else
+            LogError(xmlRenderOptionsNode, attr, "unrecognized attribute");
+
     }
 
     xmlNode *node = NULL;
