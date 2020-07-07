@@ -185,7 +185,7 @@ Vector3 Minimum::trace(const Ray &ray, const uint8_t, const float)
     IntersectionData isec;
     if(scene->intersection(ray, isec))
     {
-        return isec.material->Kd;
+        //return isec.material->Kd;
         isec.phit = ray.origin + isec.tnear * ray.direction;
         isec.object->getIsecData(isec);
         return isec.albedo;

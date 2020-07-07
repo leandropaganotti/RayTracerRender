@@ -2,7 +2,7 @@
 
 
 
-Matrix4 Transformation::T(const Vector3 &v)
+Matrix4 Transform::T(const Vector3 &v)
 {
     Matrix4 m;
     m[0][3] = v.x;
@@ -11,7 +11,7 @@ Matrix4 Transformation::T(const Vector3 &v)
     return m;
 }
 
-Matrix4 Transformation::S(const Vector3 &v)
+Matrix4 Transform::S(const Vector3 &v)
 {
     Matrix4 m;
     m[0][0] = v.x;
@@ -20,7 +20,7 @@ Matrix4 Transformation::S(const Vector3 &v)
     return m;
 }
 
-Matrix4 Transformation::Rx(float angle)
+Matrix4 Transform::Rx(float angle)
 {
     Matrix4 m;
     m[1][1] = cos(angle);
@@ -30,7 +30,7 @@ Matrix4 Transformation::Rx(float angle)
     return m;
 }
 
-Matrix4 Transformation::Ry(float angle)
+Matrix4 Transform::Ry(float angle)
 {
     Matrix4 m;
     m[0][0] = cos(angle);
@@ -40,7 +40,7 @@ Matrix4 Transformation::Ry(float angle)
     return m;
 }
 
-Matrix4 Transformation::Rz(float angle)
+Matrix4 Transform::Rz(float angle)
 {
     Matrix4 m;
     m[0][0] = cos(angle);
@@ -50,12 +50,12 @@ Matrix4 Transformation::Rz(float angle)
     return m;
 }
 
-Matrix4 Transformation::TSR(const Vector3 &translate, const Vector3 &rotate, const Vector3 &scale)
+Matrix4 Transform::TSR(const Vector3 &translate, const Vector3 &rotate, const Vector3 &scale)
 {
     return T(translate) * Rz(rotate.z) * Ry(rotate.y) * Rx(rotate.x) * S(scale);
 }
 
-Matrix4 Transformation::RotationDir(const Vector3 &direction)
+Matrix4 Transform::RotationDir(const Vector3 &direction)
 {
     Matrix4 R;
 //    Vector3 u,v=direction, w, n(1,0,0),m(0,1,0);

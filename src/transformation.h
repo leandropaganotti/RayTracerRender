@@ -3,10 +3,10 @@
 #include "vector.h"
 #include "matrix.h"
 
-class Transformation {
+class Transform {
 
 public:
-    Transformation() = delete;
+    Transform() = delete;
 
     static Matrix4 T(const Vector3& v);
     static Matrix4 S(const Vector3& v);

@@ -454,7 +454,7 @@ std::shared_ptr<Object> XMLParser::parsePlane(xmlNode *xmlPlaneNode)
             LogError(xmlPlaneNode, attr, "unrecognized attribute");
     }
 
-    transform = Transformation::T(origin) * Transformation::RotationDir(normal);
+    transform = Transform::T(origin) * Transform::RotationDir(normal);
 
     xmlNode *node = NULL;
     for (node = xmlPlaneNode->children; node; node = node->next)
@@ -505,7 +505,7 @@ std::shared_ptr<Object> XMLParser::parseSphere(xmlNode * xmlSphereNode)
             LogError(xmlSphereNode, attr, "unrecognized attribute");
     }
 
-    transform = Transformation::T(position) * Transformation::S(Vector3(radius*2.0f));
+    transform = Transform::T(position) * Transform::S(Vector3(radius*2.0f));
 
     xmlNode *node = NULL;
     for (node = xmlSphereNode->children; node; node = node->next)
@@ -744,5 +744,5 @@ Matrix4 XMLParser::parseTransformation(xmlNode *xmlTrnasformationNode)
         }
     }
 
-    return Transformation::TSR(translate, rotate, scale);
+    return Transform::TSR(translate, rotate, scale);
 }
