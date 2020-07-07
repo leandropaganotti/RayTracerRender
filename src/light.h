@@ -36,7 +36,7 @@ public:
 
     virtual void  getLightData(const Vector3 &phit, LightData &light) const = 0;
     virtual float visibility(const Ray &ray, const std::vector<std::shared_ptr<Object>> &objects) const = 0;
-    virtual float visibility(const Ray &ray, const Scene *scene) const;
+    virtual float visibility(const Ray &ray, const Scene *scene) const = 0;
 
     Vector3 getIntensity() const;
     void    setIntensity(const Vector3 &value);
@@ -73,6 +73,7 @@ class PointLightShadowOff: public PointLight
 {
 public:
     float visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const override;
+    float visibility(const Ray &ray, const Scene *scene) const override;
 };
 
 class DistantLight: public Light
@@ -83,6 +84,7 @@ public:
 
     virtual void  getLightData(const Vector3 &phit, LightData &light) const override;
     virtual float visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const override;
+    virtual float visibility(const Ray &ray, const Scene *scene) const override;
 
     Vector3  getDirection() const;
     void     setDirection(const Vector3 &value);
@@ -95,6 +97,7 @@ class DistantLightShadowOff: public DistantLight
 {
 public:
     float visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const override;
+    float visibility(const Ray &ray, const Scene *scene) const override;
 };
 
 class SphericalLight: public Sphere, public Light
@@ -103,6 +106,7 @@ public:
     SphericalLight();
     virtual void  getLightData(const Vector3 &phit, LightData &light) const override;
     virtual float visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const override;
+    virtual float visibility(const Ray &ray, const Scene *scene) const override;
 
     float getAttenuation() const;
     void  setAttenuation(float value);
@@ -116,6 +120,7 @@ class SphericalLightShadowOff: public SphericalLight
 {
 public:
     float visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const override;
+    float visibility(const Ray &ray, const Scene *scene) const override;
 };
 
 

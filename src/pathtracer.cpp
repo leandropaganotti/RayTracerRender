@@ -27,11 +27,9 @@ Vector3 PathTracer::trace(const Ray &ray, const uint8_t depth, const float E)
 
             Lo = E + (BRDF * Li * cos) / pdf; where pdf = 1/Area = 1/2M_PI (hemisphere)
 
-            Lo = E + material->color/M_PI * pathTrace() * cos * 1/pdf
-            Lo = E + material->color/M_PI * pathTrace() * cos * 2M_PI
-            Lo = E + material->color * pathTrace() * cos * 2
-            I am not recurring in case of hit a light so:
-            if hit light return E otherwise material->color * pathTrace() * cos * 2
+            Lo = E + albedo/M_PI * trace() * cos * 1/pdf
+            Lo = E + albedo/M_PI * trace() * cos * 2M_PI
+            Lo = E + albedo * trace() * cos * 2
         */
         Ray r(isec.phit + bias * isec.normal, randomUnitVectorInHemisphereOf(isec.normal));
         float cosTheta = isec.normal ^ r.direction;
@@ -102,11 +100,13 @@ Vector3 PathTracerWithDirectSampling::trace(const Ray &ray, const uint8_t depth,
             LightData isecLight;
             light->getLightData(isec.phit, isecLight);
 
-            float vis = light->visibility(Ray(isec.phit + bias * isec.normal, -isecLight.direction), scene->objects);
+            float vis = light->visibility(Ray(isec.phit + bias * isec.normal, -isecLight.direction), scene);
 
             //diffuse
             Vector3 diffuse = brdf * isecLight.intensity * std::max(0.0f, (isec.normal ^ -isecLight.direction)) * isecLight._1_pdf;
-
+            diffuse.x =  clamp(diffuse.x);
+            diffuse.y =  clamp(diffuse.y);
+            diffuse.z =  clamp(diffuse.z);
             //specular
             Vector3 toCamera = -ray.direction;
             Vector3 reflected = reflect(isecLight.direction, isec.normal);
@@ -119,7 +119,8 @@ Vector3 PathTracerWithDirectSampling::trace(const Ray &ray, const uint8_t depth,
         Ray r(isec.phit + bias * isec.normal, randomUnitVectorInHemisphereOf(isec.normal));
         float cosTheta = isec.normal ^ r.direction;
         //Vector3 indirect =  (E*material->E) + isec.object->color(isec) * pathTracer2(r, scene, depth+1, 0.0f);
-        Vector3 indirect =  (E*isec.material->E) + brdf * trace(r, depth+1, 0.0f) * cosTheta * _1_pdf;
+        Vector3 indirect =  (E*isec.material->E) + brdf * trace(r, depth+1, 1.0f) * cosTheta * _1_pdf;
+
         diffused = direct + indirect;
 
     }

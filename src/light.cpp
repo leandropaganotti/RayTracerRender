@@ -44,11 +44,6 @@ std::shared_ptr<Light> Light::Create(LightType type, const ParamSet &params)
     return nullptr;
 }
 
-float Light::visibility(const Ray &ray, const Scene *scene) const
-{
-    return 1.0f;
-}
-
 Vector3 Light::getIntensity() const
 {
     return intensity;
@@ -139,6 +134,11 @@ float PointLightShadowOff::visibility(const Ray &, const std::vector<std::shared
     return 1.0f;
 }
 
+float PointLightShadowOff::visibility(const Ray &, const Scene *) const
+{
+    return 1.0f;
+}
+
 DistantLight::DistantLight()
 {
     direction = Vector3(0, -1, 0);
@@ -174,6 +174,13 @@ float DistantLight::visibility(const Ray &ray, const std::vector<std::shared_ptr
     return vis;
 }
 
+float DistantLight::visibility(const Ray &ray, const Scene *scene) const
+{
+    ray.tmax = INFINITY;
+    if(scene->intersection(ray)) return 0.0f;
+    return 1.0f;
+}
+
 Vector3 DistantLight::getDirection() const
 {
     return direction;
@@ -186,6 +193,11 @@ void DistantLight::setDirection(const Vector3 &value)
 }
 
 float DistantLightShadowOff::visibility(const Ray &, const std::vector<std::shared_ptr<Object> > &) const
+{
+    return 1.0f;
+}
+
+float DistantLightShadowOff::visibility(const Ray &, const Scene *) const
 {
     return 1.0f;
 }
@@ -206,6 +218,13 @@ float SphericalLight::visibility(const Ray &ray, const std::vector<std::shared_p
         }
     }
     return vis;
+}
+
+float SphericalLight::visibility(const Ray &ray, const Scene *scene) const
+{
+    ray.tmax = (ray.origin - center).length() - radius;
+    if(scene->intersection(ray)) return 0.0f;
+    return 1.0f;
 }
 
 float SphericalLight::getAttenuation() const
@@ -229,10 +248,14 @@ void SphericalLight::getLightData(const Vector3 &phit, LightData &light) const
     light.distance = (phit-center).length() - radius;
     light.direction = -light.direction;
     light.intensity = intensity * 1/(1+atten*light.distance*light.distance);
-
 }
 
 float SphericalLightShadowOff::visibility(const Ray &, const std::vector<std::shared_ptr<Object> > &) const
+{
+    return 1.0f;
+}
+
+float SphericalLightShadowOff::visibility(const Ray &, const Scene *) const
 {
     return 1.0f;
 }

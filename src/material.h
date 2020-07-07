@@ -9,7 +9,7 @@
 
 struct Material;
 
-enum class MaterialType { DIFFUSE, SPECULAR, TRANSPARENT };
+enum class MaterialType { DIFFUSE, SPECULAR, TRANSPARENT, LIGHT };
 
 namespace material
 {
