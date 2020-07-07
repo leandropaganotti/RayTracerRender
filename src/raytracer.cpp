@@ -19,13 +19,13 @@ std::shared_ptr<RayTracer> RayTracer::Create(Illumination illum)
 {
     switch (illum) {
     case Illumination::GlobalIluminationWithDirectSampling:
-        return std::shared_ptr<RayTracer> (new PathTracerWithDirectSampling);
+        return std::make_shared<PathTracerWithDirectSampling>();
     case Illumination::GlobalIlumination:
-        return std::shared_ptr<RayTracer> (new PathTracer);
+        return std::make_shared<PathTracer>();
     case Illumination::Phong:
-        return std::shared_ptr<RayTracer> (new Phong);
+        return std::make_shared<Phong>();
     default:
-        return std::shared_ptr<RayTracer> (new Minimum);
+        return std::make_shared<Minimum>();
     }
 }
 
@@ -70,7 +70,7 @@ void RayTracer::render(const Scene& scene)
                     {
                         const float x = i + w_subpixel * (ii + erand48(Xi));
                         const float y = j + w_subpixel * (jj + erand48(Xi));
-                        Ray ray(camera.getPosition(), rayDirection(x, y));
+                        Ray ray(camera.getRay(x, y));
                         buffer.at(i, j) += trace(ray, 1, 1.0f);
                     }
                 }
@@ -82,39 +82,6 @@ void RayTracer::render(const Scene& scene)
         std::cout << ss.str() << std::flush;
     }
 
-}
-
-inline
-Vector3 RayTracer::rayDirection(float i, float j) const
-{
-    float Px = (2.0f * ((j) / camera.getWidth()) - 1.0f) * tan(camera.getFov() / 2.0f ) * camera.getRatio();
-    float Py = (1.0f - 2.0f * ((i) / camera.getHeight())) * tan(camera.getFov() / 2.0f);
-    Vector3 dir = (camera.getCameraToWorld() * Vector3(Px, Py, -1.0f)) - camera.getPosition();
-    return dir.normalize();
-}
-
-bool RayTracer::castRay(const Ray &ray, IntersectionData &isec)
-{
-    if(scene->intersection(ray, isec))
-    {
-        isec.phit = ray.origin + isec.tnear * ray.direction;
-        isec.object->getIsecData(isec);
-        return true;
-    }
-    return false;
-}
-
-
-float RayTracer::castShadowRay(const Ray &ray)
-{
-    return scene->intersection(ray) ? 1.0f : 0.0f;
-}
-
-inline
-Vector3 RayTracer::specularReflection(const Ray &ray, const uint8_t depth, const IntersectionData &isec)
-{
-    Ray R(isec.phit + bias * isec.normal, reflect(ray.direction, isec.normal).normalize());
-    return trace(R, depth + 1, 1.0f);
 }
 
 Vector3 RayTracer::transparentMaterial(const Ray &ray, const uint8_t depth, const IntersectionData &isec, float E)

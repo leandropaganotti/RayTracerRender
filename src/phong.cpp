@@ -9,9 +9,9 @@ Vector3 Phong::trace(const Ray &ray, const uint8_t depth, float E)
     if(depth > renderOptions.maxDepth) return color::BLACK;
 
     IntersectionData isec;
-
-    if (!castRay(ray, isec))
-        return renderOptions.bgColor;
+    if(!scene->intersection(ray, isec)) return renderOptions.bgColor;
+    isec.phit = ray.origin + isec.tnear * ray.direction;
+    isec.object->getIsecData(isec);
 
     const MaterialType type = isec.material->type;
 

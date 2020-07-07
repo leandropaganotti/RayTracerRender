@@ -10,9 +10,9 @@ Vector3 PathTracer::trace(const Ray &ray, const uint8_t depth, const float E)
     if(depth > renderOptions.maxDepth) return color::BLACK;
 
     IntersectionData isec;
-
-    if (!castRay(ray, isec))
-        return renderOptions.bgColor;
+    if(!scene->intersection(ray, isec)) return renderOptions.bgColor;
+    isec.phit = ray.origin + isec.tnear * ray.direction;
+    isec.object->getIsecData(isec);
 
     MaterialType type = isec.material->type;
 
@@ -68,9 +68,9 @@ Vector3 PathTracerWithDirectSampling::trace(const Ray &ray, const uint8_t depth,
     if(depth > renderOptions.maxDepth) return color::BLACK;
 
     IntersectionData isec;
-
-    if (!castRay(ray, isec))
-        return renderOptions.bgColor;
+    if(!scene->intersection(ray, isec)) return renderOptions.bgColor;
+    isec.phit = ray.origin + isec.tnear * ray.direction;
+    isec.object->getIsecData(isec);
 
     const MaterialType type = isec.material->type;
 
