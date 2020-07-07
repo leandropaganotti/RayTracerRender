@@ -465,7 +465,7 @@ std::shared_ptr<Object> XMLParser::parsePlane(xmlNode *xmlPlaneNode)
             if (equals(node->name, "material"))
                 material = parseMaterial(node);
             else if(equals(node->name, "transformation"))
-                transform = parseTransformation(node);
+                transform = parseTransformation(node) * transform;
             else
                 LogError(node, nullptr, "unrecognized element");
         }
@@ -516,7 +516,7 @@ std::shared_ptr<Object> XMLParser::parseSphere(xmlNode * xmlSphereNode)
             if (equals(node->name, "material"))
                 material = parseMaterial(node);
             else if (!_static && equals(node->name, "transformation"))
-                transform = parseTransformation(node);
+                transform = parseTransformation(node) * transform;
             else
                 LogError(node, nullptr, "unrecognized element");
         }
