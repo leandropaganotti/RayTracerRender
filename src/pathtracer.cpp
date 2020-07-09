@@ -5,7 +5,7 @@
 
 const float bias = 0.001f;
 
-Vector3 PathTracer::trace(const Ray &ray, const uint8_t depth, const float E)
+Vector3 PathTracer::Li(const Ray &ray, const uint8_t depth, const float E)
 {
     if(depth > renderOptions.maxDepth) return color::BLACK;
 
@@ -33,7 +33,7 @@ Vector3 PathTracer::trace(const Ray &ray, const uint8_t depth, const float E)
         */
         Ray r(isec.phit + bias * isec.normal, randomUnitVectorInHemisphereOf(isec.normal));
         float cosTheta = isec.normal ^ r.direction;
-        return isec.material->E + isec.albedo * trace(r, depth+1, E) * cosTheta * 2.0f;
+        return isec.material->E + isec.albedo * Li(r, depth+1, E) * cosTheta * 2.0f;
     }
     else if (type == MaterialType::SPECULAR)
     {
@@ -43,13 +43,13 @@ Vector3 PathTracer::trace(const Ray &ray, const uint8_t depth, const float E)
         if (kr > 0.0001f)
         {
             Ray r(isec.phit + bias * isec.normal, reflect(ray.direction, isec.normal).normalize());
-            reflected = trace(r, depth+1, 0);
+            reflected = Li(r, depth+1, 0);
         }
         if (kt > 0.0001f)
         {
             Ray r(isec.phit + bias * isec.normal, randomUnitVectorInHemisphereOf(isec.normal));
             float cosTheta = isec.normal ^ r.direction;
-            diffused = isec.material->E + isec.albedo * trace(r, depth+1, E) * cosTheta * 2.0f;
+            diffused = isec.material->E + isec.albedo * Li(r, depth+1, E) * cosTheta * 2.0f;
         }
 
         return kt*diffused + kr*reflected;
@@ -61,7 +61,7 @@ Vector3 PathTracer::trace(const Ray &ray, const uint8_t depth, const float E)
     return color::BLACK;
 }
 
-Vector3 PathTracerWithDirectSampling::trace(const Ray &ray, const uint8_t depth, const float E)
+Vector3 PathTracerWithDirectSampling::Li(const Ray &ray, const uint8_t depth, const float E)
 {
     if(depth > renderOptions.maxDepth) return color::BLACK;
 
@@ -90,45 +90,37 @@ Vector3 PathTracerWithDirectSampling::trace(const Ray &ray, const uint8_t depth,
 //        return Lo;
 //    }
     Vector3 diffused, reflected;
-    Vector3 brdf = isec.albedo * M_1_PI;
+    Vector3 f = isec.albedo * M_1_PI;
     if (kt > 0.0001f)
     {
-        //direct light
         Vector3 direct(0);
+        //direct light
         for(auto &light : scene->lights)
         {
-            SampleLi isecLight;
-            light->getSample(isec.phit, isecLight);
+            SampleLi sample;
+            light->getSample(isec.phit, sample);
 
-            float vis = light->visibility(Ray(isec.phit + bias * isec.normal, -isecLight.direction), scene);
+            float vis = light->visibility(Ray(isec.phit + bias * isec.normal, sample.direction, sample.distance), scene);
 
             //diffuse
-            Vector3 diffuse = brdf * isecLight.Li * std::max(0.0f, (isec.normal ^ -isecLight.direction)) * isecLight._1_pdf;
-            diffuse.x =  clamp(diffuse.x);
-            diffuse.y =  clamp(diffuse.y);
-            diffuse.z =  clamp(diffuse.z);
-            //specular
-            Vector3 toCamera = -ray.direction;
-            Vector3 reflected = reflect(isecLight.direction, isec.normal);
-            Vector3 specular = powf(std::max(0.0f, toCamera ^ reflected), isec.material->Ns) * isec.material->Ks;
-            direct += vis * (diffuse + specular);
+            direct  += vis * f * sample.Li * std::max(0.0f, (isec.normal ^ sample.direction)) * sample._1_pdf;
         }
-
+        direct.x = clamp(direct.x);
+        direct.y = clamp(direct.y);
+        direct.z = clamp(direct.z);
         //indirect light
         const float _1_pdf = (2.0f*M_PI);//1/(2*M_PI)
         Ray r(isec.phit + bias * isec.normal, randomUnitVectorInHemisphereOf(isec.normal));
-        float cosTheta = isec.normal ^ r.direction;
-        //Vector3 indirect =  (E*material->E) + isec.object->color(isec) * pathTracer2(r, scene, depth+1, 0.0f);
-        Vector3 indirect =  (E*isec.material->E) + brdf * trace(r, depth+1, 1.0f) * cosTheta * _1_pdf;
+        float cosine = isec.normal ^ r.direction;
+        Vector3 indirect = f * Li(r, depth+1, 0.0f) * cosine * _1_pdf;
 
         diffused = direct + indirect;
-
     }
 
     if(kr > 0.0001f)
     {
         Ray r(isec.phit + bias * isec.normal, reflect(ray.direction, isec.normal).normalize());
-        reflected = trace(r, depth+1, E);
+        reflected = Li(r, depth+1, E);
     }
 
     return kt*diffused + kr*reflected;

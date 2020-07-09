@@ -34,10 +34,10 @@ protected:
     Jitter rng;
     TentFilter filter;
 
-    virtual Vector3 trace(const Ray &ray, const uint8_t depth, float E) = 0;
+    virtual Vector3 Li(const Ray &ray, const uint8_t depth, float E) = 0;
 };
 
 class Minimum: public RayTracer
 {
-    Vector3 trace(const Ray &ray, const uint8_t depth, const float E) override;
+    Vector3 Li(const Ray &ray, const uint8_t depth, const float E) override;
 };

@@ -219,7 +219,6 @@ float SphericalLight::visibility(const Ray &ray, const std::vector<std::shared_p
 
 float SphericalLight::visibility(const Ray &ray, const Scene *scene) const
 {
-    ray.tmax = (ray.origin - center).length() - radius;
     if(scene->intersection(ray)) return 0.0f;
     return 1.0f;
 }

@@ -63,7 +63,7 @@ void RayTracer::render(const Scene& scene)
             for (auto &sample: samples)
             {
                 Ray ray(camera.getRay(i+sample.y, j+sample.x));
-                buffer.at(i, j) += trace(ray, 1, 1.0f);
+                buffer.at(i, j) += Li(ray, 1, 1.0f);
             }
             buffer.at(i, j) /= spp;
             ++count;
@@ -115,14 +115,14 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const uint8_t depth, cons
         kt = 1.0f - kr;
 
         Ray T(phit - bias * normal, (n * ray.direction + (n * cosi - cost) * normal).normalize());
-        transmited = trace(T, depth + 1, E) * kt;
+        transmited = Li(T, depth + 1, E) * kt;
     }
 
     // reflection
     if(kr)
     {
         Ray R(phit + bias * normal, reflect(ray.direction, normal).normalize());
-        reflected = trace(R, depth + 1, E) * kr;
+        reflected = Li(R, depth + 1, E) * kr;
     }
     return transmited + reflected;
 }
@@ -137,7 +137,7 @@ void RayTracer::setRenderOptions(const RenderOptions &value)
     renderOptions = value;
 }
 
-Vector3 Minimum::trace(const Ray &ray, const uint8_t, const float)
+Vector3 Minimum::Li(const Ray &ray, const uint8_t, const float)
 {
     IntersectionData isec;
     if(scene->intersection(ray, isec))
