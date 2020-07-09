@@ -74,14 +74,14 @@ PointLight::~PointLight()
 {
 }
 
-void PointLight::getLightData(const Vector3 &phit, LightData &light) const
+void PointLight::getSample(const Vector3 &phit, SampleLi &light) const
 {
-    light.direction = phit - position;
+    light.direction = position - phit;
     light.distance = light.direction.length2();
-    light.intensity = intensity * (1.0f / ( 1.0f + atten * light.distance )); // attenuation = 1/(1+atten*dist*dist) -> default atten=4*pi
-    light.distance = sqrtf(light.distance);
-    light.direction /= light.distance;
+    light.Li = intensity * (1.0f / ( 1.0f + atten * light.distance )); // attenuation = 1/(1+atten*dist*dist) -> default atten=4*pi
     light._1_pdf = 1.0f;
+    light.distance = sqrt(light.distance);
+    light.direction /= light.distance;
 }
 
 float PointLight::visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const
@@ -104,9 +104,7 @@ float PointLight::visibility(const Ray &ray, const std::vector<std::shared_ptr<O
 
 float PointLight::visibility(const Ray &ray, const Scene *scene) const
 {
-    ray.tmax = (ray.origin - position).length();
-    if(scene->intersection(ray)) return 0.0f;
-    return 1.0f;
+    return scene->intersection(ray) ? 0.0f : 1.0f;
 }
 
 Vector3 PointLight::getPosition() const
@@ -149,11 +147,10 @@ DistantLight::~DistantLight()
 
 }
 
-void DistantLight::getLightData(const Vector3 &, LightData &light) const
+void DistantLight::getSample(const Vector3 &, SampleLi &light) const
 {
-    light.distance = INFINITY;
-    light.direction = direction;
-    light.intensity = intensity;
+    light.direction = -direction;
+    light.Li = intensity;
     light._1_pdf = 1.0f;
 }
 
@@ -242,12 +239,12 @@ SphericalLight::SphericalLight()
     atten = 4 * M_PI;
 }
 
-void SphericalLight::getLightData(const Vector3 &phit, LightData &light) const
+void SphericalLight::getSample(const Vector3 &phit, SampleLi &sampleLi) const
 {
-    sampleSolidAngleSphere(phit, light.direction,  light._1_pdf);
-    light.distance = (phit-center).length() - radius;
-    light.direction = -light.direction;
-    light.intensity = intensity * 1/(1+atten*light.distance*light.distance);
+    sampleSolidAngleSphere(phit, sampleLi.direction,  sampleLi._1_pdf);
+    sampleLi.distance = (phit - center).length2();
+    sampleLi.Li = intensity / ( 1 + atten * sampleLi.distance);
+    sampleLi.distance = sqrt(sampleLi.distance);
 }
 
 float SphericalLightShadowOff::visibility(const Ray &, const std::vector<std::shared_ptr<Object> > &) const

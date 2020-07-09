@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vector.h"
+#include "material.h"
 
 class Shape;
 class Material;
@@ -26,6 +27,11 @@ struct IntersectionData
     const Material * material;
     Vector2 uv;
     Vector3 albedo;
+
+    inline Vector3 Ka() const { return albedo * material->Ka;}
+    inline Vector3 Kd() const { return albedo;}
+    inline Vector3 Ks() const { return material->Ks;}
+    inline float   Ns() const { return material->Ns;}
 };
 
 class IntersectionIF

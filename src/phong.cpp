@@ -41,26 +41,21 @@ Vector3 Phong::trace(const Ray &ray, const uint8_t depth, float E)
 }
 Vector3 Phong::phongShading(const Ray &ray, const IntersectionData &isec)
 {
-    Vector3 phitColor(isec.albedo * isec.material->Ka); // starts with ambient component
-
-    for(auto& light: scene->lights)
+    Vector3 diff, spec;
+    SampleLi sample;
+    for(const auto& light: scene->lights)
     {
+        light->getSample(isec.phit, sample);
 
-        LightData isecLight;
-        light->getLightData(isec.phit, isecLight);
+        if(light->visibility(Ray(isec.phit + bias * isec.normal, sample.direction, sample.distance), scene) > 0.0f)
+        {
+            //diffuse
+            diff += sample.Li * std::max(0.0f, (isec.normal ^ sample.direction));
 
-        float vis = light->visibility(Ray(isec.phit + bias * isec.normal, -isecLight.direction), scene);
-
-        //diffuse
-        Vector3 diffuse = isecLight.intensity * std::max(0.0f, (isec.normal ^ -isecLight.direction));
-
-        //specular
-        Vector3 toCamera = -ray.direction;
-        Vector3 reflected = reflect(isecLight.direction, isec.normal);
-        Vector3 specular = powf(std::max(0.0f, toCamera ^ reflected), isec.material->Ns);
-
-        phitColor += vis * (diffuse*isec.albedo + specular*isec.material->Ks);
-
+            //specular
+            Vector3 r = reflect(-sample.direction, isec.normal);
+            spec += sample.Li * powf(std::max(0.0f, -ray.direction ^ r), isec.Ns());
+        }
     }
-    return phitColor;
+    return isec.Ka() + (diff * isec.Kd() + spec * isec.Ks());
 }

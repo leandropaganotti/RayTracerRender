@@ -18,12 +18,12 @@ enum class LightType
     SphericalLight,
 };
 
-struct LightData
+struct SampleLi
 {
-    Vector3 intensity;
+    Vector3 Li;
     Vector3 direction;
-    float   distance;
     float   _1_pdf;
+    float distance;
 };
 
 class Light
@@ -34,7 +34,7 @@ public:
 
     static std::shared_ptr<Light> Create(LightType type, const ParamSet &params);
 
-    virtual void  getLightData(const Vector3 &phit, LightData &light) const = 0;
+    virtual void  getSample(const Vector3 &phit, SampleLi &light) const = 0;
     virtual float visibility(const Ray &ray, const std::vector<std::shared_ptr<Object>> &objects) const = 0;
     virtual float visibility(const Ray &ray, const Scene *scene) const = 0;
 
@@ -54,7 +54,7 @@ public:
     PointLight();
     virtual ~PointLight();
 
-    virtual void  getLightData(const Vector3 &phit, LightData &light) const override;
+    virtual void  getSample(const Vector3 &phit, SampleLi &light) const override;
     virtual float visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const override;
     virtual float visibility(const Ray &ray, const Scene *scene) const override;
 
@@ -82,7 +82,7 @@ public:
     DistantLight();
     virtual ~DistantLight();
 
-    virtual void  getLightData(const Vector3 &phit, LightData &light) const override;
+    virtual void  getSample(const Vector3 &phit, SampleLi &light) const override;
     virtual float visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const override;
     virtual float visibility(const Ray &ray, const Scene *scene) const override;
 
@@ -104,7 +104,7 @@ class SphericalLight: public Sphere, public Light
 {
 public:
     SphericalLight();
-    virtual void  getLightData(const Vector3 &phit, LightData &light) const override;
+    virtual void  getSample(const Vector3 &phit, SampleLi &light) const override;
     virtual float visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const override;
     virtual float visibility(const Ray &ray, const Scene *scene) const override;
 

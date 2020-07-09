@@ -107,20 +107,53 @@ AABB Sphere::getAABB() const
 {
     return AABB(center + Vector3(-radius, -radius, radius), center + Vector3(radius, radius, -radius));
 }
-
+inline Vector3 SphericalDirection(float sinTheta, float cosTheta, float phi,
+                                   const Vector3 &x, const Vector3 &y,
+                                   const Vector3 &z) {
+    return sinTheta * std::cos(phi) * x + sinTheta * std::sin(phi) * y +
+           cosTheta * z;
+}
 void Sphere::sampleSolidAngleSphere(const Vector3 &point, Vector3 &sample, float &_1_pdf) const{
-    float dist2 = (center - point).length(); dist2*=dist2; // distance from point hit to center of light power 2
-    float cos_a_max = sqrt(1.0f - radius2/dist2);
-    float r1 = dis(gen);
-    float r2 = dis(gen);
-    float cos_a = 1.0f + r1*(cos_a_max-1.0f);
-    float phi = 2.0f * M_PI * r2;
-    //float sin_a = sqrtf(1-cos_a*cos_a);
-    float sin_a = sinf(acosf(cos_a));
-    Vector3 u,v, w=(center - point).normalize(), n(1,0,0),m(0,1,0);
+    static RNG rng;
+    float r1 = rng();
+    float r2 = rng();
+
+    // Compute coordinate system for sphere sampling
+    float dc = point.distance(center);
+    float invDc = 1 / dc;
+    Vector3 w = (center - point) * invDc;
+    Vector3 u, v;
+    Vector3 n(1,0,0),m(0,1,0);
     u = w%n; if(u.length()<0.01f)u = w%m;
     v=w%u;
-    sample = u*(cos(phi)*sin_a) + v*(sin(phi)*sin_a) + w*(cos_a);
 
-    _1_pdf = (2.0f*M_PI*(1.0f-cos_a_max));//1/(2*M_PI*(1-cos_a_max));
+    // Compute $\theta$ and $\phi$ values for sample in cone
+    float sinThetaMax = radius * invDc;
+    float sinThetaMax2 = sinThetaMax * sinThetaMax;
+    float invSinThetaMax = 1 / sinThetaMax;
+    float cosThetaMax = std::sqrt(std::max((float)0.f, 1 - sinThetaMax2));
+
+    float cosTheta  = (cosThetaMax - 1) * r1 + 1;
+    float sinTheta2 = 1 - cosTheta * cosTheta;
+
+    if (sinThetaMax2 < 0.00068523f /* sin^2(1.5 deg) */) {
+       /* Fall back to a Taylor series expansion for small angles, where
+          the standard approach suffers from severe cancellation errors */
+       sinTheta2 = sinThetaMax2 * r1;
+       cosTheta = std::sqrt(1 - sinTheta2);
+    }
+
+    // Compute angle $\alpha$ from center of sphere to sampled point on surface
+    float cosAlpha = sinTheta2 * invSinThetaMax +
+       cosTheta * std::sqrt(std::max((float)0.f, 1.f - sinTheta2 * invSinThetaMax * invSinThetaMax));
+    float sinAlpha = std::sqrt(std::max((float)0.f, 1.f - cosAlpha*cosAlpha));
+    float phi = r2 * 2 * M_PI;
+
+    // Compute surface normal and sampled point on sphere
+    Vector3 nWorld = SphericalDirection(sinAlpha, cosAlpha, phi, -u, -v, -w);
+    Vector3 pWorld = center + radius * Vector3(nWorld.x, nWorld.y, nWorld.z);
+
+    sample = (pWorld-point).normalize();
+
+   _1_pdf = (2 * M_PI * (1 - cosThetaMax));
 }

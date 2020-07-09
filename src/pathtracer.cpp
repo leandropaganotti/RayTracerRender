@@ -97,13 +97,13 @@ Vector3 PathTracerWithDirectSampling::trace(const Ray &ray, const uint8_t depth,
         Vector3 direct(0);
         for(auto &light : scene->lights)
         {
-            LightData isecLight;
-            light->getLightData(isec.phit, isecLight);
+            SampleLi isecLight;
+            light->getSample(isec.phit, isecLight);
 
             float vis = light->visibility(Ray(isec.phit + bias * isec.normal, -isecLight.direction), scene);
 
             //diffuse
-            Vector3 diffuse = brdf * isecLight.intensity * std::max(0.0f, (isec.normal ^ -isecLight.direction)) * isecLight._1_pdf;
+            Vector3 diffuse = brdf * isecLight.Li * std::max(0.0f, (isec.normal ^ -isecLight.direction)) * isecLight._1_pdf;
             diffuse.x =  clamp(diffuse.x);
             diffuse.y =  clamp(diffuse.y);
             diffuse.z =  clamp(diffuse.z);
