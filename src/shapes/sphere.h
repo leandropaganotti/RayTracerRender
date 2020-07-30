@@ -21,7 +21,9 @@ public:
     float    getRadius() const;
     void     setRadius(float value);    
 
-    void sampleSolidAngleSphere(const Vector3& point, Vector3& sample,  float &_1_pdf) const;
+    void getSample(const Vector3& point, Vector3& sample,  float &_1_pdf) const override;
+
+    void getSample(IntersectionData &isec, ShapeSample &ss) const override;
 
 protected:
     Vector3 center;                 // position of the sphere

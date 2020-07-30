@@ -113,7 +113,8 @@ inline Vector3 SphericalDirection(float sinTheta, float cosTheta, float phi,
     return sinTheta * std::cos(phi) * x + sinTheta * std::sin(phi) * y +
            cosTheta * z;
 }
-void Sphere::sampleSolidAngleSphere(const Vector3 &point, Vector3 &sample, float &_1_pdf) const{
+void Sphere::getSample(const Vector3 &point, Vector3 &sample, float &_1_pdf) const
+{
     static RNG rng;
     float r1 = rng();
     float r2 = rng();
@@ -155,5 +156,48 @@ void Sphere::sampleSolidAngleSphere(const Vector3 &point, Vector3 &sample, float
 
     sample = (pWorld-point).normalize();
 
-   _1_pdf = (2 * M_PI * (1 - cosThetaMax));
+    _1_pdf = (2 * M_PI * (1 - cosThetaMax));
+}
+
+void Sphere::getSample(IntersectionData &isec, ShapeSample &ss) const
+{
+    static RNG rng;
+    float r1 = rng();
+    float r2 = rng();
+
+    // Compute coordinate system for sphere sampling
+    float dc = isec.phit.distance(center);
+    float invDc = 1 / dc;
+    Vector3 w = (center - isec.phit) * invDc;
+    Vector3 u, v;
+    Vector3 n(1,0,0),m(0,1,0);
+    u = w%n; if(u.length()<0.01f)u = w%m;
+    v=w%u;
+
+    // Compute $\theta$ and $\phi$ values for sample in cone
+    float sinThetaMax = radius * invDc;
+    float sinThetaMax2 = sinThetaMax * sinThetaMax;
+    float invSinThetaMax = 1 / sinThetaMax;
+    float cosThetaMax = std::sqrt(std::max((float)0.f, 1 - sinThetaMax2));
+
+    float cosTheta  = (cosThetaMax - 1) * r1 + 1;
+    float sinTheta2 = 1 - cosTheta * cosTheta;
+
+    if (sinThetaMax2 < 0.00068523f /* sin^2(1.5 deg) */) {
+       /* Fall back to a Taylor series expansion for small angles, where
+          the standard approach suffers from severe cancellation errors */
+       sinTheta2 = sinThetaMax2 * r1;
+       cosTheta = std::sqrt(1 - sinTheta2);
+    }
+
+    // Compute angle $\alpha$ from center of sphere to sampled point on surface
+    float cosAlpha = sinTheta2 * invSinThetaMax +
+       cosTheta * std::sqrt(std::max((float)0.f, 1.f - sinTheta2 * invSinThetaMax * invSinThetaMax));
+    float sinAlpha = std::sqrt(std::max((float)0.f, 1.f - cosAlpha*cosAlpha));
+    float phi = r2 * 2 * M_PI;
+
+    // Compute surface normal and sampled point on sphere
+    ss.n = SphericalDirection(sinAlpha, cosAlpha, phi, -u, -v, -w);
+    ss.p = center + radius * ss.n;
+    ss._1_pdf = (2 * M_PI * (1 - cosThetaMax));
 }

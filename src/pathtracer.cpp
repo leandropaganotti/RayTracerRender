@@ -81,14 +81,15 @@ Vector3 PathTracerWithDirectSampling::Li(const Ray &ray, const uint8_t depth, co
     {
         kr = schlick(-ray.direction, isec.normal, isec.material->R0);
         kt = 1.0f - kr;
+    }else if(type == MaterialType::LIGHT){
+
+        float n=5, m=1;
+        float nk = isec.normal ^ -ray.direction;
+        float ek = (n+1)/(2*M_PI)*powf(nk, m);
+        Vector3 Lo = isec.material->E * ek / nk;
+        return Lo;
     }
-//    if(isec.material->E != vector::ZERO && depth == 1){
-//        float n=5, m=5;
-//        float nk = isec.normal ^ -ray.direction;
-//        float ek = (n+1)/(2*M_PI)*powf(nk, m);
-//        Vector3 Lo = isec.material->E * ek / nk;
-//        return Lo;
-//    }
+
     Vector3 diffused, reflected;
     Vector3 f = isec.albedo * M_1_PI;
     if (kt > 0.0001f)
@@ -98,12 +99,13 @@ Vector3 PathTracerWithDirectSampling::Li(const Ray &ray, const uint8_t depth, co
         for(auto &light : scene->lights)
         {
             SampleLi sample;
-            light->getSample(isec.phit, sample);
+            Vector3 p = isec.phit + bias * isec.normal;
+            light->getSample(p, sample);
 
-            float vis = light->visibility(Ray(isec.phit + bias * isec.normal, sample.direction, sample.distance), scene);
+            float vis = light->visibility(Ray(p, sample.direction, sample.distance), scene);
 
             //diffuse
-            direct  += vis * f * sample.Li * std::max(0.0f, (isec.normal ^ sample.direction)) * sample._1_pdf;
+            direct  += vis * f * sample.Li * std::abs((isec.normal ^ sample.direction)) * sample._1_pdf;
         }
         direct.x = clamp(direct.x);
         direct.y = clamp(direct.y);

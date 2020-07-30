@@ -100,7 +100,7 @@ public:
     float visibility(const Ray &ray, const Scene *scene) const override;
 };
 
-class SphericalLight: public Sphere, public Light
+class SphericalLight: public SimpleObject, public Light
 {
 public:
     SphericalLight();
@@ -108,11 +108,15 @@ public:
     virtual float visibility(const Ray &ray, const std::vector<std::shared_ptr<Object> > &objects) const override;
     virtual float visibility(const Ray &ray, const Scene *scene) const override;
 
+    void setPosition(const Vector3 &p);
+    void setRadius(float radius);
+
     float getAttenuation() const;
     void  setAttenuation(float value);
 
 protected:
     float atten;
+    Sphere *sphere;
 
 };
 

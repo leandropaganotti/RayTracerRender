@@ -4,12 +4,25 @@
 #include <utility>
 #include <memory>
 
+
+struct ShapeSample
+{
+    Vector3 p;
+    Vector3 n;
+    float  _1_pdf;
+};
+
 class Shape: public IntersectionIF
 {
 public:
     virtual void getIsecData(IntersectionData &isec) const = 0;
     virtual void getNormal(IntersectionData &isec) const = 0;
     virtual void getUV(IntersectionData &isec) const = 0;
+
+    virtual void getSample(const Vector3 &, Vector3 &, float &) const {}
+    virtual void getSample(IntersectionData &isec, ShapeSample &ss) const {}
+    virtual float getArea() const {}
+    virtual float getPdf(IntersectionData &isec, const Vector3 &wi) const {}
 
     virtual ~Shape(){};
 };

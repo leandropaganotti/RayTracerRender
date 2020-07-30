@@ -2,6 +2,7 @@
 #include "utils.h"
 #include "material.h"
 #include "scene.h"
+#include "objectfactory.h"
 
 Light::Light():intensity(1), color(1){}
 
@@ -33,7 +34,7 @@ std::shared_ptr<Light> Light::Create(LightType type, const ParamSet &params)
     {
         std::shared_ptr<SphericalLight> light;
         light = params.get<bool>("shadowoff") ? std::shared_ptr<SphericalLight>(new SphericalLightShadowOff) : std::shared_ptr<SphericalLight>(new SphericalLight);
-        light->setCenter(params.get<Vector3>("position"));
+        light->setPosition(params.get<Vector3>("position"));
         light->setRadius(params.get<float>("radius"));
         light->setColor(params.get<Vector3>("color"));
         light->setIntensity(params.get<Vector3>("intensity"));
@@ -203,7 +204,7 @@ float SphericalLight::visibility(const Ray &ray, const std::vector<std::shared_p
 {
     float vis = 1.0f;
     IntersectionData isec;
-    ray.tmax = (ray.origin - center).length() - radius;
+    ray.tmax = (ray.origin - sphere->getCenter()).length() - sphere->getRadius();
     for(auto &object : objects)
     {
         if (object->intersection(ray, isec))
@@ -223,6 +224,16 @@ float SphericalLight::visibility(const Ray &ray, const Scene *scene) const
     return 1.0f;
 }
 
+void SphericalLight::setPosition(const Vector3 &p)
+{
+    sphere->setCenter(p);
+}
+
+void SphericalLight::setRadius(float radius)
+{
+    sphere->setRadius(radius);
+}
+
 float SphericalLight::getAttenuation() const
 {
     return atten;
@@ -233,17 +244,21 @@ void SphericalLight::setAttenuation(float value)
     atten = value;
 }
 
-SphericalLight::SphericalLight()
+SphericalLight::SphericalLight():
+    SimpleObject(std::make_shared<Sphere>(), Material::Create())
 {
+    sphere = dynamic_cast<Sphere*>(shape.get());
+    material->E = intensity;
+    material->type = MaterialType::LIGHT;
     atten = 4 * M_PI;
 }
 
 void SphericalLight::getSample(const Vector3 &phit, SampleLi &sampleLi) const
 {
-    sampleSolidAngleSphere(phit, sampleLi.direction,  sampleLi._1_pdf);
-    sampleLi.distance = (phit - center).length2();
-    sampleLi.Li = intensity / ( 1 + atten * sampleLi.distance);
-    sampleLi.distance = sqrt(sampleLi.distance);
+    sphere->getSample(phit, sampleLi.direction,  sampleLi._1_pdf);
+    sampleLi.distance = (phit - sphere->getCenter()).length() - sphere->getRadius() - 0.001f;
+    sampleLi.Li = intensity / ( 1 + atten * sampleLi.distance*sampleLi.distance);
+
 }
 
 float SphericalLightShadowOff::visibility(const Ray &, const std::vector<std::shared_ptr<Object> > &) const

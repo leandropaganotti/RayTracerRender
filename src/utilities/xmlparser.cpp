@@ -151,7 +151,9 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
             }
             else if(equals(node->name, "SphericalLight"))
             {
-                scene.addLight(parseSphericalLight(node));
+                auto light = parseSphericalLight(node);
+                scene.addLight(light);
+                scene.addObject(std::dynamic_pointer_cast<Object>(light));
             }
             else if (equals(node->name, "sphere"))
             {
