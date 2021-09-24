@@ -3,7 +3,6 @@
 
 #include "vector.h"
 #include "texture.h"
-#include "resource.h"
 
 #include <vector>
 
@@ -20,12 +19,12 @@ namespace material
 
 struct Material
 {
-    Material();
-    Material(const std::string &name, MaterialType type);
+    Material(const std::string &name="", MaterialType type=MaterialType::DIFFUSE);
     ~Material();
 
     static std::shared_ptr<Material> Create();
-    static std::shared_ptr<Material> CreateResource(const std::string &name, MaterialType type);
+    static std::shared_ptr<Material> Create(MaterialType type);
+    static std::shared_ptr<Material> Create(const std::string &name, MaterialType type);
 
     std::string name;
     MaterialType type;
