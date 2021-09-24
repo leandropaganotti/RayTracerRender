@@ -27,17 +27,6 @@ std::uniform_real_distribution<float> dis(0, 1);
 
 #define UNUSED(expr) (void)(expr)
 
-//#if defined(_WIN32) || defined(_WIN64)
-inline
-float erand48(unsigned short xsubi[3])
-{
-    UNUSED(xsubi);
-    return dis(gen);
-}
-inline
-float drand48(){ return dis(gen); }
-
-
 struct RNG
 {
     RNG()
@@ -49,8 +38,6 @@ struct RNG
         return (float) rand()/RAND_MAX;
     }
 };
-
-//#endif
 
 typedef struct timeval timestamp;
 

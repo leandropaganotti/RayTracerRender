@@ -1,4 +1,5 @@
 #include "image.h"
+
 #include <iostream>
 #include <fstream>
 
@@ -15,11 +16,12 @@ Image::Image(int width, int height): w(width), h(height), buffer(nullptr)
 
 Image::Image(int width, int height, const Vector3 &value): w(width), h(height), buffer(nullptr)
 {
-    if ( w>0 && h>0)
+    if ( w>0 && h>0) {
         buffer = new Vector3[w*h];
 
-    for(int i=0; i < w*h; ++i)
-        buffer[i] = value;
+        for(int i=0; i < w*h; ++i)
+            buffer[i] = value;
+    }
 }
 
 Image::~Image()

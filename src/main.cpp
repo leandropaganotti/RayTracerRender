@@ -16,21 +16,8 @@ unsigned    nimages  = 1;       // generates nimages from difterent angles aroun
 bool        detailedName = false;
 
 void parseArguments(int argc, char **argv);
-
 int main(int argc, char **argv)
 {
-//    std::vector<Vector2> samples;
-//    Random s0;
-//    s0(samples, 512);
-//    CreateSomplesImage("random", samples);
-//    samples.clear();
-
-//    Jitter s1;
-//    s1(samples, 512);
-//    CreateSomplesImage("random_jitter", samples);
-//    samples.clear();
-
-//    return 0;
     parseArguments(argc, argv);
 
     double time_in_ms_avg=0.0, time_in_ms=0.0;

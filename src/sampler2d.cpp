@@ -4,7 +4,6 @@
 
 void CreateSomplesImage(const std::string &filename, std::vector<Vector2> &samples, size_t width, size_t height)
 {
-
     Image image(width, height, 0.0f);
 
     for (auto sample: samples)
