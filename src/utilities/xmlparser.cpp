@@ -687,6 +687,10 @@ std::shared_ptr<Object> XMLParser::parseMesh(xmlNode *xmlMeshNode)
     if(!mesh)
     {
         mesh = OBJParser::ParseMesh(src);
+        if(!mesh) {
+            LogError(xmlMeshNode, nullptr, std::string("Can't find mesh: " + src).c_str());
+            return nullptr;
+        }
         Resource<Mesh>::Add(src, mesh);
     }
 
