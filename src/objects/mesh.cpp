@@ -38,7 +38,7 @@ void Mesh::useMaterial(const std::shared_ptr<Material> &m)
 
 void Mesh::buildAggregate()
 {
-    aggregate->create(faces);
+    aggregate->build(faces);
 }
 
 std::ostream &operator <<(std::ostream &os, const Mesh &m)

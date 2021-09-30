@@ -4,37 +4,49 @@
 #include <memory>
 #include "aggregate.h"
 #include "aabb.h"
+#include "invisible.h"
 
 class BVHNode: public IntersectionIF
 {
 public:
-    BVHNode();
-    ~BVHNode();
-    static std::shared_ptr<IntersectionIF> Create(std::vector<std::shared_ptr<IntersectionIF> > &shapes, size_t l, size_t r);
+    BVHNode() = default;
+    ~BVHNode() = default;
 
     bool intersection(const Ray &ray, IntersectionData &isec) const override;
     bool intersection(const Ray &ray) const override;
-
     AABB getAABB() const override;
 
-private:
+public:
     AABB aabb;
-    std::shared_ptr<IntersectionIF> left;
-    std::shared_ptr<IntersectionIF> right;
+    std::shared_ptr<IntersectionIF> left = nullptr;
+    std::shared_ptr<IntersectionIF> right = nullptr;
 };
 
 class BVH: public Aggregate
 {
 public:
-    BVH();
+    BVH() = default;
+    BVH(const BVH&) = delete;
+    BVH(const BVH&&) = delete;
+    BVH& operator=(const BVH&) = delete;
+    BVH& operator=(const BVH&&) = delete;
+
+    ~BVH() = default;
+
     bool intersection(const Ray &ray, IntersectionData &isec) const override;
     bool intersection(const Ray &ray) const override;
     AABB getAABB() const override;
-    void create(const std::vector<std::shared_ptr<Object> > &) override;
-    void create(const std::vector<std::shared_ptr<Shape> > &) override;
+
+    void build(const std::vector<std::shared_ptr<Shape> > &) override;
+    void build(const std::vector<std::shared_ptr<Object> > &) override;
+
     void destroy() override;
-protected:
-    std::shared_ptr<IntersectionIF> root;
+
+private:
+    std::shared_ptr<IntersectionIF> build(std::vector<std::shared_ptr<IntersectionIF> > &shapes, size_t l, size_t r);
+
+private:
+    std::shared_ptr<IntersectionIF> root = shape::Invisible;
 };
 
 

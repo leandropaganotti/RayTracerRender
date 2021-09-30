@@ -2,13 +2,13 @@
 #include "intersection.h"
 #include <memory>
 #include <vector>
-class Object;
 
 class Aggregate: public IntersectionIF
 {
 public:
-    virtual ~Aggregate(){}
-    virtual void create(const std::vector<std::shared_ptr<Object>> &) = 0;
-    virtual void create(const std::vector<std::shared_ptr<Shape>> &) = 0;
+    Aggregate() = default;
+    virtual ~Aggregate() = default;
+    virtual void build(const std::vector<std::shared_ptr<Shape>> &) = 0;
+    virtual void build(const std::vector<std::shared_ptr<Object>> &) = 0;
     virtual void destroy() = 0;
 };

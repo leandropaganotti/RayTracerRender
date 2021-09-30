@@ -1,8 +1,6 @@
 #include "objectvector.h"
 #include "object.h"
 
-ObjectVector::ObjectVector(){}
-
 bool ObjectVector::intersection(const Ray &ray, IntersectionData &isec) const
 {
     if(!aabb.intersection(ray)) return false;
@@ -35,7 +33,7 @@ AABB ObjectVector::getAABB() const
     return aabb;
 }
 
-void ObjectVector::create(const std::vector<std::shared_ptr<Object> > &objs)
+void ObjectVector::build(const std::vector<std::shared_ptr<Object> > &objs)
 {
     destroy();
     for (auto &o: objs)
@@ -45,7 +43,7 @@ void ObjectVector::create(const std::vector<std::shared_ptr<Object> > &objs)
     }
 }
 
-void ObjectVector::create(const std::vector<std::shared_ptr<Shape> > &shapes)
+void ObjectVector::build(const std::vector<std::shared_ptr<Shape> > &shapes)
 {
     destroy();
     for (auto &s: shapes)

@@ -28,7 +28,7 @@ void Scene::readFromXMLFile(const std::string &fileName)
 {
     this->fileName = fileName;
     XMLParser().parseFile(fileName.c_str(), *this);
-    aggregate->create(objects);
+    aggregate->build(objects);
 }
 
 void Scene::addObject(std::shared_ptr<Object> &&o)
