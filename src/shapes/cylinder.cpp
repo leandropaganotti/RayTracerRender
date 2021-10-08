@@ -158,7 +158,7 @@ bool UnitYCylinder::intersection(const Ray &ray) const
     return false;
 }
 
-void UnitYCylinder::getIsecData(IntersectionData &isec) const
+void UnitYCylinder::getNormalAndUV(IntersectionData &isec) const
 {
     if(isec.idx==0)
     {

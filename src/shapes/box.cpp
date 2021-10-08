@@ -92,7 +92,7 @@ bool AABox::intersection(const Ray &ray) const
     return true;
 }
 
-void AABox::getIsecData(IntersectionData &isec) const
+void AABox::getNormalAndUV(IntersectionData &isec) const
 {
     getUV(isec);
     getNormal(isec);

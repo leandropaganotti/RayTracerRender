@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-class Aggregate: public IntersectionIF
+class Aggregate: public Intersection
 {
 public:
     Aggregate() = default;

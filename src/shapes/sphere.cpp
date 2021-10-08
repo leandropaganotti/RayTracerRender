@@ -82,7 +82,7 @@ bool Sphere::intersection(const Ray &ray) const
     return t0 < ray.tmax ? true : false;
 }
 
-void Sphere::getIsecData(IntersectionData &isec) const
+void Sphere::getNormalAndUV(IntersectionData &isec) const
 {
     isec.normal = (isec.phit - center) / radius;
     isec.uv.u = 0.5 + atan2f(isec.normal.x, isec.normal.z) / (2.0f * M_PI);

@@ -6,7 +6,7 @@
 #include "aabb.h"
 #include "invisible.h"
 
-class BVHNode: public IntersectionIF
+class BVHNode: public Intersection
 {
 public:
     BVHNode() = default;
@@ -18,8 +18,8 @@ public:
 
 public:
     AABB aabb;
-    std::shared_ptr<IntersectionIF> left = nullptr;
-    std::shared_ptr<IntersectionIF> right = nullptr;
+    std::shared_ptr<Intersection> left = nullptr;
+    std::shared_ptr<Intersection> right = nullptr;
 };
 
 class BVH: public Aggregate
@@ -43,10 +43,10 @@ public:
     void destroy() override;
 
 private:
-    std::shared_ptr<IntersectionIF> build(std::vector<std::shared_ptr<IntersectionIF> > &shapes, size_t l, size_t r);
+    std::shared_ptr<Intersection> build(std::vector<std::shared_ptr<Intersection> > &shapes, size_t l, size_t r);
 
 private:
-    std::shared_ptr<IntersectionIF> root = shape::Invisible;
+    std::shared_ptr<Intersection> root = shape::Invisible;
 };
 
 

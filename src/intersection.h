@@ -28,11 +28,13 @@ struct IntersectionData
     Vector3 albedo;
 };
 
-class IntersectionIF
+class Intersection
 {
 public:
+    Intersection() = default;
+    virtual ~Intersection() = default;
+
     virtual bool intersection(const Ray &ray, IntersectionData &isec) const = 0;
     virtual bool intersection(const Ray &ray) const = 0;
     virtual AABB getAABB() const = 0;
-    virtual ~IntersectionIF(){};
 };

@@ -20,5 +20,5 @@ public:
 
 protected:
     AABB aabb;
-    std::vector<std::shared_ptr<IntersectionIF>> objects;
+    std::vector<std::shared_ptr<Intersection>> objects;
 };

@@ -13,7 +13,7 @@ public:
     // Shape interface
     bool intersection(const Ray& ray, IntersectionData& isec) const override;
     bool intersection(const Ray& ray) const override;
-    void getIsecData(IntersectionData &isec) const override;
+    void getNormalAndUV(IntersectionData &isec) const override;
     AABB getAABB() const override;
     void getNormal(IntersectionData& isec) const override;
     void getUV(IntersectionData &) const override;

@@ -8,7 +8,7 @@
 
 #include "aggregate.h"
 
-class Scene: public IntersectionIF
+class Scene: public Intersection
 {
 public:
     Scene(const std::shared_ptr<Aggregate> &agg);

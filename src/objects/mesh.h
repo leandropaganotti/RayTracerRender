@@ -57,7 +57,7 @@ protected:
     {
         if(isec.material->texture)
         {
-            faces[isec.idx]->getIsecData(isec); // get normal and uv coord
+            faces[isec.idx]->getNormalAndUV(isec); // get normal and uv coord
             isec.albedo = mtlInUse->Kd * mtlInUse->texture->get(isec.uv);
         }
         else

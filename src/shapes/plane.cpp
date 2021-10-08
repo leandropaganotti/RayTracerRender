@@ -60,7 +60,7 @@ bool Plane::intersection(const Ray &ray) const
     return ( t > 0.0f && t < ray.tmax) ? true : false;
 }
 
-void Plane::getIsecData(IntersectionData &isec) const
+void Plane::getNormalAndUV(IntersectionData &isec) const
 {
     isec.normal = w;
     Vector3 p = isec.phit - origin;

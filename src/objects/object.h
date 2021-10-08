@@ -6,7 +6,7 @@
 #include <memory>
 #include "invisible.h"
 
-class Object: public IntersectionIF
+class Object: public Intersection
 {
 public:
     virtual ~Object(){}
@@ -46,7 +46,7 @@ public:
     {
         if(material->texture)
         {
-            shape->getIsecData(isec); // get normal and uv coord
+            shape->getNormalAndUV(isec); // get normal and uv coord
             isec.albedo = material->Kd * material->texture->get(isec.uv);
         }
         else
@@ -99,7 +99,7 @@ public:
         isec.phit = worldToObject * phit;
         if(material->texture)
         {
-            shape->getIsecData(isec); // get normal and uv coord
+            shape->getNormalAndUV(isec); // get normal and uv coord
             isec.albedo = material->Kd * material->texture->get(isec.uv);
         }
         else

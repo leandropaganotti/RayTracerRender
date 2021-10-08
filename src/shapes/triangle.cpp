@@ -76,7 +76,7 @@ bool MeshTriangle::intersection(const Ray &ray) const
     return intersection(ray, isec);
 }
 
-void MeshTriangle::getIsecData(IntersectionData &isec) const
+void MeshTriangle::getNormalAndUV(IntersectionData &isec) const
 {
     getUV(isec);
     getNormal(isec);

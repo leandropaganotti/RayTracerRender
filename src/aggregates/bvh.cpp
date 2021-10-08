@@ -49,7 +49,7 @@ void BVH::build(const std::vector<std::shared_ptr<Shape> > &shapes)
 {
     destroy();
 
-    std::vector<std::shared_ptr<IntersectionIF>> leaves;
+    std::vector<std::shared_ptr<Intersection>> leaves;
     for (auto &s: shapes)
         leaves.push_back(s);
 
@@ -60,7 +60,7 @@ void BVH::build(const std::vector<std::shared_ptr<Object> > &objects)
 {
     destroy();
 
-    std::vector<std::shared_ptr<IntersectionIF>> leaves;
+    std::vector<std::shared_ptr<Intersection>> leaves;
     for (auto &o: objects)
         leaves.push_back(o);
 
@@ -72,7 +72,7 @@ void BVH::destroy()
     root = shape::Invisible;
 }
 
-std::shared_ptr<IntersectionIF> BVH::build(std::vector<std::shared_ptr<IntersectionIF> > &shapes, size_t l, size_t r)
+std::shared_ptr<Intersection> BVH::build(std::vector<std::shared_ptr<Intersection> > &shapes, size_t l, size_t r)
 {
     if (l>r || shapes.empty() || r>=shapes.size()) return shape::Invisible;
 
@@ -83,7 +83,7 @@ std::shared_ptr<IntersectionIF> BVH::build(std::vector<std::shared_ptr<Intersect
         aabb.extend(shapes[i]->getAABB());
 
     int axis = aabb.getMaxExtent();
-    sort(shapes.begin()+l,shapes.begin()+r+1,[axis](const std::shared_ptr<IntersectionIF> &a,const std::shared_ptr<IntersectionIF> &b){
+    sort(shapes.begin()+l,shapes.begin()+r+1,[axis](const std::shared_ptr<Intersection> &a,const std::shared_ptr<Intersection> &b){
         return a->getAABB().getCenter()[axis] < b->getAABB().getCenter()[axis];
     });
 

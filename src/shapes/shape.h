@@ -4,10 +4,10 @@
 #include <utility>
 #include <memory>
 
-class Shape: public IntersectionIF
+class Shape: public Intersection
 {
 public:
-    virtual void getIsecData(IntersectionData &isec) const = 0;
+    virtual void getNormalAndUV(IntersectionData &isec) const = 0;
     virtual void getNormal(IntersectionData &isec) const = 0;
     virtual void getUV(IntersectionData &isec) const = 0;
 

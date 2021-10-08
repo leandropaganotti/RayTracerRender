@@ -14,7 +14,7 @@ bool InvisibleShape::intersection(const Ray &) const
 {
     return false;
 }
-void InvisibleShape::getIsecData(IntersectionData &) const
+void InvisibleShape::getNormalAndUV(IntersectionData &) const
 {
 }
 
