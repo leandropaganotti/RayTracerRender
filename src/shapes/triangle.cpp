@@ -63,7 +63,6 @@ bool MeshTriangle::intersection(const Ray &ray, IntersectionData &isec) const
     if(isnanf(tval)) return false;
 
     isec.tnear = tval;
-    isec.idx = idx;
     isec.primitive = this;
     return true;
 

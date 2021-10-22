@@ -11,10 +11,10 @@
  ************************************************************************/
 Mesh::Mesh()
 {
-    aggregate = std::make_shared<BVH>();
+    faces = std::make_shared<BVH<MeshTriangle>>();
 }
 
-Mesh::Mesh(const std::shared_ptr<Aggregate> &agg): aggregate(agg)
+Mesh::Mesh(const std::shared_ptr<Aggregate<MeshTriangle> > &agg): faces(agg)
 {
 }
 
@@ -30,13 +30,12 @@ void Mesh::addNormal(const Vector3 &n)
 
 void Mesh::addFace(const std::shared_ptr<MeshTriangle> &face)
 {
-    face->idx = faces.size();
-    faces.push_back(face);
+    faces->add(face);
 }
 
 void Mesh::buildAggregate()
 {
-    aggregate->build(faces);
+    faces->build();
 }
 
 std::ostream &operator <<(std::ostream &os, const Mesh &m)

@@ -29,7 +29,7 @@ int main(int argc, char **argv)
     output = output.substr(output.find_last_of("/\\")+1);
     output = output.substr(0, output.find_last_of("."));
 
-    Scene scene(xmlscene, std::make_shared<BVH>());
+    Scene scene(xmlscene, std::make_shared<BVH<Object>>());
     std::cout << scene << std::endl;
 
     auto raytracer = RayTracer::Create(scene.renderOptions.illum);

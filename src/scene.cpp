@@ -3,20 +3,20 @@
 #include <string.h>
 #include "xmlparser.h"
 
-Scene::Scene(const std::shared_ptr<Aggregate> &agg): aggregate(agg)
+Scene::Scene(const std::shared_ptr<Aggregate<Object>> &agg): objects(agg)
 {
     name = "unamed";
 }
 
-Scene::Scene(const std::string &fileName, const std::shared_ptr<Aggregate> &agg)
+Scene::Scene(const std::string &fileName, const std::shared_ptr<Aggregate<Object> > &agg)
 {
-    aggregate = agg;
+    objects = agg;
     name = "unamed";
     this->fileName = fileName;
     readFromXMLFile(fileName);
 }
 
-Scene::~Scene(){}
+
 
 void Scene::addLight(std::shared_ptr<Light> light)
 {
@@ -27,14 +27,15 @@ void Scene::addLight(std::shared_ptr<Light> light)
 void Scene::readFromXMLFile(const std::string &fileName)
 {
     this->fileName = fileName;
+    objects->clear();
     XMLParser().parseFile(fileName.c_str(), *this);
-    aggregate->build(objects);
+    objects->build();
 }
 
 void Scene::addObject(std::shared_ptr<Object> &&o)
 {
     if(o)
-    objects.push_back(o);
+        objects->add(o);
 }
 
 std::ostream &operator <<(std::ostream &os, const Scene &scene)
