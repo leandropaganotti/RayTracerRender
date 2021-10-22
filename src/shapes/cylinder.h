@@ -1,7 +1,6 @@
 #pragma once
 
 #include "shape.h"
-#include <memory>
 
 class UnitYCylinder: public Shape
 {

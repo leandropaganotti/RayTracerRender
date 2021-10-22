@@ -2,6 +2,7 @@
 #include "ray.h"
 #include "aabb.h"
 #include "material.h"
+#include "intersectiondata.h"
 
 namespace shape {
     std::shared_ptr<Shape> XYPlane = std::make_shared<Plane>(vector::ZERO, vector::BACK);

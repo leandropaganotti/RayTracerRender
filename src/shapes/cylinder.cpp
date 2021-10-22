@@ -1,3 +1,4 @@
+#include "intersectiondata.h"
 #include "cylinder.h"
 #include "utils.h"
 #include "material.h"
@@ -71,6 +72,7 @@ bool UnitYCylinder::intersection(const Ray &ray, IntersectionData &isec) const
     {
         isec.tnear =t;
         isec.idx = idx;
+        isec.shape = this;
         return true;
     }
     return false;

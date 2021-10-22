@@ -664,6 +664,7 @@ std::shared_ptr<Object> XMLParser::parseMesh(xmlNode *xmlMeshNode)
     const xmlAttr *attr = NULL;
     std::string name(""), src("");
     std::shared_ptr<Material> material;
+    Matrix4 transform;
 
     for (attr = xmlMeshNode->properties; attr; attr = attr->next)
     {
@@ -682,20 +683,6 @@ std::shared_ptr<Object> XMLParser::parseMesh(xmlNode *xmlMeshNode)
             LogError(xmlMeshNode, attr, "unrecognized attribute");
     }
 
-    auto mesh = Resource<Mesh>::Get(src);
-
-    if(!mesh)
-    {
-        mesh = OBJParser::ParseMesh(src);
-        if(!mesh) {
-            LogError(xmlMeshNode, nullptr, std::string("Can't find mesh: " + src).c_str());
-            return nullptr;
-        }
-        Resource<Mesh>::Add(src, mesh);
-    }
-
-    Matrix4 transform;
-
     xmlNode *node = NULL;
     for (node = xmlMeshNode->children; node; node = node->next)
     {
@@ -709,8 +696,7 @@ std::shared_ptr<Object> XMLParser::parseMesh(xmlNode *xmlMeshNode)
                 LogError(node, nullptr, "unrecognized element");
         }
     }
-    mesh->setMaterial(material);
-    return std::make_shared<TransformedObject>(mesh, transform);
+    return ObjectFactory::CreateMesh(src, material, transform);
 }
 
 Matrix4 XMLParser::parseTransformation(xmlNode *xmlTrnasformationNode)

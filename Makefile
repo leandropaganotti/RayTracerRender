@@ -42,6 +42,7 @@ triangle.cpp \
 objectvector.cpp \
 objectfactory.cpp \
 sampler2d.cpp \
+intersectiondata.cpp \
 
 
 OBJS=$(SRCS:.cpp=.o )

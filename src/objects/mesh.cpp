@@ -9,6 +9,14 @@
 /************************************************************************
  * Mesh class
  ************************************************************************/
+Mesh::Mesh()
+{
+    aggregate = std::make_shared<BVH>();
+}
+
+Mesh::Mesh(const std::shared_ptr<Aggregate> &agg): aggregate(agg)
+{
+}
 
 void Mesh::addVertex(const Vector3 &v)
 {
@@ -24,16 +32,6 @@ void Mesh::addFace(const std::shared_ptr<MeshTriangle> &face)
 {
     face->idx = faces.size();
     faces.push_back(face);
-}
-
-void Mesh::setMaterial(const std::shared_ptr<Material> &m)
-{
-    mtlInUse = m ? m : material::DiffuseWhite;
-}
-
-void Mesh::useMaterial(const std::shared_ptr<Material> &m)
-{
-    mtlInUse = m ? m : material::DiffuseWhite;
 }
 
 void Mesh::buildAggregate()
@@ -57,15 +55,4 @@ std::ostream &operator <<(std::ostream &os, const Mesh &m)
 //        std::cout << "||" << i << ":" << m.faces[i] << std::endl;
 
     return os ;
-}
-
-Mesh::Mesh()
-{
-    mtlInUse = material::DiffuseWhite;
-    aggregate = std::make_shared<BVH>();
-}
-
-Mesh::Mesh(const std::shared_ptr<Aggregate> &agg): aggregate(agg)
-{
-    mtlInUse = material::DiffuseWhite;
 }

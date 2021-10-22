@@ -20,6 +20,5 @@ public:
 
     static std::shared_ptr<Object> CreateCylinder(std::shared_ptr<Material> &material, const Matrix4 &transform);
 
-    static std::shared_ptr<Object> CreateMesh(std::shared_ptr<Mesh> &mesh, const Matrix4 &transform);
-    static std::shared_ptr<Object> CreateObjModel(const std::string &src, const Matrix4 &transform);
+    static std::shared_ptr<Object> CreateMesh(const std::string &src, std::shared_ptr<Material> &material, const Matrix4 &transform);
 };

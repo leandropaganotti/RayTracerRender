@@ -1,7 +1,8 @@
 #pragma once
 
 #include "shape.h"
-#include <memory>
+#include "vector.h"
+
 /*
  * Axis-Aligned Box
 */

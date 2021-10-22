@@ -44,6 +44,8 @@ src/color.h
 src/image.cpp
 src/image.h
 src/intersection.h
+src/intersectiondata.cpp
+src/intersectiondata.h
 src/light.cpp
 src/light.h
 src/main.cpp

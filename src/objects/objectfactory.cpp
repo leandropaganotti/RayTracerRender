@@ -36,19 +36,17 @@ std::shared_ptr<Object> ObjectFactory::CreateCylinder(std::shared_ptr<Material> 
     return std::make_shared<TransformedSimpleObject>(shape::UnitCylinder, material, transform);
 }
 
-std::shared_ptr<Object> ObjectFactory::CreateMesh(std::shared_ptr<Mesh> &mesh, const Matrix4 &transform)
-{
-    return std::make_shared<TransformedObject>(mesh, transform);
-}
-
-std::shared_ptr<Object> ObjectFactory::CreateObjModel(const std::string &src, const Matrix4 &transform)
+std::shared_ptr<Object> ObjectFactory::CreateMesh(const std::string &src, std::shared_ptr<Material> &material, const Matrix4 &transform)
 {
     auto mesh = Resource<Mesh>::Get(src);
-
     if(!mesh)
     {
         mesh = OBJParser::ParseMesh(src);
+        if (!mesh)
+            return nullptr;
+
         Resource<Mesh>::Add(src, mesh);
     }
-    return std::make_shared<TransformedObject>(mesh, transform);
+
+   return std::make_shared<TransformedSimpleObject>(mesh, material, transform);
 }

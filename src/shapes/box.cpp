@@ -1,6 +1,7 @@
 #include "box.h"
 #include "material.h"
 #include "float.h"
+#include "intersectiondata.h"
 
 namespace shape
 {
@@ -56,12 +57,14 @@ bool AABox::intersection(const Ray &ray, IntersectionData &isec) const
     {
         isec.tnear = imax;
         isec.idx=idxmax;
+        isec.shape = this;
         return true;
     }
     if(imin>0 && imin <= imax)
     {
         isec.tnear = imin;
         isec.idx=idxmin;
+        isec.shape = this;
         return true;
     }
 

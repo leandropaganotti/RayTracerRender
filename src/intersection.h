@@ -1,32 +1,8 @@
 #pragma once
 
-#include "vector.h"
-
-class Shape;
-class Material;
-class Ray;
 class AABB;
-class Object;
-
-struct IntersectionData
-{
-    IntersectionData()
-    {
-        tnear = INFINITY;
-        shape = nullptr;
-        object = nullptr;
-        material = nullptr;
-    }
-    float tnear;
-    size_t idx;
-    const Shape * shape;
-    const Object * object;
-    Vector3 phit;
-    Vector3 normal;
-    const Material * material;
-    Vector2 uv;
-    Vector3 albedo;
-};
+class Ray;
+class IntersectionData;
 
 class Intersection
 {

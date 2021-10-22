@@ -1,6 +1,7 @@
 #include "sphere.h"
 #include "material.h"
 #include "utils.h"
+#include "intersectiondata.h"
 
 namespace shape
 {

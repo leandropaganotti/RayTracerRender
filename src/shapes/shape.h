@@ -1,7 +1,6 @@
 #pragma once
 
 #include "intersection.h"
-#include <utility>
 #include <memory>
 
 class Shape: public Intersection

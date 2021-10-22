@@ -3,6 +3,9 @@
 #include <memory>
 #include <vector>
 
+class Shape;
+class Object;
+
 class Aggregate: public Intersection
 {
 public:

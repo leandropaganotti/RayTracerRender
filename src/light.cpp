@@ -2,6 +2,7 @@
 #include "utils.h"
 #include "material.h"
 #include "scene.h"
+#include "intersectiondata.h"
 
 Light::Light():intensity(1), color(1){}
 
