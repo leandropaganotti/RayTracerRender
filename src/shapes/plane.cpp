@@ -4,8 +4,8 @@
 #include "material.h"
 #include "intersectiondata.h"
 
-namespace shape {
-    std::shared_ptr<Shape> XYPlane = std::make_shared<Plane>(vector::ZERO, vector::BACK);
+namespace primitives {
+    std::shared_ptr<Primitive> XYPlane = std::make_shared<Plane>(vector::ZERO, vector::BACK);
 }
 
 Plane::Plane(const Vector3 &origin, const Vector3 &normal)
@@ -51,7 +51,7 @@ bool Plane::intersection(const Ray &ray, IntersectionData& isec) const
     if( t < 0.0f || t > ray.tmax) return false;
 
     isec.tnear = t;
-    isec.shape = this;
+    isec.primitive = this;
     return true;
 }
 

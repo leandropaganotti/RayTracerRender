@@ -3,9 +3,9 @@
 #include "float.h"
 #include "intersectiondata.h"
 
-namespace shape
+namespace primitives
 {
-std::shared_ptr<Shape> UnitBox = CreateShape<AABox>(-0.5f, 0.5f);
+std::shared_ptr<Primitive> UnitBox = CreatePrimitive<AABox>(-0.5f, 0.5f);
 }
 
 AABox::AABox(const Vector3 &min, const Vector3 &max): data{min, max}
@@ -57,14 +57,14 @@ bool AABox::intersection(const Ray &ray, IntersectionData &isec) const
     {
         isec.tnear = imax;
         isec.idx=idxmax;
-        isec.shape = this;
+        isec.primitive = this;
         return true;
     }
     if(imin>0 && imin <= imax)
     {
         isec.tnear = imin;
         isec.idx=idxmin;
-        isec.shape = this;
+        isec.primitive = this;
         return true;
     }
 

@@ -1,13 +1,13 @@
 #pragma once
 
 #include "matrix.h"
-#include "shape.h"
+#include "primitive.h"
 #include "material.h"
 #include "invisible.h"
 #include "intersectiondata.h"
 #include <memory>
 
-class Object: public Intersection
+class Object: public Shape
 {
 public:
     Object() = default;
@@ -18,9 +18,9 @@ public:
 class SimpleObject: public Object
 {
 public:
-    SimpleObject(const std::shared_ptr<Intersection> &s, const std::shared_ptr<Material> &m):shape(s), material(m)
+    SimpleObject(const std::shared_ptr<Shape> &s, const std::shared_ptr<Material> &m):shape(s), material(m)
     {
-        if(!this->shape) this->shape = shape::Invisible;
+        if(!this->shape) this->shape = primitives::Invisible;
         if(!this->material) this->material = material::DiffuseWhite;
     }
     virtual ~SimpleObject() = default;
@@ -47,25 +47,25 @@ public:
         isec.material = material.get();
         if(isec.material->texture)
         {
-            isec.shape->getNormalAndUV(isec); // get normal and uv coord
+            isec.primitive->getNormalAndUV(isec); // get normal and uv coord
             isec.albedo = isec.material->Kd * isec.material->texture->get(isec.uv);
         }
         else
         {
-            isec.shape->getNormal(isec);
+            isec.primitive->getNormal(isec);
             isec.albedo = isec.material->Kd;
         }
     }
 
 protected:
-    std::shared_ptr<Intersection> shape;
+    std::shared_ptr<Shape> shape;
     std::shared_ptr<Material> material;
 };
 
 class TransformedSimpleObject: public SimpleObject
 {
 public:
-    TransformedSimpleObject(const std::shared_ptr<Intersection> &s, const std::shared_ptr<Material> &m, const Matrix4 &t):
+    TransformedSimpleObject(const std::shared_ptr<Shape> &s, const std::shared_ptr<Material> &m, const Matrix4 &t):
         SimpleObject(s, m), objectToWorld(t)
     {
         worldToObject = t.getInverse();

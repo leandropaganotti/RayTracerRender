@@ -14,11 +14,11 @@ public:
     bool intersection(const Ray &ray) const override;
     AABB getAABB() const override;
 
-    void build(const std::vector<std::shared_ptr<Shape>> &shapes) override;
+    void build(const std::vector<std::shared_ptr<Primitive>> &shapes) override;
     void build(const std::vector<std::shared_ptr<Object>> &objects) override;
     void destroy() override;
 
 protected:
     AABB aabb;
-    std::vector<std::shared_ptr<Intersection>> objects;
+    std::vector<std::shared_ptr<Shape>> objects;
 };

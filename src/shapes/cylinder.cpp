@@ -4,9 +4,9 @@
 #include "material.h"
 #include "float.h"
 
-namespace shape
+namespace primitives
 {
-    std::shared_ptr<Shape> UnitCylinder = CreateShape<UnitYCylinder>();
+    std::shared_ptr<Primitive> UnitCylinder = CreatePrimitive<UnitYCylinder>();
 }
 
 bool UnitYCylinder::intersection(const Ray &ray, IntersectionData &isec) const
@@ -72,7 +72,7 @@ bool UnitYCylinder::intersection(const Ray &ray, IntersectionData &isec) const
     {
         isec.tnear =t;
         isec.idx = idx;
-        isec.shape = this;
+        isec.primitive = this;
         return true;
     }
     return false;

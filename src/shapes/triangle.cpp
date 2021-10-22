@@ -64,7 +64,7 @@ bool MeshTriangle::intersection(const Ray &ray, IntersectionData &isec) const
 
     isec.tnear = tval;
     isec.idx = idx;
-    isec.shape = this;
+    isec.primitive = this;
     return true;
 
 

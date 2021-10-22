@@ -1,11 +1,11 @@
 #include "intersectiondata.h"
-#include "shape.h"
+#include "primitive.h"
 #include "material.h"
 
 IntersectionData::IntersectionData()
 {
     tnear = INFINITY;
-    shape = nullptr;
+    primitive = nullptr;
     object = nullptr;
     material = nullptr;
 }

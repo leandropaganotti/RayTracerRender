@@ -1,8 +1,8 @@
 #pragma once
 
-#include "shape.h"
+#include "primitive.h"
 
-class UnitYCylinder: public Shape
+class UnitYCylinder: public Primitive
 {
 public:
     UnitYCylinder() = default;

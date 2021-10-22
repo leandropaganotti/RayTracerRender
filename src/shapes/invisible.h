@@ -1,9 +1,9 @@
 #pragma once
 
-#include "shape.h"
+#include "primitive.h"
 #include <memory>
 
-class InvisibleShape: public Shape
+class InvisibleShape: public Primitive
 {
 public:
     InvisibleShape() = default;

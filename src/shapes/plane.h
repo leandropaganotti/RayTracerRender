@@ -1,9 +1,9 @@
 #pragma once
 
-#include "shape.h"
+#include "primitive.h"
 #include "vector.h"
 
-class Plane: public Shape
+class Plane: public Primitive
 {
 public:
     Plane(const Vector3& origin=vector::ZERO, const Vector3& normal=vector::BACK);

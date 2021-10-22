@@ -1,11 +1,11 @@
 #pragma once
 
-#include "shape.h"
+#include "primitive.h"
 #include "aabb.h"
 
 class Mesh;
 
-class MeshTriangle: public Shape
+class MeshTriangle: public Primitive
 {
 public:
     MeshTriangle(const Mesh *m, size_t v0,  size_t v1, size_t v2, size_t nv0, size_t nv1, size_t nv2);

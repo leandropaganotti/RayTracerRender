@@ -1,14 +1,14 @@
 #pragma once
 
 #include <vector>
-#include "shape.h"
+#include "primitive.h"
 #include "aabb.h"
 #include "object.h"
 #include "aggregate.h"
 
 class MeshTriangle;
 
-class Mesh: public Intersection
+class Mesh: public Shape
 {    
 public:
     Mesh();
@@ -23,7 +23,7 @@ public:
 protected:
     std::vector<Vector3>                        vertices;
     std::vector<Vector3>                        normals;
-    std::vector<std::shared_ptr<Shape>>         faces;
+    std::vector<std::shared_ptr<Primitive>>         faces;
     std::shared_ptr<Aggregate>                  aggregate;
 
     friend class MeshTriangle;

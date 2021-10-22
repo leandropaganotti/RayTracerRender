@@ -1,9 +1,9 @@
 #pragma once
 
-#include "shape.h"
+#include "primitive.h"
 #include "vector.h"
 
-class Sphere: public Shape
+class Sphere: public Primitive
 {    
 public:
     Sphere(const Vector3 &center={0.0f}, const float &radius=0.5f);

@@ -13,7 +13,7 @@ std::shared_ptr<Object> ObjectFactory::CreateSphereStatic(const Vector3 &positio
 
 std::shared_ptr<Object> ObjectFactory::CreateSphere(std::shared_ptr<Material> &material, const Matrix4 &transform)
 {
-    return std::make_shared<TransformedSimpleObject>(shape::UnitSphere, material, transform);
+    return std::make_shared<TransformedSimpleObject>(primitives::UnitSphere, material, transform);
 }
 
 std::shared_ptr<Object> ObjectFactory::CreatePlaneStatic(const Vector3 &origin, const Vector3 &normal, std::shared_ptr<Material> &material)
@@ -23,17 +23,17 @@ std::shared_ptr<Object> ObjectFactory::CreatePlaneStatic(const Vector3 &origin, 
 
 std::shared_ptr<Object> ObjectFactory::CreatePlane(std::shared_ptr<Material> &material, const Matrix4 &transform)
 {
-    return std::make_shared<TransformedSimpleObject>(shape::XYPlane, material, transform);
+    return std::make_shared<TransformedSimpleObject>(primitives::XYPlane, material, transform);
 }
 
 std::shared_ptr<Object> ObjectFactory::CreateBox(std::shared_ptr<Material> &material, const Matrix4 &transform)
 {
-    return std::make_shared<TransformedSimpleObject>(shape::UnitBox, material, transform);
+    return std::make_shared<TransformedSimpleObject>(primitives::UnitBox, material, transform);
 }
 
 std::shared_ptr<Object> ObjectFactory::CreateCylinder(std::shared_ptr<Material> &material, const Matrix4 &transform)
 {
-    return std::make_shared<TransformedSimpleObject>(shape::UnitCylinder, material, transform);
+    return std::make_shared<TransformedSimpleObject>(primitives::UnitCylinder, material, transform);
 }
 
 std::shared_ptr<Object> ObjectFactory::CreateMesh(const std::string &src, std::shared_ptr<Material> &material, const Matrix4 &transform)

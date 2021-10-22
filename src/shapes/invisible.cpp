@@ -1,9 +1,9 @@
 #include "invisible.h"
 #include "aabb.h"
 
-namespace shape
+namespace primitives
 {
-    std::shared_ptr<Shape> Invisible = std::make_shared<InvisibleShape>();
+    std::shared_ptr<Primitive> Invisible = std::make_shared<InvisibleShape>();
 }
 
 bool InvisibleShape::intersection(const Ray &, IntersectionData &) const

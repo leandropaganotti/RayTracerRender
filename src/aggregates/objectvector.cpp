@@ -43,7 +43,7 @@ void ObjectVector::build(const std::vector<std::shared_ptr<Object> > &objs)
     }
 }
 
-void ObjectVector::build(const std::vector<std::shared_ptr<Shape> > &shapes)
+void ObjectVector::build(const std::vector<std::shared_ptr<Primitive> > &shapes)
 {
     destroy();
     for (auto &s: shapes)

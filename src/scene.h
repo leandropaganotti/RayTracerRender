@@ -8,7 +8,7 @@
 
 #include "aggregate.h"
 
-class Scene: public Intersection
+class Scene: public Shape
 {
 public:
     Scene(const std::shared_ptr<Aggregate> &agg);

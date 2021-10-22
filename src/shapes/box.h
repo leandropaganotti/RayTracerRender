@@ -1,12 +1,12 @@
 #pragma once
 
-#include "shape.h"
+#include "primitive.h"
 #include "vector.h"
 
 /*
  * Axis-Aligned Box
 */
-class AABox: public Shape
+class AABox: public Primitive
 {
 public:
     AABox(const Vector3 &min={-0.5f, -0.5f, -0.5f}, const Vector3 &max={0.5f,0.5f,0.5f});

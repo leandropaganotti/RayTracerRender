@@ -3,9 +3,9 @@
 #include "utils.h"
 #include "intersectiondata.h"
 
-namespace shape
+namespace primitives
 {
-    std::shared_ptr<Shape> UnitSphere = CreateShape<Sphere>(0.0f, 0.5f);
+    std::shared_ptr<Primitive> UnitSphere = CreatePrimitive<Sphere>(0.0f, 0.5f);
 }
 
 Sphere::Sphere(const Vector3 &center, const float &radius) :
@@ -58,7 +58,7 @@ bool Sphere::intersection(const Ray &ray, IntersectionData &isec) const
     if(t0 > ray.tmax) return false;
 
     isec.tnear = t0;
-    isec.shape = this;
+    isec.primitive = this;
     return true;
 }
 

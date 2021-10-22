@@ -3,7 +3,7 @@
 #include "vector.h"
 
 class Object;
-class Shape;
+class Primitive;
 class Material;
 
 struct IntersectionData
@@ -11,7 +11,7 @@ struct IntersectionData
     IntersectionData();
     float tnear;
     size_t idx;
-    const Shape * shape;
+    const Primitive * primitive;
     const Object * object;
     Vector3 phit;
     Vector3 normal;

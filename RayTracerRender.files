@@ -43,7 +43,6 @@ src/cameraoptions.h
 src/color.h
 src/image.cpp
 src/image.h
-src/intersection.h
 src/intersectiondata.cpp
 src/intersectiondata.h
 src/light.cpp
@@ -52,7 +51,6 @@ src/main.cpp
 src/material.cpp
 src/material.h
 src/matrix.h
-src/objects/mesh.cpp
 src/objects/mesh.h
 src/objects/object.h
 src/objects/objectfactory.cpp
@@ -75,8 +73,11 @@ src/shapes/cylinder.cpp
 src/shapes/cylinder.h
 src/shapes/invisible.cpp
 src/shapes/invisible.h
+src/shapes/mesh.cpp
+src/shapes/mesh.h
 src/shapes/plane.cpp
 src/shapes/plane.h
+src/shapes/primitive.h
 src/shapes/shape.h
 src/shapes/sphere.cpp
 src/shapes/sphere.h
