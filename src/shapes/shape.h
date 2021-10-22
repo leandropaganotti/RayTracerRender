@@ -7,11 +7,13 @@
 class Shape: public Intersection
 {
 public:
+    Shape() = default;
+    virtual ~Shape() = default;
+
     virtual void getNormalAndUV(IntersectionData &isec) const = 0;
     virtual void getNormal(IntersectionData &isec) const = 0;
     virtual void getUV(IntersectionData &isec) const = 0;
 
-    virtual ~Shape(){};
 };
 
 template <typename T, typename ... Args>
