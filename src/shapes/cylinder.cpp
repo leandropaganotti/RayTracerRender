@@ -5,15 +5,7 @@
 
 namespace shape
 {
-    std::shared_ptr<Shape> unitCylinder = CreateShape<UnitYCylinder>();
-}
-
-UnitYCylinder::UnitYCylinder()
-{
-    r = 0.5f;
-    r2 = r*r;
-    ymin = -0.5f;
-    ymax = 0.5;
+    std::shared_ptr<Shape> UnitCylinder = CreateShape<UnitYCylinder>();
 }
 
 bool UnitYCylinder::intersection(const Ray &ray, IntersectionData &isec) const

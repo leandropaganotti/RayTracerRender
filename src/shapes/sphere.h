@@ -7,7 +7,7 @@ class Sphere: public Shape
 {    
 public:
     Sphere(const Vector3 &center={0.0f}, const float &radius=0.5f);
-    virtual ~Sphere();
+    ~Sphere() = default;
 
     bool intersection(const Ray &ray, IntersectionData &isec) const override;
     bool intersection(const Ray& ray) const override;

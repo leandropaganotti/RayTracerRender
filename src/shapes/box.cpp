@@ -4,7 +4,7 @@
 
 namespace shape
 {
-std::shared_ptr<Shape> unitBox = CreateShape<AABox>(-0.5f, 0.5f);
+std::shared_ptr<Shape> UnitBox = CreateShape<AABox>(-0.5f, 0.5f);
 }
 
 AABox::AABox(const Vector3 &min, const Vector3 &max): data{min, max}

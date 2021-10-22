@@ -9,6 +9,8 @@ class AABox: public Shape
 {
 public:
     AABox(const Vector3 &min={-0.5f, -0.5f, -0.5f}, const Vector3 &max={0.5f,0.5f,0.5f});
+    ~AABox() = default;
+
     bool intersection(const Ray &ray, IntersectionData &isec) const override;
     bool intersection(const Ray &ray) const override;
     void getNormalAndUV(IntersectionData &isec) const override;

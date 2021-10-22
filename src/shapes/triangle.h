@@ -9,6 +9,7 @@ class MeshTriangle: public Shape
 {
 public:
     MeshTriangle(const Mesh *m, size_t v0,  size_t v1, size_t v2, size_t nv0, size_t nv1, size_t nv2);
+    ~MeshTriangle() = default;
 
     // Shape interface
     bool intersection(const Ray& ray, IntersectionData& isec) const override;

@@ -7,7 +7,7 @@ class Plane: public Shape
 {
 public:
     Plane(const Vector3& origin=vector::ZERO, const Vector3& normal=vector::BACK);
-    virtual ~Plane();
+    ~Plane() = default;
 
     bool intersection(const Ray& ray, IntersectionData& isec) const override;
     bool intersection(const Ray& ray) const override;

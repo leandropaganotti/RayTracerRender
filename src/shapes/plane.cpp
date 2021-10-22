@@ -4,7 +4,7 @@
 #include "material.h"
 
 namespace shape {
-    std::shared_ptr<Shape> xyPlane = std::make_shared<Plane>(vector::ZERO, vector::BACK);
+    std::shared_ptr<Shape> XYPlane = std::make_shared<Plane>(vector::ZERO, vector::BACK);
 }
 
 Plane::Plane(const Vector3 &origin, const Vector3 &normal)
@@ -17,7 +17,7 @@ Plane::Plane(const Vector3 &origin, const Vector3 &normal)
     v=w%u;
 }
 
-Plane::~Plane(){}
+
 
 Vector3 Plane::getNormal() const
 {

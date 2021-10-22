@@ -24,8 +24,8 @@ std::shared_ptr<T> CreateShape(Args&& ... args){
 namespace shape
 {
     extern std::shared_ptr<Shape> Invisible;
-    extern std::shared_ptr<Shape> unitCylinder;
-    extern std::shared_ptr<Shape> unitBox;
-    extern std::shared_ptr<Shape> unitSphere;
-    extern std::shared_ptr<Shape> xyPlane;
+    extern std::shared_ptr<Shape> UnitCylinder;
+    extern std::shared_ptr<Shape> UnitBox;
+    extern std::shared_ptr<Shape> UnitSphere;
+    extern std::shared_ptr<Shape> XYPlane;
 }
