@@ -619,7 +619,7 @@ std::shared_ptr<Object> XMLParser::parseBox(xmlNode *xmlBoxNode)
         }
     }
 
-    return std::shared_ptr<Object>(new TransformedObject(shape::unitBox, material, transform));
+    return ObjectFactory::CreateBox(material, transform);
 }
 
 std::shared_ptr<Object> XMLParser::parseCylinder(xmlNode *xmlCylinderNode)
@@ -656,7 +656,7 @@ std::shared_ptr<Object> XMLParser::parseCylinder(xmlNode *xmlCylinderNode)
         }
     }
 
-    return std::shared_ptr<Object>(new TransformedObject(shape::unitCylinder, material, transform));
+    return ObjectFactory::CreateCylinder(material, transform);
 }
 
 std::shared_ptr<Object> XMLParser::parseMesh(xmlNode *xmlMeshNode)
