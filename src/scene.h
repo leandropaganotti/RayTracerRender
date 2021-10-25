@@ -7,41 +7,31 @@
 #include "renderoptions.h"
 #include "bvh.h"
 
-class Scene: public Shape
+class Scene
 {
 public:
-    Scene(const std::shared_ptr<Aggregate<Object>> &agg);
-    Scene(const std::string &fileName="", const std::shared_ptr<Aggregate<Object>> &agg=std::make_shared<BVH<Object>>());
+    Scene(const std::string &fileName="");
     ~Scene() = default;
 
     void addLight(std::shared_ptr<Light> light);
-
-    void readFromXMLFile(const std::string &fileName);
+    void addObject(std::shared_ptr<Object> &&o);
+    bool isEmpty();
+    bool readFromXMLFile(const std::string &fileName);
 
     std::string     fileName;
     std::string     name;
-
     RenderOptions   renderOptions;
     CameraOptions   cameraOptions;
+    std::vector<std::shared_ptr<Light>> lights;
+    std::shared_ptr<Aggregate<Object>>  objects;
 
-    std::vector<std::shared_ptr<Light>>     lights;
-
-
-    std::shared_ptr<Aggregate<Object>> objects;
-
-    void addObject(std::shared_ptr<Object> &&o);
-
-    bool intersection(const Ray &ray, IntersectionData &isec) const override
+    bool intersection(const Ray &ray, IntersectionData &isec) const
     {
         return objects->intersection(ray, isec);
     }
-    bool intersection(const Ray &ray) const override
+    bool intersection(const Ray &ray) const
     {
         return objects->intersection(ray);
-    }
-    AABB getAABB() const override
-    {
-        return objects->getAABB();
     }
 
     friend std::ostream &operator <<(std::ostream &os, const Scene &scene);

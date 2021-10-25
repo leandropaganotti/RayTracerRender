@@ -87,7 +87,7 @@ void XMLParser::LogError(const xmlNode *node, const xmlAttr* attr, const char *m
     }
 }
 
-void XMLParser::parseFile(const char *filename, Scene & scene)
+bool XMLParser::parseFile(const char *filename, Scene & scene)
 {
     xmlDoc *doc = NULL;
     xmlNode *xmlSceneNode = NULL;
@@ -104,6 +104,7 @@ void XMLParser::parseFile(const char *filename, Scene & scene)
     if (doc == NULL)
     {
         std::cerr << "\x1b[33;1m" << "error: could not parse file " << filename << "\x1b[0m" << std::endl;
+        return false;
     }
     else
     {
@@ -114,6 +115,7 @@ void XMLParser::parseFile(const char *filename, Scene & scene)
         xmlFreeDoc(doc);
 
         xmlCleanupParser();
+        return true;
     }
 }
 

@@ -11,25 +11,29 @@
 #include "objectvector.h"
 #include "bvh.h"
 
-char	    *xmlscene = NULL;	// xml file with scene description
-unsigned    nimages  = 1;       // generates nimages from difterent angles around y-axis
+std::string	sceneFileName;	// xml file with scene description
+unsigned    nImages  = 1;       // generates nimages from difterent angles around y-axis
 bool        detailedName = false;
 
 void parseArguments(int argc, char **argv);
+
 int main(int argc, char **argv)
 {
     parseArguments(argc, argv);
 
-    double time_in_ms_avg=0.0, time_in_ms=0.0;
-    float angle = nimages ? 360.0 / nimages : 0.0;
-
-    std::string output(xmlscene);
+    double avgTime=0.0, totalTime=0.0;
+    float angle = nImages ? 360.0 / nImages : 0.0;
 
     //get the name of the file input (scene in xml file)
-    output = output.substr(output.find_last_of("/\\")+1);
-    output = output.substr(0, output.find_last_of("."));
+    std::string outputFileName(sceneFileName);
+    outputFileName = outputFileName.substr(outputFileName.find_last_of("/\\")+1);
+    outputFileName = outputFileName.substr(0, outputFileName.find_last_of("."));
 
-    Scene scene(xmlscene, std::make_shared<BVH<Object>>());
+    Scene scene(sceneFileName);
+    if (scene.isEmpty()) {
+        std::cout << "Scene does not have any object to render\n";
+        exit(0);
+    }
     std::cout << scene << std::endl;
 
     auto raytracer = RayTracer::Create(scene.renderOptions.illum);
@@ -40,36 +44,36 @@ int main(int argc, char **argv)
 
     const Vector3 from( scene.cameraOptions.getFrom() ), to( scene.cameraOptions.getTo());
 
-    for (unsigned i=0; i < nimages; ++i)
+    for (unsigned i=0; i < nImages; ++i)
     {
-        std::cout << "\n" << i+1 << "/" << nimages << ": at " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) <<  i*angle << " deg" << std::flush;
+        std::cout << "\n" << i+1 << "/" << nImages << ": at " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) <<  i*angle << " deg" << std::flush;
         camera.lookAt( Transform::T(to) * Transform::Ry(deg2rad( i*angle )) * Transform::T(-to) * from, to); // rotate around y-axis
 
-        auto start = std::chrono::high_resolution_clock::now();
+        auto startTime = std::chrono::high_resolution_clock::now();
         raytracer->render(scene);
-        auto end = std::chrono::high_resolution_clock::now();
+        auto endTime = std::chrono::high_resolution_clock::now();
 
-        time_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        totalTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+        avgTime += totalTime;
 
         std::stringstream ss;
-        int ms = (unsigned long long)time_in_ms % 1000;
-        int s  = ((unsigned long long)time_in_ms / 1000) % 60;
-        int m  = ((unsigned long long)time_in_ms / 1000 / 60) % 60;
-        int h  = ((unsigned long long)time_in_ms / 1000 / 60 / 60);
+        int ms = (unsigned long long)totalTime % 1000;
+        int s  = ((unsigned long long)totalTime / 1000) % 60;
+        int m  = ((unsigned long long)totalTime / 1000 / 60) % 60;
+        int h  = ((unsigned long long)totalTime / 1000 / 60 / 60);
         ss << std::setw(2) << std::setfill('0') << h << "." << std::setw(2) << std::setfill('0') << m << "." << std::setw(2) << std::setfill('0') << s << "." << std::setw(3) << std::setfill('0') << ms;
-        std::string time_str = ss.str();
-        std::cout << ", Time: " << time_str << std::endl << std::flush;
+        std::string totalTimeStr = ss.str();
+        std::cout << ", Time: " << totalTimeStr << std::endl << std::flush;
 
         std::stringstream ss2;
-        ss2 << output << "_" << std::setw(4) << std::setfill('0') << i;
-        if (detailedName) { ss2 << "_SPP" << scene.renderOptions.spp << "_T" << time_str; }
-        raytracer->getBuffer().write_png(ss2.str().c_str());
+        ss2 << outputFileName << "_" << std::setw(4) << std::setfill('0') << i;
+        if (detailedName) { ss2 << "_SPP" << scene.renderOptions.spp << "_T" << totalTimeStr; }
 
-        time_in_ms_avg += time_in_ms;
+        raytracer->getBuffer().write_png(ss2.str().c_str());
     }
 
-    time_in_ms_avg = time_in_ms_avg / (nimages);
-    std::cout << std::endl << "Total Average in ms: " << time_in_ms_avg << std::endl;
+    avgTime = avgTime / (nImages);
+    std::cout << std::endl << "Total Average in ms: " << avgTime << std::endl;
 
     return 0;
 }
@@ -102,7 +106,7 @@ void parseArguments(int argc, char **argv)
             ++opt;
             if (opt < argc)
             {
-                nimages = atoi(argv[opt]);
+                nImages = atoi(argv[opt]);
             }
             else
             {
@@ -112,11 +116,11 @@ void parseArguments(int argc, char **argv)
         }
         else
         {
-            xmlscene = argv[opt];
+            sceneFileName = std::string(argv[opt]);
         }
         ++opt;
     }
-    if (!xmlscene)
+    if (sceneFileName.empty())
     {
         usage(argv);
         exit(0);

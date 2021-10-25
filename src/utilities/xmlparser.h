@@ -19,7 +19,7 @@ class XMLParser
 public:
     XMLParser() = default;
 
-    void parseFile(const char *filename, Scene & scene);
+    bool parseFile(const char *filename, Scene & scene);
 
     void parseScene(xmlNode * xmlSceneNode, Scene & scene);
 
