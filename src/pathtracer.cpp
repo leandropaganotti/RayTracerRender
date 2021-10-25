@@ -5,6 +5,8 @@
 
 const float bias = 0.001f;
 
+PathTracer::PathTracer(const RenderOptions &renderOptions) : RayTracer(renderOptions) {}
+
 Vector3 PathTracer::trace(const Ray &ray, const uint8_t depth, const float E)
 {
     if(depth > renderOptions.maxDepth) return color::BLACK;
@@ -60,6 +62,8 @@ Vector3 PathTracer::trace(const Ray &ray, const uint8_t depth, const float E)
     }
     return color::BLACK;
 }
+
+PathTracerWithDirectSampling::PathTracerWithDirectSampling(const RenderOptions &renderOptions) : RayTracer(renderOptions) {}
 
 Vector3 PathTracerWithDirectSampling::trace(const Ray &ray, const uint8_t depth, const float E)
 {

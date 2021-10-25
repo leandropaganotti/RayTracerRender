@@ -1,35 +1,29 @@
 #pragma once
 
-#include "image.h"
-#include "camera.h"
-#include "scene.h"
+#include <memory>
 #include "renderoptions.h"
 #include "sampler2d.h"
+#include "scene.h"
+#include "image.h"
+#include "intersectiondata.h"
+
+class Camera;
 
 class RayTracer
 {
 public:
-    static std::shared_ptr<RayTracer> Create(Illumination illum);
+    static std::unique_ptr<RayTracer> Create(const RenderOptions& renderOptions);
+    std::shared_ptr<Image> render(const Scene& scene, const Camera &camera);
 
-    RayTracer();
-    ~RayTracer();
-
-    void render(const Scene& scene);
-
-    Camera&       getCameraRef() { return camera; }
-    const Camera& getCameraRef() const { return camera; }
-    const Image&  getBuffer() const { return buffer; }    
-
-    void setRenderOptions(const RenderOptions &value);
-    void setCameraOptions(const CameraOptions &value);
+    virtual ~RayTracer() = default;
 
 protected:
+    RayTracer(const RenderOptions& renderOptions);
+
     Vector3 transparentMaterial(const Ray &ray, const uint8_t depth, const IntersectionData &isec, float E);
 
 protected:
     RenderOptions renderOptions;
-    Camera camera;
-    Image  buffer;
     const Scene *scene;
     Jitter rng;
     TentFilter filter;
@@ -39,5 +33,8 @@ protected:
 
 class Minimum: public RayTracer
 {
+public:
+    Minimum(const RenderOptions& renderOptions);
+private:
     Vector3 trace(const Ray &ray, const uint8_t depth, const float E) override;
 };

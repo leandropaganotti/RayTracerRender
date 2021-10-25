@@ -4,12 +4,9 @@
 #include <string>
 #include <cstring>
 #include <sstream>
-#include "raytracer.h"
 #include "transformation.h"
-#include "resource.h"
-#include "material.h"
-#include "objectvector.h"
-#include "bvh.h"
+#include "scene.h"
+#include "camera.h"
 
 std::string	sceneFileName;	// xml file with scene description
 unsigned    nImages  = 1;       // generates nimages from difterent angles around y-axis
@@ -36,13 +33,12 @@ int main(int argc, char **argv)
     }
     std::cout << scene << std::endl;
 
-    auto raytracer = RayTracer::Create(scene.renderOptions.illum);
-    raytracer->setRenderOptions(scene.renderOptions);
-    raytracer->setCameraOptions(scene.cameraOptions);
+    Camera camera;
+    camera.setOptions(scene.cameraOptions);
+    camera.setRenderOptions(scene.renderOptions);
 
-    Camera &camera = raytracer->getCameraRef();
-
-    const Vector3 from( scene.cameraOptions.getFrom() ), to( scene.cameraOptions.getTo());
+    const Vector3 from(scene.cameraOptions.getFrom());
+    const Vector3 to(scene.cameraOptions.getTo());
 
     for (unsigned i=0; i < nImages; ++i)
     {
@@ -50,7 +46,7 @@ int main(int argc, char **argv)
         camera.lookAt( Transform::T(to) * Transform::Ry(deg2rad( i*angle )) * Transform::T(-to) * from, to); // rotate around y-axis
 
         auto startTime = std::chrono::high_resolution_clock::now();
-        raytracer->render(scene);
+        auto buffer = camera.capture(scene);
         auto endTime = std::chrono::high_resolution_clock::now();
 
         totalTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
@@ -69,7 +65,7 @@ int main(int argc, char **argv)
         ss2 << outputFileName << "_" << std::setw(4) << std::setfill('0') << i;
         if (detailedName) { ss2 << "_SPP" << scene.renderOptions.spp << "_T" << totalTimeStr; }
 
-        raytracer->getBuffer().write_png(ss2.str().c_str());
+        buffer->write_png(ss2.str().c_str());
     }
 
     avgTime = avgTime / (nImages);

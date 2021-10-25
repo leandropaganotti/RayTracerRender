@@ -4,6 +4,8 @@
 
 const float bias = 0.001f;
 
+Phong::Phong(const RenderOptions &renderOptions) : RayTracer(renderOptions) {}
+
 Vector3 Phong::trace(const Ray &ray, const uint8_t depth, float E)
 {
     if(depth > renderOptions.maxDepth) return color::BLACK;

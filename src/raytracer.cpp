@@ -12,31 +12,28 @@
 #include "color.h"
 #include "pathtracer.h"
 #include "phong.h"
+#include "camera.h"
+#include "intersectiondata.h"
 
 const float bias = 0.001f;
 
-std::shared_ptr<RayTracer> RayTracer::Create(Illumination illum)
+RayTracer::RayTracer(const RenderOptions &renderOptions): renderOptions(renderOptions){}
+
+std::unique_ptr<RayTracer> RayTracer::Create(const RenderOptions &renderOptions)
 {
-    switch (illum) {
+    switch (renderOptions.illum) {
     case Illumination::GlobalIluminationWithDirectSampling:
-        return std::make_shared<PathTracerWithDirectSampling>();
+        return std::make_unique<PathTracerWithDirectSampling>(renderOptions);
     case Illumination::GlobalIlumination:
-        return std::make_shared<PathTracer>();
+        return std::make_unique<PathTracer>(renderOptions);
     case Illumination::Phong:
-        return std::make_shared<Phong>();
+        return std::make_unique<Phong>(renderOptions);
     default:
-        return std::make_shared<Minimum>();
+        return std::make_unique<Minimum>(renderOptions);
     }
 }
 
-RayTracer::RayTracer()
-{
-
-}
-
-RayTracer::~RayTracer(){}
-
-void RayTracer::render(const Scene& scene)
+std::shared_ptr<Image> RayTracer::render(const Scene& scene, const Camera& camera)
 {
     this->scene = &scene;
 
@@ -46,11 +43,11 @@ void RayTracer::render(const Scene& scene)
     filter(samples);
 
     std::cout << " -> SPP: " << spp << std::endl << std::endl;
-
     std::cout << "\r -> 0.00% completed" << std::flush;
 
+    auto buffer = std::make_shared<Image>(camera.getWidth(), camera.getHeight());
+
     size_t count = 0, total = camera.getWidth()*camera.getHeight();
-    buffer.resize(camera.getWidth(), camera.getHeight());
     for (size_t i = 0; i < camera.getHeight(); ++i)
     {
 
@@ -59,19 +56,21 @@ void RayTracer::render(const Scene& scene)
         #endif
         for (size_t j = 0; j < camera.getWidth(); ++j)
         {
-            buffer.at(i, j) = 0;
+            buffer->at(i, j) = 0;
             for (auto &sample: samples)
             {
                 Ray ray(camera.getRay(i+sample.y, j+sample.x));
-                buffer.at(i, j) += trace(ray, 1, 1.0f);
+                buffer->at(i, j) += trace(ray, 1, 1.0f);
             }
-            buffer.at(i, j) /= spp;
+            buffer->at(i, j) /= spp;
             ++count;
 
         }
         std::cout << "\r -> " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) << count/float(total) * 100.0f << "% completed" << std::flush;
     }
     std::cout << "\r -> " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) << count/float(total) * 100.0f << "% completed" << std::flush;
+
+    return buffer;
 }
 
 Vector3 RayTracer::transparentMaterial(const Ray &ray, const uint8_t depth, const IntersectionData &isec, float E)
@@ -127,15 +126,7 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const uint8_t depth, cons
     return transmited + reflected;
 }
 
-void RayTracer::setCameraOptions(const CameraOptions &value)
-{
-    camera.setOptions(value);
-}
-
-void RayTracer::setRenderOptions(const RenderOptions &value)
-{
-    renderOptions = value;
-}
+Minimum::Minimum(const RenderOptions &renderOptions) : RayTracer(renderOptions) {}
 
 Vector3 Minimum::trace(const Ray &ray, const uint8_t, const float)
 {
