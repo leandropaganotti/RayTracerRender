@@ -46,7 +46,7 @@ int main(int argc, char **argv)
         camera.lookAt( Transform::T(to) * Transform::Ry(deg2rad( i*angle )) * Transform::T(-to) * from, to); // rotate around y-axis
 
         auto startTime = std::chrono::high_resolution_clock::now();
-        auto buffer = camera.capture(scene);
+        auto image = camera.capture(scene);
         auto endTime = std::chrono::high_resolution_clock::now();
 
         totalTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
@@ -65,7 +65,7 @@ int main(int argc, char **argv)
         ss2 << outputFileName << "_" << std::setw(4) << std::setfill('0') << i;
         if (detailedName) { ss2 << "_SPP" << scene.renderOptions.spp << "_T" << totalTimeStr; }
 
-        buffer->write_png(ss2.str().c_str());
+        image->write_png(ss2.str().c_str());
     }
 
     avgTime = avgTime / (nImages);

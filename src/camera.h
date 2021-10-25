@@ -12,7 +12,6 @@ class Camera
 public:
     Camera();
     ~Camera();
-    void lookAt(const Vector3 &from, const Vector3 &to, const Vector3& up=vector::UP);
 
     const CameraOptions& getOptions()   const { return options; }
     const Vector3& getPosition()        const { return options.from; }
@@ -30,6 +29,7 @@ public:
 
     Ray getRay(float i, float j) const;
     std::shared_ptr<Image> capture(const Scene& scene);
+    void lookAt(const Vector3 &from, const Vector3 &to, const Vector3& up=vector::UP);
 
     friend std::ostream& operator << (std::ostream& os, const Camera& cam);
 
