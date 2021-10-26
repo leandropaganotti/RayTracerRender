@@ -3,10 +3,15 @@
 #include <iostream>
 #include <fstream>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#pragma GCC diagnostic ignored "-Wsign-compare"
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "external/stb-master/stb_image_write.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "external/stb-master/stb_image.h"
+#pragma GCC diagnostic pop
 
 Image::Image(int width, int height): w(width), h(height), buffer(nullptr)
 {

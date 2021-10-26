@@ -14,8 +14,6 @@ Sphere::Sphere(const Vector3 &center, const float &radius) :
 
 }
 
-
-
 Vector3 Sphere::getCenter() const
 {
     return center;
