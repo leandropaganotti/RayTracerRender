@@ -3,14 +3,8 @@
 
 #include "vector.h"
 
-#define FOV 	0.698131700797732 // 40 degree
-#define WIDTH 	640
-#define HEIGHT 	480
-
 class CameraOptions
 {
-    friend class Camera;
-
 public:
     CameraOptions();
 
@@ -36,6 +30,8 @@ protected:
     size_t   width;
     size_t   height;
     float    aspectRatio;
+
+    friend class Camera;
 };
 
 #endif // CAMERAOPTIONS_H

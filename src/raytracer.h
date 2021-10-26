@@ -6,29 +6,30 @@
 #include "scene.h"
 #include "image.h"
 #include "intersectiondata.h"
-
-class Camera;
+#include "camera.h"
 
 class RayTracer
 {
 public:
-    static std::unique_ptr<RayTracer> Create(const RenderOptions& renderOptions);
-    std::shared_ptr<Image> render(const Scene& scene, const Camera &camera);
-
     virtual ~RayTracer() = default;
+
+    static std::unique_ptr<RayTracer> Create(const RenderOptions& renderOptions);
+    std::shared_ptr<Image> render(const Scene& scene);
+
+    Camera& getCamera();
+    void setCameraOptions(const CameraOptions& options);
 
 protected:
     RayTracer(const RenderOptions& renderOptions);
-
     Vector3 transparentMaterial(const Ray &ray, const uint8_t depth, const IntersectionData &isec, float E);
+    virtual Vector3 trace(const Ray &ray, const uint8_t depth, float E) = 0;
 
 protected:
     RenderOptions renderOptions;
+    Camera camera;
     const Scene *scene;
-    Jitter rng;
+    Jitter sampler2d;
     TentFilter filter;
-
-    virtual Vector3 trace(const Ray &ray, const uint8_t depth, float E) = 0;
 };
 
 class Minimum: public RayTracer

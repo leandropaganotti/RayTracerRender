@@ -4,10 +4,7 @@
 Camera::Camera()
 {
     lookAt(options.from, options.to);
-    rayTracer = RayTracer::Create(RenderOptions());
 }
-
-Camera::~Camera(){}
 
 void Camera::lookAt(const Vector3 &from, const Vector3 &to, const Vector3 &up)
 {
@@ -33,11 +30,6 @@ void Camera::lookAt(const Vector3 &from, const Vector3 &to, const Vector3 &up)
 
     options.from = from;
     options.to	 = to;
-}
-
-void Camera::setRenderOptions(const RenderOptions &renderOptions)
-{
-    rayTracer = RayTracer::Create(renderOptions);
 }
 
 void Camera::setResolution(size_t width, size_t height)
@@ -73,9 +65,4 @@ void Camera::setOptions(const CameraOptions& options)
 std::ostream &operator <<(std::ostream &os, const Camera &cam)
 {
     return os << "Camera: " << cam.options;
-}
-
-std::shared_ptr<Image> Camera::capture(const Scene &scene)
-{
-    return buffer = rayTracer->render(scene, *this);
 }

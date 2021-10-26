@@ -33,13 +33,13 @@ std::unique_ptr<RayTracer> RayTracer::Create(const RenderOptions &renderOptions)
     }
 }
 
-std::shared_ptr<Image> RayTracer::render(const Scene& scene, const Camera& camera)
+std::shared_ptr<Image> RayTracer::render(const Scene& scene)
 {
     this->scene = &scene;
 
     int sqrt_samples = sqrt(renderOptions.spp);
     int spp = sqrt_samples * sqrt_samples;
-    std::vector<Vector2> samples = rng(spp);
+    std::vector<Vector2> samples = sampler2d(spp);
     filter(samples);
 
     std::cout << " -> SPP: " << spp << std::endl << std::endl;
@@ -50,7 +50,6 @@ std::shared_ptr<Image> RayTracer::render(const Scene& scene, const Camera& camer
     size_t count = 0, total = camera.getWidth()*camera.getHeight();
     for (size_t i = 0; i < camera.getHeight(); ++i)
     {
-
         #ifndef DEBUG
         #pragma omp parallel for schedule(dynamic, 1) shared(count)
         #endif
@@ -71,6 +70,16 @@ std::shared_ptr<Image> RayTracer::render(const Scene& scene, const Camera& camer
     std::cout << "\r -> " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) << count/float(total) * 100.0f << "% completed" << std::flush;
 
     return buffer;
+}
+
+Camera &RayTracer::getCamera()
+{
+    return camera;
+}
+
+void RayTracer::setCameraOptions(const CameraOptions &options)
+{
+    camera.setOptions(options);
 }
 
 Vector3 RayTracer::transparentMaterial(const Ray &ray, const uint8_t depth, const IntersectionData &isec, float E)

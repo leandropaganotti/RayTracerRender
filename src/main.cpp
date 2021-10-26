@@ -6,7 +6,7 @@
 #include <sstream>
 #include "transformation.h"
 #include "scene.h"
-#include "camera.h"
+#include "raytracer.h"
 
 std::string	sceneFileName;	// xml file with scene description
 unsigned    nImages  = 1;       // generates nimages from difterent angles around y-axis
@@ -33,9 +33,8 @@ int main(int argc, char **argv)
     }
     std::cout << scene << std::endl;
 
-    Camera camera;
-    camera.setOptions(scene.cameraOptions);
-    camera.setRenderOptions(scene.renderOptions);
+    std::unique_ptr<RayTracer> raytracer = RayTracer::Create(scene.renderOptions);
+    raytracer->setCameraOptions(scene.cameraOptions);
 
     const Vector3 from(scene.cameraOptions.getFrom());
     const Vector3 to(scene.cameraOptions.getTo());
@@ -43,10 +42,10 @@ int main(int argc, char **argv)
     for (unsigned i=0; i < nImages; ++i)
     {
         std::cout << "\n" << i+1 << "/" << nImages << ": at " << std::fixed  << std::setw(6) <<  std::setprecision( 2 ) <<  i*angle << " deg" << std::flush;
-        camera.lookAt( Transform::T(to) * Transform::Ry(deg2rad( i*angle )) * Transform::T(-to) * from, to); // rotate around y-axis
+        raytracer->getCamera().lookAt( Transform::T(to) * Transform::Ry(deg2rad( i*angle )) * Transform::T(-to) * from, to); // rotate around y-axis
 
         auto startTime = std::chrono::high_resolution_clock::now();
-        auto image = camera.capture(scene);
+        auto image = raytracer->render(scene);
         auto endTime = std::chrono::high_resolution_clock::now();
 
         totalTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();

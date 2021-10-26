@@ -1,6 +1,10 @@
 #include "cameraoptions.h"
 #include "utils.h"
 
+#define FOV 	0.698131700797732 // 40 degree
+#define WIDTH 	640
+#define HEIGHT 	480
+
 CameraOptions::CameraOptions():
         from(0), to(vector::FRONT), fov(FOV), width(WIDTH), height(HEIGHT), aspectRatio(float(WIDTH)/HEIGHT)
 {}

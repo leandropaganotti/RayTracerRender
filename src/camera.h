@@ -1,17 +1,14 @@
 #pragma once
 
 #include "matrix.h"
-#include "image.h"
 #include "scene.h"
 #include "cameraoptions.h"
-
-class RayTracer;
 
 class Camera
 {
 public:
     Camera();
-    ~Camera();
+    ~Camera() = default;
 
     const CameraOptions& getOptions()   const { return options; }
     const Vector3& getPosition()        const { return options.from; }
@@ -20,7 +17,6 @@ public:
     float  getFov()                     const { return options.fov; }
     float  getRatio()                   const { return options.aspectRatio; }
 
-    void setRenderOptions(const RenderOptions& renderOptions);
     void setOptions(const CameraOptions& options);
     void setResolution(size_t width, size_t height);
     void setWidth(float width);
@@ -28,7 +24,6 @@ public:
     void setFov(float fov);
 
     Ray getRay(float i, float j) const;
-    std::shared_ptr<Image> capture(const Scene& scene);
     void lookAt(const Vector3 &from, const Vector3 &to, const Vector3& up=vector::UP);
 
     friend std::ostream& operator << (std::ostream& os, const Camera& cam);
@@ -36,8 +31,6 @@ public:
 protected:
     CameraOptions               options;
     Matrix4                     cameraToWorld;
-    std::shared_ptr<Image>      buffer;
-    std::unique_ptr<RayTracer>  rayTracer;
 };
 
 inline Ray Camera::getRay(float i, float j) const
