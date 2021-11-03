@@ -8,17 +8,6 @@
 #include <cmath>
 #include <iostream>
 
-#ifndef M_PI
-#define M_PI           3.14159265358979323846
-#endif
-
-#ifndef M_1_PI
-#define M_1_PI           0.31830988618379067153
-#endif
-
-//#define M_PI	3.14159265358979323846
-//#define M_1_PI	0.31830988618379067153
-
 namespace {
 std::random_device rd;  //Will be used to obtain a seed for the random number engine
 std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
@@ -35,7 +24,7 @@ struct RNG
     }
     float operator()()
     {
-        return (float) rand()/RAND_MAX;
+        return float(rand()) / float(RAND_MAX);
     }
 };
 
@@ -46,7 +35,7 @@ inline
 Vector3 reflect(const Vector3 &I, const Vector3 &N)
 {
     //I-2(N.I)N => N.I = cosi
-    return (I - 2.0f * I.dot(N) * N).normalize();
+    return (I + 2.0f * -I.dot(N) * N).normalize();
 }
 
 inline
@@ -56,52 +45,60 @@ Vector3 refract(const Vector3 &I, const Vector3 &N, float n1, float n2)
     float n = n1 / n2;
 
     //cosi = N.I
-    float cosi = N.dot(I);
+    float cosi = -I.dot(N);
 
     // sin2t = n^2(1-cosi^2)
-    float sin2t = n * n * (1.0f - cosi * cosi);
+    float sin2t = n * n * std::max(0.0f, 1.0f - cosi * cosi);
 
-    if (sin2t > 1.0f) return Vector3(0);
+    if (sin2t >= 1.0f) return Vector3(0);// TIR
 
     return n * I + (n * cosi - sqrt(1.0f - sin2t)) * N;
 }
 
 inline
-void fresnel(const Vector3 &I, const Vector3 &N, const float &ior, float &kr)
+float fresnel(const Vector3 &I, const Vector3 &N, float etai, float etat)
 {
-    float cosi = N.dot(I);
-    float etai = 1, etat = ior;
-    if (cosi > 0) { std::swap(etai, etat); }
+    float Re;
+    float cosThetaI = - I.dot(N);
     // Compute sini using Snell's law
-    float sint = etai / etat * sqrtf(std::max(0.f, 1 - cosi * cosi));
+    float sinThetaT = etai / etat * std::sqrt(std::max(0.f, 1 - cosThetaI * cosThetaI));
     // Total internal reflection
-    if (sint >= 1) {
-        kr = 1;
-    }
-    else {
-        float cost = sqrtf(std::max(0.f, 1 - sint * sint));
-        cosi = fabsf(cosi);
-        float Rs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost));
-        float Rp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost));
-        kr = (Rs * Rs + Rp * Rp) / 2;
+    if (sinThetaT >= 1) {
+        Re = 1.0;
+    } else {
+        float cosThetaT = sqrtf(std::max(0.f, 1 - sinThetaT * sinThetaT));
+        float Rs = ((etai * cosThetaI) - (etat * cosThetaT)) / ((etai * cosThetaI) + (etat * cosThetaT));
+        float Rp = ((etat * cosThetaI) - (etai * cosThetaT)) / ((etat * cosThetaI) + (etai * cosThetaT));
+        Re = (Rs * Rs + Rp * Rp) / 2;
     }
     // As a consequence of the conservation of energy, transmittance is given by:
     // kt = 1 - kr;
+    return Re;
+
 }
 
 inline
-float schlick(const Vector3 &I, const Vector3 &N, const float &R0)
+float schlick(const Vector3 &I, const Vector3 &N, const float R0)
 {
-    float c = 1.0f - (N ^ I);
+    float c = 1.0f + I.dot(N); // 1.0 - -cosThetaI
     return R0 + (1.0f - R0) * (c*c*c*c*c);
 }
 
 inline
-float schlick(const Vector3 &I, const Vector3 &N, const float &n1, const float &n2)
+float schlick(const Vector3 &I, const Vector3 &N, const float n1, const float n2)
 {
+    float cosThetaX = -I.dot(N); // cosThetaI
+    if (n1 > n2){
+        const float n = n1 / n2;
+        const float sin2ThetaT = n * n * (1.0 - (cosThetaX * cosThetaX));
+        if (sin2ThetaT > 1.0) return 1.0; // TIR
+        cosThetaX = std::sqrt(1.0 - sin2ThetaT * sin2ThetaT);
+    }
+
     float R0 = (n1-n2) / (n1 + n2);
-    R0 = R0 * R0;
-    return schlick(I, N, R0);
+    R0 *= R0;
+    float c = 1.0 - cosThetaX;
+    return R0 + (1.0f - R0) * (c*c*c*c*c);;
 }
 
 inline
@@ -115,14 +112,6 @@ float clamp(float x)
 {
     return x < 0.0f ? 0.0f : x > 1.0 ? 1.0f : x;
 }
-/*
-inline
-double ms_time()
-{
-    struct timeval currentTime;
-    gettimeofday(&currentTime, NULL);
-    return (double) currentTime.tv_sec * 1000.0 + (double)currentTime.tv_usec/1000.0;
-}*/
 
 inline
 float deg2rad(float deg)

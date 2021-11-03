@@ -23,7 +23,7 @@ Vector3 Phong::trace(const Ray &ray, const uint8_t depth, float E)
     }
     else if (type == MaterialType::SPECULAR)
     {
-        float kr = schlick(-ray.direction, isec.normal, isec.material->R0);
+        float kr = schlick(ray.direction, isec.normal, isec.material->R0);
         float kt = 1.0f - kr;
         Vector3 diffused(0), reflected(0);
         if (kr > 0.0001f)

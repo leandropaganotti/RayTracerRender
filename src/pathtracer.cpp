@@ -83,7 +83,7 @@ Vector3 PathTracerWithDirectSampling::trace(const Ray &ray, const uint8_t depth,
     }
     else if (type == MaterialType::SPECULAR)
     {
-        kr = schlick(-ray.direction, isec.normal, isec.material->R0);
+        kr = schlick(ray.direction, isec.normal, isec.material->R0);
         kt = 1.0f - kr;
     }
 //    if(isec.material->E != vector::ZERO && depth == 1){
