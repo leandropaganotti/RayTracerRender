@@ -292,6 +292,8 @@ std::shared_ptr<Material> XMLParser::parseMaterial(xmlNode *xmlMaterialNode)
                 material.type = MaterialType::SPECULAR;
             else if (equals(attr->children->content, "TRANSPARENT"))
                 material.type = MaterialType::TRANSPARENT;
+            else if (equals(attr->children->content, "MIRROR"))
+                material.type = MaterialType::MIRROR;
             else
                 LogError(xmlMaterialNode, attr, "unrecognized material type");
         }
@@ -317,13 +319,18 @@ std::shared_ptr<Material> XMLParser::parseMaterial(xmlNode *xmlMaterialNode)
         }
     }
 
+
     std::shared_ptr<Material> m;
+
     if(material.name != "")
-       m = Resource<Material>::Create(material.name);
+       m = Resource<Material>::Create(material.name, material.type);
     else
-       m = Material::Create();
+       m = Material::Create(material.type);
 
     *m = material; // TODO
+
+
+
     return m;
 }
 

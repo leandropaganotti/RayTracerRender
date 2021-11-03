@@ -137,16 +137,25 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const uint8_t depth, cons
 
 Minimum::Minimum(const RenderOptions &renderOptions) : RayTracer(renderOptions) {}
 
-Vector3 Minimum::trace(const Ray &ray, const uint8_t, const float)
+Vector3 Minimum::trace(const Ray &ray, uint8_t depth, float E)
 {
+    if(depth > renderOptions.maxDepth) return color::BLACK;
+
     IntersectionData isec;
-    if(scene->intersection(ray, isec))
-    {
-        //return isec.material->Kd;
-        isec.phit = ray.origin + isec.tnear * ray.direction;
-        isec.object->getIsecData(isec);
-        return isec.albedo;
-    }
-    return renderOptions.bgColor;
+    if(!scene->intersection(ray, isec)) return renderOptions.bgColor;
+    isec.phit = ray.origin + isec.tnear * ray.direction;
+    isec.object->getIsecData(isec);
+    isec.wo = ray.direction;
+
+    Vector3 Le = isec.emittance();
+
+    ScatterData srec;
+    isec.bsdf(srec);
+
+    Vector3 Li = trace(srec.scattered[0], depth + 1, E);
+
+    float cosTheta = isec.normal ^ srec.scattered[0].direction;
+
+    return Le + srec.f[0] * Li  * std::fabs(cosTheta) / srec.pdf[0];
 }
 

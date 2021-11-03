@@ -6,6 +6,7 @@
 class Ray
 {
 public:
+    Ray(){}
     Ray(const Vector3& o, const Vector3& d, float tmax=INFINITY): origin(o), direction(d), tmax(tmax)
     {
         invdir[0] = 1.0f / direction[0];

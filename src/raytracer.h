@@ -37,5 +37,5 @@ class Minimum: public RayTracer
 public:
     Minimum(const RenderOptions& renderOptions);
 private:
-    Vector3 trace(const Ray &ray, const uint8_t depth, const float E) override;
+    Vector3 trace(const Ray &ray, uint8_t depth, float E) override;
 };
