@@ -23,7 +23,7 @@ struct IntersectionData
 
     Vector3 emittance()
     {
-        return material->E;
+        return material->emission;
     }
     void bsdf(ScatterData &srec)
     {

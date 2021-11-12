@@ -82,9 +82,9 @@ void Image::write_png(const char *filename, float gamma) const
     std::vector<uint8_t> data(w*h*3);
     for (int i=0; i < w*h; ++i)
     {
-        data[i*3]   = pow(clamp(buffer[i].r), gamma) * 255.f;
-        data[i*3+1] = pow(clamp(buffer[i].g), gamma) * 255.f;
-        data[i*3+2] = pow(clamp(buffer[i].b), gamma) * 255.f;
+        data[i*3]   = (uint8_t) clamp(255.f * std::pow(buffer[i].r, gamma) + 0.5f, 0.f, 255.f);
+        data[i*3+1] = (uint8_t) clamp(255.f * std::pow(buffer[i].g, gamma) + 0.5f, 0.f, 255.f);
+        data[i*3+2] = (uint8_t) clamp(255.f * std::pow(buffer[i].b, gamma) + 0.5f, 0.f, 255.f);
     }
     stbi_write_png(filenameext.c_str(), w, h, 3, data.data(), w*3);
 }
@@ -98,7 +98,9 @@ void Image::write_ppm(const char *filename) const
     for (uint16_t i=0; i < h; ++i)
     {
         for (uint16_t j=0; j < w; ++j)
-            outfile << (int)round(255 * buffer[i*w+j][0]) << " " << (int)round( 255 * buffer[i*w+j][1]) << " " << (int)round(255 * buffer[i*w+j][2]) << " ";
+            outfile << (int)round(255 * buffer[i*w+j][0]) << " "
+                    << (int)round( 255 * buffer[i*w+j][1]) << " "
+                    << (int)round(255 * buffer[i*w+j][2]) << " ";
         outfile << "\n";
     }
     outfile.close();

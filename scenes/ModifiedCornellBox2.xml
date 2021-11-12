@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scene name="ModifiedCornellBox" >
-	<RenderOptions grid="2" spp="8" index="1.0" maxdepth="5" bgcolor="1" illum="global2" />
+        <RenderOptions grid="2" spp="512" index="1.0" maxdepth="5" bgcolor="1" illum="global2" />
     <CameraOptions position="0,1.7,5" lookingat="0,1.7,0" fov="50" width="640" height="480"></CameraOptions>
     <Sphere name="mirrorBall" position="-2,0.8,-1.5" radius="0.8">
-        <material type="specular" ks="0.9" R0="1"></material>
+        <material type="metal" ks="0.9" R0="1"></material>
     </Sphere>
     <Sphere name="glassBall" position="1.8,1.5,0.2" radius="0.5">
 		<material type="transparent" index="1.5" ns="150" ks="1"></material>

@@ -21,8 +21,8 @@ public:
 
 protected:
     RayTracer(const RenderOptions& renderOptions);
-    Vector3 transparentMaterial(const Ray &ray, const uint8_t depth, const IntersectionData &isec, float E);
-    virtual Vector3 trace(const Ray &ray, const uint8_t depth, float E) = 0;
+    Vector3 transparentMaterial(const Ray &ray, const uint8_t depth, const IntersectionData &isec);
+    virtual Vector3 trace(const Ray &ray, const uint8_t depth) = 0;
 
 protected:
     RenderOptions renderOptions;
@@ -37,5 +37,5 @@ class Minimum: public RayTracer
 public:
     Minimum(const RenderOptions& renderOptions);
 private:
-    Vector3 trace(const Ray &ray, uint8_t depth, float E) override;
+    Vector3 trace(const Ray &ray, uint8_t depth) override;
 };

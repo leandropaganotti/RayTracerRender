@@ -22,8 +22,6 @@ RayTracer::RayTracer(const RenderOptions &renderOptions): renderOptions(renderOp
 std::unique_ptr<RayTracer> RayTracer::Create(const RenderOptions &renderOptions)
 {
     switch (renderOptions.illum) {
-    case Illumination::GlobalIluminationWithDirectSampling:
-        return std::make_unique<PathTracerWithDirectSampling>(renderOptions);
     case Illumination::GlobalIlumination:
         return std::make_unique<PathTracer>(renderOptions);
     case Illumination::Phong:
@@ -59,7 +57,7 @@ std::shared_ptr<Image> RayTracer::render(const Scene& scene)
             for (auto &sample: samples)
             {
                 Ray ray(camera.getRay(i+sample.y, j+sample.x));
-                buffer->at(i, j) += trace(ray, 1, 1.0f);
+                buffer->at(i, j) += trace(ray, 1);
             }
             buffer->at(i, j) /= spp;
             ++count;
@@ -82,7 +80,7 @@ void RayTracer::setCameraOptions(const CameraOptions &options)
     camera.setOptions(options);
 }
 
-Vector3 RayTracer::transparentMaterial(const Ray &ray, const uint8_t depth, const IntersectionData &isec, float E)
+Vector3 RayTracer::transparentMaterial(const Ray &ray, const uint8_t depth, const IntersectionData &isec)
 {
     const Vector3 &phit = isec.phit;
     Vector3 normal = isec.normal;
@@ -123,39 +121,30 @@ Vector3 RayTracer::transparentMaterial(const Ray &ray, const uint8_t depth, cons
         kt = 1.0f - kr;
 
         Ray T(phit - bias * normal, (n * ray.direction + (n * cosi - cost) * normal).normalize());
-        transmited = trace(T, depth + 1, E) * kt;
+        transmited = trace(T, depth + 1) * kt;
     }
 
     // reflection
     if(kr)
     {
         Ray R(phit + bias * normal, reflect(ray.direction, normal).normalize());
-        reflected = trace(R, depth + 1, E) * kr;
+        reflected = trace(R, depth + 1) * kr;
     }
     return transmited + reflected;
 }
 
 Minimum::Minimum(const RenderOptions &renderOptions) : RayTracer(renderOptions) {}
 
-Vector3 Minimum::trace(const Ray &ray, uint8_t depth, float E)
+Vector3 Minimum::trace(const Ray &ray, uint8_t)
 {
-    if(depth > renderOptions.maxDepth) return color::BLACK;
-
     IntersectionData isec;
-    if(!scene->intersection(ray, isec)) return renderOptions.bgColor;
-    isec.phit = ray.origin + isec.tnear * ray.direction;
-    isec.object->getIsecData(isec);
-    isec.wo = ray.direction;
-
-    Vector3 Le = isec.emittance();
-
-    ScatterData srec;
-    isec.bsdf(srec);
-
-    Vector3 Li = trace(srec.scattered[0], depth + 1, E);
-
-    float cosTheta = isec.normal ^ srec.scattered[0].direction;
-
-    return Le + srec.f[0] * Li  * std::fabs(cosTheta) / srec.pdf[0];
+    if(scene->intersection(ray, isec))
+    {
+        //return isec.material->Kd;
+        isec.phit = ray.origin + isec.tnear * ray.direction;
+        isec.object->getIsecData(isec);
+        return isec.albedo;
+    }
+    return renderOptions.bgColor;
 }
 

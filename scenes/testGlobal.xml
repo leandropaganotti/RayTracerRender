@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scene name="test_global_illum">
-	<RenderOptions grid="4" spp="32" index="1.0" maxdepth="5" bgcolor="0" illum="global" />
+    <RenderOptions spp="100" index="1.0" maxdepth="5" bgcolor="0" illum="global" />
     <CameraOptions position="0,0,5" lookingat="0" fov="45" width="250" height="500"></CameraOptions>
-    <sphere name="light" position="0,1,0" radius="1">
-        <material E="1"></material>
-    </sphere>
+    <AreaLight name="light" color="1" intensity="1">
+    <sphere position="0,1,0" radius="1"/>
+    </AreaLight>
     <sphere position="0,-1,0" radius="1"/>
 </scene>

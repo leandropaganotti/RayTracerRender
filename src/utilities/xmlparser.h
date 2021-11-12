@@ -29,13 +29,15 @@ public:
     std::shared_ptr<Light> parsePointLight(xmlNode * xmlPointLightNode);
     std::shared_ptr<Light> parseDistantLight(xmlNode * xmlDistantLightNode);
     std::shared_ptr<Light> parseSphericalLight(xmlNode * xmlsSphericalLightNode);
+    std::shared_ptr<Light> parseAreaLight(xmlNode * xmlsAreaLightNode);
 
+    std::shared_ptr<Object>  parseObject(xmlNode * xmlObjectNode);
     std::shared_ptr<Object>  parsePlane(xmlNode * xmlPlaneNode);
     std::shared_ptr<Object>  parseSphere(xmlNode * xmlSphereNode);
     std::shared_ptr<Object>  parseBox(xmlNode * xmlBoxNode);
     std::shared_ptr<Object>  parseCylinder(xmlNode * xmlCylinderNode);
     std::shared_ptr<Object>  parseMesh(xmlNode * xmlMeshNode);
-
+    std::shared_ptr<Object>  parseDisk(xmlNode * xmlDiskNode);
 
     Matrix4 parseTransformation(xmlNode * xmlTrnasformationNode);
     std::shared_ptr<Material> parseMaterial(xmlNode * xmlMaterialNode);

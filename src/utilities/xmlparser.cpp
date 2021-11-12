@@ -155,6 +155,12 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
             {
                 scene.addLight(parseSphericalLight(node));
             }
+            else if(equals(node->name, "AreaLight"))
+            {
+                auto light = std::dynamic_pointer_cast<AreaLight>(parseAreaLight(node));
+                scene.addLight(light);
+                scene.addObject(light->getObject());
+            }
             else if (equals(node->name, "sphere"))
             {
                 scene.addObject(parseSphere(node));
@@ -174,6 +180,10 @@ void XMLParser::parseScene(xmlNode *xmlSceneNode, Scene & scene)
             else if (equals(node->name, "mesh"))
             {
                 scene.addObject(parseMesh(node));
+            }
+            else if (equals(node->name, "disk"))
+            {
+                scene.addObject(parseDisk(node));
             }
             else
                 LogError(node, nullptr, "unrecognized element");
@@ -275,7 +285,7 @@ std::shared_ptr<Material> XMLParser::parseMaterial(xmlNode *xmlMaterialNode)
         else if (equals(attr->name, "ka"))
             material.Ka = toVector3(attr->children->content);
         else if (equals(attr->name, "E"))
-            material.E = toVector3(attr->children->content);
+            material.emission = toVector3(attr->children->content);
         else if (equals(attr->name, "ks"))
             material.Ks = toFloat(attr->children->content);
         else if (equals(attr->name, "ns"))
@@ -284,6 +294,8 @@ std::shared_ptr<Material> XMLParser::parseMaterial(xmlNode *xmlMaterialNode)
             material.R0 = toFloat(attr->children->content);
         else if (equals(attr->name, "index"))
             material.Ni = toFloat(attr->children->content);
+        else if (equals(attr->name, "fuzz"))
+            material.fuzz = toFloat(attr->children->content);
         else if (equals(attr->name, "type"))
         {
             if (equals(attr->children->content, "DIFFUSE"))
@@ -294,6 +306,8 @@ std::shared_ptr<Material> XMLParser::parseMaterial(xmlNode *xmlMaterialNode)
                 material.type = MaterialType::TRANSPARENT;
             else if (equals(attr->children->content, "MIRROR"))
                 material.type = MaterialType::MIRROR;
+            else if (equals(attr->children->content, "METAL"))
+                material.type = MaterialType::METAL;
             else
                 LogError(xmlMaterialNode, attr, "unrecognized material type");
         }
@@ -328,8 +342,6 @@ std::shared_ptr<Material> XMLParser::parseMaterial(xmlNode *xmlMaterialNode)
        m = Material::Create(material.type);
 
     *m = material; // TODO
-
-
 
     return m;
 }
@@ -437,6 +449,60 @@ std::shared_ptr<Light> XMLParser::parseSphericalLight(xmlNode *xmlsSphericalLigh
         }
     }
     return light;
+}
+
+std::shared_ptr<Light> XMLParser::parseAreaLight(xmlNode *xmlsAreaLightNode)
+{
+    ParamSet params;
+    const xmlAttr *attr = NULL;
+    for (attr = xmlsAreaLightNode->properties; attr; attr = attr->next)
+    {
+        if (equals(attr->name, "name"))
+            params.set<std::string>((const char*)attr->name, (const char*)attr->children->content);
+        else if (equals(attr->name, "color"))
+            params.set<Vector3>((const char*)attr->name, toVector3(attr->children->content) );
+        else if (equals(attr->name, "intensity"))
+            params.set<Vector3>((const char*)attr->name, toVector3(attr->children->content) );
+        else
+            LogError(xmlsAreaLightNode, attr, "unrecognized attribute");
+    }
+
+    std::shared_ptr<SimpleObject> object;
+    xmlNode *node = NULL;
+    for (node = xmlsAreaLightNode->children; node; node = node->next)
+    {
+        if (node->type == XML_ELEMENT_NODE)
+        {
+           object = std::dynamic_pointer_cast<SimpleObject>(parseObject(node));
+        }
+    }
+    auto material = Material::Create(MaterialType::DIFFUSE_LIGHT);
+    material->Kd = params.get<Vector3>("color");
+    material->emission = params.get<Vector3>("intensity");
+    object->setMaterial(material);
+    params.set<std::shared_ptr<SimpleObject>>("object", object);
+    auto light = Light::Create(LightType::AreaLight, params);
+    return light;
+}
+
+std::shared_ptr<Object> XMLParser::parseObject(xmlNode *xmlObjectNode)
+{
+    if (equals(xmlObjectNode->name, "sphere")){
+        return parseSphere(xmlObjectNode);
+    } else if (equals(xmlObjectNode->name, "plane")){
+        return parsePlane(xmlObjectNode);
+    } else if (equals(xmlObjectNode->name, "box")){
+        return parseBox(xmlObjectNode);
+    } else if (equals(xmlObjectNode->name, "cylinder")){
+        return parseCylinder(xmlObjectNode);
+    } else if (equals(xmlObjectNode->name, "mesh")){
+        return parseMesh(xmlObjectNode);
+    } else if (equals(xmlObjectNode->name, "disk")){
+        return parseDisk(xmlObjectNode);
+    } else {
+        LogError(xmlObjectNode, nullptr, "unrecognized element");
+        return nullptr;
+    }
 }
 
 std::shared_ptr<Object> XMLParser::parsePlane(xmlNode *xmlPlaneNode)
@@ -706,6 +772,55 @@ std::shared_ptr<Object> XMLParser::parseMesh(xmlNode *xmlMeshNode)
         }
     }
     return ObjectFactory::CreateMesh(src, material, transform);
+}
+
+std::shared_ptr<Object> XMLParser::parseDisk(xmlNode *xmlDiskNode)
+{
+    std::shared_ptr<Material> material;
+    Matrix4 transform;
+    bool _static=false;
+    Vector3 origin=vector::ZERO, normal=vector::BACK;
+    float radius = 0.0;
+    const xmlAttr *attr = NULL;
+    std::string name("");
+    for (attr = xmlDiskNode->properties; attr; attr = attr->next)
+    {
+        if (equals(attr->name, "name"))
+            name = (const char*)attr->children->content;
+        else if (equals(attr->name, "origin"))
+            origin = toVector3(attr->children->content);
+        else if (equals(attr->name, "normal"))
+            normal = toVector3(attr->children->content);
+        else if (equals(attr->name, "radius"))
+            radius = toFloat(attr->children->content);
+        else if (equals(attr->name, "material"))
+            material = Resource<Material>::Get((const char*)attr->children->content);
+        else if (equals(attr->name, "static"))
+            _static = toBool(attr->children->content);
+        else
+            LogError(xmlDiskNode, attr, "unrecognized attribute");
+    }
+
+    transform = Transform::T(origin) * Transform::RotationDir(normal);
+
+    xmlNode *node = NULL;
+    for (node = xmlDiskNode->children; node; node = node->next)
+    {
+        if (node->type == XML_ELEMENT_NODE)
+        {
+            if (equals(node->name, "material"))
+                material = parseMaterial(node);
+            else if(equals(node->name, "transformation"))
+                transform = parseTransformation(node) * transform;
+            else
+                LogError(node, nullptr, "unrecognized element");
+        }
+    }
+
+    if(_static)
+        return ObjectFactory::CreateDiskStatic(origin, normal, radius, material);
+    else
+        return ObjectFactory::CreateDisk(material, transform);
 }
 
 Matrix4 XMLParser::parseTransformation(xmlNode *xmlTrnasformationNode)

@@ -1,7 +1,8 @@
-libxml/include/libxml2
+/usr/include/libxml2
 .
 src
 src/shapes
 src/aggregates
 src/objects
 src/utilities
+scenes

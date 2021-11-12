@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scene name="CornellBox">
+<!--    <RenderOptions spp="10" index="1.0" maxdepth="5" bgcolor="0" illum="global" />
+    <CameraOptions position="278, 273, -800" lookingat="278,273,0" fov="30" width="500" height="500" />
+
+    <AreaLight name="light" color="1" intensity="17, 12, 4">
+    <disk origin="275, 549.9, 280" normal="0, -1, 0" radius="30" static="true" />
+    </AreaLight>
+
+    <plane name="left" origin="550,0,0" normal="-1,0,0">
+        <material type="diffuse" kd ="0.630000, 0.065000, 0.050000" ></material>
+    </plane>
+   <plane name="right" origin="0,0,0" normal="1,0,0">
+        <material type="diffuse" kd="0.140000, 0.450000, 0.091000" ></material>
+    </plane>
+     <plane name="floor" origin="0,0,0" normal="0,1,0">
+        <material type="diffuse" kd="0.725000, 0.710000, 0.680000" ></material>
+    </plane>
+    <plane name="ceiling" origin="0,550,0" normal="0,-1,0">
+        <material type="diffuse" kd="0.725000, 0.710000, 0.680000" ></material>
+    </plane>
+    <plane name="back" origin="0,0,560" normal="0,0,-1">
+        <material type="diffuse" kd="0.725000, 0.710000, 0.680000" ></material>
+    </plane>-->
+
+
+    <RenderOptions spp="100" index="1.0" maxdepth="5" bgcolor="0" illum="global" />
+    <CameraOptions position="0, 1, 6.8" lookingat="0,1,0" fov="19.5" width="500" height="500" />
+
+    <AreaLight name="light" color="1" intensity="17, 12, 4">
+    <disk origin="0, 1.999, 0" normal="0, -1, 0" radius="0.22" static="true" />
+    </AreaLight>
+
+    <plane name="left" origin="-1,0,0" normal="1,0,0">
+        <material type="diffuse" kd ="0.630000, 0.065000, 0.050000" ></material>
+    </plane>
+   <plane name="right" origin="1,0,0" normal="-1,0,0">
+        <material type="diffuse" kd="0.140000, 0.450000, 0.091000" ></material>
+    </plane>
+     <plane name="floor" origin="0,0,0" normal="0,1,0">
+        <material type="diffuse" kd="0.725000, 0.710000, 0.680000" ></material>
+    </plane>
+    <plane name="ceiling" origin="0,2,0" normal="0,-1,0">
+        <material type="diffuse" kd="0.725000, 0.710000, 0.680000" ></material>
+    </plane>
+    <plane name="back" origin="0,0,-1" normal="0,0,1">
+        <material type="diffuse" kd="0.725000, 0.710000, 0.680000" ></material>
+    </plane>
+</scene>

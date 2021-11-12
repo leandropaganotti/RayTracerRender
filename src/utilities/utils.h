@@ -108,9 +108,17 @@ float modulo(const float x)
 }
 
 inline
-float clamp(float x)
+float clamp(float x, float min=0.0f, float max=1.0f)
 {
-    return x < 0.0f ? 0.0f : x > 1.0 ? 1.0f : x;
+    return x < min ? min : x > max ? max : x;
+}
+
+inline
+void clamp(Vector3 &v)
+{
+     v.x = clamp(v.x);
+     v.y = clamp(v.y);
+     v.z = clamp(v.z);
 }
 
 inline
@@ -166,28 +174,33 @@ bool solveQuadratic(const float a, const float b, const float c, float &x0, floa
     return true;
 }
 
+// unit sphere
 inline
-Vector3 uniformSampleHemisphere(const float &r1, const float &r2)
-{
-    // cos(theta) = r1 = y
-    // cos^2(theta) + sin^2(theta) = 1^2 -> sin(theta) = srtf(1 - cos^2(theta))
-    float sinTheta = sqrtf(1 - r1 * r1);
-    float phi = 2 * M_PI * r2;    
-    return Vector3(sinTheta * cosf(phi), sinTheta * sinf(phi), r1);
+Vector3 uniformSampleSphere(const Vector2 &u, float &_1_pdf) {
+    float z = 1 - 2 * u[0];
+    float r = std::sqrt(std::max(0.0f, 1.0f - z * z));
+    float phi = 2 * M_PI * u[1];
+    _1_pdf = 4.0f*M_PI;
+    return Vector3(r * std::cos(phi), r * std::sin(phi), z);
+}
+
+// unit hemisphere
+inline
+Vector3 uniformSampleHemisphere(const Vector2 &u, float &_1_pdf) {
+    float r = std::sqrt(std::max(0.0f, 1.0f - u[0] * u[0]));
+    float phi = 2.0f * M_PI * u[1];
+    _1_pdf = 1.0f / (2.0f * M_PI);
+    return Vector3(r * std::cos(phi), u[0], r * std::sin(phi));
 }
 
 inline
-Vector3 randomUnitVectorInHemisphereOf(const Vector3& normalAtpoint)
+Vector3 uniformSampleHemisphere(const Vector3& normal, float &_1_pdf)
 {
-    Vector3 u,v, w=normalAtpoint, n(1,0,0),m(0,1,0);
+    Vector3 u,v, w=normal, n(1,0,0),m(0,1,0);
     u = w%n; if(u.length()<0.01f)u = w%m;
     v=w%u;
-
-    float r1 = dis(gen); // this is cosi
-    float r2 = dis(gen);
-
-    Vector3 sample = uniformSampleHemisphere(r1, r2);
-    return sample.x*u + sample.y*v + sample.z*w;
+    Vector3 sample = uniformSampleHemisphere(Vector2(dis(gen), dis(gen)), _1_pdf);
+    return sample.x*u + sample.y*w + sample.z*v;
 }
 
 inline
@@ -199,6 +212,28 @@ void createCoordinateSystem(const Vector3 &N, Vector3 &Nt, Vector3 &Nb)
         Nt = Vector3(0, -N.z, N.y) / sqrtf(N.y * N.y + N.z * N.z);
     Nb = N.cross(Nt);
 }
+
+// sample direction
+inline
+Vector3 sampleSolidAngleSphere(const Vector3 &center, float radius, const Vector3 &from, float &_1_pdf)
+{
+    float r1 = dis(gen);
+    float r2 = dis(gen);
+
+    Vector3 u,v, w=(center - from).normalize(), n(1,0,0),m(0,1,0);
+    u = w%n; if(u.length()<0.01f)u = w%m;
+    v=w%u;
+
+    float dist2 = (center - from).length2(); // distance from point hit to center of light power 2
+    float cos_a_max = std::sqrt(std::max(0.0f, 1.0f - (radius*radius)/dist2));
+    float cos_a = (1.0f - r1) + r1 * cos_a_max;
+    float sin_a = std::sqrt(std::max(0.0f, 1.0f - cos_a*cos_a));
+    float phi = 2.0f * M_PI * r2;
+    _1_pdf = (2.0f*M_PI*(1.0f-cos_a_max));//1/(2*M_PI*(1-cos_a_max));
+    //_1_pdf = 1.0f/(2.0f*M_PI*(1.0f-cos_a_max));
+    return u*(cos(phi)*sin_a) + v*(sin(phi)*sin_a) + w*(cos_a);
+}
+
 
 /*inline
 std::string timestamp2string(std::time_t timestamp, const char* format="%FT%T")

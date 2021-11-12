@@ -57,6 +57,24 @@ public:
         }
     }
 
+    const std::shared_ptr<Material> getMaterial() const
+    {
+        return material;
+    }
+    void setMaterial(const std::shared_ptr<Material> &newMaterial)
+    {
+        material = newMaterial ? newMaterial : material::DiffuseWhite;
+    }
+
+    const std::shared_ptr<Shape> getShape() const
+    {
+        return shape;
+    }
+    void setShape(const std::shared_ptr<Shape> &newShape)
+    {
+        shape = newShape ? newShape : primitives::Invisible;
+    }
+
 protected:
     std::shared_ptr<Shape> shape;
     std::shared_ptr<Material> material;
@@ -98,3 +116,11 @@ protected:
     Matrix4 worldToObject;
     Matrix4 objectToWorldNormal;
 };
+
+
+
+
+
+
+
+

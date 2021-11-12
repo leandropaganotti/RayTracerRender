@@ -15,13 +15,12 @@ public:
     void getNormal(IntersectionData& isec) const override;
     void getUV(IntersectionData &isec) const override;
     AABB getAABB() const override;
+    void getSample(const Vector3 &from, Vector3 &dir, float &t, float &_1_pdf) const override;;
 
     Vector3  getCenter() const;
     void     setCenter(const Vector3 &value);
     float    getRadius() const;
     void     setRadius(float value);    
-
-    void sampleSolidAngleSphere(const Vector3& point, Vector3& sample,  float &_1_pdf) const;
 
 protected:
     Vector3 center;                 // position of the sphere

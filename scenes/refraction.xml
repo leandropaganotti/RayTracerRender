@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scene name="refraction" >
-	<RenderOptions grid="4" spp="4" index="1.0" maxdepth="5" bgcolor="0" illum="phong" />
+        <RenderOptions grid="4" spp="8" index="1.0" maxdepth="5" bgcolor="0" illum="phong" />
     <CameraOptions position="0,3.5,7.5" lookingat="0, 0.5, 0" fov="45" width="640" height="480"></CameraOptions>
 	<PointLight position="0,5.5,0" color="1" intensity="1.5" atten="0.001"></PointLight>
     <Sphere name="glass" position="0, 1.2, 0" radius="0.8" material="Glass" />

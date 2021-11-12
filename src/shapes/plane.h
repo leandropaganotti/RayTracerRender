@@ -7,14 +7,14 @@ class Plane: public Primitive
 {
 public:
     Plane(const Vector3& origin=vector::ZERO, const Vector3& normal=vector::BACK);
-    ~Plane() = default;
+    virtual ~Plane() = default;
 
-    bool intersection(const Ray& ray, IntersectionData& isec) const override;
-    bool intersection(const Ray& ray) const override;
-    void getNormalAndUV(IntersectionData &isec) const override;
-    void getNormal(IntersectionData& isec) const override;
-    void getUV(IntersectionData& isec) const override;
-    AABB getAABB() const override;
+    virtual bool intersection(const Ray& ray, IntersectionData& isec) const override;
+    virtual bool intersection(const Ray& ray) const override;
+    virtual void getNormalAndUV(IntersectionData &isec) const override;
+    virtual void getNormal(IntersectionData& isec) const override;
+    virtual void getUV(IntersectionData& isec) const override;
+    virtual AABB getAABB() const override;
 
     Vector3 getOrigin() const;
     void    setOrigin(const Vector3 &value);

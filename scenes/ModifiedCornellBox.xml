@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scene name="ModifiedCornellBox">
-	<RenderOptions grid="8" spp="8" index="1.0" maxdepth="5" bgcolor="0" illum="global" />
+<RenderOptions grid="8" spp="512" index="1.0" maxdepth="5" bgcolor="0" illum="global" />
     <CameraOptions position="0,1.7,5" lookingat="0,1.7,0" fov="50" width="640" height="480"></CameraOptions>
     <Sphere name="mirrorBall" position="-2,0.8,-1.5" radius="0.8">
-        <material type="specular" kd="1" R0="0.95"></material>
+        <material type="metal" kd="1" R0="0.95"></material>
     </Sphere>
     <Sphere name="glassBall" position="1.8,1.5,0.2" radius="0.5">
 		<material type="transparent" index="1.5" ns="150"></material>
@@ -19,7 +19,7 @@
     </plane>
 	<plane name="floor" origin="0,0,0" normal="0,1,0">
         <material type="diffuse" kd="0.70" >
-            <texture type="Tiles" name="tiles" rows="10" cols="10" color1="1" color2="0.1, 0.1, 0" angle="0"></texture>
+            <texture type="Tiles" name="tiles" rows="10" cols="10" color1="1" color2="0.1, 0.1, 0" uedge="0.2" vedge="0.2" angle="0"></texture>
         </material>
     </plane>
 	<plane name="back" origin="0,0,-3" normal="0,0,1">
@@ -34,10 +34,10 @@
     </Box>
 
     <Sphere name="yellow" position="-1.0,0.3,0" radius="0.3">
-        <material type="diffuse" kd="1,1,0"></material>
+        <material type="diffuse" kd="1,1,0" R0="0.1"></material>
     </Sphere>
     <Sphere name="blue" position="1.1,0.4,-2.0" radius="0.4">
-        <material type="diffuse" kd="0,0,1"></material>
+        <material type="diffuse" kd="0,0,1" fuzz="0.5"></material>
     </Sphere>
     <Box>
         <transformation translate="0,3.5,0" rotate="0" scale="5, 0.1, 1.5"></transformation>

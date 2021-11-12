@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scene name="pbrt">
+<RenderOptions grid="4" spp="9" index="1.0" maxdepth="5" bgcolor="0" illum="global" />
+<CameraOptions position="20, 10, 400" lookingat="63, -110, 0" fov="40" width="700" height="700"></CameraOptions>
+
+<Sphere name="red" position="0, -110, 100" radius="30">
+<material name="red" type="diffuse" kd="0.4,0.5,0.4" ks="0" ns="30"></material>
+</Sphere>
+
+<Plane name="floor" origin="0, -140, 0" normal="0,1,0">
+<material type="diffuse" kd="0.5,0.5,0.8"/>
+</Plane>
+
+<Plane name="floor" origin="0, 31, 0" normal="0,-1,0">
+<material type="diffuse" kd="0.5,0.5,0.8"/>
+</Plane>
+
+<AreaLight name="light" color="1" intensity="2000,2000, 2000">
+<Sphere position="120, 20, 150" radius="3" static="true" />
+</AreaLight>
+
+</scene>
